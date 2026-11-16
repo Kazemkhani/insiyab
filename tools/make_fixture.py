@@ -104,7 +104,7 @@ def build():
         return out
     f_route = {"fixture": True, "target": "boardings", "level": "route", "bin_seconds": BIN,
                "series": [{"id": rid, "rows": rows_for(s)} for rid, s in actual_route.items()]}
-    busiest = sorted({(rid, sid) for (rid, sid, _) in board}, key=lambda k: -sum(v for (r2, s2, _), v in board.items() if (r2, s2) == k))
+    busiest = sorted({(rid, sid) for (rid, sid, _) in board}, key=lambda k: (-sum(v for (r2, s2, _), v in board.items() if (r2, s2) == k), k))   # the pair breaks ties: a set has no order of its own
     f_stop = {"fixture": True, "target": "boardings", "level": "stop", "bin_seconds": BIN,
               "series": [{"id": sid, "route_id": rid, "rows": rows_for({b: board.get((rid, sid, b), 0) for b in bins})} for rid, sid in busiest]}
 

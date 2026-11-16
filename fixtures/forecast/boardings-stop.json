@@ -49066,25 +49066,25 @@
    ]
   },
   {
-   "id": "R4-S04",
+   "id": "R4-S01",
    "route_id": "R4",
    "rows": [
     {
-     "actual": 1,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 21600,
-     "forecast": 1.18,
-     "hi": 3.48,
+     "forecast": 2.28,
+     "hi": 4.85,
      "horizon": 900,
      "lo": 0.0,
      "origin": 21600
     },
     {
-     "actual": 1,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 22500,
-     "forecast": 0.41,
-     "hi": 2.51,
+     "forecast": 1.33,
+     "hi": 3.67,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 21600
@@ -49100,28 +49100,28 @@
      "origin": 21600
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 27900,
-     "forecast": 1.26,
-     "hi": 3.58,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 21600
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 23400,
-     "forecast": 1.44,
-     "hi": 3.8,
+     "forecast": 0.55,
+     "hi": 2.69,
      "horizon": 900,
      "lo": 0.0,
      "origin": 23400
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 2.0,
      "bin_start": 24300,
      "forecast": 0.08,
      "hi": 2.1,
@@ -49130,18 +49130,18 @@
      "origin": 23400
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 3,
+     "baseline": 2.0,
      "bin_start": 26100,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 2.26,
+     "hi": 4.83,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 23400
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 2.0,
      "bin_start": 29700,
      "forecast": 1.25,
      "hi": 3.56,
@@ -49150,27 +49150,27 @@
      "origin": 23400
     },
     {
-     "actual": 2,
-     "baseline": 0.0,
-     "bin_start": 25200,
-     "forecast": 3.17,
-     "hi": 5.96,
-     "horizon": 900,
-     "lo": 0.37,
-     "origin": 25200
-    },
-    {
      "actual": 1,
      "baseline": 0.0,
-     "bin_start": 26100,
-     "forecast": 1.7,
-     "hi": 4.13,
-     "horizon": 1800,
+     "bin_start": 25200,
+     "forecast": 2.1,
+     "hi": 4.63,
+     "horizon": 900,
      "lo": 0.0,
      "origin": 25200
     },
     {
-     "actual": 1,
+     "actual": 3,
+     "baseline": 0.0,
+     "bin_start": 26100,
+     "forecast": 3.55,
+     "hi": 6.44,
+     "horizon": 1800,
+     "lo": 0.66,
+     "origin": 25200
+    },
+    {
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 27900,
      "forecast": 0.0,
@@ -49190,28 +49190,28 @@
      "origin": 25200
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 3.0,
      "bin_start": 27000,
-     "forecast": 2.54,
-     "hi": 5.18,
+     "forecast": 1.49,
+     "hi": 3.86,
      "horizon": 900,
      "lo": 0.0,
      "origin": 27000
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 3.0,
      "bin_start": 27900,
-     "forecast": 1.61,
-     "hi": 4.02,
+     "forecast": 0.6,
+     "hi": 2.76,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 27000
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 3.0,
      "bin_start": 29700,
      "forecast": 2.19,
      "hi": 4.74,
@@ -49221,7 +49221,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 3.0,
      "bin_start": 33300,
      "forecast": 0.0,
      "hi": 2.0,
@@ -49230,8 +49230,8 @@
      "origin": 27000
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 28800,
      "forecast": 0.0,
      "hi": 2.0,
@@ -49241,7 +49241,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 29700,
      "forecast": 0.0,
      "hi": 2.0,
@@ -49251,7 +49251,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 31500,
      "forecast": 1.38,
      "hi": 3.72,
@@ -49261,7 +49261,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 35100,
      "forecast": 0.38,
      "hi": 2.47,
@@ -49270,11 +49270,11 @@
      "origin": 28800
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 30600,
-     "forecast": 1.11,
-     "hi": 3.39,
+     "forecast": 1.84,
+     "hi": 4.29,
      "horizon": 900,
      "lo": 0.0,
      "origin": 30600
@@ -49310,11 +49310,11 @@
      "origin": 30600
     },
     {
-     "actual": 0,
+     "actual": 3,
      "baseline": 0.0,
      "bin_start": 32400,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 1.44,
+     "hi": 3.8,
      "horizon": 900,
      "lo": 0.0,
      "origin": 32400
@@ -49350,11 +49350,11 @@
      "origin": 32400
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 34200,
-     "forecast": 0.62,
-     "hi": 2.77,
+     "forecast": 1.71,
+     "hi": 4.13,
      "horizon": 900,
      "lo": 0.0,
      "origin": 34200
@@ -49390,11 +49390,11 @@
      "origin": 34200
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 36000,
-     "forecast": 1.41,
-     "hi": 3.77,
+     "forecast": 2.2,
+     "hi": 4.75,
      "horizon": 900,
      "lo": 0.0,
      "origin": 36000
@@ -49580,7 +49580,7 @@
      "origin": 43200
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 49500,
      "forecast": 0.0,
@@ -49590,11 +49590,11 @@
      "origin": 43200
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 45000,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.95,
+     "hi": 3.19,
      "horizon": 900,
      "lo": 0.0,
      "origin": 45000
@@ -49650,21 +49650,21 @@
      "origin": 46800
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 1.0,
      "bin_start": 49500,
-     "forecast": 0.39,
-     "hi": 2.48,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 46800
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 1.0,
      "bin_start": 53100,
-     "forecast": 2.66,
-     "hi": 5.32,
+     "forecast": 1.52,
+     "hi": 3.9,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 46800
@@ -49680,11 +49680,11 @@
      "origin": 48600
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 49500,
-     "forecast": 1.9,
-     "hi": 4.37,
+     "forecast": 0.84,
+     "hi": 3.04,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 48600
@@ -49710,18 +49710,18 @@
      "origin": 48600
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 50400,
-     "forecast": 3.07,
-     "hi": 5.84,
+     "forecast": 1.99,
+     "hi": 4.49,
      "horizon": 900,
-     "lo": 0.3,
+     "lo": 0.0,
      "origin": 50400
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 51300,
      "forecast": 0.92,
      "hi": 3.15,
@@ -49730,41 +49730,41 @@
      "origin": 50400
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 53100,
-     "forecast": 1.23,
-     "hi": 3.53,
+     "forecast": 0.26,
+     "hi": 2.32,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 50400
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 56700,
-     "forecast": 0.6,
-     "hi": 2.75,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 50400
     },
     {
-     "actual": 2,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 52200,
-     "forecast": 1.49,
-     "hi": 3.87,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 900,
      "lo": 0.0,
      "origin": 52200
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 53100,
-     "forecast": 1.02,
-     "hi": 3.28,
+     "forecast": 0.32,
+     "hi": 2.4,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 52200
@@ -49780,28 +49780,28 @@
      "origin": 52200
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 58500,
-     "forecast": 2.69,
-     "hi": 5.36,
+     "forecast": 1.91,
+     "hi": 4.39,
      "horizon": 7200,
-     "lo": 0.02,
+     "lo": 0.0,
      "origin": 52200
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 54000,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.64,
+     "hi": 2.8,
      "horizon": 900,
      "lo": 0.0,
      "origin": 54000
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 54900,
      "forecast": 0.28,
      "hi": 2.35,
@@ -49810,37 +49810,37 @@
      "origin": 54000
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 56700,
-     "forecast": 2.05,
-     "hi": 4.56,
+     "forecast": 0.74,
+     "hi": 2.93,
      "horizon": 3600,
-     "lo": 0.0,
-     "origin": 54000
-    },
-    {
-     "actual": 1,
-     "baseline": 1.0,
-     "bin_start": 60300,
-     "forecast": 0.95,
-     "hi": 3.19,
-     "horizon": 7200,
      "lo": 0.0,
      "origin": 54000
     },
     {
      "actual": 2,
      "baseline": 0.0,
+     "bin_start": 60300,
+     "forecast": 2.33,
+     "hi": 4.91,
+     "horizon": 7200,
+     "lo": 0.0,
+     "origin": 54000
+    },
+    {
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 55800,
-     "forecast": 1.83,
-     "hi": 4.28,
+     "forecast": 0.64,
+     "hi": 2.79,
      "horizon": 900,
      "lo": 0.0,
      "origin": 55800
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 56700,
      "forecast": 0.0,
@@ -49850,38 +49850,38 @@
      "origin": 55800
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 58500,
-     "forecast": 1.54,
-     "hi": 3.92,
+     "forecast": 0.52,
+     "hi": 2.65,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 55800
     },
     {
-     "actual": 0,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 62100,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.32,
+     "hi": 2.4,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 55800
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 57600,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.3,
+     "hi": 2.38,
      "horizon": 900,
      "lo": 0.0,
      "origin": 57600
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 58500,
      "forecast": 0.0,
      "hi": 2.0,
@@ -49890,28 +49890,28 @@
      "origin": 57600
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 2,
+     "baseline": 0.0,
      "bin_start": 60300,
-     "forecast": 0.55,
-     "hi": 2.69,
+     "forecast": 1.7,
+     "hi": 4.12,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 57600
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 63900,
-     "forecast": 0.42,
-     "hi": 2.53,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 57600
     },
     {
      "actual": 1,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 59400,
      "forecast": 0.14,
      "hi": 2.18,
@@ -49920,8 +49920,8 @@
      "origin": 59400
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 2,
+     "baseline": 0.0,
      "bin_start": 60300,
      "forecast": 0.0,
      "hi": 2.0,
@@ -49930,58 +49930,58 @@
      "origin": 59400
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 2,
+     "baseline": 0.0,
      "bin_start": 62100,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 1.26,
+     "hi": 3.58,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 59400
     },
     {
-     "actual": 2,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 65700,
-     "forecast": 1.65,
-     "hi": 4.06,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 59400
     },
     {
-     "actual": 2,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 61200,
-     "forecast": 3.3,
-     "hi": 6.13,
+     "forecast": 0.82,
+     "hi": 3.02,
      "horizon": 900,
-     "lo": 0.48,
+     "lo": 0.0,
      "origin": 61200
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 2,
+     "baseline": 2.0,
      "bin_start": 62100,
-     "forecast": 0.22,
-     "hi": 2.27,
+     "forecast": 1.97,
+     "hi": 4.46,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 61200
     },
     {
-     "actual": 1,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 63900,
-     "forecast": 1.44,
-     "hi": 3.79,
+     "forecast": 0.57,
+     "hi": 2.71,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 61200
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 2.0,
      "bin_start": 67500,
      "forecast": 0.0,
      "hi": 2.0,
@@ -49990,38 +49990,38 @@
      "origin": 61200
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 63000,
-     "forecast": 1.38,
-     "hi": 3.72,
+     "forecast": 0.25,
+     "hi": 2.31,
      "horizon": 900,
      "lo": 0.0,
      "origin": 63000
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 63900,
-     "forecast": 0.1,
-     "hi": 2.12,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 63000
     },
     {
-     "actual": 2,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 65700,
-     "forecast": 1.09,
-     "hi": 3.36,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 63000
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 2.0,
      "bin_start": 69300,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50031,7 +50031,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 64800,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50040,18 +50040,18 @@
      "origin": 64800
     },
     {
-     "actual": 2,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 65700,
-     "forecast": 2.65,
-     "hi": 5.32,
+     "forecast": 1.29,
+     "hi": 3.62,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 64800
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 67500,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50061,7 +50061,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 71100,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50070,18 +50070,18 @@
      "origin": 64800
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 2,
+     "baseline": 0.0,
      "bin_start": 66600,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 1.22,
+     "hi": 3.53,
      "horizon": 900,
      "lo": 0.0,
      "origin": 66600
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 0.0,
      "bin_start": 67500,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50091,7 +50091,7 @@
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 0.0,
      "bin_start": 69300,
      "forecast": 0.88,
      "hi": 3.09,
@@ -50100,13 +50100,13 @@
      "origin": 66600
     },
     {
-     "actual": 2,
-     "baseline": 2.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 72900,
-     "forecast": 3.65,
-     "hi": 6.56,
+     "forecast": 0.59,
+     "hi": 2.74,
      "horizon": 7200,
-     "lo": 0.74,
+     "lo": 0.0,
      "origin": 66600
     },
     {
@@ -50140,21 +50140,21 @@
      "origin": 68400
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 74700,
-     "forecast": 1.39,
-     "hi": 3.74,
+     "forecast": 0.45,
+     "hi": 2.57,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 68400
     },
     {
-     "actual": 2,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 70200,
-     "forecast": 1.45,
-     "hi": 3.81,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 900,
      "lo": 0.0,
      "origin": 70200
@@ -50170,37 +50170,37 @@
      "origin": 70200
     },
     {
-     "actual": 2,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 72900,
-     "forecast": 1.62,
-     "hi": 4.02,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 70200
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 76500,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.35,
+     "hi": 2.43,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 70200
     },
     {
-     "actual": 0,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 72000,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 1.6,
+     "hi": 4.0,
      "horizon": 900,
      "lo": 0.0,
      "origin": 72000
     },
     {
-     "actual": 2,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 72900,
      "forecast": 0.0,
@@ -50210,7 +50210,7 @@
      "origin": 72000
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 74700,
      "forecast": 0.0,
@@ -50231,7 +50231,7 @@
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 0.0,
      "bin_start": 73800,
      "forecast": 0.18,
      "hi": 2.22,
@@ -50240,28 +50240,28 @@
      "origin": 73800
     },
     {
-     "actual": 1,
-     "baseline": 2.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 74700,
-     "forecast": 2.16,
-     "hi": 4.7,
+     "forecast": 1.33,
+     "hi": 3.67,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 73800
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 76500,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.85,
+     "hi": 3.07,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 73800
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 0.0,
      "bin_start": 80100,
      "forecast": 0.76,
      "hi": 2.94,
@@ -50270,28 +50270,28 @@
      "origin": 73800
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 75600,
-     "forecast": 0.04,
-     "hi": 2.05,
+     "forecast": 0.97,
+     "hi": 3.21,
      "horizon": 900,
      "lo": 0.0,
      "origin": 75600
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 76500,
-     "forecast": 1.46,
-     "hi": 3.82,
+     "forecast": 2.62,
+     "hi": 5.28,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 75600
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 78300,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50300,18 +50300,18 @@
      "origin": 75600
     },
     {
-     "actual": 2,
-     "baseline": 1.0,
+     "actual": 0,
+     "baseline": 0.0,
      "bin_start": 81900,
-     "forecast": 1.81,
-     "hi": 4.26,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 75600
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 1.0,
      "bin_start": 77400,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50321,7 +50321,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 78300,
      "forecast": 0.59,
      "hi": 2.73,
@@ -50331,7 +50331,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 80100,
      "forecast": 0.72,
      "hi": 2.9,
@@ -50341,7 +50341,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 83700,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50370,11 +50370,11 @@
      "origin": 79200
     },
     {
-     "actual": 2,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 81900,
-     "forecast": 2.12,
-     "hi": 4.64,
+     "forecast": 0.15,
+     "hi": 2.18,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 79200
@@ -50392,27 +50392,27 @@
    ]
   },
   {
-   "id": "R4-S01",
+   "id": "R4-S04",
    "route_id": "R4",
    "rows": [
     {
-     "actual": 2,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 21600,
-     "forecast": 2.69,
-     "hi": 5.36,
+     "forecast": 1.55,
+     "hi": 3.94,
      "horizon": 900,
-     "lo": 0.02,
+     "lo": 0.0,
      "origin": 21600
     },
     {
-     "actual": 2,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 22500,
-     "forecast": 2.81,
-     "hi": 5.51,
+     "forecast": 1.64,
+     "hi": 4.05,
      "horizon": 1800,
-     "lo": 0.11,
+     "lo": 0.0,
      "origin": 21600
     },
     {
@@ -50426,28 +50426,28 @@
      "origin": 21600
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 27900,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.46,
+     "hi": 2.58,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 21600
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 23400,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.42,
+     "hi": 2.53,
      "horizon": 900,
      "lo": 0.0,
      "origin": 23400
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 1.0,
      "bin_start": 24300,
      "forecast": 2.0,
      "hi": 4.5,
@@ -50456,18 +50456,18 @@
      "origin": 23400
     },
     {
-     "actual": 3,
-     "baseline": 2.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 26100,
-     "forecast": 2.78,
-     "hi": 5.48,
+     "forecast": 0.23,
+     "hi": 2.29,
      "horizon": 3600,
-     "lo": 0.09,
+     "lo": 0.0,
      "origin": 23400
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 1.0,
      "bin_start": 29700,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50476,31 +50476,31 @@
      "origin": 23400
     },
     {
-     "actual": 1,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 25200,
-     "forecast": 0.49,
-     "hi": 2.61,
+     "forecast": 1.33,
+     "hi": 3.67,
      "horizon": 900,
      "lo": 0.0,
      "origin": 25200
     },
     {
-     "actual": 3,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 26100,
-     "forecast": 3.38,
-     "hi": 6.22,
+     "forecast": 0.79,
+     "hi": 2.99,
      "horizon": 1800,
-     "lo": 0.53,
+     "lo": 0.0,
      "origin": 25200
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 27900,
-     "forecast": 0.86,
-     "hi": 3.08,
+     "forecast": 1.91,
+     "hi": 4.39,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 25200
@@ -50516,28 +50516,28 @@
      "origin": 25200
     },
     {
-     "actual": 0,
-     "baseline": 3.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 27000,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.83,
+     "hi": 3.04,
      "horizon": 900,
      "lo": 0.0,
      "origin": 27000
     },
     {
-     "actual": 0,
-     "baseline": 3.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 27900,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.72,
+     "hi": 2.89,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 27000
     },
     {
      "actual": 0,
-     "baseline": 3.0,
+     "baseline": 1.0,
      "bin_start": 29700,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50547,7 +50547,7 @@
     },
     {
      "actual": 0,
-     "baseline": 3.0,
+     "baseline": 1.0,
      "bin_start": 33300,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50556,18 +50556,18 @@
      "origin": 27000
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 1.0,
      "bin_start": 28800,
-     "forecast": 1.42,
-     "hi": 3.77,
+     "forecast": 0.54,
+     "hi": 2.67,
      "horizon": 900,
      "lo": 0.0,
      "origin": 28800
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 29700,
      "forecast": 0.73,
      "hi": 2.92,
@@ -50577,7 +50577,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 31500,
      "forecast": 0.0,
      "hi": 2.0,
@@ -50587,7 +50587,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 35100,
      "forecast": 0.88,
      "hi": 3.1,
@@ -50596,11 +50596,11 @@
      "origin": 28800
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 30600,
-     "forecast": 1.45,
-     "hi": 3.81,
+     "forecast": 0.6,
+     "hi": 2.75,
      "horizon": 900,
      "lo": 0.0,
      "origin": 30600
@@ -50636,11 +50636,11 @@
      "origin": 30600
     },
     {
-     "actual": 3,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 32400,
-     "forecast": 2.18,
-     "hi": 4.72,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 900,
      "lo": 0.0,
      "origin": 32400
@@ -50676,11 +50676,11 @@
      "origin": 32400
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 34200,
-     "forecast": 0.63,
-     "hi": 2.79,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 900,
      "lo": 0.0,
      "origin": 34200
@@ -50716,11 +50716,11 @@
      "origin": 34200
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 36000,
-     "forecast": 1.53,
-     "hi": 3.91,
+     "forecast": 0.26,
+     "hi": 2.33,
      "horizon": 900,
      "lo": 0.0,
      "origin": 36000
@@ -50906,21 +50906,21 @@
      "origin": 43200
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 49500,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.56,
+     "hi": 2.7,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 43200
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 45000,
-     "forecast": 1.9,
-     "hi": 4.37,
+     "forecast": 0.94,
+     "hi": 3.18,
      "horizon": 900,
      "lo": 0.0,
      "origin": 45000
@@ -50976,17 +50976,17 @@
      "origin": 46800
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 1.0,
      "bin_start": 49500,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.81,
+     "hi": 3.02,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 46800
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 1.0,
      "bin_start": 53100,
      "forecast": 0.0,
@@ -51006,11 +51006,11 @@
      "origin": 48600
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 49500,
-     "forecast": 1.81,
-     "hi": 4.26,
+     "forecast": 2.54,
+     "hi": 5.18,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 48600
@@ -51036,18 +51036,18 @@
      "origin": 48600
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 50400,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.39,
+     "hi": 2.48,
      "horizon": 900,
      "lo": 0.0,
      "origin": 50400
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 51300,
      "forecast": 0.98,
      "hi": 3.22,
@@ -51056,43 +51056,43 @@
      "origin": 50400
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 53100,
-     "forecast": 0.2,
-     "hi": 2.25,
+     "forecast": 1.02,
+     "hi": 3.27,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 50400
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 56700,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.3,
+     "hi": 2.38,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 50400
     },
     {
-     "actual": 0,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 52200,
-     "forecast": 0.77,
-     "hi": 2.96,
+     "forecast": 2.61,
+     "hi": 5.27,
      "horizon": 900,
      "lo": 0.0,
      "origin": 52200
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 53100,
-     "forecast": 2.41,
-     "hi": 5.02,
+     "forecast": 3.25,
+     "hi": 6.06,
      "horizon": 1800,
-     "lo": 0.0,
+     "lo": 0.44,
      "origin": 52200
     },
     {
@@ -51106,18 +51106,18 @@
      "origin": 52200
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 58500,
-     "forecast": 0.76,
-     "hi": 2.95,
+     "forecast": 1.54,
+     "hi": 3.92,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 52200
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 1.0,
      "bin_start": 54000,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51127,7 +51127,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 54900,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51136,27 +51136,27 @@
      "origin": 54000
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 56700,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.64,
+     "hi": 2.8,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 54000
     },
     {
-     "actual": 2,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 60300,
-     "forecast": 3.18,
-     "hi": 5.98,
+     "forecast": 1.92,
+     "hi": 4.4,
      "horizon": 7200,
-     "lo": 0.39,
+     "lo": 0.0,
      "origin": 54000
     },
     {
-     "actual": 1,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 55800,
      "forecast": 0.0,
@@ -51166,78 +51166,78 @@
      "origin": 55800
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 56700,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.17,
+     "hi": 2.21,
      "horizon": 1800,
-     "lo": 0.0,
-     "origin": 55800
-    },
-    {
-     "actual": 0,
-     "baseline": 0.0,
-     "bin_start": 58500,
-     "forecast": 0.16,
-     "hi": 2.2,
-     "horizon": 3600,
-     "lo": 0.0,
-     "origin": 55800
-    },
-    {
-     "actual": 2,
-     "baseline": 0.0,
-     "bin_start": 62100,
-     "forecast": 0.22,
-     "hi": 2.28,
-     "horizon": 7200,
      "lo": 0.0,
      "origin": 55800
     },
     {
      "actual": 1,
      "baseline": 0.0,
+     "bin_start": 58500,
+     "forecast": 0.93,
+     "hi": 3.17,
+     "horizon": 3600,
+     "lo": 0.0,
+     "origin": 55800
+    },
+    {
+     "actual": 0,
+     "baseline": 0.0,
+     "bin_start": 62100,
+     "forecast": 0.0,
+     "hi": 2.0,
+     "horizon": 7200,
+     "lo": 0.0,
+     "origin": 55800
+    },
+    {
+     "actual": 0,
+     "baseline": 1.0,
      "bin_start": 57600,
-     "forecast": 0.8,
-     "hi": 3.0,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 900,
      "lo": 0.0,
      "origin": 57600
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 58500,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.22,
+     "hi": 2.27,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 57600
     },
     {
-     "actual": 2,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 60300,
-     "forecast": 1.38,
-     "hi": 3.72,
+     "forecast": 0.08,
+     "hi": 2.1,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 57600
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 63900,
-     "forecast": 0.02,
-     "hi": 2.03,
+     "forecast": 0.9,
+     "hi": 3.12,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 57600
     },
     {
      "actual": 1,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 59400,
      "forecast": 0.16,
      "hi": 2.2,
@@ -51246,68 +51246,68 @@
      "origin": 59400
     },
     {
-     "actual": 2,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 60300,
-     "forecast": 2.8,
-     "hi": 5.5,
+     "forecast": 1.6,
+     "hi": 4.0,
      "horizon": 1800,
-     "lo": 0.1,
-     "origin": 59400
-    },
-    {
-     "actual": 2,
-     "baseline": 0.0,
-     "bin_start": 62100,
-     "forecast": 0.36,
-     "hi": 2.45,
-     "horizon": 3600,
      "lo": 0.0,
      "origin": 59400
     },
     {
      "actual": 0,
-     "baseline": 0.0,
-     "bin_start": 65700,
+     "baseline": 1.0,
+     "bin_start": 62100,
      "forecast": 0.0,
      "hi": 2.0,
+     "horizon": 3600,
+     "lo": 0.0,
+     "origin": 59400
+    },
+    {
+     "actual": 2,
+     "baseline": 1.0,
+     "bin_start": 65700,
+     "forecast": 2.07,
+     "hi": 4.58,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 59400
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 2,
+     "baseline": 1.0,
      "bin_start": 61200,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 2.17,
+     "hi": 4.72,
      "horizon": 900,
      "lo": 0.0,
      "origin": 61200
     },
     {
-     "actual": 2,
-     "baseline": 2.0,
+     "actual": 0,
+     "baseline": 1.0,
      "bin_start": 62100,
-     "forecast": 1.71,
-     "hi": 4.14,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 61200
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 1,
+     "baseline": 1.0,
      "bin_start": 63900,
-     "forecast": 2.05,
-     "hi": 4.56,
+     "forecast": 3.15,
+     "hi": 5.93,
      "horizon": 3600,
-     "lo": 0.0,
+     "lo": 0.36,
      "origin": 61200
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 1.0,
      "bin_start": 67500,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51316,38 +51316,38 @@
      "origin": 61200
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 63000,
-     "forecast": 1.45,
-     "hi": 3.81,
+     "forecast": 2.63,
+     "hi": 5.29,
      "horizon": 900,
      "lo": 0.0,
      "origin": 63000
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 63900,
-     "forecast": 1.73,
-     "hi": 4.16,
+     "forecast": 2.73,
+     "hi": 5.42,
      "horizon": 1800,
-     "lo": 0.0,
+     "lo": 0.05,
      "origin": 63000
     },
     {
-     "actual": 0,
-     "baseline": 2.0,
+     "actual": 2,
+     "baseline": 0.0,
      "bin_start": 65700,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.33,
+     "hi": 2.41,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 63000
     },
     {
      "actual": 0,
-     "baseline": 2.0,
+     "baseline": 0.0,
      "bin_start": 69300,
      "forecast": 1.32,
      "hi": 3.65,
@@ -51357,7 +51357,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 64800,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51366,18 +51366,18 @@
      "origin": 64800
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 2,
+     "baseline": 1.0,
      "bin_start": 65700,
-     "forecast": 0.55,
-     "hi": 2.69,
+     "forecast": 2.55,
+     "hi": 5.19,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 64800
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 67500,
      "forecast": 0.87,
      "hi": 3.09,
@@ -51387,7 +51387,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 71100,
      "forecast": 1.18,
      "hi": 3.47,
@@ -51396,18 +51396,18 @@
      "origin": 64800
     },
     {
-     "actual": 2,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 66600,
-     "forecast": 2.7,
-     "hi": 5.38,
+     "forecast": 1.11,
+     "hi": 3.39,
      "horizon": 900,
-     "lo": 0.03,
+     "lo": 0.0,
      "origin": 66600
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 2.0,
      "bin_start": 67500,
      "forecast": 1.95,
      "hi": 4.44,
@@ -51417,7 +51417,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 2.0,
      "bin_start": 69300,
      "forecast": 0.18,
      "hi": 2.23,
@@ -51426,11 +51426,11 @@
      "origin": 66600
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 2,
+     "baseline": 2.0,
      "bin_start": 72900,
-     "forecast": 0.34,
-     "hi": 2.42,
+     "forecast": 2.26,
+     "hi": 4.82,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 66600
@@ -51466,17 +51466,17 @@
      "origin": 68400
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 74700,
-     "forecast": 0.2,
-     "hi": 2.25,
+     "forecast": 1.19,
+     "hi": 3.49,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 68400
     },
     {
-     "actual": 0,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 70200,
      "forecast": 0.0,
@@ -51496,51 +51496,51 @@
      "origin": 70200
     },
     {
-     "actual": 0,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 72900,
-     "forecast": 1.04,
-     "hi": 3.29,
+     "forecast": 3.11,
+     "hi": 5.89,
      "horizon": 3600,
-     "lo": 0.0,
+     "lo": 0.33,
      "origin": 70200
     },
     {
-     "actual": 1,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 76500,
-     "forecast": 1.09,
-     "hi": 3.36,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 7200,
      "lo": 0.0,
      "origin": 70200
     },
     {
-     "actual": 2,
+     "actual": 0,
      "baseline": 0.0,
      "bin_start": 72000,
-     "forecast": 0.75,
-     "hi": 2.94,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 900,
      "lo": 0.0,
      "origin": 72000
     },
     {
-     "actual": 0,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 72900,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.97,
+     "hi": 3.21,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 72000
     },
     {
-     "actual": 0,
+     "actual": 1,
      "baseline": 0.0,
      "bin_start": 74700,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.33,
+     "hi": 2.41,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 72000
@@ -51557,7 +51557,7 @@
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 2.0,
      "bin_start": 73800,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51566,28 +51566,28 @@
      "origin": 73800
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 1,
+     "baseline": 2.0,
      "bin_start": 74700,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.22,
+     "hi": 2.28,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 73800
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 2.0,
      "bin_start": 76500,
-     "forecast": 1.01,
-     "hi": 3.26,
+     "forecast": 0.0,
+     "hi": 2.0,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 73800
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 2.0,
      "bin_start": 80100,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51596,28 +51596,28 @@
      "origin": 73800
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 1.0,
      "bin_start": 75600,
-     "forecast": 1.74,
-     "hi": 4.18,
+     "forecast": 0.78,
+     "hi": 2.97,
      "horizon": 900,
      "lo": 0.0,
      "origin": 75600
     },
     {
-     "actual": 1,
-     "baseline": 0.0,
+     "actual": 0,
+     "baseline": 1.0,
      "bin_start": 76500,
-     "forecast": 1.92,
-     "hi": 4.4,
+     "forecast": 0.72,
+     "hi": 2.9,
      "horizon": 1800,
      "lo": 0.0,
      "origin": 75600
     },
     {
      "actual": 0,
-     "baseline": 0.0,
+     "baseline": 1.0,
      "bin_start": 78300,
      "forecast": 1.52,
      "hi": 3.91,
@@ -51626,28 +51626,28 @@
      "origin": 75600
     },
     {
-     "actual": 0,
-     "baseline": 0.0,
+     "actual": 2,
+     "baseline": 1.0,
      "bin_start": 81900,
-     "forecast": 1.33,
-     "hi": 3.66,
+     "forecast": 2.77,
+     "hi": 5.46,
      "horizon": 7200,
-     "lo": 0.0,
+     "lo": 0.08,
      "origin": 75600
     },
     {
-     "actual": 0,
-     "baseline": 1.0,
+     "actual": 1,
+     "baseline": 0.0,
      "bin_start": 77400,
-     "forecast": 0.0,
-     "hi": 2.0,
+     "forecast": 0.27,
+     "hi": 2.33,
      "horizon": 900,
      "lo": 0.0,
      "origin": 77400
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 78300,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51657,7 +51657,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 80100,
      "forecast": 0.33,
      "hi": 2.41,
@@ -51667,7 +51667,7 @@
     },
     {
      "actual": 0,
-     "baseline": 1.0,
+     "baseline": 0.0,
      "bin_start": 83700,
      "forecast": 0.0,
      "hi": 2.0,
@@ -51696,11 +51696,11 @@
      "origin": 79200
     },
     {
-     "actual": 0,
+     "actual": 2,
      "baseline": 0.0,
      "bin_start": 81900,
-     "forecast": 0.06,
-     "hi": 2.07,
+     "forecast": 1.89,
+     "hi": 4.36,
      "horizon": 3600,
      "lo": 0.0,
      "origin": 79200
