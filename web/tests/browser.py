@@ -37,6 +37,10 @@ with sync_playwright() as p:
         if width in [1280,390] and not reduced:
             rect=page.locator('#play').bounding_box();check(rect['y']+rect['height']<=height,f'{width}: clock control visible without scrolling')
             if shots:page.screenshot(path=str(shots/f'first-{width}x{height}.png'))
+        page.locator('[data-route]').nth(1).click()
+        check(page.evaluate('new Set(insiyab.buses.map(b=>b.route_id)).size<=1'),f'{width}: focus filters buses to one route')
+        page.locator('[data-route]').first.click()
+        check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='communities').props.data.length===0"),f'{width}: overview has no overlapping community labels')
         page.locator('#entity-type').select_option('bus');check('model year' in page.locator('#detail').inner_text(),f'{width}: bus details')
         page.locator('#entity-type').select_option('community');check('boardings over the service day' in page.locator('#detail').inner_text(),f'{width}: community totals')
         page.locator('[data-view="forecast"]').click()
@@ -66,6 +70,8 @@ with sync_playwright() as p:
         check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f'{width}: model page has no sideways overflow')
         if shots and width in [1280,390] and not reduced:page.screenshot(path=str(shots/f'model-{width}x{height}.png'))
         page.locator('#model-horizon').select_option(index=0)
+        expected=page.evaluate("()=>{const t=INSIYAB_BUNDLE['metrics.json'].targets[+document.querySelector('#model-target').value],h=+document.querySelector('#model-horizon').value,ids=t.models.filter(m=>m.is_baseline).map(m=>m.model);return new Intl.NumberFormat('en-GB',{maximumFractionDigits:2}).format(Math.min(...t.results.filter(r=>ids.includes(r.model)&&r.horizon===h&&r.subset==='all').map(r=>r.mae)));}")
+        check(f'Best naive forecast in this table: {expected}.' in page.locator('#model-sentence').inner_text(),f'{width}: headline uses strongest naive at selected horizon')
         page.locator('#model details summary').click()
         check('MAPE' in page.locator('#mape-rule').inner_text(),f'{width}: MAPE denominator rule visible')
         page.locator('[data-view="gap"]').click()
@@ -86,6 +92,10 @@ with sync_playwright() as p:
         page.locator('[data-print]').first.click()
         page.wait_for_function('window.printCalled===true')
         check(page.evaluate('window.printCalled===true'),f'{width}: print command reached')
+        swaps=page.evaluate("INSIYAB_BUNDLE['decisions.json'].decisions[0].swaps??[]")
+        for swap in swaps:
+            for side in ['from','to']:
+                check(swap[side]['trip_id'] in page.locator('#print-order').text_content(),f'{width}: printed swap includes exact {side} trip')
         check('SIMULATION. NOTHING WAS SENT.' in page.locator('#print-order').text_content(),f'{width}: print order carries simulation warning')
         page.emulate_media(media='print')
         check(page.locator('#print-order').is_visible() and page.locator('main').is_hidden(),f'{width}: print exposes only the order')
@@ -141,6 +151,7 @@ with sync_playwright() as p:
         stop_data=json.loads((site/'data/forecast/boardings-stop.json').read_text());stop_data['fixture']=False
         (mutant/'stop-forecast.js').write_text("window.INSIYAB_BUNDLE['forecast/boardings-stop.json']="+json.dumps(stop_data)+';')
         context=browser.new_context(offline=True);page=context.new_page();page.goto(mutant.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized')
+        page.locator('.day-summary summary').click()
         check(page.locator('[data-headline]').inner_text().replace(',','')==str(old+987),'mutated bundle count changes the screen')
         check(page.locator('#fixture').is_hidden(),'fixture false removes stand-in label')
         for name in ['forecast','model','gap','stories']:

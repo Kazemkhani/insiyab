@@ -7,7 +7,7 @@ const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 const css=getComputedStyle(document.documentElement);
 const colour=name=>css.getPropertyValue('--'+name).trim().match(/\w\w/g).map(v=>parseInt(v,16));
 const C=Object.fromEntries(['ink','paper','flow','over','spare','simulated','line','grey'].map(n=>[n,colour(n)]));
-let time=Math.min(M.max,Math.max(M.min,M.meta.origins[0]+3600)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1,closedGaps=false,roomState=null,playbackCount=null;
+let time=Math.min(M.max,Math.max(M.min,M.meta.origins[0]+3600)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1,focusRoute='',closedGaps=false,roomState=null,playbackCount=null;
 const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Room';
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 $('fixture').hidden=!M.meta.fixture;
@@ -33,14 +33,14 @@ function detail() {
     html=`<strong>${escape(s.name)}</strong><p>${number(current?.on??0)} boardings in this quarter hour. Measured.</p><span class="source">replay/ · ${M.meta.service_date}</span><details><summary>Boardings and buses through the day</summary><div class="table-scroll"><table><thead><tr><th>Time</th><th>Trip</th><th>Boardings</th></tr></thead><tbody>${visits.sort((a,b)=>a.act_dep-b.act_dep).map(v=>`<tr><td>${clock(v.act_dep)}</td><td>${escape(v.trip_id)}</td><td>${v.on}</td></tr>`).join('')}</tbody></table></div></details>`;
   } else if(kind==='bus') {
     const t=M.trips.find(t=>t.trip_id===selected),now=busesAt(M,time).find(t=>t.trip_id===selected);
-    html=`<strong>${escape(t.trip_id)}</strong><p>${escape(t.bus_type.toLowerCase())} · ${t.seats} seats · model year ${t.model_year}</p><p>${now?`${now.load} passengers · ${busState(now)} · ${number(now.delay/60)} minutes relative to schedule`:'Not travelling at this time.'}</p><span class="source">Measured · replay/ · ${M.meta.service_date}</span><details><summary>Load at every stop</summary><table><thead><tr><th>Stop</th><th>Load</th><th>Time</th></tr></thead><tbody>${t.visits.map(v=>`<tr><td>${escape(M.stops.get(v.stop_id).name)}</td><td>${v.load}</td><td>${clock(v.act_dep)}</td></tr>`).join('')}</tbody></table></details>`;
+    html=`<p class="eyebrow">${escape(M.routes.get(t.route_id).short_name)} · ${escape(t.trip_id)}</p><h3>${now?busState(now):'Between journeys'}</h3>${now?`<div class="load-reading"><strong>${now.load}</strong><span>passengers<br>for ${t.seats} seats</span></div><div class="seat-rule"><span style="width:${Math.min(100,now.load/t.seats*100)}%;background:var(--${now.load>t.seats?'over':'flow'})"></span></div>`:''}<p>${escape(t.bus_type.toLowerCase())} · ${t.seats} seats · model year ${t.model_year}</p><p>${now?`${number(now.delay/60)} minutes relative to schedule`:'Not travelling at this time.'}</p><span class="source">Measured · replay/ · ${M.meta.service_date}</span><details><summary>Load at every stop</summary><table><thead><tr><th>Stop</th><th>Load</th><th>Time</th></tr></thead><tbody>${t.visits.map(v=>`<tr><td>${escape(M.stops.get(v.stop_id).name)}</td><td>${v.load}</td><td>${clock(v.act_dep)}</td></tr>`).join('')}</tbody></table></details>`;
   } else {
     const c=M.network.communities.find(c=>c.community_id===selected),ids=new Set(M.network.stops.filter(s=>s.community_id===selected).map(s=>s.stop_id)),visits=M.visits.filter(v=>ids.has(v.stop_id));
     html=`<strong>${escape(c.name_en)}</strong><p>${number(visits.reduce((s,v)=>s+v.on,0))} boardings over the service day, across ${ids.size} stops. Measured.</p><span class="source">network.json + replay/ · ${M.meta.service_date}</span>`;
   }
   $('detail').innerHTML=html;
 }
-function pick(kind,id){$('entity-type').value=kind;selected=id;records();if(view==='forecast'&&B['forecast/boardings-stop.json']&&kind==='stop'){$('forecast-stop').value=id;forecastTimes();}}
+function pick(kind,id){$('entity-type').value=kind;selected=id;records();render();if(view==='forecast'&&B['forecast/boardings-stop.json']&&kind==='stop'){$('forecast-stop').value=id;forecastSeries();}}
 function render() {
   if(Math.floor(time/M.meta.bin_seconds)!==lastErrorBin){renderError();lastErrorBin=Math.floor(time/M.meta.bin_seconds);}
 
@@ -48,32 +48,39 @@ function render() {
   const bin=Math.floor(time/M.meta.bin_seconds);
   if(bin!==lastBin){stopData=boardingsAt(M,time);lastBin=bin;detail();if(view==='gap')renderGap();}
   if(!deck||!fit)return;
-  const buses=busesAt(M,time),unit=1/fit.scale;
+  const buses=busesAt(M,time).filter(b=>!focusRoute||b.route_id===focusRoute),unit=1/fit.scale;
+  const paths=M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),stopIds=new Set(paths.flatMap(p=>p.stops)),shownStops=stopData.filter(s=>stopIds.has(s.stop_id));
   const shared={coordinateSystem:COORDINATE_SYSTEM.CARTESIAN};
   deck.setProps({layers:[
     ...forecastLayers(shared,unit),
     ...gapLayers(shared,unit),
-    new PathLayer({...shared,id:'routes',data:M.paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:view==='gap'?[...C.grey,50]:C.grey,getWidth:3,widthUnits:'pixels'}),
-    new PathLayer({...shared,id:'boardings',data:stopData,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*5*unit]],getColor:C.ink,getWidth:3,widthUnits:'pixels'}),
-    new ScatterplotLayer({...shared,id:'stops',data:stopData,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
+    new PathLayer({...shared,id:'routes',data:paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:view==='gap'?[...C.grey,50]:C.grey,getWidth:3,widthUnits:'pixels'}),
+    new PathLayer({...shared,id:'boardings',data:shownStops,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*3.5*unit]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
+    new ScatterplotLayer({...shared,id:'stops',data:shownStops,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
     new PathLayer({...shared,id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*unit)),b.position],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
     new PolygonLayer({...shared,id:'buses',data:buses,getPolygon:b=>{const [x,y]=b.position;return b.load>b.seats?[[x,y-9*unit],[x+8*unit,y+7*unit],[x-8*unit,y+7*unit]]:[[x-7*unit,y-5*unit],[x+7*unit,y-5*unit],[x+7*unit,y+5*unit],[x-7*unit,y+5*unit]];},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
     new PathLayer({...shared,id:'load-bars',data:buses,getPath:b=>{const [x,y]=b.position;return [[x-7*unit,y+11*unit],[x+(-7+14*Math.min(1.5,b.load/b.seats))*unit,y+11*unit]];},getColor:busColour,getWidth:3,widthUnits:'pixels'}),
-    new TextLayer({...shared,id:'route-labels',data:M.paths.filter(p=>p.direction===0),getPosition:d=>d.points[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:12,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
-    new TextLayer({...shared,id:'communities',data:$('map').clientWidth<600?[]:M.network.communities,getPosition:c=>M.project(c.centroid),getText:c=>c.name_en,getPixelOffset:[0,-18],getSize:10,getColor:C.ink,fontFamily:'Plex',pickable:true,onClick:({object})=>object&&pick('community',object.community_id)})
+    new ScatterplotLayer({...shared,id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>b.position,getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
+    new TextLayer({...shared,id:'route-labels',data:paths.filter(p=>p.direction===0),getPosition:d=>d.points[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:14,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
+    new TextLayer({...shared,id:'communities',data:$('entity-type').value==='community'?M.network.communities.filter(c=>c.community_id===selected):[],getPosition:c=>M.project(c.centroid),getText:c=>c.name_en,getPixelOffset:[0,-18],getSize:10,getColor:C.ink,fontFamily:'Plex',pickable:true,onClick:({object})=>object&&pick('community',object.community_id)})
   ]});
   // The browser checks rendered layer data, not a separate animation model.
   window.insiyab={model:M,time,buses,fit,deck,setTime:t=>{time=+t;playing=false;$('play').textContent='Play';render();},get selected(){return selected;},get view(){return view;},get forecastOrigin(){return forecastOrigin;}};
 }
-$('entity-type').onchange=records;$('entity').onchange=()=>{selected=$('entity').value;detail();};
+$('entity-type').value='bus';
+selected=(busesAt(M,time).find(b=>b.load>b.seats)??busesAt(M,time)[0])?.trip_id??M.trips[0].trip_id;
+$('entity-type').onchange=()=>{records();render();};$('entity').onchange=()=>{selected=$('entity').value;detail();render();};
 $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pause':'Play';};
 $('time').oninput=e=>{time=+e.target.value;playing=false;$('play').textContent='Play';render();};
 $('speed').onchange=e=>{speed=+e.target.value;};
 records();render();
+function fitMap(){const summary=document.querySelector('.forecast-summary'),grid=document.querySelector('.replay-grid'),reading=document.querySelector('.reading');if(matchMedia('(max-width:800px)').matches){if(summary.parentElement!==grid)grid.insertBefore(summary,reading);}else if(summary!==reading.firstElementChild)reading.prepend(summary);if(!deck)return;const rect=$('map').getBoundingClientRect();if(!rect.width||!rect.height)return;fit=fitPaths(M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),rect.width,rect.height);deck.setProps({width:rect.width,height:rect.height,viewState:{target:fit.target,zoom:fit.zoom}});render();}
+$('route-focus').innerHTML='<button data-route="" aria-pressed="true">All routes</button>'+M.network.routes.map(r=>`<button data-route="${escape(r.route_id)}" aria-pressed="false">${escape(r.short_name)}</button>`).join('');
+document.querySelectorAll('[data-route]').forEach(e=>e.onclick=()=>{focusRoute=e.dataset.route;document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',String(b===e)));if(focusRoute){const bus=busesAt(M,time).find(b=>b.route_id===focusRoute);if(bus)pick('bus',bus.trip_id);}fitMap();});
 async function start(){
   await document.fonts.ready;
   deck=new Deck({canvas:$('map-canvas'),views:new OrthographicView({id:'network',flipY:true}),controller:false,initialViewState:{target:[0,0,0],zoom:0},getCursor:({isHovering})=>isHovering?'pointer':'default',onError:e=>{console.error(e);$('map-failure').hidden=false;}});
-  new ResizeObserver(()=>{const rect=$('map').getBoundingClientRect();fit=fitPaths(M.paths,rect.width,rect.height);deck.setProps({width:rect.width,height:rect.height,viewState:{target:fit.target,zoom:fit.zoom}});render();}).observe($('map'));
+  new ResizeObserver(fitMap).observe($('map'));
   let previous=performance.now(),lastRender=0;
   function tick(now){if(playing){time+=Math.min((now-previous)/1000,.2)*speed;if(time>M.max)time=M.min;if(now-lastRender>80){render();lastRender=now;}}previous=now;requestAnimationFrame(tick);}
   requestAnimationFrame(tick);
@@ -86,7 +93,7 @@ document.querySelectorAll('.forecast-limit').forEach(e=>e.textContent=limit);
 document.querySelectorAll('.date').forEach(e=>e.textContent=M.meta.service_date);
 function renderError(){
   const score=rollingError(B['forecast/boardings-route.json'],time,3600);
-  $('error-counter').innerHTML=score.n?`<span>Average miss so far<br><small>One hour ahead</small></span><strong>${number(score.model)} <small>forecast</small></strong><strong>${number(score.naive)} <small>naive forecast</small></strong><span class="source">passengers / route / ${M.meta.bin_seconds/60} min · <br>${score.n} held-out bins · forecast/boardings-route.json</span>`:'<span>Waiting for the first one-hour forecast bin to finish. No error is known yet.</span>';
+  $('error-counter').innerHTML=score.n?`<span class="error-title">Average miss so far</span><strong>${number(score.model)} <small>forecast</small></strong><strong>${number(score.naive)} <small>naive forecast</small></strong><span class="source">passengers / route / ${M.meta.bin_seconds/60} min · ${score.n} completed bins<br>forecast/boardings-route.json · ${M.meta.service_date}</span>`:'<span>Waiting for the first one-hour forecast bin to finish. No error is known yet.</span>';
 }
 async function setView(next){
   view=next;playing=false;$('play').textContent='Play';
@@ -95,11 +102,11 @@ async function setView(next){
   $('gap-controls').hidden=next!=='gap';$('gap-results').hidden=next!=='gap';$('replay').classList.toggle('gap-view',next==='gap');
   $('forecast-controls').hidden=next!=='forecast';$('pick-stop').hidden=next!=='forecast';
   $('map-caption').textContent=next==='forecast'?'The forecast meeting reality':next==='gap'?'Where seats and passengers do not match':'The day, replayed';
-  if(next==='forecast'){await ensureStopForecast();freezeForecast();}
+  if(next==='forecast'){try{await ensureStopForecast();freezeForecast();}catch{$('challenge').textContent='The local forecast file could not be opened. Return to this view to try again.';stopForecastPromise=null;render();return;}}
   if(next==='model')renderModel();
   if(next==='gap'){renderGap();pollRoom();}
   if(next==='stories')renderStory();
-  render();window.scrollTo(0,0);
+  fitMap();render();window.scrollTo(0,0);
 }
 document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.dataset.view));
 function freezeForecast(){forecastOrigin=[...M.meta.origins].reverse().find(o=>o<=time)??M.meta.origins[0];$('frozen-at').textContent=`Made at ${clock(forecastOrigin)}. Quarter hour ending ${clock(forecastOrigin+3600)}. forecast/boardings-stop.json · ${M.meta.service_date}`;render();}
@@ -111,17 +118,18 @@ function forecastLayers(shared,unit){
     const bins=rows.filter(r=>r.id===id),known=bins.filter(r=>r.bin_start+B['forecast/boardings-stop.json'].bin_seconds<=time && r.actual!==null);
     return {id,position:M.stops.get(id).position,forecast:bins.reduce((s,r)=>s+r.forecast,0),actual:known.length?known.reduce((s,r)=>s+r.actual,0):null};
   });
-  return [new ScatterplotLayer({...shared,id:'forecast-halos',data,getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.forecast)*4,radiusUnits:'pixels',radiusMaxPixels:34,filled:false,stroked:true,getLineColor:[...C.spare,130],getLineWidth:2,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('forecast-stop').value=object.id;forecastTimes();pick('stop',object.id);}}}),new ScatterplotLayer({...shared,id:'actual-halos',data:data.filter(d=>d.actual!==null),getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.actual)*4,radiusUnits:'pixels',radiusMaxPixels:34,getFillColor:[...C.flow,90]})];
+  return [new ScatterplotLayer({...shared,id:'forecast-halos',data,getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.forecast)*4,radiusUnits:'pixels',radiusMaxPixels:34,filled:false,stroked:true,getLineColor:[...C.spare,130],getLineWidth:2,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('forecast-stop').value=object.id;forecastSeries();pick('stop',object.id);}}}),new ScatterplotLayer({...shared,id:'actual-halos',data:data.filter(d=>d.actual!==null),getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.actual)*4,radiusUnits:'pixels',radiusMaxPixels:34,getFillColor:[...C.flow,90]})];
 }
 $('forecast-stop').innerHTML=M.network.stops.map(s=>`<option value="${escape(s.stop_id)}">${escape(s.name)}</option>`).join('');
 let stopForecastPromise;
 function ensureStopForecast(){
-  if(!stopForecastPromise)stopForecastPromise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='stop-forecast.js';script.onload=()=>{if(B['forecast/boardings-stop.json'].fixture!==M.meta.fixture){reject(Error('Mixed forecast bundle'));return;}$('forecast-stop').value=B['forecast/boardings-stop.json'].series[0]?.id;forecastTimes();resolve();};script.onerror=()=>{ $('challenge').textContent='The local forecast file could not be opened.';reject(Error('Missing stop-forecast.js'));};document.head.append(script);});
+  if(!stopForecastPromise)stopForecastPromise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='stop-forecast.js';script.onload=()=>{if(B['forecast/boardings-stop.json'].fixture!==M.meta.fixture){delete B['forecast/boardings-stop.json'];reject(Error('Mixed forecast bundle'));return;}$('forecast-stop').value=B['forecast/boardings-stop.json'].series[0]?.id;forecastSeries();resolve();};script.onerror=()=>{ $('challenge').textContent='The local forecast file could not be opened.';reject(Error('Missing stop-forecast.js'));};document.head.append(script);});
   return stopForecastPromise;
 }
 let challengeRows=[],challengeRevealed=false;
+function forecastSeries(){const candidates=B['forecast/boardings-stop.json']?.series.map((s,i)=>({...s,index:i})).filter(s=>s.id===$('forecast-stop').value)??[];$('forecast-series').innerHTML=candidates.map((s,i)=>`<option value="${s.index}">${escape(M.routes.get(s.route_id).short_name)}${candidates.filter(c=>c.route_id===s.route_id).length>1?' · series '+(i+1):''}</option>`).join('');forecastTimes();}
 function forecastTimes(){
-  const series=B['forecast/boardings-stop.json']?.series.find(s=>s.id===$('forecast-stop').value);
+  const series=$('forecast-series').value===''?null:B['forecast/boardings-stop.json']?.series[+$('forecast-series').value];
   challengeRows=(series?.rows??[]).filter(r=>r.horizon===oneHour && r.bin_start>=12*3600).sort((a,b)=>a.bin_start-b.bin_start);
   $('forecast-time').innerHTML=challengeRows.map((r,i)=>`<option value="${i}">${clock(r.bin_start)} to ${clock(r.bin_start+B['forecast/boardings-stop.json'].bin_seconds)}</option>`).join('');
   challengeRevealed=false;renderChallenge();
@@ -130,25 +138,29 @@ function renderChallenge(){
   const row=challengeRows[+$('forecast-time').value];
   $('reveal').hidden=!row;$('forecast-time').disabled=!row;
   if(!row){$('challenge').innerHTML='<p>No held-out afternoon forecast supplied for this stop. Choose another stop; no value has been invented.</p>';return;}
-  $('challenge').innerHTML=`<p>Forecast made at ${clock(row.origin)} for the bin ending ${clock(row.origin+row.horizon)}. The model had seen no records after ${clock(row.origin)}.</p><div class="challenge-numbers"><div><span class="eyebrow">Forecast</span><strong>${number(row.forecast)}</strong><span>passengers boarding</span><small>Range ${number(row.lo)} to ${number(row.hi)}</small></div><div><span class="eyebrow">What happened · measured</span><strong data-actual>${challengeRevealed?number(row.actual):'?'}</strong><span>${challengeRevealed?'passengers boarded':'Hidden until you reveal'}</span></div></div>${challengeRevealed?`<p data-miss>${row.actual===null?'No actual count supplied.':`A miss of ${number(Math.abs(row.forecast-row.actual))} passengers. The naive forecast said ${number(row.baseline)} and missed by ${number(Math.abs(row.baseline-row.actual))}.`}</p>`:''}`;
+  $('challenge').innerHTML=`<p>Forecast made at ${clock(row.origin)} for the bin ending ${clock(row.origin+row.horizon)}. The model had seen no records after ${clock(row.origin)}.</p><div class="challenge-numbers"><div><span class="eyebrow">Forecast</span><strong>${number(row.forecast)}</strong><span>passengers boarding</span><small>Range ${number(row.lo)} to ${number(row.hi)}</small></div><div><span class="eyebrow">What happened · measured</span><strong data-actual>${challengeRevealed?number(row.actual):'?'}</strong><span>${challengeRevealed?'passengers boarded':'Hidden until you reveal'}</span></div></div>${challengeRevealed?`<p data-miss>${row.actual===null?'No actual count supplied.':`A miss of ${number(Math.abs(row.forecast-row.actual))} passengers. ${row.actual>=row.lo&&row.actual<=row.hi?'Inside':'Outside'} the supplied range. The naive forecast said ${number(row.baseline)} and missed by ${number(Math.abs(row.baseline-row.actual))}.`}</p>`:''}`;
   $('reveal').textContent=challengeRevealed?'Hide what happened':'Reveal what happened';
 }
-$('forecast-stop').onchange=forecastTimes;$('forecast-time').onchange=()=>{challengeRevealed=false;renderChallenge();};$('reveal').onclick=()=>{challengeRevealed=!challengeRevealed;renderChallenge();};
+$('forecast-stop').onchange=forecastSeries;$('forecast-series').onchange=forecastTimes;$('forecast-time').onchange=()=>{challengeRevealed=false;renderChallenge();};$('reveal').onclick=()=>{challengeRevealed=!challengeRevealed;renderChallenge();};
 $('model-target').innerHTML=B['metrics.json'].targets.map((t,i)=>`<option value="${i}">${escape(t.target.replaceAll('_',' '))} · ${escape(t.level)}</option>`).join('');
 function renderModel(){
-  const t=B['metrics.json'].targets[+$('model-target').value],horizons=[...new Set(t.results.map(r=>r.horizon))].sort((a,b)=>a-b),all=t.subsets.find(s=>s.kind==='all')?.subset,chosen=t.models.find(m=>!m.is_baseline),naive=t.models.find(m=>m.is_baseline);
-  const h=horizons.includes(oneHour)?oneHour:horizons[0],result=(model,horizon,subset)=>t.results.find(r=>r.model===model&&r.horizon===horizon&&r.subset===subset);
-  const best=result(chosen.model,h,all),base=result(naive.model,h,all);
-  $('model-sentence').textContent=`${h/60} minutes ahead, the forecast misses by ${number(best?.mae)} on average. The naive forecast misses by ${number(base?.mae)}. Unit: ${t.unit}.`;
+  const t=B['metrics.json'].targets[+$('model-target').value],horizons=[...new Set(t.results.map(r=>r.horizon))].sort((a,b)=>a-b),all=t.subsets.find(s=>s.kind==='all')?.subset;
+  const result=(model,horizon,subset)=>t.results.find(r=>r.model===model&&r.horizon===horizon&&r.subset===subset);
+  const selectedH=$('model-horizon').value;$('model-horizon').innerHTML=horizons.map(h=>`<option value="${h}">${h/60} minutes</option>`).join('');$('model-horizon').value=horizons.includes(+selectedH)?selectedH:(horizons.includes(oneHour)?oneHour:horizons[0]);
+  const h=+$('model-horizon').value,choices=t.models.filter(m=>!m.is_baseline),oldChoice=$('model-choice').value;
+  $('model-choice').innerHTML=choices.map(m=>`<option value="${escape(m.model)}">${escape(m.label)}</option>`).join('');if(choices.some(m=>m.model===oldChoice))$('model-choice').value=oldChoice;
+  const chosen=t.models.find(m=>m.model===$('model-choice').value),best=result(chosen.model,h,all);
+  const baselines=t.models.filter(m=>m.is_baseline).map(m=>({m,r:result(m.model,h,all)})).filter(x=>x.r).sort((a,b)=>a.r.mae-b.r.mae),naive=baselines[0]?.m,base=baselines[0]?.r;
+  $('model-sentence').textContent=`${h/60} minutes ahead: ${number(best?.mae)} passengers average miss. Best naive forecast in this table: ${number(base?.mae)}.${best&&base?(best.mae<base.mae?' The model misses less.':best.mae>base.mae?' The naive forecast misses less.':' The two have the same average miss.'):''}`;
+  $('comparison-note').textContent=`Comparing ${chosen.label} with ${naive?.label??'no supplied naive result'}. The naive comparison is the lowest MAE at this horizon, on the same held-out bins. This table comparison does not select a model for deployment.`;
   $('model-unit').textContent=`Average absolute miss (MAE). ${t.unit}. Lower is better.`;
-  $('model-table').innerHTML=`<div class="table-scroll"><table class="metrics"><thead><tr><th>Model</th>${horizons.map(h=>`<th>${h/60} min ahead</th>`).join('')}</tr></thead><tbody>${t.models.map(m=>`<tr><th>${m.is_baseline?'Naive forecast: ':''}${escape(m.label)}</th>${horizons.map(h=>`<td>${number(result(m.model,h,all)?.mae)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-  const selected=$('model-horizon').value;$('model-horizon').innerHTML=horizons.map(h=>`<option value="${h}">${h/60} minutes</option>`).join('');$('model-horizon').value=horizons.includes(+selected)?selected:h;
+  $('model-table').innerHTML=`<div class="table-scroll"><table class="metrics"><thead><tr><th>Model</th>${horizons.map(h=>`<th>${h/60}<small>min ahead</small></th>`).join('')}</tr></thead><tbody>${t.models.map(m=>`<tr><th>${m.is_baseline?'Naive forecast: ':''}${escape(m.label)}</th>${horizons.map(h=>`<td>${number(result(m.model,h,all)?.mae)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
   const horizon=+$('model-horizon').value;
   const worst=new Map(t.models.map(m=>[m.model,Math.max(...t.results.filter(r=>r.model===m.model&&r.horizon===horizon&&r.subset!==all).map(r=>r.mae))]));
   $('subset-table').innerHTML=`<div class="table-scroll"><table class="metrics"><thead><tr><th>Subset / model</th><th>MAE</th><th>RMSE</th><th>MAPE</th><th>WAPE</th><th>Bins / MAPE bins</th></tr></thead><tbody>${t.subsets.filter(s=>s.subset!==all).map(s=>t.models.map(m=>{const r=result(m.model,horizon,s.subset);return r?`<tr class="${r.mae===worst.get(m.model)?'worst':''}"><th>${escape(s.label)}<small>${m.is_baseline?'Naive forecast':escape(m.label)}${r.mae===worst.get(m.model)?' · Largest miss':''}</small></th><td>${number(r.mae)}</td><td>${number(r.rmse)}</td><td>${r.mape===null?'—':number(r.mape*100)+'%'}</td><td>${r.wape===null?'—':number(r.wape*100)+'%'}</td><td>${r.n} / ${r.mape_n}</td></tr>`:'';}).join('')).join('')}</tbody></table></div>`;
   $('mape-rule').textContent=t.mape_rule;$('split-rule').textContent=`Learning: ${t.split.train}. Held-out: ${t.split.test}.`;
 }
-$('model-target').onchange=renderModel;$('model-horizon').onchange=renderModel;
+$('model-target').onchange=renderModel;$('model-horizon').onchange=renderModel;$('model-choice').onchange=renderModel;
 
 function gapRows(){const hour=Math.floor(time/B['gap.json'].bin_seconds)*B['gap.json'].bin_seconds;return B['gap.json'].rows.filter(r=>r.hour_start===hour);}
 function gapLayers(shared,unit){
@@ -180,7 +192,7 @@ function renderDecisions(){
 }
 async function printOrder(id){
   const d=B['decisions.json'].decisions.find(d=>d.id===id);
-  $('print-order').innerHTML=`<p class="fixture">${M.meta.fixture?'STAND-IN DATA, NOT A RESULT':'Aggregate records only'}</p><h1>SIMULATION. NOTHING WAS SENT.</h1>${decisionHTML(d,true)}<p>Specific vehicle and trip assignments are not supplied in this decision. A planner must validate and assign them.</p><img width="90" height="90" src="qr-${encodeURIComponent(d.id)}.svg" alt="QR code back to this decision"><p class="source">insiyab.amirkazemkhani.com/#decision-${escape(d.id)}</p><p>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</p>`;
+  $('print-order').innerHTML=`<p class="fixture">${M.meta.fixture?'STAND-IN DATA, NOT A RESULT':'Aggregate records only'}</p><h1>SIMULATION. NOTHING WAS SENT.</h1>${decisionHTML(d,true)}${d.swaps?.length?`<h2>Proposed vehicle exchange</h2>${d.swaps.map(pair=>`<table><thead><tr><th>Trip</th><th>Start</th><th>Vehicle</th><th>Seats / peak load</th></tr></thead><tbody>${[pair.from,pair.to].map(t=>`<tr><td>${escape(t.route_id)} · ${escape(t.trip_id)}</td><td>${clock(t.start)}</td><td>${escape(t.vehicle)} · ${escape(t.bus_type)}</td><td>${t.seats} / ${t.largest_load}</td></tr>`).join('')}</tbody></table>`).join('')}<p>Swap the listed vehicles. Planner review required: depot, vehicle blocks, access and driver duties have not been validated.</p>`:'<p>No specific vehicle exchange supplied. A planner must validate and assign trips.</p>'}<img width="90" height="90" src="qr-${encodeURIComponent(d.id)}.svg" alt="QR code back to this decision"><p class="source">insiyab.amirkazemkhani.com/#decision-${escape(d.id)}</p><p>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</p>`;
   $('print-order').hidden=false;await $('print-order').querySelector('img').decode();await document.fonts.ready;window.print();
 }
 window.addEventListener('afterprint',()=>{$('print-order').hidden=true;});
