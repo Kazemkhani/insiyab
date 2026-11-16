@@ -99,3 +99,46 @@ He found no leak: the clock test, the rolling origin, the route and community sp
 | S8 | "Best naive forecast" was chosen by MAE in one table and WAPE in another. | Fixed: WAPE for counts in both, MAE for lateness in both. He notes choosing the best naive forecast on the test rows makes the model's gain smaller, not larger. |
 | S9 | The kind-of-bus label for a route was set from the whole day, the untouched hours among them. | Fixed: from visits before 16:00. |
 | S10 | MAPE at stop level rests on very few quarter-hours. | Answered: the table gives the count beside it. TO LANE 4: say the count out loud. |
+
+## Review 2, 17 November 2026, about 00:40. The designer again, on commit f4c453b (built locally from the stated commands; not on a real graphics chip, not the live address)
+
+### F. The ten changes of section C, as they now stand
+
+| # | Change | State | What is left |
+|---|---|---|---|
+| 1 | The map as the stage | Partly | The network is about 400 pixels wide in a 920 pixel canvas; buses are still small rectangles with no "55/35" when over seats; about 500 pixels of empty left column under the map; route labels fuse at 390 ("K10904"). |
+| 2 | A headline for each view | Done | The forecast view repeats its own heading above the map and shows the whole day screen again under the chart. |
+| 3 | The model screen as charts | Mostly | The gap at one hour is not drawn as a gap; charts are capped at 880 pixels in a 1232 pixel page (`charts.mjs:5`); subset labels are cut at 31 letters, so two different subsets read the same. |
+| 4 | The forecast as a line through the day | Partly | The shaded "tested" region covers the whole chart, so it says nothing; the chosen quarter-hour is a 6 pixel dot at the left edge; no unit on the axis; no label on the lines. |
+| 5 | One comparison and one chart on the gap screen | Partly | 16 bars and one 7 pixel red mark; bars are one hour while the totals above are the whole day; no title, no unit; the map paints every route as a 14 pixel blue ribbon. |
+| 6 | The four figures redrawn | Not done | Still soft clay renders on a grey slab, in a different language from everything else on the site; for three of the four people the second step shows the same picture; the bus is cut by the frame. The two bugs (driver outside his bus, planner on the table) are fixed. |
+| 7 | Six type sizes | Not done | 19 sizes measured, from 9 to 58 pixels; a source line under every number remains. |
+| 8 | One large number a screen | Partly | The day has two pairs (58 and 32 pixels) with different meanings; the model has a second pair at 30. |
+| 9 | The decision card | Done | "0 before, 0.9 after" for passengers shifted cannot be read; the before value sits at 13 pixels beside a 52 pixel "0"; three actions on one card. |
+| 10 | Borders, legend, wording | Partly | The legend on The day is still text glyphs. |
+
+His line on each screen, answering "would a senior designer believe a person designed this?": The day, almost. The forecast, no. The gap, partly. The model, mostly. Four people, no. A decision's evidence, yes. The printed order, yes. Khutwa, mostly.
+
+### G. For lane 2: the five changes he would make tonight, in order
+
+1. **The four figures.** The second step must change the picture, and the picture must carry the count: 25 squares against 20 outlined seats beside the figure, the 5 over in #B23A2E; then 20 against 20. Drop the grey slab, keep the bus inside the frame. The caption names the tool ("Fictional Blender scene; the seated view is a cutaway"): say "Illustration. It does not show a real passenger or a count of people waiting."
+2. **The forecast chart** (`charts.mjs`, forecastChart): delete the `chart-heldout` rectangle or shade only the tested hours and label it once at its start; label the lines "Model" and "Naive" at their right ends as the horizon chart does; axis title "passengers boarding per 15 minutes" at 13 pixels; the chosen quarter-hour as a 10 pixel ring with its time above it; full width; delete the sentence that serves as a legend. Remove the second "Forecast against what happened" heading and the day's rail from this view.
+3. **Bugs a visitor sees.** On a phone the forecast rail shows on the gap screen: add `.gap-view .replay-grid>.forecast-summary{display:none}` after `style.css:1489`, and inside the narrow-screen rule. "model year null" is printed (`app.js:39`): leave it out when null. "1 stops ahead" (`app.js:177`). "20.29% error removed against In proportion to the timetable" (`app.js:173`): write "against the timetable-share forecast". "11520" needs its comma. "Room unavailable." (`app.js:250`): "No phones are connected to this page. Play the offer back to see what a passenger would see." A bus's state "Room" reads as a place: "Has room".
+4. **Type.** Six sizes: 52, 32, 20, 16, 13, 11. Every 9, 10 and 11 pixel line of body or source to 13 (`style.css:107, 361, 800, 1199`); one source line a section, at its foot; the "Tested on" line once a screen.
+5. **The gap chart** (`charts.mjs`, gapChart): sort by passengers over seats, largest first; show the rows with anybody over and fold the rest into one line ("15 other route-directions: nobody over seats, 26 to 112 seats spare"); title "Seats short, 16:00 to 17:00"; unit "passengers"; label the red mark "7 over". On the map: spare seats as a 4 pixel line in #2F6690 at 40 in 100, over seats as 6 pixels in #B23A2E, no 14 pixel ribbon.
+
+Wording he would still change: "Forecast error" as the model screen's headline to the finding itself ("The forecast misses by 7.8 passengers. A plain guess misses by 9.1."); "Does the improvement hold?" to "Is the forecast really better?"; "Untouched hours · route forecast" to "Hours the model had not seen"; "Replay · one hour ahead" to "The forecast against the day so far"; "Look at the recorded context" to "See the day's records for this stop"; "held-out" still appears twice (`app.js:173`); "Proposed", "A planner decides" and "Proposals only..." say one thing three times on a card: keep the last. Contrast: no text fails; marks that fail 3 to 1 are any chart mark in #8C96A0 (2.76) and unfilled tracks in #C3C9CF (1.53).
+
+### H. What lane 1 changed after this review (the Khutwa page and the engine's words)
+
+| Finding | State |
+|---|---|
+| The bus drawing read as a building with windows. | Fixed: no box. Twenty seat squares in rows of five, captioned "20 seats, all taken", and the passengers with no seat as their own red group, captioned. |
+| Three equal outlined buttons: no obvious next step. | Fixed: the bus with the most room is the one filled button; the other is outlined; "No thanks" is a plain link, still 48 pixels tall. A test holds that exactly one choice is the primary one. |
+| "I cannot walk further" came after the choices it filters. | Fixed: it is above them. |
+| The meter's empty track was 1.53 to 1. | Fixed: the track has an edge in #5A6672 (5.4 to 1). |
+| A repository path shown to a passenger in the simulated line. | Fixed in the engine: the assumption is a plain sentence, and the source moved to the effect's `source`. |
+| A 55-word footer on every screen. | Fixed: 25 words. |
+| "Seats only". | Fixed: "Counts seats, not standing room." |
+| The gap note was 90 words and used the product's name as a unit. | Fixed in the engine: `index_note` is one line ("Gap score: from 0.1 (only empty seats) to 10 (only passengers without a seat)."), and the method moved to `index_method`. |
+| The "Tested on" line was 31 words on four screens. | Fixed in the engine: `tested_on` is "Tested on one day only: Monday 15 December 2025, in the school holidays." and the rest moved to `tested_on_more`. |

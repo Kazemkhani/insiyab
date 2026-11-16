@@ -23,14 +23,16 @@ p { margin: 0 0 16px; }
 .source { font: 400 11px/1.5 "IBM Plex Mono", monospace; color: var(--muted); margin-bottom: 32px; }
 
 /* The bus, drawn from the count: one square a seat, four across with an aisle, and the passengers with no seat standing beside it. */
-.bus { display: flex; align-items: flex-end; gap: 16px; margin: 0 0 16px; }
-.seats { display: grid; grid-template-columns: repeat(2, 14px) 10px repeat(2, 14px); gap: 4px; padding: 10px; border: 2px solid var(--ink); border-radius: 10px 10px 4px 4px; }
-.seats i, .standing i { width: 14px; height: 14px; display: block; }
+.bus { display: flex; align-items: flex-end; gap: 24px; margin: 0 0 24px; }
+.bus figure { margin: 0; }
+.seats, .standing { display: grid; grid-template-columns: repeat(5, 16px); gap: 4px; }
+.standing { grid-template-columns: repeat(3, 16px); }
+.seats i, .standing i { width: 16px; height: 16px; display: block; }
 .seats i { border: 1.5px solid var(--ink); }
 .seats i.taken { background: var(--ink); }
-.seats i.aisle { border: 0; }
-.standing { display: grid; grid-template-columns: repeat(3, 14px); gap: 4px; align-content: end; padding-bottom: 12px; }
-.standing i { background: var(--over); border-radius: 50%; }
+.standing i { background: var(--over); }
+figcaption { margin-top: 8px; font-size: 13px; color: var(--muted); }
+figcaption.over { color: var(--over); }
 .count { margin: 0 0 8px; font-size: 16px; }
 .count strong { display: block; font: 600 44px/1 Overpass, sans-serif; letter-spacing: -.02em; }
 .count strong.over { color: var(--over); }
@@ -38,6 +40,7 @@ p { margin: 0 0 16px; }
 button { font: 500 16px/1.2 "IBM Plex Sans", sans-serif; min-height: 48px; padding: 12px 20px; border-radius: 4px; cursor: pointer; }
 .primary { width: 100%; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); }
 .plain { width: 100%; background: transparent; color: var(--ink); border: 1.5px solid var(--muted); margin: 8px 0 16px; }
+.quiet { width: 100%; background: transparent; color: var(--ink); border: 0; text-decoration: underline; text-underline-offset: 4px; margin: 0 0 8px; }
 button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--flow); outline-offset: 2px; }
 .wait { color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
 
@@ -48,15 +51,16 @@ ol li { padding: 24px 0; border-bottom: 1px solid var(--line); }
 .earn { font: 600 20px/1.2 Overpass, sans-serif; color: var(--flow); white-space: nowrap; }
 .detail { margin: 0 0 4px; color: var(--muted); font-size: 13px; }
 .room-left { margin: 0 0 16px; font-size: 13px; }
-.meter { height: 6px; background: var(--line); margin: 8px 0 4px; }
+.meter { height: 6px; background: var(--paper); border: 1px solid var(--muted); margin: 8px 0 4px; }   /* the edge is 5.4 to 1 on paper: a pale track alone was 1.5 to 1 */
 .meter b { display: block; height: 100%; background: var(--ink); }   /* ink is a seat taken, as in the drawing of the bus */
-ol li button { width: 100%; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); }
-.walk { display: flex; align-items: center; gap: 12px; min-height: 48px; margin-bottom: 8px; }
+ol li button { width: 100%; background: var(--paper); color: var(--ink); border: 1.5px solid var(--muted); }
+ol li button.primary { background: var(--ink); color: var(--paper); border: 2px solid var(--ink); }
+.walk { display: flex; align-items: center; gap: 12px; min-height: 48px; margin: -8px 0 16px; }
 .walk input { width: 24px; height: 24px; accent-color: var(--ink); }
 
 .points { display: flex; gap: 6px; margin: 0 0 16px; }
-.points i { flex: 1; height: 12px; background: var(--line); }
-.points i.on { background: var(--flow); }
+.points i { flex: 1; height: 12px; border: 1px solid var(--muted); }
+.points i.on { background: var(--flow); border-color: var(--flow); }
 .room { font: 600 20px/1.3 Overpass, sans-serif; border-top: 2px solid var(--ink); padding-top: 16px; }
 .simulated { color: var(--simulated); font-size: 13px; }
 footer { padding-top: 24px; padding-bottom: 40px; border-top: 1px solid var(--line); }

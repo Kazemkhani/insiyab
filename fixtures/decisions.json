@@ -288,10 +288,11 @@
    "effect": [
     {
      "after": 0.9,
-     "assumption": "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 11 in 100: docs/research/research-methods.md, section 6). A planner can move this number.",
+     "assumption": "8 in 100 passengers who get the offer take it. Trials in San Francisco and Singapore found 7 to 11 in 100. A planner can move this number.",
      "before": 0,
      "kind": "simulated",
-     "metric": "passengers_shifted"
+     "metric": "passengers_shifted",
+     "source": "docs/research/research-methods.md, section 6"
     }
    ],
    "evidence": [

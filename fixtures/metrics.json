@@ -6270,7 +6270,8 @@
     }
    ],
    "target": "boardings",
-   "tested_on": "later hours of one day, Monday 15 December 2025, inside the winter break of most schools. Not tested on another day, and a school day may look different.",
+   "tested_on": "Tested on one day only: Monday 15 December 2025, in the school holidays.",
+   "tested_on_more": "Later hours of that day, and routes and communities the model had not seen, are what was tested. Nothing was tested on another day, and a school day may look different.",
    "unit": "passengers boarding per route per 15 minutes"
   },
   {
@@ -13122,7 +13123,8 @@
     }
    ],
    "target": "boardings",
-   "tested_on": "later hours of one day, Monday 15 December 2025, inside the winter break of most schools. Not tested on another day, and a school day may look different.",
+   "tested_on": "Tested on one day only: Monday 15 December 2025, in the school holidays.",
+   "tested_on_more": "Later hours of that day, and routes and communities the model had not seen, are what was tested. Nothing was tested on another day, and a school day may look different.",
    "unit": "passengers boarding per stop per 15 minutes"
   },
   {

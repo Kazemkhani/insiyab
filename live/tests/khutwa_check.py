@@ -46,11 +46,12 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
     check("the page says STAND-IN DATA, NOT A RESULT when the bundle is stand-in data", page.get_by_text("STAND-IN DATA, NOT A RESULT").is_visible())
     over = u["load"] - u["seats"]
     check("the first screen shows the usual bus's own numbers from the bundle", f"{over} without a seat" in page.inner_text("#usual-load") and f"{u['load']} passengers on board, {u['seats']} seats" in page.inner_text("#usual-words"), page.inner_text("#s-usual"))
-    check("the bus is drawn from the count: one square a seat, one mark a passenger without one", page.locator("#usual-bus .seats i:not(.aisle)").count() == u["seats"] and page.locator("#usual-bus .seats i.taken").count() == min(u["load"], u["seats"]) and page.locator("#usual-bus .standing i").count() == max(0, over))
+    check("the bus is drawn from the count: one square a seat, one mark a passenger without one", page.locator("#usual-bus .seats i").count() == u["seats"] and page.locator("#usual-bus .seats i.taken").count() == min(u["load"], u["seats"]) and page.locator("#usual-bus .standing i").count() == max(0, over))
     page.wait_for_selector("#show", state="visible", timeout=4000)
     check("with no room to be reached, the page offers 'Show me the offer' within two seconds or so and does not claim to be in a room", page.inner_text("#show") == "Show me the offer" and not page.locator("#waiting").is_visible())
     page.click("#show")
     check("the offer lists every choice in the bundle, each with its points", page.locator("#choices li button").count() == len(d["offers"]) - 1 and all(f"+{o['points']} points" in page.inner_text("#choices") for o in d["offers"][:-1]), page.inner_text("#choices"))
+    check("one choice is the obvious next step: the bus with the most room, and only that one", page.locator("#choices li button.primary").count() == 1)
     check("the passenger can always say no and keep the usual bus", page.locator("#decline").is_visible() and "usual bus still runs" in page.inner_text("#s-offer"))
     small = page.evaluate("[...document.querySelectorAll('button:not([hidden]), .walk, header a')].filter(e => e.offsetParent !== null && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim().slice(0, 30))")
     check("every control is at least 44 pixels tall", small == [], small)

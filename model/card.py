@@ -40,7 +40,7 @@ def card(bundle):
         ["How late a bus arrives at a stop ahead of it", "seconds (early is below zero)", "each time a bus leaves a stop", "1, 5, 10 and 20 stops ahead"]]) + "\n")
     w("## The data, and its one day\n")
     c = meta["counts"]
-    w(f"One service day, {meta['service_date']}: {_n(c['routes'])} routes, {_n(c['stops'])} stops, {_n(c['trips'])} trips, {_n(c['stop_visits'])} stop visits and {_n(c['boardings'])} boardings. {_cap(targets[0].get('tested_on', ''))}\n")
+    w(f"One service day, {meta['service_date']}: {_n(c['routes'])} routes, {_n(c['stops'])} stops, {_n(c['trips'])} trips, {_n(c['stop_visits'])} stop visits and {_n(c['boardings'])} boardings. {targets[0].get('tested_on', '')} {targets[0].get('tested_on_more', '')}\n")
     w("How the tables were made ready, stage by stage, with the count each stage kept:\n")
     for s in meta.get("stages", []):
         counts = ", ".join(f"{k.replace('_', ' ')} {_n(v, 4)}" for k, v in s.items() if k not in ("stage", "text") and k != "service_date_as_number")

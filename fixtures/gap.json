@@ -1,7 +1,8 @@
 {
  "bin_seconds": 3600,
  "fixture": true,
- "index_note": "The Insiyab index runs from 0.1 to 10. In each route, direction and hour, add the passengers above the seats and the seats above the passengers over its trips: the index is 0.1 when all of that is empty seats and 10 when all of it is passengers without a seat. Loads here are the day's own, made from taps (forecast_peak_load holds the same measured number as peak_load until a forecast of load exists); 15 in 100 boardings had no recorded alighting and were spread along the trip. Seats only.",
+ "index_method": "In each route, direction and hour, add the passengers above the seats and the seats above the passengers over its trips. The gap score is 0.1 when all of that is empty seats and 10 when all of it is passengers without a seat. Loads are the day's own, made from taps (forecast_peak_load holds the same measured number as peak_load until a forecast of load exists); 15 in 100 boardings had no recorded alighting and were spread along the trip. Seats are counted, not standing room.",
+ "index_note": "Gap score: from 0.1 (only empty seats) to 10 (only passengers without a seat).",
  "load_kind": "measured",
  "rows": [
   {

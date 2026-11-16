@@ -141,7 +141,8 @@ def build(day, fixture=True, generated_at=None, commit=None):
     date = pd.Timestamp(day["service_date"]).strftime("%A %-d %B %Y") if os.name != "nt" else day["service_date"]
     t_stop["features"] = F.importance(rows, F.UNTOUCHED[0])           # learned from the hours before 16:00 only
     for t in (t_route, t_stop):
-        t["tested_on"] = f"later hours of one day, {date}, inside the winter break of most schools. Not tested on another day, and a school day may look different."
+        t["tested_on"] = f"Tested on one day only: {date}, in the school holidays."
+        t["tested_on_more"] = "Later hours of that day, and routes and communities the model had not seen, are what was tested. Nothing was tested on another day, and a school day may look different."
     base = t_stop["best_naive"]
 
     # At an origin with too little of the day behind it, a model can only repeat the timetable. Those forecasts are learned from but not shown as the model's.

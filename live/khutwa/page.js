@@ -15,10 +15,10 @@
 
   // One square a seat, four across with an aisle; a dot for each passenger with no seat.
   function drawBus(el, load, seats) {
-    var html = '<div class="seats">', taken = Math.min(load, seats);
-    for (var i = 0; i < seats; i++) { if (i % 4 === 2) html += '<i class="aisle"></i>'; html += '<i' + (i < taken ? ' class="taken"' : '') + '></i>'; }
-    html += '</div>';
-    if (load > seats) { html += '<div class="standing">'; for (var j = 0; j < load - seats; j++) html += '<i></i>'; html += '</div>'; }
+    var taken = Math.min(load, seats), extra = Math.max(0, load - seats), html = '<figure><div class="seats">';
+    for (var i = 0; i < seats; i++) html += '<i' + (i < taken ? ' class="taken"' : '') + '></i>';
+    html += '</div><figcaption>' + plural(seats, 'seat', 'seats') + ', ' + (taken === seats ? 'all taken' : taken + ' taken') + '</figcaption></figure>';
+    if (extra) { html += '<figure><div class="standing">'; for (var j = 0; j < extra; j++) html += '<i></i>'; html += '</div><figcaption class="over">' + extra + ' with no seat</figcaption></figure>'; }
     el.innerHTML = html;
     el.setAttribute('aria-label', plural(load, 'passenger', 'passengers') + ' on a bus with ' + plural(seats, 'seat', 'seats'));
   }
@@ -29,7 +29,7 @@
   $('usual-load').textContent = over > 0 ? over + ' without a seat' : (U.seats - U.load) + ' seats free';
   $('usual-load').className = over > 0 ? 'over' : '';
   $('usual-words').textContent = plural(U.load, 'passenger', 'passengers') + ' on board, ' + plural(U.seats, 'seat', 'seats') + '.';
-  $('usual-source').textContent = 'Measured from taps on ' + D.service_date + '. Seats only.';
+  $('usual-source').textContent = 'From card taps on ' + D.service_date + '. Counts seats, not standing room.';
 
   function describe(o) {
     if (o.kind === 'earlier') return { title: 'Leave ' + plural(o.minutes_earlier, 'minute', 'minutes') + ' earlier', detail: clock(o.depart) + ' from this stop, route ' + o.route + '. No extra walk.' };
@@ -39,13 +39,15 @@
 
   function drawChoices() {
     var noWalk = $('no-walk').checked, list = $('choices'); list.innerHTML = '';
-    D.offer.choices.forEach(function (o, i) {
-      if (noWalk && o.walk_metres > 0) return;                       // never offered to someone who has said they cannot walk further
+    var open = D.offer.choices.filter(function (o) { return !(noWalk && o.walk_metres > 0); });      // never offered to someone who has said they cannot walk further
+    var roomiest = open.slice().sort(function (a, b) { return ((b.seats || 0) - (b.load || 0)) - ((a.seats || 0) - (a.load || 0)); })[0];
+    open.forEach(function (o, i) {
       var t = describe(o), li = document.createElement('li'), free = o.seats === null ? null : Math.max(0, o.seats - o.load);
       li.innerHTML = '<div class="choice-head"><h2></h2><span class="earn"></span></div><p class="detail"></p>' +
         (free === null ? '' : '<div class="meter"><b style="width:' + Math.min(100, Math.round(100 * o.load / o.seats)) + '%"></b></div><p class="room-left"></p>') + '<button type="button">I will take it</button>';
       li.querySelector('h2').textContent = t.title; li.querySelector('.earn').textContent = '+' + o.points + ' points'; li.querySelector('.detail').textContent = t.detail;
       if (free !== null) li.querySelector('.room-left').textContent = free > 0 ? o.load + ' on board, ' + plural(free, 'seat', 'seats') + ' free of ' + o.seats + ' when it left on the day' : 'Full when it left on the day';
+      if (o === roomiest) li.querySelector('button').className = 'primary';       // one obvious next step: the bus with the most room
       li.querySelector('button').addEventListener('click', function () { finish(o); });
       list.appendChild(li);
     });

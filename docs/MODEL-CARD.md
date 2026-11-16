@@ -13,7 +13,7 @@ This file is written by the engine (`python3 -m model.card`) from `metrics.json`
 
 ## The data, and its one day
 
-One service day, 2025-12-15: 8 routes, 240 stops, 551 trips, 8,265 stop visits and 6,409 boardings. Later hours of one day, Monday 15 December 2025, inside the winter break of most schools. Not tested on another day, and a school day may look different.
+One service day, 2025-12-15: 8 routes, 240 stops, 551 trips, 8,265 stop visits and 6,409 boardings. Tested on one day only: Monday 15 December 2025, in the school holidays. Later hours of that day, and routes and communities the model had not seen, are what was tested. Nothing was tested on another day, and a school day may look different.
 
 How the tables were made ready, stage by stage, with the count each stage kept:
 

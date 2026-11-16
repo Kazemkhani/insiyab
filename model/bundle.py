@@ -21,7 +21,8 @@ WALK_MAX = 400                 # rewarded choice: never offer a walk longer than
 WALK_FACTOR = 1.3              # a walk is the straight line times this
 WALK_SPEED = 75                # metres a minute
 TAKE_UP = 0.08                 # rewarded choice: the share of passengers who take an offer
-TAKE_UP_NOTE = "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 11 in 100: docs/research/research-methods.md, section 6). A planner can move this number."
+TAKE_UP_NOTE = "8 in 100 passengers who get the offer take it. Trials in San Francisco and Singapore found 7 to 11 in 100. A planner can move this number."
+TAKE_UP_SOURCE = "docs/research/research-methods.md, section 6"
 KHUTWA_NOTE = "Khutwa is this prototype's name for the points. RTA's nol Plus already gives points for spending; what is added here is offering them only where the day shows a gap."
 
 
@@ -194,7 +195,7 @@ def gap_and_decisions(day):
                              {"label": "Seats on that bus", "value": int(f.seats), "unit": "seats", "source": f"replay/route-{f.route_id}.json"},
                              {"label": "Passengers boarding at this stop within half an hour either side", "value": asked, "unit": "passengers", "source": f"replay/route-{f.route_id}.json"}],
                 "change": "Offer Khutwa points to passengers at this stop who take a bus with room: one a little earlier or later, or one on another route a short walk away.",
-                "effect": [{"metric": "passengers_shifted", "before": 0, "after": round(asked * TAKE_UP, 1), "kind": "simulated", "assumption": TAKE_UP_NOTE}],
+                "effect": [{"metric": "passengers_shifted", "before": 0, "after": round(asked * TAKE_UP, 1), "kind": "simulated", "assumption": TAKE_UP_NOTE, "source": TAKE_UP_SOURCE}],
                 "passengers_affected": asked, "cost_note": "Points for each passenger who shifts. Nobody is charged more, and an offer to walk is never made to someone who has said they cannot. " + KHUTWA_NOTE,
                 "confidence": "low", "offers": offers, "usual": {"route_id": f.route_id, "stop_id": f.stop_id, "depart": int(f.sched_dep), "load": int(f.load), "seats": int(f.seats)},
                 "why": f"The {clock(f.sched_dep)} bus on route {f.route_id} left this stop with {int(f.load)} passengers and {int(f.seats)} seats, and a bus with room was close in time or place."})
@@ -204,7 +205,8 @@ def gap_and_decisions(day):
         d["related"] = [x["id"] for x in decisions if x is not d and x["where"]["route_id"] == d["where"]["route_id"]]
 
     gap = {"bin_seconds": 3600, "load_kind": "measured",
-           "index_note": f"The Insiyab index runs from 0.1 to 10. In each route, direction and hour, add the passengers above the seats and the seats above the passengers over its trips: the index is 0.1 when all of that is empty seats and 10 when all of it is passengers without a seat. Loads here are the day's own, made from taps (forecast_peak_load holds the same measured number as peak_load until a forecast of load exists); {round(unknown_share * 100)} in 100 boardings had no recorded alighting and were spread along the trip. Seats only.",
+           "index_note": "Gap score: from 0.1 (only empty seats) to 10 (only passengers without a seat).",
+           "index_method": f"In each route, direction and hour, add the passengers above the seats and the seats above the passengers over its trips. The gap score is 0.1 when all of that is empty seats and 10 when all of it is passengers without a seat. Loads are the day's own, made from taps (forecast_peak_load holds the same measured number as peak_load until a forecast of load exists); {round(unknown_share * 100)} in 100 boardings had no recorded alighting and were spread along the trip. Seats are counted, not standing room.",
            "rows": rows, "totals": {"kind": "simulated", "assumption": "the vehicle swaps in the right-bus decision are made; the same passengers travel at the same times. A stretch between stops is measured as a straight line, so empty seat-kilometres are an under-count.",
                                     "before": {"passenger_minutes_over_seats": round(before[0]), "empty_seat_km": round(before[1])},
                                     "after": {"passenger_minutes_over_seats": round(min(after[0], before[0])), "empty_seat_km": round(after[1])}}}
