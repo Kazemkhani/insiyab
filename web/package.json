@@ -1,0 +1,9 @@
+{
+  "name": "insiyab-twin", "version": "1.0.0", "private": true, "type": "module",
+  "dependencies": {
+    "@deck.gl/core": "9.4.1", "@deck.gl/layers": "9.4.1",
+    "@fontsource/overpass": "5.3.0", "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0", "@fontsource/noto-kufi-arabic": "5.3.0",
+    "esbuild": "0.28.2", "qrcode": "1.5.4"
+  }
+}
