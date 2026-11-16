@@ -184,6 +184,10 @@ def build(day, fixture=True, generated_at=None, commit=None):
                {"key": "doors_not_opened", "label": "Stop visits where the door did not open", "value": closed, "unit": f"of {len(v)}", "kind": "measured", "source": "replay/"},
                {"key": "visits_with_nobody", "label": "Stop visits where nobody boarded and nobody alighted", "value": nobody, "unit": f"of {len(v)}", "kind": "measured", "source": "replay/"},
                {"key": "trips_over_seats", "label": "Trips with more passengers than seats", "value": int((trips["peak"] > trips["seats"]).sum()), "unit": f"of {len(trips)}", "kind": "measured", "source": "replay/"},
+               {"key": "trips_under_a_third_full", "label": "Trips that never filled a third of their seats", "value": int((trips["peak"] < trips["seats"] * B.SPARE_SHARE).sum()), "unit": f"of {len(trips)}", "kind": "measured", "source": "replay/"},
+               {"key": "trips", "label": "Bus trips on the day", "value": len(trips), "unit": "trips", "kind": "measured", "source": "replay/"},
+               {"key": "routes", "label": "Routes", "value": len(net["routes"]), "unit": "routes", "kind": "measured", "source": "network.json"},
+               {"key": "stops", "label": "Stops", "value": len(net["stops"]), "unit": "stops", "kind": "measured", "source": "network.json"},
                {"key": "wape_60", "label": "Forecast error one hour ahead, by route (WAPE)", "value": hour and hour["wape"], "unit": "share", "kind": "measured", "source": "metrics.json"},
                {"key": "skill_60", "label": "Better than the best naive forecast, one hour ahead", "value": hour and hour["skill"], "unit": "share of error removed", "kind": "measured", "source": "metrics.json"},
                {"key": "range_kept", "label": "How often the truth fell inside the stated range", "value": t_stop["range"]["kept"], "unit": "share, nine in ten promised", "kind": "measured", "source": "metrics.json"}]

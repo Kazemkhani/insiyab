@@ -34,6 +34,38 @@
    "value": 20
   },
   {
+   "key": "trips_under_a_third_full",
+   "kind": "measured",
+   "label": "Trips that never filled a third of their seats",
+   "source": "replay/",
+   "unit": "of 796",
+   "value": 606
+  },
+  {
+   "key": "trips",
+   "kind": "measured",
+   "label": "Bus trips on the day",
+   "source": "replay/",
+   "unit": "trips",
+   "value": 796
+  },
+  {
+   "key": "routes",
+   "kind": "measured",
+   "label": "Routes",
+   "source": "network.json",
+   "unit": "routes",
+   "value": 9
+  },
+  {
+   "key": "stops",
+   "kind": "measured",
+   "label": "Stops",
+   "source": "network.json",
+   "unit": "stops",
+   "value": 478
+  },
+  {
    "key": "wape_60",
    "kind": "measured",
    "label": "Forecast error one hour ahead, by route (WAPE)",
