@@ -22,6 +22,7 @@ Set up on 16 November. The plan, the contract between lanes, the stand-in data a
 | `docs/CONTRACT.md` | The files the four lanes meet through |
 | `docs/LANES.md` | Who owns what, how to push, cut lines |
 | `docs/RULES.md` | The rules that never bend, the glossary and the identity |
+| `docs/TOOLS.md` | Which tools we use, which we leave, and why |
 | `docs/CRITERIA-MATRIX.md` | Every scoring line, what we show for it, and where the proof is |
 | `docs/research/` | Sources, each with its address |
 | `handoff/` | The four prompts, one for each worker |

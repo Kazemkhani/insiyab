@@ -34,6 +34,8 @@ def check(paths, read):
             bad.append((p, "it is a data file type outside fixtures/ and opendata/public/")); continue
         if p.startswith(ALLOWED_DIRS) and not p.endswith(".json"):
             continue
+        if p.startswith("fixtures/raw/"):
+            continue            # invented tables with the real column names. scripts/gates.sh proves they equal a fresh build of tools/make_standin_raw.py
         try:
             text = read(p)
         except Exception:

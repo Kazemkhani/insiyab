@@ -18,6 +18,11 @@ run "the guard catches planted raw data"            python3 tools/guard.py --sel
 run "no raw data and no identifier in the repository" python3 tools/guard.py --all
 run "the stand-in bundle equals a fresh build"      python3 tools/make_fixture.py --check
 run "the stand-in bundle meets the contract"        python3 tools/contract_check.py fixtures
+# Invented raw tables carry the real column names, so the guard lets them through only here, and only if they are provably invented.
+if [ -d fixtures/raw ]; then
+  if [ -f tools/make_standin_raw.py ]; then run "the stand-in raw tables equal a fresh build (so they are invented, not real)" python3 tools/make_standin_raw.py --check
+  else echo "FAIL fixtures/raw/ exists but tools/make_standin_raw.py does not: nothing proves these tables are invented"; FAIL=1; fi
+fi
 if [ -f artifacts/meta.json ]; then run "the real bundle meets the contract" python3 tools/contract_check.py artifacts; else echo "NOTE artifacts/ is empty: no real result exists yet"; fi
 
 # Each lane adds its own suite here as one line, when the suite exists. A missing file is a failure, not a skip.

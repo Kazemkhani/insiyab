@@ -78,5 +78,6 @@ A GitHub Actions workflow in `.github/workflows/` that, on every push to `main`,
 5. The daily tap tables, once access is settled.
 6. The workflow.
 7. Metro stations, monthly totals, anything further.
+8. Only if everything above is done: walking times in minutes between each stop and the stops of other routes within 500 metres, from the OpenStreetMap street network (see `docs/TOOLS.md`). Keep the street file out of git and commit only the small table.
 
 The team shows its work to RTA's mentors on Tuesday 17 November at 09:00 Dubai time (05:00 UTC), and presents on Wednesday 18 November at 10:00 Dubai time. Your freeze is Wednesday 05:00 Dubai time.

@@ -59,6 +59,18 @@ How the forecasts are built and tested is in `docs/MODEL-PLAN.md`. That file is 
 
 Every decision is a card: where, when, the evidence with its source, the change in one sentence, the effect before and after marked measured or simulated, who is affected, and one plain reason.
 
+### 4.3 What trials elsewhere found, so our estimates are not guesses
+
+Each has its source in `docs/research/research-methods.md`, section 6. These set the range a simulated effect may use. They are never shown as our results.
+
+| Lever | What was measured elsewhere |
+|---|---|
+| Rewarded choice | San Francisco's BART Perks: those who joined cut their peak travel by about 10 in 100, and a third of the shift lasted after the rewards ended. Singapore's INSINC: about 7.5 in 100, more among heavy peak travellers. Melbourne's free early travel moved only 1.2 to 1.5 in 100. So we assume 5 to 10 in 100 of those offered, and let the planner move it. |
+| Right stop | Removing or merging close stops sped buses by about 6 in 100 in Portland and 4 to 14 in 100 in San Francisco. Guidance puts stops roughly 250 to 400 metres apart. |
+| On demand | Often costs more for each passenger than a bus: about twice in Los Angeles, and many trials closed. So we propose it only where a fixed route carries almost nobody, and we show the bus-hours released, not a saving in money. |
+| Fares | Bus passengers respond to price modestly: a 10 in 100 fare cut brings roughly 4 in 100 more trips in the short run, more off-peak. |
+| Walking | In one hot-city study, passengers accepted about 80 metres more walking to avoid a route 1 degree hotter. No measurement for Dubai was found, so any walking offer here is short and never the only choice. |
+
 ### 4.3 The demonstration goes deep on two scenes, not wide on five
 
 Dubai Airports told Marsad that two scenarios were enough. A judge counted buttons aloud. So all five levers exist as cards, and the walk-through shows two, chosen from the real day once the census is in:

@@ -46,7 +46,9 @@ The scoring sheet asks for "proper train/test separation" and for error "on held
 
 For B the unit that must never be split is the trip: all the stops of one trip are either learned from or tested on.
 
-**What stays untouched.** The last third of the origins, and one group of routes, are set aside at the start and looked at once, at the end. Every choice (which model, which features, which settings) is made on the rest. The numbers on the first screen are from the untouched part. This is said in the documentation, because a reader cannot otherwise tell a tuned number from a true one.
+**What stays untouched.** Forecasts made from 16:00 to 21:30, which cover the evening peak, and one group of communities, are set aside at the start and looked at once, at the end. Every choice (which model, which features, which settings) is made on forecasts made from 08:00 to 15:30. The numbers on the first screen are from the untouched part. The morning peak falls in the part used for choosing, so it is reported in its own table and labelled as such. This is said in the documentation, because a reader cannot otherwise tell a tuned number from a true one. (In the M5 forecasting competition most teams had an entry that beat the naive forecast and fewer than half chose it, misled by their own validation: `docs/research/research-methods.md`.)
+
+**How sure the gain is.** The gain over the naive forecast is reported with a range, found by resampling whole origins and whole communities, so a judge can see it is not luck.
 
 **If other days arrive:** learn from earlier days, test on later ones, and test once on the organisers' day, which the model will never have seen.
 
@@ -72,7 +74,7 @@ The sheet wants the choice "justified against alternatives". So several are buil
 |---|---|---|
 | 1 | The naive forecasts above | The floor |
 | 2 | A plain count model (Poisson regression with a penalty) on a handful of features | Easy to explain; shows how much of the answer is simple |
-| 3 | Boosted trees with a loss made for counts | The method that most often wins on tables like this; handles zeros and mixed features |
+| 3 | Boosted trees with a loss made for counts with many zeros (LightGBM with a Tweedie loss), one model across every stop and every horizon | The method that won the M5 competition and the best in a published study of bus boardings in Brisbane; handles zeros and mixed features |
 | 4 | **Two parts added together**: what kind of place this is (learned across all stops from the timetable, the stop's place on the route, the community and public data), and what today has been so far (learned from the hours already seen) | With one day there is no history for any single stop. This lets every stop borrow from stops like it, and still follow the day. This is the design we expect to choose. |
 | 5 | Model 4 with the levels made to add up: stops sum to routes, routes to communities, communities to the network | A planner who sees 400 on the route screen and 380 summed from the stops stops trusting both |
 
@@ -87,7 +89,8 @@ For B: the two naive forecasts, a boosted-tree model, and the same model given h
 3. **Borrowing across stops** to make one day enough (model 4).
 4. **Ranges that are tested**, and decisions that state their risk.
 5. **Levels that add up.**
-6. **Public data as features**: population of the community, the kind of stop (pole, shelter, air-conditioned shelter), the weather that hour, the school calendar, and if they arrive, RTA's own open daily taps.
+6. **People who will come back.** A passenger who got off at a stop this morning and has not boarded since is likely to board near there later. The count of such passengers at each stop is a feature no timetable holds. Cards are only counted, never shown.
+7. **Public data as features**: population of the community, the kind of stop (pole, shelter, air-conditioned shelter), the weather that hour, the school calendar, and if they arrive, RTA's own open daily taps.
 
 **Why not a deep network.** One day of data, a table of mixed features, a deadline of hours, and a judge who must trust it. Say this in the documentation, with the comparison table, and with the published comparisons from the research file.
 
@@ -97,16 +100,16 @@ Every one of these, for every model, at every horizon, on every subset. The engi
 
 | Measure | What it is | Care needed |
 |---|---|---|
+| WAPE | total miss over total passengers | Lead with this one. It is a share, and it does not break on zeros. |
 | MAE | the average size of the miss | In passengers, or seconds. The one a planner can feel. |
 | RMSE | the same, punishing large misses | |
 | MAPE | the average miss as a share of what happened | Breaks when what happened is zero or tiny, and most stop-quarter-hours are. So it is taken only over bins with at least 5 boardings, and `mape_n` says how many that was. Say this out loud in the pitch before a judge asks. |
-| WAPE | total miss over total passengers | The share measure that does not break. Put it next to MAPE. |
 | Gain over naive | 1 less (model MAE over naive MAE) | Against the best naive forecast |
 | Range kept | how often the truth fell inside the stated range | Should be near the nine in ten promised |
 
 **Subsets** (the slide's "multiple subsets of the data"): time of day (early, morning peak, midday, evening peak, late); route groups never seen in learning; community groups never seen; kind of bus; direction; busy stops against quiet ones.
 
-**The table the judges see** has horizons across the top and, down the side, the naive forecasts, each model, and then the chosen model on each subset, with the worst subset marked. Showing the worst case is what makes the rest believable.
+**The three tables the judges see** are set out, with their rows and columns, at the end of `docs/research/research-methods.md`: the headline table on the untouched part (every naive forecast and every model); the table by horizon and by peak or off-peak; and the table by subset. Every row is shown, including any where the model loses to the naive forecast. A row where it loses tells a planner where not to rely on it, and is what makes the other rows believable.
 
 ## 7. Explaining it
 
@@ -128,12 +131,14 @@ Each lever is a rule on the forecasts and the day's records. The rule, its thres
 
 Decisions are ranked by passenger-minutes improved for each bus-hour they cost. The first screen shows the top few.
 
+One caution from the research binds the right-stop lever: published work finds that skipping stops and holding buses can make service worse when the forecasts behind them are unreliable. So a request stop is proposed only where the forecast was right on held-out visits, and the card shows how often it was. That is also the answer to "why does accuracy matter": the decision is only as safe as the forecast.
+
 ## 9. Running it again
 
 - One command runs every stage and writes the bundle: `python3 -m model.run --data <folder> --out artifacts`. With `--data fixtures-raw` it runs on stand-in tables, so every stage can be built and tested before the real data is touched.
 - Fixed random seeds. The same input gives the same bundle, byte for byte, and a test checks it.
 - `docs/MODEL-CARD.md` is written by the engine from `metrics.json`: what was forecast, the data and its one day, the splits, the table, the limits. Never by hand.
-- The same stages are laid out as a flow in Dataiku, one recipe for each stage, because that is where RTA would run it, and a picture of that flow goes in the documentation.
+- The same stages are laid out as a flow in Dataiku, one recipe for each stage, because that is where RTA would run it, and a picture of that flow goes in the documentation. Dataiku's own analysis of a model by sub-population is run as well: it answers the slide's "multiple subsets of the data" in the organisers' own tool.
 - Few libraries, all common, so the code runs inside Dataiku without special set-up.
 
 ## 10. Tests that must exist before any number is shown

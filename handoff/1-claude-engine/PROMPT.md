@@ -10,7 +10,7 @@ The team has two wins behind it this month, and both taught the same thing. Mars
 
 ## 2. Read first, in this order
 
-`docs/REQUIREMENTS.md`, `docs/STRATEGY.md`, `docs/MODEL-PLAN.md`, `docs/DATA.md`, `docs/CONTRACT.md`, `docs/LANES.md`, `docs/RULES.md`, then `docs/research/research-methods.md` and `docs/research/research-dubai.md`. Then every file in `coordination/`.
+`docs/REQUIREMENTS.md`, `docs/STRATEGY.md`, `docs/MODEL-PLAN.md`, `docs/DATA.md`, `docs/CONTRACT.md`, `docs/LANES.md`, `docs/RULES.md`, `docs/TOOLS.md`, then `docs/research/research-methods.md` and `docs/research/research-dubai.md`. Then every file in `coordination/`.
 
 On this laptop you also have what the earlier projects left: `~/dev/bayyina` (its `scripts/gates.sh`, `scripts/deploy.sh`, `tests/browser_check.py` and `tools/` are the patterns to copy) and `~/work/bayyina-pack/` (the method, the checklists, the templates). Read them; never change them.
 
@@ -34,13 +34,13 @@ The data is in Dataiku, in a collection Amir has open in Chrome: `https://dss-8a
 
 1. First write `model/census.py`: one program that, given the five tables, prints only counts and shares (rows, columns, types, empty cells, first and last time, distinct counts, join match rates, and the six counts in `docs/DATA.md` section 3). It must never print a row, a card, a device or a driver. Test it on stand-in raw tables (step 3 below).
 2. Then run it where the data is. If you have a browser tool that can drive Amir's Chrome, create a project in Dataiku, add the datasets from the collection, and run the program in a Python notebook there. If you do not, write the exact steps in `coordination/lane-1.md` as `TO AMIR:` (or `TO MUSTAFO:`, who also has access and is at the lab): where to click, what to paste, and that the printed output, which holds no personal data, is to be pasted back.
-3. Build `tools/make_standin_raw.py`: invented tables with exactly the provided column names (`docs/DATA.md`), written to `fixtures/raw/`, so every stage below can be built and tested tonight without the real data. Use the public GTFS standard for the twelve network files.
+3. Build `tools/make_standin_raw.py`: invented tables with exactly the provided column names (`docs/DATA.md`), written to `fixtures/raw/`, so every stage below can be built and tested tonight without the real data. Use the public GTFS standard for the twelve network files. It must take `--check` (rebuild in memory, compare with what is on disk, end with the line `ALL PASS`), as `tools/make_fixture.py` does: the gates use that to prove the tables in `fixtures/raw/` are invented, which is the only reason the guard lets files with those column names into git. A real table must never be put there.
 
 The census settles the two things the plan cannot guess: what one nol row is (a tap, or a journey), and how taps, the runtime report, the fleet table and the network join.
 
 ## 5. The engine
 
-Build `model/` exactly as `docs/MODEL-PLAN.md` sets out, in its cut-line order (section 11 of that file). The rules that matter most:
+Build `model/` exactly as `docs/MODEL-PLAN.md` sets out, in its cut-line order (section 11 of that file). The design to build, its features and the three tables the judges will see are written out at the end of `docs/research/research-methods.md` ("My recommendation"): follow it unless the census says otherwise. The rules that matter most:
 
 - **The rule of the clock**, with its test, before any model.
 - **Every naive forecast is built and scored exactly like the model.** Gain is reported against the best of them.

@@ -17,7 +17,7 @@ cd ~/dev/insiyab-codex && bash scripts/install-hooks.sh
 
 Work only in that clone, on `main`, and only inside `web/` and `coordination/lane-2.md`. Lane 1 (Claude) works in `~/dev/insiyab` on the same laptop: never open or change that folder.
 
-Read, in this order: `docs/REQUIREMENTS.md`, `docs/STRATEGY.md`, `docs/TWIN.md` (your specification), `docs/CONTRACT.md` (the only files you may read data from), `docs/RULES.md` (words, honesty, design, the glossary and the identity), `docs/LANES.md`. Then every file in `coordination/`.
+Read, in this order: `docs/REQUIREMENTS.md`, `docs/STRATEGY.md`, `docs/TWIN.md` (your specification), `docs/TOOLS.md` (which tools to use and which to leave: deck.gl for the moving buses, Blender from scripts for the figures, no map service), `docs/CONTRACT.md` (the only files you may read data from), `docs/RULES.md` (words, honesty, design, the glossary and the identity), `docs/LANES.md`. Then every file in `coordination/`.
 
 On this laptop, `~/dev/bayyina/twin/` is a working guided scene you built last week (three.js 0.187.0, esbuild 0.28.2, chapters, a fitted camera, tests at five screen sizes), and `~/dev/bayyina/web/` and `~/dev/bayyina/tests/browser_check.py` show the patterns for a plain static site with a browser test. Reuse the patterns. Never change those folders.
 
