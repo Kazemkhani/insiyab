@@ -29,7 +29,9 @@ for (const [name,value] of Object.entries(data)) {
   await fs.mkdir(path.dirname(path.join(out,'data',name)),{recursive:true});
   await fs.writeFile(path.join(out,'data',name),JSON.stringify(value));
 }
-await fs.writeFile(path.join(out,'bundle.js'), 'window.INSIYAB_BUNDLE=' + JSON.stringify(data).replace(/</g,'\\u003c') + ';\n');
+const firstScreenData={...data};delete firstScreenData['forecast/boardings-stop.json'];
+await fs.writeFile(path.join(out,'bundle.js'), 'window.INSIYAB_BUNDLE=' + JSON.stringify(firstScreenData).replace(/</g,'\\u003c') + ';\n');
+await fs.writeFile(path.join(out,'stop-forecast.js'), "window.INSIYAB_BUNDLE['forecast/boardings-stop.json']=" + JSON.stringify(data['forecast/boardings-stop.json']).replace(/</g,'\\u003c') + ';\n');
 await build({entryPoints:[path.join(here,'src/app.js')],outfile:path.join(out,'app.js'),bundle:true,format:'iife',target:'es2022',minify:true,legalComments:'linked'});
 for (const name of ['index.html','style.css']) await fs.copyFile(path.join(here,'src',name),path.join(out,name));
 await fs.mkdir(path.join(out,'fonts'),{recursive:true});

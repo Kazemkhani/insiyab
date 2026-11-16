@@ -41,6 +41,7 @@ with sync_playwright() as p:
         page.locator('#entity-type').select_option('community');check('boardings over the service day' in page.locator('#detail').inner_text(),f'{width}: community totals')
         page.locator('[data-view="forecast"]').click()
         check(page.locator('#forecast-controls').is_visible(),f'{width}: forecast switch responds')
+        page.wait_for_function("!!INSIYAB_BUNDLE['forecast/boardings-stop.json']")
         page.locator('#freeze').click()
         origin=page.evaluate('insiyab.forecastOrigin')
         page.evaluate('insiyab.setTime(insiyab.forecastOrigin)')

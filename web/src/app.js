@@ -39,7 +39,7 @@ function detail() {
   }
   $('detail').innerHTML=html;
 }
-function pick(kind,id){$('entity-type').value=kind;selected=id;records();if(view==='forecast'&&kind==='stop'){$('forecast-stop').value=id;forecastTimes();}}
+function pick(kind,id){$('entity-type').value=kind;selected=id;records();if(view==='forecast'&&B['forecast/boardings-stop.json']&&kind==='stop'){$('forecast-stop').value=id;forecastTimes();}}
 function render() {
   if(Math.floor(time/M.meta.bin_seconds)!==lastErrorBin){renderError();lastErrorBin=Math.floor(time/M.meta.bin_seconds);}
 
@@ -87,14 +87,14 @@ function renderError(){
   const score=rollingError(B['forecast/boardings-route.json'],time,3600);
   $('error-counter').innerHTML=score.n?`<span>Average miss so far<br><small>One hour ahead</small></span><strong>${number(score.model)} <small>forecast</small></strong><strong>${number(score.naive)} <small>naive forecast</small></strong><span class="source">passengers / route / ${M.meta.bin_seconds/60} min · <br>${score.n} held-out bins · forecast/boardings-route.json</span>`:'<span>Waiting for the first one-hour forecast bin to finish. No error is known yet.</span>';
 }
-function setView(next){
+async function setView(next){
   view=next;playing=false;$('play').textContent='Play';
   document.querySelectorAll('nav button').forEach(e=>e.setAttribute('aria-current',e.dataset.view===next?'page':'false'));
   $('replay').hidden=next==='model';$('model').hidden=next!=='model';
   $('gap-controls').hidden=next!=='gap';$('gap-results').hidden=next!=='gap';$('replay').classList.toggle('gap-view',next==='gap');
   $('forecast-controls').hidden=next!=='forecast';$('pick-stop').hidden=next!=='forecast';
   $('map-caption').textContent=next==='forecast'?'The forecast meeting reality':next==='gap'?'Where seats and passengers do not match':'The day, replayed';
-  if(next==='forecast')freezeForecast();
+  if(next==='forecast'){await ensureStopForecast();freezeForecast();}
   if(next==='model')renderModel();
   if(next==='gap'){renderGap();pollRoom();}
   render();window.scrollTo(0,0);
@@ -103,7 +103,7 @@ document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.datas
 function freezeForecast(){forecastOrigin=[...M.meta.origins].reverse().find(o=>o<=time)??M.meta.origins[0];$('frozen-at').textContent=`Made at ${clock(forecastOrigin)}. Quarter hour ending ${clock(forecastOrigin+3600)}. forecast/boardings-stop.json · ${M.meta.service_date}`;render();}
 $('freeze').onclick=freezeForecast;
 function forecastLayers(shared,unit){
-  if(view!=='forecast')return [];
+  if(view!=='forecast'||!B['forecast/boardings-stop.json'])return [];
   const rows=originRows(B['forecast/boardings-stop.json'],forecastOrigin,3600).filter(r=>r.horizon===3600);
   const data=[...new Set(rows.map(r=>r.id))].map(id=>{
     const bins=rows.filter(r=>r.id===id),known=bins.filter(r=>r.bin_start+B['forecast/boardings-stop.json'].bin_seconds<=time && r.actual!==null);
@@ -112,10 +112,14 @@ function forecastLayers(shared,unit){
   return [new ScatterplotLayer({...shared,id:'forecast-halos',data,getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.forecast)*4,radiusUnits:'pixels',radiusMaxPixels:34,filled:false,stroked:true,getLineColor:[...C.spare,130],getLineWidth:2,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('forecast-stop').value=object.id;forecastTimes();pick('stop',object.id);}}}),new ScatterplotLayer({...shared,id:'actual-halos',data:data.filter(d=>d.actual!==null),getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.actual)*4,radiusUnits:'pixels',radiusMaxPixels:34,getFillColor:[...C.flow,90]})];
 }
 $('forecast-stop').innerHTML=M.network.stops.map(s=>`<option value="${escape(s.stop_id)}">${escape(s.name)}</option>`).join('');
-$('forecast-stop').value=B['forecast/boardings-stop.json'].series[0]?.id;
+let stopForecastPromise;
+function ensureStopForecast(){
+  if(!stopForecastPromise)stopForecastPromise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='stop-forecast.js';script.onload=()=>{if(B['forecast/boardings-stop.json'].fixture!==M.meta.fixture){reject(Error('Mixed forecast bundle'));return;}$('forecast-stop').value=B['forecast/boardings-stop.json'].series[0]?.id;forecastTimes();resolve();};script.onerror=()=>{ $('challenge').textContent='The local forecast file could not be opened.';reject(Error('Missing stop-forecast.js'));};document.head.append(script);});
+  return stopForecastPromise;
+}
 let challengeRows=[],challengeRevealed=false;
 function forecastTimes(){
-  const series=B['forecast/boardings-stop.json'].series.find(s=>s.id===$('forecast-stop').value);
+  const series=B['forecast/boardings-stop.json']?.series.find(s=>s.id===$('forecast-stop').value);
   challengeRows=(series?.rows??[]).filter(r=>r.horizon===oneHour && r.bin_start>=12*3600).sort((a,b)=>a.bin_start-b.bin_start);
   $('forecast-time').innerHTML=challengeRows.map((r,i)=>`<option value="${i}">${clock(r.bin_start)} to ${clock(r.bin_start+B['forecast/boardings-stop.json'].bin_seconds)}</option>`).join('');
   challengeRevealed=false;renderChallenge();
@@ -127,7 +131,7 @@ function renderChallenge(){
   $('challenge').innerHTML=`<p>Forecast made at ${clock(row.origin)} for the bin ending ${clock(row.origin+row.horizon)}. The model had seen no records after ${clock(row.origin)}.</p><div class="challenge-numbers"><div><span class="eyebrow">Forecast</span><strong>${number(row.forecast)}</strong><span>passengers boarding</span><small>Range ${number(row.lo)} to ${number(row.hi)}</small></div><div><span class="eyebrow">What happened · measured</span><strong data-actual>${challengeRevealed?number(row.actual):'?'}</strong><span>${challengeRevealed?'passengers boarded':'Hidden until you reveal'}</span></div></div>${challengeRevealed?`<p data-miss>${row.actual===null?'No actual count supplied.':`A miss of ${number(Math.abs(row.forecast-row.actual))} passengers. The naive forecast said ${number(row.baseline)} and missed by ${number(Math.abs(row.baseline-row.actual))}.`}</p>`:''}`;
   $('reveal').textContent=challengeRevealed?'Hide what happened':'Reveal what happened';
 }
-$('forecast-stop').onchange=forecastTimes;$('forecast-time').onchange=()=>{challengeRevealed=false;renderChallenge();};$('reveal').onclick=()=>{challengeRevealed=!challengeRevealed;renderChallenge();};forecastTimes();
+$('forecast-stop').onchange=forecastTimes;$('forecast-time').onchange=()=>{challengeRevealed=false;renderChallenge();};$('reveal').onclick=()=>{challengeRevealed=!challengeRevealed;renderChallenge();};
 $('model-target').innerHTML=B['metrics.json'].targets.map((t,i)=>`<option value="${i}">${escape(t.target.replaceAll('_',' '))} · ${escape(t.level)}</option>`).join('');
 function renderModel(){
   const t=B['metrics.json'].targets[+$('model-target').value],horizons=[...new Set(t.results.map(r=>r.horizon))].sort((a,b)=>a-b),all=t.subsets.find(s=>s.kind==='all')?.subset,chosen=t.models.find(m=>!m.is_baseline),naive=t.models.find(m=>m.is_baseline);
