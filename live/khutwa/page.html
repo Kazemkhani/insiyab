@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Khutwa: a seat on the next bus</title>
+<style>/*STYLE*/</style>
+</head>
+<body>
+<p class="band" id="band" hidden>STAND-IN DATA, NOT A RESULT</p>
+<header>
+  <p class="name">Khutwa <span lang="ar" dir="rtl">خطوة</span></p>
+  <a href="../">Insiyab</a>
+</header>
+
+<main id="main" aria-live="polite">
+  <!-- 1. The usual bus -->
+  <section id="s-usual">
+    <p class="eyebrow" id="where"></p>
+    <h1 id="headline"></h1>
+    <div class="bus" id="usual-bus" role="img"></div>
+    <p class="count"><strong id="usual-load"></strong> <span id="usual-words"></span></p>
+    <p class="source" id="usual-source"></p>
+    <button class="primary" id="show" hidden>Show me the offer</button>
+    <p class="wait" id="waiting" hidden>You are in the room. The offer will appear here.</p>
+  </section>
+
+  <!-- 2. The choices -->
+  <section id="s-offer" hidden>
+    <p class="eyebrow">A bus with room</p>
+    <h1>Take one of these and earn Khutwa points.</h1>
+    <ol id="choices"></ol>
+    <label class="walk"><input type="checkbox" id="no-walk"> <span>I cannot walk further</span></label>
+    <button class="plain" id="decline">No thanks, I will take my usual bus</button>
+    <p class="small">Your usual bus still runs, and its fare does not change. An offer only ever adds points.</p>
+  </section>
+
+  <!-- 3. Taken, or not -->
+  <section id="s-done" hidden>
+    <p class="eyebrow" id="done-eyebrow"></p>
+    <h1 id="done-headline"></h1>
+    <div class="points" id="points" role="img"></div>
+    <p id="done-words"></p>
+    <p class="room" id="room-count" hidden></p>
+    <p class="simulated" id="simulated"></p>
+    <button class="plain" id="again">See the choices again</button>
+  </section>
+
+  <section id="s-none" hidden>
+    <p class="eyebrow">Nothing to offer</p>
+    <h1>No stop had a full bus with a roomier one close by.</h1>
+    <p>On this day's records the rule found no place for a rewarded choice. An offer is made only where there is a real gap.</p>
+  </section>
+</main>
+
+<footer>
+  <p>A fictional passenger, built from the day's totals and not from any one person. A student prototype for the RTA Future Move Hackathon. Khutwa is this prototype's name for points; RTA's nol Plus already gives points for spending. This page asks you for nothing: no name, no number.</p>
+</footer>
+<script>window.KHUTWA = "__DATA__";</script>
+<script>/*SCRIPT*/</script>
+</body>
+</html>

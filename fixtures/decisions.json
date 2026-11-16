@@ -321,9 +321,11 @@
      "depart": 60680,
      "extra_minutes": 0,
      "kind": "earlier",
+     "load": 19,
      "minutes_earlier": 26,
      "points": 20,
      "route_id": "901",
+     "seats": 48,
      "stop_id": "101052",
      "walk_metres": 0,
      "walk_minutes": 0
@@ -332,9 +334,11 @@
      "depart": 63560,
      "extra_minutes": 0,
      "kind": "later",
+     "load": 30,
      "minutes_later": 22,
      "points": 18,
      "route_id": "901",
+     "seats": 48,
      "stop_id": "101052",
      "walk_metres": 0,
      "walk_minutes": 0
@@ -345,6 +349,13 @@
     "d001"
    ],
    "title": "Reward the passenger who takes the emptier bus",
+   "usual": {
+    "depart": 62240,
+    "load": 25,
+    "route_id": "901",
+    "seats": 20,
+    "stop_id": "101052"
+   },
    "when": {
     "from": 60440,
     "to": 64040

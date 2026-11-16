@@ -174,7 +174,8 @@ def gap_and_decisions(day):
         for kind, cand in (("earlier", line[line["sched_dep"] < f.sched_dep].tail(1)), ("later", line[line["sched_dep"] > f.sched_dep].head(1))):
             if len(cand) and cand.iloc[0].load < cand.iloc[0].seats:
                 c = cand.iloc[0]; shift = int(round(abs(f.sched_dep - c.sched_dep) / 60))
-                offers.append({"kind": kind, "route_id": f.route_id, "stop_id": f.stop_id, "depart": int(c.sched_dep), "walk_metres": 0, "walk_minutes": 0, "extra_minutes": 0, "points": 10 + 2 * (shift // 5), f"minutes_{kind}": shift})
+                offers.append({"kind": kind, "route_id": f.route_id, "stop_id": f.stop_id, "depart": int(c.sched_dep), "walk_metres": 0, "walk_minutes": 0, "extra_minutes": 0, "points": 10 + 2 * (shift // 5), f"minutes_{kind}": shift,
+                               "load": int(c.load), "seats": int(c.seats)})
         if f.stop_id in stops.index:
             near = v[(v["route_id"] != f.route_id) & ((v["sched_dep"] - f.sched_dep).abs() <= 1200) & (v["load"] < v["seats"])].copy()
             near["walk"] = metres(stops.at[f.stop_id, "lon"], stops.at[f.stop_id, "lat"], near["lon"], near["lat"]) * WALK_FACTOR
@@ -182,7 +183,7 @@ def gap_and_decisions(day):
             if len(near):
                 c = near.iloc[0]; walk = int(round(c.walk)); mins = int(np.ceil(walk / WALK_SPEED))
                 offers.append({"kind": "other_route", "route_id": c.route_id, "stop_id": c.stop_id, "depart": int(c.sched_dep), "walk_metres": walk, "walk_minutes": mins,
-                               "extra_minutes": mins + max(0, int(round((c.sched_dep - f.sched_dep) / 60))), "points": 10 + 2 * mins})
+                               "extra_minutes": mins + max(0, int(round((c.sched_dep - f.sched_dep) / 60))), "points": 10 + 2 * mins, "load": int(c.load), "seats": int(c.seats)})
         if offers:
             hour = v[(v["stop_id"] == f.stop_id) & (v["route_id"] == f.route_id) & ((v["sched_dep"] - f.sched_dep).abs() <= 1800)]
             asked = int(hour["on"].sum())
@@ -195,7 +196,7 @@ def gap_and_decisions(day):
                 "change": "Offer Khutwa points to passengers at this stop who take a bus with room: one a little earlier or later, or one on another route a short walk away.",
                 "effect": [{"metric": "passengers_shifted", "before": 0, "after": round(asked * TAKE_UP, 1), "kind": "simulated", "assumption": TAKE_UP_NOTE}],
                 "passengers_affected": asked, "cost_note": "Points for each passenger who shifts. Nobody is charged more, and an offer to walk is never made to someone who has said they cannot. " + KHUTWA_NOTE,
-                "confidence": "low", "offers": offers,
+                "confidence": "low", "offers": offers, "usual": {"route_id": f.route_id, "stop_id": f.stop_id, "depart": int(f.sched_dep), "load": int(f.load), "seats": int(f.seats)},
                 "why": f"The {clock(f.sched_dep)} bus on route {f.route_id} left this stop with {int(f.load)} passengers and {int(f.seats)} seats, and a bus with room was close in time or place."})
     for i, d in enumerate(decisions):
         decisions[i] = {"id": f"d{i + 1:03d}", **d}

@@ -47,7 +47,10 @@ KHUTWA=0
 if [ -f "$WORK/src/rider/build.mjs" ]; then
   ( cd "$WORK/src" && node rider/build.mjs --bundle "$BUNDLE" --out "$UP/khutwa" ) > "$LOCK/rider.txt" 2>&1 || { tail -15 "$LOCK/rider.txt"; stop "lane 3's build failed"; }
   [ -s "$UP/khutwa/index.html" ] || stop "the Khutwa build has no index.html"; KHUTWA=1
-else echo "NOTE rider/build.mjs does not exist yet: this deploy has no Khutwa page"; fi
+elif [ -f "$WORK/src/live/khutwa/build.mjs" ]; then      # lane 1's stand-in for the passenger page, until lane 3's rider/ exists
+  ( cd "$WORK/src" && node live/khutwa/build.mjs --bundle "$BUNDLE" --out "$UP/khutwa" ) > "$LOCK/rider.txt" 2>&1 || { tail -15 "$LOCK/rider.txt"; stop "the Khutwa page's build failed"; }
+  [ -s "$UP/khutwa/index.html" ] || stop "the Khutwa build has no index.html"; KHUTWA=1; echo "NOTE rider/build.mjs does not exist yet: the Khutwa page is lane 1's, from live/khutwa/"
+else echo "NOTE this deploy has no Khutwa page"; fi
 # The room relay (live/api): six small calls under /api/room/. It is the only thing in the upload that is not a plain file.
 RELAY=0
 if [ -d "$WORK/src/live/api" ]; then
