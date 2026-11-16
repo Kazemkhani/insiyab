@@ -1,0 +1,145 @@
+{
+ "decisions": [
+  {
+   "change": "Swap the double-deck buses on route R4 with the standard buses on route R1 between 06:30 and 09:00.",
+   "confidence": "medium",
+   "cost_note": "No extra bus and no extra driver.",
+   "effect": [
+    {
+     "after": 900,
+     "assumption": "the same passengers board at the same times; only the vehicles change",
+     "before": 5400,
+     "kind": "simulated",
+     "metric": "passengers_over_seats_minutes"
+    }
+   ],
+   "evidence": [
+    {
+     "label": "Largest load on the fullest trip",
+     "source": "replay/route-R1.json",
+     "unit": "passengers",
+     "value": 55
+    },
+    {
+     "label": "Seats on that bus",
+     "source": "replay/route-R1.json",
+     "unit": "seats",
+     "value": 35
+    },
+    {
+     "label": "Largest load on the emptiest R4 trip",
+     "source": "replay/route-R4.json",
+     "unit": "passengers",
+     "value": 0
+    }
+   ],
+   "id": "d001",
+   "lever": "right_bus",
+   "riders_affected": 640,
+   "title": "Put the big bus where the people are",
+   "when": {
+    "from": 23400,
+    "to": 32400
+   },
+   "where": {
+    "community_id": "c6",
+    "route_id": "R1",
+    "stop_ids": [
+     "R1-S12"
+    ]
+   },
+   "why": "The forecast puts more people on R1 than its buses seat, while R4's larger buses run mostly empty in the same hours."
+  },
+  {
+   "change": "After 21:00, make three R4 stops request stops: the bus calls there when a rider asks from the stop or from the bus.",
+   "confidence": "low",
+   "cost_note": "A request button or a tap in the app at each stop.",
+   "effect": [
+    {
+     "after": 2.5,
+     "assumption": "25 seconds saved for each stop the bus no longer slows for",
+     "before": 0,
+     "kind": "simulated",
+     "metric": "minutes_saved_per_trip"
+    }
+   ],
+   "evidence": [
+    {
+     "label": "Stop visits where the door did not open",
+     "source": "replay/",
+     "unit": "visits",
+     "value": 348
+    },
+    {
+     "label": "All stop visits",
+     "source": "replay/",
+     "unit": "visits",
+     "value": 4716
+    }
+   ],
+   "id": "d002",
+   "lever": "right_stop",
+   "riders_affected": 12,
+   "title": "Stop only when someone is there",
+   "when": {
+    "from": 75600,
+    "to": 86400
+   },
+   "where": {
+    "community_id": null,
+    "route_id": "R4",
+    "stop_ids": [
+     "R4-S03",
+     "R4-S04",
+     "R4-S05"
+    ]
+   },
+   "why": "At these stops and hours the forecast says nobody boards or alights on most visits."
+  },
+  {
+   "change": "Offer Khutwa points to riders at this stop who take route R2 from the next stop, or travel 20 minutes earlier.",
+   "confidence": "low",
+   "cost_note": "Points worth a few dirhams for each rider who shifts.",
+   "effect": [
+    {
+     "after": 17,
+     "assumption": "8 in 100 riders who get the offer take it (published trials in other cities found 7 to 10 in 100)",
+     "before": 0,
+     "kind": "simulated",
+     "metric": "riders_shifted"
+    }
+   ],
+   "evidence": [
+    {
+     "label": "Forecast boardings at the stop in the peak hour",
+     "source": "forecast/boardings-stop.json",
+     "unit": "passengers",
+     "value": 210
+    },
+    {
+     "label": "Free seats on route R2 within 400 metres in the same hour",
+     "source": "replay/route-R2.json",
+     "unit": "seats",
+     "value": 95
+    }
+   ],
+   "id": "d003",
+   "lever": "rewarded_choice",
+   "riders_affected": 210,
+   "title": "Reward the rider who takes the emptier bus",
+   "when": {
+    "from": 25200,
+    "to": 30600
+   },
+   "where": {
+    "community_id": null,
+    "route_id": "R1",
+    "stop_ids": [
+     "R1-S11"
+    ]
+   },
+   "why": "The forecast shows more riders than seats here, and spare seats a short walk away."
+  }
+ ],
+ "fixture": true
+}

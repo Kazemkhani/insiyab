@@ -1,0 +1,37 @@
+{
+ "fixture": true,
+ "headline": [
+  {
+   "key": "boardings",
+   "kind": "measured",
+   "label": "Boardings on the day",
+   "source": "replay/",
+   "unit": "taps",
+   "value": 10750
+  },
+  {
+   "key": "doors_not_opened",
+   "kind": "measured",
+   "label": "Stop visits where the door did not open",
+   "source": "replay/",
+   "unit": "of 4716",
+   "value": 348
+  },
+  {
+   "key": "wape_60",
+   "kind": "measured",
+   "label": "Forecast error one hour ahead (WAPE)",
+   "source": "metrics.json",
+   "unit": "share",
+   "value": 0.1793
+  },
+  {
+   "key": "skill_60",
+   "kind": "measured",
+   "label": "Better than the naive forecast, one hour ahead",
+   "source": "metrics.json",
+   "unit": "share of error removed",
+   "value": 0.5434
+  }
+ ]
+}

@@ -1,0 +1,828 @@
+{
+ "communities": [
+  {
+   "centroid": [
+    55.2,
+    25.1
+   ],
+   "community_id": "c1",
+   "name_ar": "منطقة تجريبية 1",
+   "name_en": "Stand-in community 1"
+  },
+  {
+   "centroid": [
+    55.26,
+    25.1
+   ],
+   "community_id": "c2",
+   "name_ar": "منطقة تجريبية 2",
+   "name_en": "Stand-in community 2"
+  },
+  {
+   "centroid": [
+    55.32,
+    25.1
+   ],
+   "community_id": "c3",
+   "name_ar": "منطقة تجريبية 3",
+   "name_en": "Stand-in community 3"
+  },
+  {
+   "centroid": [
+    55.2,
+    25.15
+   ],
+   "community_id": "c4",
+   "name_ar": "منطقة تجريبية 4",
+   "name_en": "Stand-in community 4"
+  },
+  {
+   "centroid": [
+    55.26,
+    25.15
+   ],
+   "community_id": "c5",
+   "name_ar": "منطقة تجريبية 5",
+   "name_en": "Stand-in community 5"
+  },
+  {
+   "centroid": [
+    55.32,
+    25.15
+   ],
+   "community_id": "c6",
+   "name_ar": "منطقة تجريبية 6",
+   "name_en": "Stand-in community 6"
+  }
+ ],
+ "fixture": true,
+ "fleet_types": [
+  {
+   "bus_type": "MIDI",
+   "seats": 25
+  },
+  {
+   "bus_type": "STANDARD",
+   "seats": 35
+  },
+  {
+   "bus_type": "ARTICULATED",
+   "seats": 52
+  },
+  {
+   "bus_type": "DOUBLE",
+   "seats": 78
+  }
+ ],
+ "routes": [
+  {
+   "directions": [
+    {
+     "direction": 0,
+     "shape": [
+      [
+       55.18,
+       25.09
+      ],
+      [
+       55.192,
+       25.096
+      ],
+      [
+       55.204,
+       25.102
+      ],
+      [
+       55.216,
+       25.108
+      ],
+      [
+       55.228,
+       25.114
+      ],
+      [
+       55.24,
+       25.12
+      ],
+      [
+       55.252,
+       25.126
+      ],
+      [
+       55.264,
+       25.132
+      ],
+      [
+       55.276,
+       25.138
+      ],
+      [
+       55.288,
+       25.144
+      ],
+      [
+       55.3,
+       25.15
+      ],
+      [
+       55.312,
+       25.156
+      ]
+     ],
+     "stops": [
+      "R1-S01",
+      "R1-S02",
+      "R1-S03",
+      "R1-S04",
+      "R1-S05",
+      "R1-S06",
+      "R1-S07",
+      "R1-S08",
+      "R1-S09",
+      "R1-S10",
+      "R1-S11",
+      "R1-S12"
+     ]
+    },
+    {
+     "direction": 1,
+     "shape": [
+      [
+       55.312,
+       25.156
+      ],
+      [
+       55.3,
+       25.15
+      ],
+      [
+       55.288,
+       25.144
+      ],
+      [
+       55.276,
+       25.138
+      ],
+      [
+       55.264,
+       25.132
+      ],
+      [
+       55.252,
+       25.126
+      ],
+      [
+       55.24,
+       25.12
+      ],
+      [
+       55.228,
+       25.114
+      ],
+      [
+       55.216,
+       25.108
+      ],
+      [
+       55.204,
+       25.102
+      ],
+      [
+       55.192,
+       25.096
+      ],
+      [
+       55.18,
+       25.09
+      ]
+     ],
+     "stops": [
+      "R1-S12",
+      "R1-S11",
+      "R1-S10",
+      "R1-S09",
+      "R1-S08",
+      "R1-S07",
+      "R1-S06",
+      "R1-S05",
+      "R1-S04",
+      "R1-S03",
+      "R1-S02",
+      "R1-S01"
+     ]
+    }
+   ],
+   "long_name": "Stand-in route R1",
+   "route_id": "R1",
+   "short_name": "R1"
+  },
+  {
+   "directions": [
+    {
+     "direction": 0,
+     "shape": [
+      [
+       55.19,
+       25.17
+      ],
+      [
+       55.203,
+       25.166
+      ],
+      [
+       55.216,
+       25.162
+      ],
+      [
+       55.229,
+       25.158
+      ],
+      [
+       55.242,
+       25.154
+      ],
+      [
+       55.255,
+       25.15
+      ],
+      [
+       55.268,
+       25.146
+      ],
+      [
+       55.281,
+       25.142
+      ],
+      [
+       55.294,
+       25.138
+      ],
+      [
+       55.307,
+       25.134
+      ]
+     ],
+     "stops": [
+      "R2-S01",
+      "R2-S02",
+      "R2-S03",
+      "R2-S04",
+      "R2-S05",
+      "R2-S06",
+      "R2-S07",
+      "R2-S08",
+      "R2-S09",
+      "R2-S10"
+     ]
+    },
+    {
+     "direction": 1,
+     "shape": [
+      [
+       55.307,
+       25.134
+      ],
+      [
+       55.294,
+       25.138
+      ],
+      [
+       55.281,
+       25.142
+      ],
+      [
+       55.268,
+       25.146
+      ],
+      [
+       55.255,
+       25.15
+      ],
+      [
+       55.242,
+       25.154
+      ],
+      [
+       55.229,
+       25.158
+      ],
+      [
+       55.216,
+       25.162
+      ],
+      [
+       55.203,
+       25.166
+      ],
+      [
+       55.19,
+       25.17
+      ]
+     ],
+     "stops": [
+      "R2-S10",
+      "R2-S09",
+      "R2-S08",
+      "R2-S07",
+      "R2-S06",
+      "R2-S05",
+      "R2-S04",
+      "R2-S03",
+      "R2-S02",
+      "R2-S01"
+     ]
+    }
+   ],
+   "long_name": "Stand-in route R2",
+   "route_id": "R2",
+   "short_name": "R2"
+  },
+  {
+   "directions": [
+    {
+     "direction": 0,
+     "shape": [
+      [
+       55.22,
+       25.08
+      ],
+      [
+       55.224,
+       25.091
+      ],
+      [
+       55.228,
+       25.102
+      ],
+      [
+       55.232,
+       25.113
+      ],
+      [
+       55.236,
+       25.124
+      ],
+      [
+       55.24,
+       25.135
+      ],
+      [
+       55.244,
+       25.146
+      ],
+      [
+       55.248,
+       25.157
+      ],
+      [
+       55.252,
+       25.168
+      ]
+     ],
+     "stops": [
+      "R3-S01",
+      "R3-S02",
+      "R3-S03",
+      "R3-S04",
+      "R3-S05",
+      "R3-S06",
+      "R3-S07",
+      "R3-S08",
+      "R3-S09"
+     ]
+    },
+    {
+     "direction": 1,
+     "shape": [
+      [
+       55.252,
+       25.168
+      ],
+      [
+       55.248,
+       25.157
+      ],
+      [
+       55.244,
+       25.146
+      ],
+      [
+       55.24,
+       25.135
+      ],
+      [
+       55.236,
+       25.124
+      ],
+      [
+       55.232,
+       25.113
+      ],
+      [
+       55.228,
+       25.102
+      ],
+      [
+       55.224,
+       25.091
+      ],
+      [
+       55.22,
+       25.08
+      ]
+     ],
+     "stops": [
+      "R3-S09",
+      "R3-S08",
+      "R3-S07",
+      "R3-S06",
+      "R3-S05",
+      "R3-S04",
+      "R3-S03",
+      "R3-S02",
+      "R3-S01"
+     ]
+    }
+   ],
+   "long_name": "Stand-in route R3",
+   "route_id": "R3",
+   "short_name": "R3"
+  },
+  {
+   "directions": [
+    {
+     "direction": 0,
+     "shape": [
+      [
+       55.3,
+       25.1
+      ],
+      [
+       55.294,
+       25.11
+      ],
+      [
+       55.288,
+       25.12
+      ],
+      [
+       55.282,
+       25.13
+      ],
+      [
+       55.276,
+       25.14
+      ],
+      [
+       55.27,
+       25.15
+      ],
+      [
+       55.264,
+       25.16
+      ],
+      [
+       55.258,
+       25.17
+      ]
+     ],
+     "stops": [
+      "R4-S01",
+      "R4-S02",
+      "R4-S03",
+      "R4-S04",
+      "R4-S05",
+      "R4-S06",
+      "R4-S07",
+      "R4-S08"
+     ]
+    },
+    {
+     "direction": 1,
+     "shape": [
+      [
+       55.258,
+       25.17
+      ],
+      [
+       55.264,
+       25.16
+      ],
+      [
+       55.27,
+       25.15
+      ],
+      [
+       55.276,
+       25.14
+      ],
+      [
+       55.282,
+       25.13
+      ],
+      [
+       55.288,
+       25.12
+      ],
+      [
+       55.294,
+       25.11
+      ],
+      [
+       55.3,
+       25.1
+      ]
+     ],
+     "stops": [
+      "R4-S08",
+      "R4-S07",
+      "R4-S06",
+      "R4-S05",
+      "R4-S04",
+      "R4-S03",
+      "R4-S02",
+      "R4-S01"
+     ]
+    }
+   ],
+   "long_name": "Stand-in route R4",
+   "route_id": "R4",
+   "short_name": "R4"
+  }
+ ],
+ "stops": [
+  {
+   "community_id": "c1",
+   "lat": 25.09,
+   "lon": 55.18,
+   "name": "Stand-in stop R1 1",
+   "stop_id": "R1-S01"
+  },
+  {
+   "community_id": "c1",
+   "lat": 25.096,
+   "lon": 55.192,
+   "name": "Stand-in stop R1 2",
+   "stop_id": "R1-S02"
+  },
+  {
+   "community_id": "c1",
+   "lat": 25.102,
+   "lon": 55.204,
+   "name": "Stand-in stop R1 3",
+   "stop_id": "R1-S03"
+  },
+  {
+   "community_id": "c1",
+   "lat": 25.108,
+   "lon": 55.216,
+   "name": "Stand-in stop R1 4",
+   "stop_id": "R1-S04"
+  },
+  {
+   "community_id": "c1",
+   "lat": 25.114,
+   "lon": 55.228,
+   "name": "Stand-in stop R1 5",
+   "stop_id": "R1-S05"
+  },
+  {
+   "community_id": "c2",
+   "lat": 25.12,
+   "lon": 55.24,
+   "name": "Stand-in stop R1 6",
+   "stop_id": "R1-S06"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.126,
+   "lon": 55.252,
+   "name": "Stand-in stop R1 7",
+   "stop_id": "R1-S07"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.132,
+   "lon": 55.264,
+   "name": "Stand-in stop R1 8",
+   "stop_id": "R1-S08"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.138,
+   "lon": 55.276,
+   "name": "Stand-in stop R1 9",
+   "stop_id": "R1-S09"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.144,
+   "lon": 55.288,
+   "name": "Stand-in stop R1 10",
+   "stop_id": "R1-S10"
+  },
+  {
+   "community_id": "c6",
+   "lat": 25.15,
+   "lon": 55.3,
+   "name": "Stand-in stop R1 11",
+   "stop_id": "R1-S11"
+  },
+  {
+   "community_id": "c6",
+   "lat": 25.156,
+   "lon": 55.312,
+   "name": "Stand-in stop R1 12",
+   "stop_id": "R1-S12"
+  },
+  {
+   "community_id": "c4",
+   "lat": 25.17,
+   "lon": 55.19,
+   "name": "Stand-in stop R2 1",
+   "stop_id": "R2-S01"
+  },
+  {
+   "community_id": "c4",
+   "lat": 25.166,
+   "lon": 55.203,
+   "name": "Stand-in stop R2 2",
+   "stop_id": "R2-S02"
+  },
+  {
+   "community_id": "c4",
+   "lat": 25.162,
+   "lon": 55.216,
+   "name": "Stand-in stop R2 3",
+   "stop_id": "R2-S03"
+  },
+  {
+   "community_id": "c4",
+   "lat": 25.158,
+   "lon": 55.229,
+   "name": "Stand-in stop R2 4",
+   "stop_id": "R2-S04"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.154,
+   "lon": 55.242,
+   "name": "Stand-in stop R2 5",
+   "stop_id": "R2-S05"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.15,
+   "lon": 55.255,
+   "name": "Stand-in stop R2 6",
+   "stop_id": "R2-S06"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.146,
+   "lon": 55.268,
+   "name": "Stand-in stop R2 7",
+   "stop_id": "R2-S07"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.142,
+   "lon": 55.281,
+   "name": "Stand-in stop R2 8",
+   "stop_id": "R2-S08"
+  },
+  {
+   "community_id": "c6",
+   "lat": 25.138,
+   "lon": 55.294,
+   "name": "Stand-in stop R2 9",
+   "stop_id": "R2-S09"
+  },
+  {
+   "community_id": "c6",
+   "lat": 25.134,
+   "lon": 55.307,
+   "name": "Stand-in stop R2 10",
+   "stop_id": "R2-S10"
+  },
+  {
+   "community_id": "c1",
+   "lat": 25.08,
+   "lon": 55.22,
+   "name": "Stand-in stop R3 1",
+   "stop_id": "R3-S01"
+  },
+  {
+   "community_id": "c1",
+   "lat": 25.091,
+   "lon": 55.224,
+   "name": "Stand-in stop R3 2",
+   "stop_id": "R3-S02"
+  },
+  {
+   "community_id": "c1",
+   "lat": 25.102,
+   "lon": 55.228,
+   "name": "Stand-in stop R3 3",
+   "stop_id": "R3-S03"
+  },
+  {
+   "community_id": "c2",
+   "lat": 25.113,
+   "lon": 55.232,
+   "name": "Stand-in stop R3 4",
+   "stop_id": "R3-S04"
+  },
+  {
+   "community_id": "c2",
+   "lat": 25.124,
+   "lon": 55.236,
+   "name": "Stand-in stop R3 5",
+   "stop_id": "R3-S05"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.135,
+   "lon": 55.24,
+   "name": "Stand-in stop R3 6",
+   "stop_id": "R3-S06"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.146,
+   "lon": 55.244,
+   "name": "Stand-in stop R3 7",
+   "stop_id": "R3-S07"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.157,
+   "lon": 55.248,
+   "name": "Stand-in stop R3 8",
+   "stop_id": "R3-S08"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.168,
+   "lon": 55.252,
+   "name": "Stand-in stop R3 9",
+   "stop_id": "R3-S09"
+  },
+  {
+   "community_id": "c3",
+   "lat": 25.1,
+   "lon": 55.3,
+   "name": "Stand-in stop R4 1",
+   "stop_id": "R4-S01"
+  },
+  {
+   "community_id": "c3",
+   "lat": 25.11,
+   "lon": 55.294,
+   "name": "Stand-in stop R4 2",
+   "stop_id": "R4-S02"
+  },
+  {
+   "community_id": "c2",
+   "lat": 25.12,
+   "lon": 55.288,
+   "name": "Stand-in stop R4 3",
+   "stop_id": "R4-S03"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.13,
+   "lon": 55.282,
+   "name": "Stand-in stop R4 4",
+   "stop_id": "R4-S04"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.14,
+   "lon": 55.276,
+   "name": "Stand-in stop R4 5",
+   "stop_id": "R4-S05"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.15,
+   "lon": 55.27,
+   "name": "Stand-in stop R4 6",
+   "stop_id": "R4-S06"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.16,
+   "lon": 55.264,
+   "name": "Stand-in stop R4 7",
+   "stop_id": "R4-S07"
+  },
+  {
+   "community_id": "c5",
+   "lat": 25.17,
+   "lon": 55.258,
+   "name": "Stand-in stop R4 8",
+   "stop_id": "R4-S08"
+  }
+ ]
+}

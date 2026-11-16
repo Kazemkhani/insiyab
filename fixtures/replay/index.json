@@ -1,0 +1,25 @@
+{
+ "fixture": true,
+ "routes": [
+  {
+   "file": "replay/route-R1.json",
+   "route_id": "R1",
+   "trips": 144
+  },
+  {
+   "file": "replay/route-R2.json",
+   "route_id": "R2",
+   "trips": 144
+  },
+  {
+   "file": "replay/route-R3.json",
+   "route_id": "R3",
+   "trips": 108
+  },
+  {
+   "file": "replay/route-R4.json",
+   "route_id": "R4",
+   "trips": 72
+  }
+ ]
+}

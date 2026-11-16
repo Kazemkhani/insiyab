@@ -1,0 +1,20 @@
+# RTA's raw data never enters git. See docs/DATA.md, section 6.
+data/
+*.csv
+*.xlsx
+*.xls
+*.parquet
+*.kml
+*.kmz
+!fixtures/**
+!opendata/public/**
+.env
+.env.*
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+.vercel/
+dist-tmp/
+*.log
