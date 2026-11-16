@@ -15,7 +15,7 @@
      "before": null,
      "decision_id": null,
      "kind": "measured",
-     "say": "At 06:00 the forecast shows where buses and riders will not match by 07:30.",
+     "say": "At 06:00 the forecast shows where buses and passengers will not match by 07:30.",
      "scene": "control_room",
      "t": 21600
     },

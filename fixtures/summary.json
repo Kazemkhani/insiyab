@@ -6,7 +6,7 @@
    "kind": "measured",
    "label": "Boardings on the day",
    "source": "replay/",
-   "unit": "taps",
+   "unit": "boardings",
    "value": 10750
   },
   {

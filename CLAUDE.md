@@ -3,7 +3,7 @@
 You are one of four workers building Insiyab for the RTA Future Move Hackathon. Read these, in this order, before you change anything:
 
 1. `docs/REQUIREMENTS.md`: what RTA asked for and how we are scored. It overrides everything.
-2. `docs/STRATEGY.md`: the one idea, and what is cut.
+2. `docs/STRATEGY.md`: the one idea, and what is cut. Then `docs/WOW.md`: the moments that make it stand out.
 3. `docs/RULES.md`: the rules that never bend.
 4. `docs/LANES.md`: which folders are yours, and how to push.
 5. `docs/CONTRACT.md`: the files the lanes meet through.

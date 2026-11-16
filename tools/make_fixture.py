@@ -160,29 +160,31 @@ def build():
                       {"label": "Largest load on the emptiest R4 trip", "value": max(v["load"] for v in quiet["visits"]), "unit": "passengers", "source": "replay/route-R4.json"}],
          "change": "Swap the double-deck buses on route R4 with the standard buses on route R1 between 06:30 and 09:00.",
          "effect": [{"metric": "passengers_over_seats_minutes", "before": 5400, "after": 900, "kind": "simulated", "assumption": "the same passengers board at the same times; only the vehicles change"}],
-         "riders_affected": 640, "cost_note": "No extra bus and no extra driver.", "confidence": "medium",
+         "passengers_affected": 640, "cost_note": "No extra bus and no extra driver.", "confidence": "medium",
          "why": "The forecast puts more people on R1 than its buses seat, while R4's larger buses run mostly empty in the same hours."},
         {"id": "d002", "lever": "right_stop", "title": "Stop only when someone is there",
          "where": {"route_id": "R4", "stop_ids": [s for s in routes[3]["directions"][0]["stops"][2:5]], "community_id": None},
          "when": {"from": 21 * 3600, "to": 24 * 3600},
          "evidence": [{"label": "Stop visits where the door did not open", "value": closed, "unit": "visits", "source": "replay/"},
                       {"label": "All stop visits", "value": visits_n, "unit": "visits", "source": "replay/"}],
-         "change": "After 21:00, make three R4 stops request stops: the bus calls there when a rider asks from the stop or from the bus.",
+         "change": "After 21:00, make three R4 stops request stops: the bus calls there when a passenger asks from the stop or from the bus.",
          "effect": [{"metric": "minutes_saved_per_trip", "before": 0, "after": 2.5, "kind": "simulated", "assumption": "25 seconds saved for each stop the bus no longer slows for"}],
-         "riders_affected": 12, "cost_note": "A request button or a tap in the app at each stop.", "confidence": "low",
+         "passengers_affected": 12, "cost_note": "A request button or a tap in the app at each stop.", "confidence": "low",
          "why": "At these stops and hours the forecast says nobody boards or alights on most visits."},
-        {"id": "d003", "lever": "rewarded_choice", "title": "Reward the rider who takes the emptier bus",
+        {"id": "d003", "lever": "rewarded_choice", "title": "Reward the passenger who takes the emptier bus",
          "where": {"route_id": "R1", "stop_ids": [peak["visits"][1]["stop_id"]], "community_id": None},
          "when": {"from": 7 * 3600, "to": 8 * 3600 + 1800},
          "evidence": [{"label": "Forecast boardings at the stop in the peak hour", "value": 210, "unit": "passengers", "source": "forecast/boardings-stop.json"},
                       {"label": "Free seats on route R2 within 400 metres in the same hour", "value": 95, "unit": "seats", "source": "replay/route-R2.json"}],
-         "change": "Offer Khutwa points to riders at this stop who take route R2 from the next stop, or travel 20 minutes earlier.",
-         "effect": [{"metric": "riders_shifted", "before": 0, "after": 17, "kind": "simulated", "assumption": "8 in 100 riders who get the offer take it (published trials in other cities found 7 to 10 in 100)"}],
-         "riders_affected": 210, "cost_note": "Points worth a few dirhams for each rider who shifts.", "confidence": "low",
-         "why": "The forecast shows more riders than seats here, and spare seats a short walk away."}]}
+         "change": "Offer Khutwa points to passengers at this stop who take route R2 from a stop nearby, or travel 20 minutes earlier.",
+         "effect": [{"metric": "passengers_shifted", "before": 0, "after": 17, "kind": "simulated", "assumption": "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 10 in 100: docs/research/research-methods.md, section 6)"}],
+         "passengers_affected": 210, "cost_note": "Points worth a few dirhams for each passenger who shifts.", "confidence": "low",
+         "offers": [{"kind": "other_route", "route_id": "R2", "stop_id": routes[1]["directions"][0]["stops"][0], "depart": 7 * 3600 + 1500, "walk_metres": 320, "walk_minutes": 4, "extra_minutes": 6, "points": 20},
+                    {"kind": "earlier", "route_id": "R1", "stop_id": peak["visits"][1]["stop_id"], "depart": 7 * 3600, "walk_metres": 0, "walk_minutes": 0, "extra_minutes": 0, "minutes_earlier": 20, "points": 12}],
+         "why": "The forecast shows more passengers than seats here, and spare seats a short walk away."}]}
     personas = {"fixture": True, "personas": [
         {"id": "planner", "title": "The planner", "label": "Fictional. Built from the day's totals, not from any one person.", "anchor": {"route_id": "R1", "stop_id": None, "time": 6 * 3600},
-         "steps": [{"t": 6 * 3600, "scene": "control_room", "say": "At 06:00 the forecast shows where buses and riders will not match by 07:30.", "kind": "measured", "decision_id": None, "before": None, "after": None},
+         "steps": [{"t": 6 * 3600, "scene": "control_room", "say": "At 06:00 the forecast shows where buses and passengers will not match by 07:30.", "kind": "measured", "decision_id": None, "before": None, "after": None},
                    {"t": 6 * 3600 + 600, "scene": "control_room", "say": "One decision closes the largest gap without a single extra bus.", "kind": "simulated", "decision_id": "d001", "before": {"passengers_over_seats_minutes": 5400}, "after": {"passengers_over_seats_minutes": 900}}]},
         {"id": "site_worker", "title": "The site worker", "label": "Fictional. Built from the day's totals, not from any one person.", "anchor": {"route_id": "R1", "stop_id": peak["visits"][0]["stop_id"], "time": 6 * 3600 + 2700},
          "steps": [{"t": 6 * 3600 + 2700, "scene": "stop", "say": "On the day, the 06:45 bus left this stop with more people than seats.", "kind": "measured", "decision_id": None, "before": {"load": max(v["load"] for v in peak["visits"]), "seats": peak["seats"]}, "after": None},
@@ -204,12 +206,32 @@ def build():
                "fleet_types": [{"bus_type": k, "seats": v} for k, v in TYPES.items()]}
     best = next(x for x in results if x["model"] == "insiyab" and x["horizon"] == 3600 and x["subset"] == "all")
     summary = {"fixture": True, "headline": [
-        {"key": "boardings", "label": "Boardings on the day", "value": boardings, "unit": "taps", "kind": "measured", "source": "replay/"},
+        {"key": "boardings", "label": "Boardings on the day", "value": boardings, "unit": "boardings", "kind": "measured", "source": "replay/"},
         {"key": "doors_not_opened", "label": "Stop visits where the door did not open", "value": closed, "unit": "of " + str(visits_n), "kind": "measured", "source": "replay/"},
         {"key": "wape_60", "label": "Forecast error one hour ahead (WAPE)", "value": best["wape"], "unit": "share", "kind": "measured", "source": "metrics.json"},
         {"key": "skill_60", "label": "Better than the naive forecast, one hour ahead", "value": best["skill"], "unit": "share of error removed", "kind": "measured", "source": "metrics.json"}]}
+    # the gap: for each route, direction and hour, seats offered against the largest load on each trip
+    rows, over_min, empty_km = [], 0, 0
+    for rid, r in replay.items():
+        cell = {}
+        for t in r["trips"]:
+            hour = (t["visits"][0]["sched_arr"] // 3600) * 3600
+            c = cell.setdefault((t["direction"], hour), {"seats": 0, "peak": 0, "over": 0, "spare": 0, "trips": 0})
+            top = max(v["load"] for v in t["visits"])
+            c["seats"] += t["seats"]; c["peak"] += top; c["over"] += max(0, top - t["seats"]); c["spare"] += max(0, t["seats"] - top); c["trips"] += 1
+            for a, b in zip(t["visits"], t["visits"][1:]):
+                over_min += max(0, a["load"] - t["seats"]) * (b["act_arr"] - a["act_dep"]) / 60
+                empty_km += max(0, t["seats"] - a["load"]) * 0.8          # stand-in: every stretch is taken as 0.8 km
+        for (direction, hour), c in sorted(cell.items()):
+            gap = c["over"] + c["spare"]
+            rows.append({"route_id": rid, "direction": direction, "hour_start": hour, "trips": c["trips"], "seats_offered": c["seats"], "forecast_peak_load": c["peak"],
+                         "over": c["over"], "spare": c["spare"], "index": round(0.1 + 9.9 * c["over"] / gap, 1) if gap else 0.1})
+    gap_file = {"fixture": True, "bin_seconds": 3600, "index_note": "The Insiyab index runs from 0.1 (every seat empty) to 10 (every passenger without a seat): the share of the gap that is people without seats.",
+                "rows": rows, "totals": {"kind": "simulated", "assumption": "the decisions in decisions.json are all made; the same passengers travel at the same times",
+                                         "before": {"passenger_minutes_over_seats": round(over_min), "empty_seat_km": round(empty_km)},
+                                         "after": {"passenger_minutes_over_seats": round(over_min * 0.35), "empty_seat_km": round(empty_km * 0.82)}}}
     files = {"meta.json": meta, "network.json": network, "metrics.json": metrics, "decisions.json": decisions, "personas.json": personas,
-             "summary.json": summary, "forecast/boardings-route.json": f_route, "forecast/boardings-stop.json": f_stop,
+             "summary.json": summary, "gap.json": gap_file, "forecast/boardings-route.json": f_route, "forecast/boardings-stop.json": f_stop,
              "replay/index.json": {"fixture": True, "routes": [{"route_id": rid, "file": f"replay/route-{rid}.json", "trips": len(r["trips"])} for rid, r in replay.items()]}}
     for rid, r in replay.items():
         files[f"replay/route-{rid}.json"] = r

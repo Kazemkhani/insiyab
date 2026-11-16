@@ -9,7 +9,7 @@ Where this file says "census", it means the answer comes from `docs/DATA-CENSUS.
 | | Target | Unit | Made at | For |
 |---|---|---|---|---|
 | **P** | Boardings at a stop on a route in one quarter of an hour | passengers | every 30 minutes from 06:00 to 22:00 | 15, 30, 60 and 120 minutes ahead |
-| **B** | How late a bus arrives at a stop ahead of it | seconds | each time a bus leaves a stop | 1, 5, 10 and 20 stops ahead |
+| **B** | How late a bus arrives at a stop ahead of it | seconds | each time a bus leaves a stop | 1, 5, 10 and 20 stops ahead (the contract writes these as `stops_ahead`) |
 
 P answers "understand demand". B answers "improve operations". Together they give the gap, which answers "optimise service".
 
@@ -135,8 +135,8 @@ One caution from the research binds the right-stop lever: published work finds t
 
 ## 9. Running it again
 
-- One command runs every stage and writes the bundle: `python3 -m model.run --data <folder> --out artifacts`. With `--data fixtures-raw` it runs on stand-in tables, so every stage can be built and tested before the real data is touched.
-- Fixed random seeds. The same input gives the same bundle, byte for byte, and a test checks it.
+- One command runs every stage and writes the bundle: `python3 -m model.run --data <folder> --out artifacts`. With `--data fixtures/raw` it runs on invented tables, so every stage can be built and tested before the real data is touched.
+- Fixed random seeds. The same input gives the same bundle, byte for byte apart from the time and the commit written in `meta.json`, and a test checks it.
 - `docs/MODEL-CARD.md` is written by the engine from `metrics.json`: what was forecast, the data and its one day, the splits, the table, the limits. Never by hand.
 - The same stages are laid out as a flow in Dataiku, one recipe for each stage, because that is where RTA would run it, and a picture of that flow goes in the documentation. Dataiku's own analysis of a model by sub-population is run as well: it answers the slide's "multiple subsets of the data" in the organisers' own tool.
 - Few libraries, all common, so the code runs inside Dataiku without special set-up.

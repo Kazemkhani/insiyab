@@ -1,6 +1,6 @@
 # Lane 3: open data, the passenger prototype, and the checks on every push
 
-You are Devin, working in the repository `Kazemkhani/insiyab` on branch `main`. Three other workers are building at the same time on other machines. This file is your instruction from Amir, the team lead.
+You are Devin, started by Mustafo, working in the repository `Kazemkhani/insiyab` on branch `main`. Three other workers are building at the same time on other machines. This file is your instruction from Amir, the team lead, and Mustafo.
 
 ## 1. What the project is, in four sentences
 
@@ -19,7 +19,7 @@ You own `opendata/`, `rider/`, `.github/` and `coordination/lane-3.md`. Change n
 RTA publishes a dataset called `rta_bus_ridership-open`: one file for each day, each row one nol check-in or check-out with its date, time, route, start and end stop and zones (`docs/research/research-dubai.md`, section A1). The team's provided data covers one day. If we can add even four weeks of public days, the forecast can be tested across days, we can forecast a day ahead, and the organisers' own day becomes a day the model has never seen. The old portal (dubaipulse.gov.ae) now redirects to data.dubai, and nobody has confirmed the files still download.
 
 1. Find the dataset's current home and how it is fetched today. Write what you find in `opendata/ACCESS.md`: the address, whether it needs an account or an API key, the terms or licence as stated on the page, the fields, the dates covered.
-2. **If it downloads with no account:** fetch the days from 3 November 2025 to 14 December 2025, and any later days that exist, including 15 December 2025 if it is there. Keep the daily files out of git (they are 76 to 97 MB each). From them build small tables in `opendata/public/`: boardings by day, route and hour; boardings by day, stop and hour; and the same for alightings. Each table has a file beside it saying the source address, the date fetched, the terms, and how it was made.
+2. **If it downloads with no account:** fetch the six weeks before 15 December 2025, up to the last day published, and 15 December 2025 itself if it is there. Keep the daily files on your own machine and out of git (they are 76 to 97 MB each): the other lanes only ever need the small tables. From them build small tables in `opendata/public/`: boardings by day, route and hour; boardings by day, stop and hour; and the same for alightings. Each table has a file beside it saying the source address, the date fetched, the terms, and how it was made.
 3. **If it needs an account or a key:** do not create an account in anyone's name, do not look for a way round the login, and do not use a copy from an unofficial site. Write in `coordination/lane-3.md`: `TO AMIR:` and then the exact steps a person must take (the address, what to click, what will be emailed), and where to put the result so you can carry on. Then go on to task two.
 4. Compare the public file's fields with the provided file's (listed in `docs/DATA.md`, section 1.2) and tell lane 1 how route and stop names can be matched between them.
 
@@ -35,7 +35,7 @@ Each as a small table in `opendata/public/` with its source file beside it, and 
 | Bus routes: name, kind (urban, feeder, intercity and the rest), direction, stops in order | To match public names to the provided network |
 | Population by community, latest year | Demand follows people |
 | Weather by hour for Dubai, 1 November 2025 to 15 December 2025 (temperature, rain, humidity, wind) | Heat and rain move passengers |
-| Calendar: day of week, public holidays, school terms and breaks for the same period | 15 December 2025 was a Monday inside the school winter break: the model must know |
+| Calendar: day of week, public holidays, school terms and breaks for the same period | 15 December 2025 was a Monday inside the winter break of most schools: the model must know |
 | Metro and tram stations with positions | Many bus trips feed the metro |
 | Monthly passengers by route, if still published | A check on the daily totals |
 
@@ -48,17 +48,19 @@ The idea the team cares about most: where the forecast shows a full bus and an e
 Build `rider/`: a single page for a phone (390 wide first), plain files, no framework needed, no outside service at run time. It reads the bundle described in `docs/CONTRACT.md` (`fixtures/` for now) and shows one passenger's morning:
 
 1. Her usual bus at her stop, with the forecast: how full, how late.
-2. If the forecast shows more people than seats: one or two better choices from `decisions.json` (lever `rewarded_choice`), each with what it costs her (minutes, metres) and what she earns.
+2. If the forecast shows more people than seats: the choices in the `offers` of a `rewarded_choice` decision in `decisions.json` (`docs/CONTRACT.md` lists the keys: the walk in metres and minutes, the extra minutes, the points), each with what it costs her and what she earns.
 3. If she takes one: the points, and what they buy. Use everyday things: a fare, bread, rice, a phone top-up. Do not name any real shop or brand.
 4. A control "I cannot walk further": after it, no choice ever involves a longer walk.
 
 It must honour these, because the team's own members raised them: a choice is never the only way to travel; nobody is ever charged more; a walking offer is never made for a long walk; the page says STAND-IN DATA, NOT A RESULT whenever the bundle says so; every expected effect is marked simulated; the passenger is fictional and the page says so. Words come from the glossary in `docs/RULES.md` section 9, the look from section 10. No RTA or nol logo or colours.
 
-Give it one command to build and one to test: `node rider/build.mjs --bundle <folder> --out <folder>` and `bash rider/tests/run.sh`, ending with the line `ALL PASS`. Tell lane 1 when they exist.
+**The room.** Read `docs/WOW.md`, moment 2, and "The live room" in `docs/CONTRACT.md`. When a judge scans the QR code, this page is what opens on their phone. It joins the room, waits, and when the room's phase becomes "offer" it shows the offer at once and buzzes the phone where the browser allows. A tap on "I'll take it" or "No thanks" is sent to the room. If the room does not answer within two seconds the page shows "Show me the offer" and works by itself. It asks the visitor for nothing: no name, no number. Opened with `?stop=<stop_id>` it shows that one stop's next buses and how full each is forecast to be (moment 6: a printed stop flag on the team's table carries that address).
+
+Give it one command to build and one to test: `node rider/build.mjs --bundle <folder> --out <folder>` and `bash rider/tests/run.sh`, ending with the line `ALL PASS`. Tell lane 1 when they exist: lane 1 places your build inside the public site at `khutwa/`, so every address inside the page must be relative, and it reads the bundle from `../data/`.
 
 ## 6. Task four: checks on every push
 
-A GitHub Actions workflow in `.github/workflows/` that, on every push to `main`, runs `bash scripts/gates.sh` and fails loudly if the last line is not `ALL GATES PASS`. Keep it fast. It must not need any secret.
+A GitHub Actions workflow in `.github/workflows/` that, on every push to `main`, runs `bash scripts/gates.sh` and fails loudly if the last line is not `ALL GATES PASS`. It installs Python 3 and Node and nothing else, runs without a browser, and needs no secret. If your key or token is not allowed to push a workflow file, say so in your coordination file and leave this task: a person will add it.
 
 ## 7. How to work in this repository
 
@@ -80,4 +82,4 @@ A GitHub Actions workflow in `.github/workflows/` that, on every push to `main`,
 7. Metro stations, monthly totals, anything further.
 8. Only if everything above is done: walking times in minutes between each stop and the stops of other routes within 500 metres, from the OpenStreetMap street network (see `docs/TOOLS.md`). Keep the street file out of git and commit only the small table.
 
-The team shows its work to RTA's mentors on Tuesday 17 November at 09:00 Dubai time (05:00 UTC), and presents on Wednesday 18 November at 10:00 Dubai time. Your freeze is Wednesday 05:00 Dubai time.
+**Tonight's target, from Amir: items 1 to 4 pushed by 06:00 on Tuesday 17 November, Dubai time (02:00 UTC)**, so the whole walk-through is live by 06:30. RTA's mentors see it at 09:15 Dubai time. Presentations start on Wednesday 18 November at 10:00 Dubai time. Your final freeze is Wednesday 05:00 Dubai time.

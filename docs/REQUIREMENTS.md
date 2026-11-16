@@ -95,9 +95,13 @@ The field lists are in `docs/DATA.md`.
 
 | Question | Why it matters | Who asks, when |
 |---|---|---|
-| May the provided data, or totals worked out from it, leave Dataiku (a laptop, GitHub, a public demo address)? | A teammate understood on day 1 that "external things are not allowed". Until this is answered, raw data stays in Dataiku and the public site runs on made-up stand-in data. | A team member, to a mentor, Tue 17 Nov 09:15 |
+| May the provided data, or totals worked out from it, leave Dataiku (a laptop, GitHub, a public demo address)? | A teammate understood on day 1 that "external things are not allowed". Until this is answered, raw data stays in Dataiku and the public site runs on made-up stand-in data. | A team member, to a mentor, Tue 17 Nov 09:15 (the sprint with mentors runs 09:15 to 11:15) |
 | May we use our own AI tools on the data, or only "the provided LLM capabilities"? | Same reason. | Same |
 | What exactly is submitted before 10:00 on Wed, and where? | "submission details to be confirmed" | Same |
 | How long is the Wednesday pitch? | The agenda gives 7 to 8 minutes plus 2 for the Friday final only. | Same |
 
-Write each answer into this table, with who said it and when.
+A person writes each answer in `docs/team/MENTOR-ANSWERS.md`, with who said it and when. Lane 1 copies it into this table.
+
+| Answer | Who said it, and when |
+|---|---|
+| (none yet) | |

@@ -15,10 +15,10 @@ These held through two projects that came before this one (Marsad, which won the
 
 1. **Stand-in data says so, on the screen it appears on**: STAND-IN DATA, NOT A RESULT.
 2. **Measured and simulated are never mixed.** A count from the day's records is "measured". What we expect if RTA made a change is "simulated", and shows its assumption beside it.
-3. **One day.** The provided transactions and the runtime report cover one day, Monday 15 December 2025, in the school winter break. Wherever a forecast number appears, the screen says what it was tested on. We never say the model predicts another day unless it was tested on another day.
+3. **One day.** The provided transactions and the runtime report cover one day, Monday 15 December 2025, inside the winter break of most schools. Wherever a forecast number appears, the screen says what it was tested on. We never say the model predicts another day unless it was tested on another day.
 4. **We measure buses, not roads.** We have no road traffic data. We may say a bus was crowded or late. We never say we reduce road congestion by a number.
 5. **Seats, not standing.** The fleet table marks standing capacity "not verified". We count seats and say so.
-6. **RTA already uses AI on its buses.** It announced machine-learning route planning from nol data in 2020, with stop-skipping and express-route proposals, and its app shows live buses. We never present those as new. We say what we add.
+6. **RTA already uses AI on its buses.** It announced machine-learning route planning from nol data in 2020, which can propose removing little-used stops and creating express services, and its app is reported to show live buses and how full they are. We never present those as new. We say what we add.
 7. If the honest number is small or zero, show it and explain it. Marsad showed "0 connections at risk" on live data and said so on stage.
 8. The tool advises. A planner decides. A driver drives. Nothing here instructs a driver or changes a timetable by itself.
 9. Never claim a saving in money. We do not have RTA's costs. We report kilometres, minutes, seats and passengers.
@@ -59,7 +59,7 @@ These held through two projects that came before this one (Marsad, which won the
 1. Everyone works on `main`, in small commits, and pushes often. Pull with rebase before every push. Never force-push. Never amend a pushed commit.
 2. Each lane commits only inside the folders it owns (`docs/LANES.md`). A change outside them is asked for in `coordination/`.
 3. Add named files. Never `git add -A`.
-4. Commits are authored by the person whose account runs the worker, with no co-author line and no other trailer.
+4. Commits are authored by the person whose account runs the worker (Amir for lanes 1 and 2, Mustafo for lanes 3 and 4), with no co-author line and no other trailer. A hook refuses a commit that has one.
 5. Never commit a built file by hand: rebuild it from source and check it matches.
 
 ## 8. Proof

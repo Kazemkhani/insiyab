@@ -35,7 +35,7 @@
    ],
    "id": "d001",
    "lever": "right_bus",
-   "riders_affected": 640,
+   "passengers_affected": 640,
    "title": "Put the big bus where the people are",
    "when": {
     "from": 23400,
@@ -51,7 +51,7 @@
    "why": "The forecast puts more people on R1 than its buses seat, while R4's larger buses run mostly empty in the same hours."
   },
   {
-   "change": "After 21:00, make three R4 stops request stops: the bus calls there when a rider asks from the stop or from the bus.",
+   "change": "After 21:00, make three R4 stops request stops: the bus calls there when a passenger asks from the stop or from the bus.",
    "confidence": "low",
    "cost_note": "A request button or a tap in the app at each stop.",
    "effect": [
@@ -79,7 +79,7 @@
    ],
    "id": "d002",
    "lever": "right_stop",
-   "riders_affected": 12,
+   "passengers_affected": 12,
    "title": "Stop only when someone is there",
    "when": {
     "from": 75600,
@@ -97,16 +97,16 @@
    "why": "At these stops and hours the forecast says nobody boards or alights on most visits."
   },
   {
-   "change": "Offer Khutwa points to riders at this stop who take route R2 from the next stop, or travel 20 minutes earlier.",
+   "change": "Offer Khutwa points to passengers at this stop who take route R2 from a stop nearby, or travel 20 minutes earlier.",
    "confidence": "low",
-   "cost_note": "Points worth a few dirhams for each rider who shifts.",
+   "cost_note": "Points worth a few dirhams for each passenger who shifts.",
    "effect": [
     {
      "after": 17,
-     "assumption": "8 in 100 riders who get the offer take it (published trials in other cities found 7 to 10 in 100)",
+     "assumption": "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 10 in 100: docs/research/research-methods.md, section 6)",
      "before": 0,
      "kind": "simulated",
-     "metric": "riders_shifted"
+     "metric": "passengers_shifted"
     }
    ],
    "evidence": [
@@ -125,8 +125,31 @@
    ],
    "id": "d003",
    "lever": "rewarded_choice",
-   "riders_affected": 210,
-   "title": "Reward the rider who takes the emptier bus",
+   "offers": [
+    {
+     "depart": 26700,
+     "extra_minutes": 6,
+     "kind": "other_route",
+     "points": 20,
+     "route_id": "R2",
+     "stop_id": "R2-S01",
+     "walk_metres": 320,
+     "walk_minutes": 4
+    },
+    {
+     "depart": 25200,
+     "extra_minutes": 0,
+     "kind": "earlier",
+     "minutes_earlier": 20,
+     "points": 12,
+     "route_id": "R1",
+     "stop_id": "R1-S11",
+     "walk_metres": 0,
+     "walk_minutes": 0
+    }
+   ],
+   "passengers_affected": 210,
+   "title": "Reward the passenger who takes the emptier bus",
    "when": {
     "from": 25200,
     "to": 30600
@@ -138,7 +161,7 @@
      "R1-S11"
     ]
    },
-   "why": "The forecast shows more riders than seats here, and spare seats a short walk away."
+   "why": "The forecast shows more passengers than seats here, and spare seats a short walk away."
   }
  ],
  "fixture": true

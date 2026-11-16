@@ -40,7 +40,7 @@ def main():
         with open(path, encoding="utf-8") as f:
             return json.load(f)
 
-    need = ["meta.json", "network.json", "metrics.json", "decisions.json", "personas.json", "summary.json", "replay/index.json", "forecast/boardings-route.json"]
+    need = ["meta.json", "network.json", "metrics.json", "decisions.json", "personas.json", "summary.json", "replay/index.json", "forecast/boardings-route.json", "forecast/boardings-stop.json", "gap.json"]
     got = {n: load(n) for n in need}
     missing = [n for n, v in got.items() if v is None]
     check("every required file is present", not missing, missing)
@@ -106,8 +106,10 @@ def main():
         rows = [r for s in f.get("series", []) for r in s.get("rows", [])]
         ok = bool(rows) and all(num(r.get("forecast")) and num(r.get("lo")) and num(r.get("hi")) and r["lo"] <= r["forecast"] <= r["hi"] and r["forecast"] >= 0
                                 and r.get("origin") is not None and r.get("horizon") in meta["horizons_seconds"] and r["bin_start"] + f.get("bin_seconds", 0) == r["origin"] + r["horizon"]
-                                and (r.get("actual") is None or num(r["actual"])) for r in rows)
-        check(f"{name}: every row has a forecast inside its interval, for a bin that ends at origin plus horizon", ok)
+                                and num(r.get("baseline")) and r["baseline"] >= 0 and (r.get("actual") is None or num(r["actual"])) for r in rows)
+        check(f"{name}: every row has a forecast inside its interval and the naive forecast for the same bin, for a bin that ends at origin plus horizon", ok)
+        if f.get("level") == "stop":
+            check(f"{name}: every stop series names a stop and a route that exist", all(s.get("id") in stops and s.get("route_id") in routes for s in f.get("series", [])))
         check(f"{name}: no forecast is made for a bin that had already ended at its origin", all(r["bin_start"] + f.get("bin_seconds", 0) > r["origin"] for r in rows))
 
     # metrics: the table the judges read
@@ -138,6 +140,20 @@ def main():
     check("decisions: each shows its evidence with a value, a unit and where it came from", all(d.get("evidence") and all(num(e.get("value")) and e.get("unit") and e.get("source") and e.get("label") for e in d["evidence"]) for d in ds))
     check("decisions: every effect says whether it was measured or simulated, and a simulated one states its assumption",
           all(d.get("effect") and all(e.get("kind") in KINDS and num(e.get("before")) and num(e.get("after")) and (e["kind"] == "measured" or e.get("assumption")) for e in d["effect"]) for d in ds))
+    check("decisions: each says how many passengers it affects", all(num(d.get("passengers_affected")) and d["passengers_affected"] >= 0 for d in ds))
+    rc = [d for d in ds if d.get("lever") == "rewarded_choice"]
+    check("decisions: a rewarded choice carries its offers, each with its walk in metres and minutes, the extra minutes, the points, and a stop and route that exist",
+          all(d.get("offers") and all(o.get("kind") in ("other_route", "earlier", "later") and o.get("route_id") in routes and o.get("stop_id") in stops and num(o.get("depart"))
+                                      and all(num(o.get(k)) and o[k] >= 0 for k in ("walk_metres", "walk_minutes", "extra_minutes", "points")) for o in d["offers"]) for d in rc))
+    gap = got["gap.json"]
+    grows = gap.get("rows", [])
+    check("gap: every row is a route and direction that exist, in one hour, with seats, the largest loads, people over seats, seats spare and an index from 0.1 to 10",
+          bool(grows) and all(g.get("route_id") in routes and g.get("direction") in (0, 1) and num(g.get("hour_start")) and all(num(g.get(k)) and g[k] >= 0 for k in ("seats_offered", "forecast_peak_load", "over", "spare"))
+                              and num(g.get("index")) and 0.1 <= g["index"] <= 10 for g in grows))
+    tot = gap.get("totals") or {}
+    check("gap: the totals before and after are given, marked simulated with the assumption, and after is not worse than before",
+          tot.get("kind") in KINDS and (tot.get("kind") == "measured" or tot.get("assumption")) and all(num((tot.get(w) or {}).get(k)) for w in ("before", "after") for k in ("passenger_minutes_over_seats", "empty_seat_km"))
+          and tot["after"]["passenger_minutes_over_seats"] <= tot["before"]["passenger_minutes_over_seats"])
     check("decisions: places named exist", all((d["where"].get("route_id") is None or d["where"]["route_id"] in routes) and all(s in stops for s in d["where"].get("stop_ids") or []) for d in ds))
     ps = per.get("personas", [])
     check("points of view: each is labelled fictional and has steps", bool(ps) and all("ictional" in (p.get("label") or "") and p.get("steps") for p in ps))

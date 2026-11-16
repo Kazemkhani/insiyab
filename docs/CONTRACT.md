@@ -1,6 +1,6 @@
 # The contract between lanes, version 1
 
-Four workers build this at once. They meet only through the files described here. If two lanes disagree, this file wins; if this file is wrong, the integrator (lane 1) changes it, bumps nothing silently, and posts the change in `COORDINATION.md`.
+Four workers build this at once. They meet only through the files described here. If two lanes disagree, this file wins; if this file is wrong, the integrator (lane 1) changes it and posts the change in `coordination/lane-1.md`. Adding a key or a file does not change the contract's version. Removing or renaming one is not done.
 
 A set of these files is a **bundle**. There are two:
 
@@ -8,6 +8,8 @@ A set of these files is a **bundle**. There are two:
 |---|---|---|
 | `fixtures/` | Stand-in data: invented network, invented numbers, the same shape as the real thing. Built by `python3 tools/make_fixture.py`. | The integrator. Nobody else edits it. |
 | `artifacts/` | The real results, worked out from RTA's data. Totals only, never raw rows. | Lane 1's engine, and only when `docs/REQUIREMENTS.md` section 6 says totals may leave Dataiku. |
+
+Which bundle the public site shows is decided in `docs/LANES.md` (Deploying): stand-in data unless a mentor has said yes.
 
 `python3 tools/contract_check.py <bundle>` checks a bundle. A screen may rely on anything that program checks, and on nothing else.
 
@@ -38,7 +40,7 @@ The index lists `route_id`, `file`, `trips`. Each route file has `trips`: `trip_
 The checker requires: a bus leaves after it arrives and reaches the next stop later; `load` equals the load before, less `off`, plus `on`.
 
 ### `forecast/boardings-route.json`, `forecast/boardings-stop.json` (and later `boardings-community.json`, `delay-route.json`)
-`target`, `level` ("route", "stop", "community"), `bin_seconds`, and `series`: each has `id` and `rows`. A row is one forecast made at one moment for one bin:
+`target`, `level` ("route", "stop", "community"), `bin_seconds`, and `series`: each has `id` (a route, stop or community that exists) and `rows`. A stop series also has `route_id`. A row is one forecast made at one moment for one bin:
 
 | Key | Meaning |
 |---|---|
@@ -46,8 +48,15 @@ The checker requires: a bus leaves after it arrives and reaches the next stop la
 | `horizon` | how far ahead, in seconds |
 | `bin_start` | the bin forecast. It ends at `origin + horizon`. |
 | `forecast`, `lo`, `hi` | the forecast and its interval |
-| `baseline` | what the naive forecast said for the same bin |
+| `baseline` | what the naive forecast said for the same bin. Always present: the error counter on screen needs it. |
 | `actual` | what happened (null if not yet known) |
+
+The delay forecast, when it exists, is `forecast/delay-route.json` with `target` "arrival_delay_seconds" and `horizon_unit` "stops": its rows carry `stops_ahead` (1, 5, 10, 20) in place of `horizon` and `bin_start`, and the rest is the same.
+
+### `gap.json`: where buses and passengers do not match
+`bin_seconds` (3600), `index_note`, and `rows`: one for each route, direction and hour, with `route_id`, `direction`, `hour_start`, `trips`, `seats_offered`, `forecast_peak_load` (the largest load on each trip, added up), `over` (passengers above the seats, added over the trips), `spare` (seats above the largest load, added over the trips) and `index`: the Insiyab index, from 0.1 (every seat empty) to 10 (every passenger without a seat). The map is red where `over` is above zero and blue where `spare` is large.
+
+`totals` has `before` and `after`, each with `passenger_minutes_over_seats` and `empty_seat_km`, a `kind`, and for a simulated one its `assumption`. "Close the gaps" moves the two totals from before to after.
 
 ### `metrics.json`: the table the judges read
 `targets`: each has `target`, `level`, `unit`, `split` {kind, origins, train, test}, `mape_rule` (a sentence saying over which bins MAPE is taken), `models` (each `model`, `label`, `is_baseline`), `subsets` (each `subset`, `kind`, `label`; kinds are `all`, `time_block`, `route`, `route_group`, `community_group`, `bus_type`, `direction`) and `results`. A result is one model at one horizon on one subset: `model`, `horizon`, `subset`, `n`, `mae`, `rmse`, `mape` (or null), `mape_n`, `wape`, `skill_vs` (the baseline it is compared with), `skill` (1 minus this model's MAE over the baseline's MAE).
@@ -55,9 +64,11 @@ The checker requires: a bus leaves after it arrives and reaches the next stop la
 The checker requires at least one baseline and one model that is not a baseline, more than one horizon, more than one kind of subset, and that RMSE is never below MAE.
 
 ### `decisions.json`: patterns turned into decisions
-`decisions`: each has `id`, `lever` (one of `right_bus`, `right_time`, `right_stop`, `rewarded_choice`, `on_demand`), `title`, `where` {route_id, stop_ids, community_id}, `when` {from, to}, `evidence` (each `label`, `value`, `unit`, `source`: the file the number came from), `change` (what RTA would do, in one sentence), `effect` (each `metric`, `before`, `after`, `kind`, and for a simulated one its `assumption`), `riders_affected`, `cost_note`, `confidence` ("high", "medium", "low"), `why` (one plain sentence built from the evidence).
+`decisions`: each has `id`, `lever` (one of `right_bus`, `right_time`, `right_stop`, `rewarded_choice`, `on_demand`), `title`, `where` {route_id, stop_ids, community_id}, `when` {from, to}, `evidence` (each `label`, `value`, `unit`, `source`: the file the number came from), `change` (what RTA would do, in one sentence), `effect` (each `metric`, `before`, `after`, `kind`, and for a simulated one its `assumption`), `passengers_affected`, `cost_note`, `confidence` ("high", "medium", "low"), `why` (one plain sentence built from the evidence).
 
 `kind` is `measured` (counted from the day's records) or `simulated` (what we expect if the change were made). A screen always shows which.
+
+A decision whose lever is `rewarded_choice` also has `offers`: the choices put to the passenger. Each has `kind` ("other_route", "earlier" or "later"), `route_id`, `stop_id`, `depart`, `walk_metres`, `walk_minutes`, `extra_minutes` (how much longer the journey takes), `points`, and for an earlier or later bus `minutes_earlier` or `minutes_later`. The Khutwa page is built from these. An offer with `walk_metres` above zero is never shown to a passenger who has said they cannot walk further.
 
 ### `personas.json`: the same morning from four places
 `personas`: each has `id` (`planner`, `office_worker`, `site_worker`, `driver`), `title`, `label` (must say Fictional), `anchor` {route_id, stop_id, time}, and `steps`. A step has `t`, `scene` (`control_room`, `stop`, `bus`, `phone`, `street`), `say` (one sentence, at most 28 words), `kind`, `decision_id` (or null), `before`, `after`.
@@ -65,6 +76,21 @@ The checker requires at least one baseline and one model that is not a baseline,
 ### `summary.json`
 `headline`: each has `key`, `label`, `value`, `unit`, `kind`, `source`. The first screen shows these and nothing it worked out itself.
 
+## The live room (for the moments in `docs/WOW.md`)
+
+A small relay, owned by lane 1, served from the public address. It holds one room's state in memory or a small store. It never holds a name, a number or anything about a visitor: a phone is a seat number. Every page works without it.
+
+| Call | Who | Does |
+|---|---|---|
+| `POST /api/room/join` | any phone | returns `{"seat": 7}` |
+| `GET /api/room/state` | any page, about once a second | returns `{"phase": "waiting" or "offer" or "closed", "decision_id": "d003", "joined": 9, "accepted": 6, "declined": 1, "depot": "none" or "ringing" or "confirmed" or "declined", "at": <seconds>}` |
+| `POST /api/room/answer` | a phone | `{"seat": 7, "accept": true}` |
+| `POST /api/room/phase` | the presenter only (needs the presenter's code) | `{"phase": "offer"}` |
+| `POST /api/room/call` | the presenter only | rings the team member's phone for the decision named; the state's `depot` follows the call |
+| `POST /api/room/reset` | the presenter only | back to waiting, counts to zero |
+
+A page that gets no answer within two seconds treats the room as absent: the phone offers "Show me the offer", and the big screen offers "Play it back", labelled "Played back, nobody is connected".
+
 ## Changing the contract
 
-Post the proposed change in `COORDINATION.md` first. The integrator changes this file, the fixture generator and the checker in one commit, and every lane pulls before its next push.
+Ask in your own coordination file, addressed `TO LANE 1:`. The integrator changes this file, the stand-in generator and the checker in one commit, and every lane pulls before its next push.

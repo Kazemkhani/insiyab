@@ -26,9 +26,9 @@ From public sources (`docs/research/research-dubai.md`, each with its address):
 
 | RTA already has | So we do not say | What we add |
 |---|---|---|
-| Machine-learning route planning from nol data, announced in 2020: a trial on 10 routes cut wasted time by 13.3%, and proposes removing little-used stops and creating express services | "Nobody has used nol data to skip stops" | The same question asked an hour ahead with a stated error, and the passenger's cost shown beside the saving |
-| Live bus positions in the S'hail app, and an on-time rate it reports as above 77% | "Buses are always late and nobody measures it" | A forecast of lateness several stops ahead, tested against the timetable |
-| Bus on Demand in 17 areas with 49 minibuses and 984,929 riders in 2025 | "Dubai should try on-demand buses" | Where the next zone should be, from the day's records |
+| Machine-learning route planning from nol data, announced in 2020: a trial on 10 routes cut wasted time by 13.3%, and the system can propose removing little-used stops and creating express services | "Nobody has used nol data to find wasted stops" | The same question asked an hour ahead with a stated error, and the passenger's cost shown beside the saving |
+| An app, S'hail, reported to show live buses and how full they are, and an on-time rate RTA gave as above 77% for 2024 | "Buses are always late and nobody measures it", or "nobody knows how full a bus is" | A forecast of lateness and of load an hour ahead, tested against the timetable and the naive forecast |
+| Bus on Demand: 17 areas and 49 minibuses in May 2026, more since; 984,929 passengers in 2025 | "Dubai should try on-demand buses" | Where the next zone should be, from the day's records |
 | nol Plus, a points programme | "RTA should start a loyalty programme" | Points earned for the choice that closes a gap, offered only where the forecast shows one |
 | 637 new buses arriving in 2025 and 2026 | | Which old bus each new one should replace first, from load and distance run |
 
@@ -102,9 +102,9 @@ From the team's meeting on 16 November and the written proposal for dynamic pric
 | Reward passengers for the longer or emptier route, with coupons like a supermarket receipt | The rewarded-choice lever and the Khutwa prototype |
 | Bus on demand to bring people to stops | The on-demand lever, shown as "where the next zone should be" |
 | Twice as many stops as buses; buses from 2007 and 2008 | Stop spacing is measured in the census. Fleet age drives the right-bus lever. Note: stops and buses are different things, so the ratio alone proves nothing, and we do not present it as a finding. |
-| Skip stops where nobody boards or alights; a button or an app tap to call the bus | The right-stop lever. RTA trialled this in 2020, so we add the forecast and the passenger's cost. |
+| Skip stops where nobody boards or alights; a button or an app tap to call the bus | The right-stop lever. RTA's 2020 system already proposes removing little-used stops, so we add the forecast and the passenger's cost. |
 | Lower fares at the peak, and bus lanes | A fare offer is one form of rewarded choice. Bus lanes need road works and road data we do not have: named in the pitch as RTA's own plan, not ours. |
-| A congestion index from 0.1 to 10, and 1, 2 or 3 buses by level | The gap, shown on that scale on the planner's screen and called the Insiyab index. Buses are allocated by forecast load, not by three fixed steps. |
+| A congestion index from 0.1 to 10, and 1, 2 or 3 buses by level | The gap, shown on that scale on the planner's screen and called the Insiyab index (`gap.json` in the contract). Buses are allocated by forecast load, not by three fixed steps. |
 | The last mile; bikes and e-scooters; knee problems; heat | The on-demand lever, and the limits on walking offers in section 5 |
 | Collection zones, as the metro has | On-demand zones feed a busy stop: the same thought |
 | Tap-in to tap-out times; where buses are wasted or too full | The census and both forecasts |

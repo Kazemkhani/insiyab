@@ -62,7 +62,7 @@ Use: community-level demand, spatial coverage, route and community relationships
 | AVL `Trip_ID`, `avm_pattern_id` | GTFS `trip_id`, `shape_id` | unknown | whether they match at all |
 | GTFS stop position | community polygon | point in polygon | stops outside every polygon |
 
-The most important unknown is what one nol row is. Either one row is one tap (with a flag saying check-in or check-out), or one row is one journey (with both ends). The census must say which, with ten example rows described in words and no card number written down.
+The most important unknown is what one nol row is. Either one row is one tap (with a flag saying check-in or check-out), or one row is one journey (with both ends). The census must say which, and how it was established (for example: "every card appears on two rows, one with CKI filled and one with CKO"). It never writes down a row or a card number.
 
 ## 3. The census: the first task, before any model
 
@@ -77,12 +77,14 @@ Whoever has access to Dataiku writes `docs/DATA-CENSUS.md` with, for every datas
 
 Nothing in the strategy is treated as true until its count is in this file.
 
+**Where the counts are kept.** Counts are totals worked out from the provided data, and whether totals may leave Dataiku is not yet answered (`docs/REQUIREMENTS.md`, section 6). Until it is, the census program is run where the data is, by a person, and its printed counts are kept in `data/CENSUS-LOCAL.md` on that person's machine. Git ignores that folder. `docs/DATA-CENSUS.md` in the repository holds only what RTA's own slides already say, and the list of what is still to be counted. Once a mentor says totals may be shared, the counts are copied in.
+
 ## 4. One day only, and what that does to every claim
 
-Both the nol transactions and the AVL report cover a single day, Monday 15 December 2025 (confirm the weekday in the census). So:
+Both the nol transactions and the AVL report cover a single day, Monday 15 December 2025, which fell inside the winter break of most schools. So:
 
-- We can test how well the model predicts later hours of that day from earlier ones, and how well it carries over to routes, stops and communities it was not trained on.
-- We cannot test how well it predicts another day. We say so on every screen where a forecast number appears.
+- We can test how well the model forecasts later hours of that day from earlier ones, and how well it carries over to routes, stops and communities it was not trained on.
+- We cannot test how well it forecasts another day. We say so on every screen where a forecast number appears.
 - Everything is built so that adding more days is a change of input and nothing else.
 
 ## 5. Open data we may add
@@ -94,6 +96,6 @@ The slides say teams "may add open data". The verified list, with addresses and 
 1. **Raw data stays where the organisers put it** until a mentor has said it may leave. `docs/REQUIREMENTS.md`, section 6, records the answer. Until then the model code is written against stand-in data with the same shape (in `fixtures/`), and run on the real data inside Dataiku.
 2. **Raw rows never enter git, in any case.** `.gitignore` blocks `data/` and data file types. `tools/guard.py` refuses a commit that contains a column named like a card, device or driver identifier.
 3. **Nothing about a single card, device or driver is ever shown or exported.** `NOL_ID`, `device_id`, `device_id_hex` and `Driver_id` are used only to count and to group. No output is broken down by driver: this is a tool for planning a network, not for watching staff.
-4. **Small cells are hidden.** A published total built from fewer than five cards is shown as "under 5".
+4. **Counts are totals; journeys are private.** A count of boardings at a stop is a total and may be shown, however small. A journey from one stop to another made by fewer than five cards is never shown: such a cell is left out.
 5. **The public site shows made-up stand-in data, labelled on every screen, until rule 1 is settled.** If export of totals is allowed, the site switches to real totals by replacing the files in `artifacts/`; nothing else changes.
 6. **Open data keeps its source.** Every table built from public data carries the address, the date fetched and the licence.

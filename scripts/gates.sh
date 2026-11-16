@@ -18,6 +18,7 @@ run "the guard catches planted raw data"            python3 tools/guard.py --sel
 run "no raw data and no identifier in the repository" python3 tools/guard.py --all
 run "the stand-in bundle equals a fresh build"      python3 tools/make_fixture.py --check
 run "the stand-in bundle meets the contract"        python3 tools/contract_check.py fixtures
+run "the hand-off zips carry the current prompts"    bash tools/make_handoff.sh --check
 # Invented raw tables carry the real column names, so the guard lets them through only here, and only if they are provably invented.
 if [ -d fixtures/raw ]; then
   if [ -f tools/make_standin_raw.py ]; then run "the stand-in raw tables equal a fresh build (so they are invented, not real)" python3 tools/make_standin_raw.py --check

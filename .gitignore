@@ -1,15 +1,28 @@
 # RTA's raw data never enters git. See docs/DATA.md, section 6.
-data/
+/data/
 *.csv
+*.tsv
 *.xlsx
 *.xls
 *.parquet
 *.kml
 *.kmz
+*.feather
+*.sqlite
+*.db
+*.pkl
+*.gz
+# a notebook keeps the rows it printed: run it where the data is, and commit the program, not the notebook
+*.ipynb
 !fixtures/**
 !opendata/public/**
+# secrets
 .env
 .env.*
+*.pem
+*.key
+*.p8
+# built and local things
 node_modules/
 __pycache__/
 *.pyc
@@ -17,4 +30,7 @@ __pycache__/
 .DS_Store
 .vercel/
 dist-tmp/
+dist/
+build/
+out/
 *.log
