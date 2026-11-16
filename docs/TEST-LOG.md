@@ -142,3 +142,21 @@ Wording he would still change: "Forecast error" as the model screen's headline t
 | "Seats only". | Fixed: "Counts seats, not standing room." |
 | The gap note was 90 words and used the product's name as a unit. | Fixed in the engine: `index_note` is one line ("Gap score: from 0.1 (only empty seats) to 10 (only passengers without a seat)."), and the method moved to `index_method`. |
 | The "Tested on" line was 31 words on four screens. | Fixed in the engine: `tested_on` is "Tested on one day only: Monday 15 December 2025, in the school holidays." and the rest moved to `tested_on_more`. |
+
+## Review 2, the judge again, on the live address at commit f4c453b (17 November, about 00:45)
+
+Her score: **64 of 100**, up from 58. By criterion: business 13 of 20, documentation and presentation 10, innovation 15, the model 14, accuracy 12. She walked the public address in a browser at both sizes and with reduced motion, and checked each finding of Review 1 that was marked fixed. One line of her report is wrong and is not repeated here: the site runs on Vercel, not Fly.io.
+
+Really fixed, checked by her on the live address: every planner finding but one (P1 to P7, P9 to P12); the model screen shows a real model's table (J2); khutwa/ answers and its journey works to the end (J3); no console errors from the room (J4); the public name resolves (J5); the range of the gain is on the screen (J7); features are listed (J8); the phone's time slider is 358 pixels wide (J12); and all of the statistician's.
+
+| # | Finding | State |
+|---|---|---|
+| K1 | P8 was marked fixed and is not: `related` is in decisions.json and no screen shows it. A planner who approves the swap has no path to the offer that fills the freed bus. | TO LANE 2: one line in the decision card, "See also". My mistake was to mark it fixed when only the data was. |
+| K2 | No pitch, no prepared answers: 1 of 6. | A first draft now exists: docs/PITCH-DRAFT.md, seven minutes and twelve answers, with no number typed. TO LANE 4: take it over. |
+| K3 | At 120 minutes ahead the model loses to the naive forecast and no sentence says so. | Fixed in the engine: each target in metrics.json carries `cautions`, plain sentences built from the table. TO LANE 2: show them beside the number they qualify. |
+| K4 | At stop level the range held 87 in 100 times when somebody boarded, under the 90 promised, and nothing flags it. | Same: a `range_short` caution. TO LANE 2. Open in the engine: the range itself is still short there. |
+| K5 | "Insiyab index" still on the gap screen. | Fixed in the data at c35b241 (`index_note` says "Gap score"); she reviewed the commit before. TO LANE 2: check no string of yours still says it. |
+| K6 | "Room unavailable." and "held-out" still in body text. | TO LANE 2 (also section G, item 3). |
+| K7 | The error counter moves with the clock and nothing says so (J6). | TO LANE 2. Partly met already: the first screen now leads with the untouched table's fixed number. |
+| K8 | No census, no public data, no picture of the Dataiku flow. | The census waits on a person in Dataiku. Public data is lane 3's. The flow is lane 1's, on Tuesday, with the real tables. |
+| K9 | Her hardest question with no answer anywhere: how one December Monday carries over to Ramadan or summer. | Answered in docs/PITCH-DRAFT.md: it does not, and we do not claim it. |

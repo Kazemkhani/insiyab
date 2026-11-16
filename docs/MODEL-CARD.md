@@ -50,6 +50,8 @@ Unit: passengers boarding per route per 15 minutes. MAPE is taken only over quar
 
 **The range of the gain includes zero.** On these rows the model is not shown to beat the best naive forecast, and no screen should say it does.
 
+**Caution.** At 120 minutes ahead the model misses by more than the naive forecast (in proportion to the timetable). Use the naive forecast that far ahead.
+
 **By horizon, untouched part, every row.** A row where the model loses stays in: it tells a planner where not to rely on it.
 
 | Ahead | n | Best naive forecast there | Its MAE | Model MAE | Gain |
@@ -103,6 +105,10 @@ Unit: passengers boarding per stop per 15 minutes. MAPE is taken only over quart
 | Boosted trees with a loss made for counts, one model for every stop and every horizon (chosen) | 11,520 | 0.52 | 0.92 | 1.09 | 0.74 over 154 | +5 in 100 (-6 to +18) against in proportion to the timetable |
 
 **The range of the gain includes zero.** On these rows the model is not shown to beat the best naive forecast, and no screen should say it does.
+
+**Caution.** At 120 minutes ahead the model misses by more than the naive forecast (in proportion to the timetable). Use the naive forecast that far ahead.
+
+**Caution.** When somebody boarded, the range held 87 times in 100, short of the 90 promised.
 
 **By horizon, untouched part, every row.** A row where the model loses stays in: it tells a planner where not to rely on it.
 

@@ -75,6 +75,7 @@ The main table of a target is its **untouched part**: forecasts set aside at the
 | `pooled` | one row a model, every horizon together: the same measures as a result, plus `skill` against `skill_vs`, `skill_measure` ("wape" or "mae") and `skill_lo`, `skill_hi`: the range the gain fell in 95 times in 100 when whole origins were drawn again and again. If the range holds zero, say so. |
 | `range` | `promised` (0.9), `kept` (how often the truth fell inside the range), `kept_when_nobody_boarded`, `kept_when_somebody_boarded`, `n_nobody`, `n_somebody`, `method`. Show the two apart: a range that is only right about empty quarter-hours has not kept its promise. |
 | `features` | (stop level) what the model leans on: `feature`, `label` in plain words, `share` of the model's gain. Shares add up to 1. |
+| `cautions` | where a planner should not lean on the model, each with `kind` ("loses_at_horizon", "range_short", "gain_not_established") and `say`: one sentence to show beside the number it qualifies. An empty list means none. |
 | `more_tables` | other tables with the same shape of `results` and `pooled`: `development` (where every choice was made: these numbers flatter the model), `other_routes` and `other_communities` (learn from four groups, forecast the fifth). Each has `table`, `note`, `split`. |
 
 In a result, `skill_vs` is the best naive forecast **on that horizon and subset**, so it can differ from row to row. Compare a model with the naive forecast its own row names, never with the first naive forecast in the list.

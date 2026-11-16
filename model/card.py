@@ -67,6 +67,9 @@ def card(bundle):
         if best and best["skill"] is not None:
             holds = best["skill_lo"] > 0
             w(("The range of the gain lies above zero: on these rows the model beat the best naive forecast." if holds else "**The range of the gain includes zero.** On these rows the model is not shown to beat the best naive forecast, and no screen should say it does.") + "\n")
+        for c in t.get("cautions", []):
+            if c["kind"] != "gain_not_established":
+                w("**Caution.** " + c["say"] + "\n")
         w("**By horizon, untouched part, every row.** A row where the model loses stays in: it tells a planner where not to rely on it.\n")
         unit = "stops" if t.get("horizon_unit") == "stops" else "minutes"; rows = []
         for h in sorted({r["horizon"] for r in t["results"]}):

@@ -3,6 +3,21 @@
  "targets": [
   {
    "best_naive": "naive_timetable",
+   "cautions": [
+    {
+     "against": "naive_timetable",
+     "horizon": 7200,
+     "kind": "loses_at_horizon",
+     "say": "At 120 minutes ahead the model misses by more than the naive forecast (in proportion to the timetable). Use the naive forecast that far ahead.",
+     "skill": -0.187
+    },
+    {
+     "kind": "gain_not_established",
+     "say": "The range of the gain includes zero: on this day the model is not shown to beat the best naive forecast.",
+     "skill_hi": 0.4669,
+     "skill_lo": -0.1211
+    }
+   ],
    "chosen": "gbt",
    "chosen_on": "development",
    "level": "route",
@@ -6276,6 +6291,27 @@
   },
   {
    "best_naive": "naive_timetable",
+   "cautions": [
+    {
+     "against": "naive_timetable",
+     "horizon": 7200,
+     "kind": "loses_at_horizon",
+     "say": "At 120 minutes ahead the model misses by more than the naive forecast (in proportion to the timetable). Use the naive forecast that far ahead.",
+     "skill": -0.0856
+    },
+    {
+     "kept": 0.8655,
+     "kind": "range_short",
+     "promised": 0.9,
+     "say": "When somebody boarded, the range held 87 times in 100, short of the 90 promised."
+    },
+    {
+     "kind": "gain_not_established",
+     "say": "The range of the gain includes zero: on this day the model is not shown to beat the best naive forecast.",
+     "skill_hi": 0.1759,
+     "skill_lo": -0.058
+    }
+   ],
    "chosen": "gbt",
    "chosen_on": "development",
    "features": [
@@ -13129,6 +13165,7 @@
   },
   {
    "best_naive": "naive_stays",
+   "cautions": [],
    "chosen": "gbt",
    "half_hours_with_too_little_to_learn_from": 3,
    "horizon_unit": "stops",

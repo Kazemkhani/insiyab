@@ -149,6 +149,7 @@ def main():
             check(f"{tag}: the range says what was promised and how often it was kept", share(g.get("promised")) and share(g.get("kept")) and all(g.get(k) is None or share(g[k]) for k in ("kept_when_nobody_boarded", "kept_when_somebody_boarded")), g)
         if t.get("features"):
             check(f"{tag}: what the model leans on is given in plain words with shares that add up to one", all(f.get("feature") and f.get("label") and share(f.get("share")) for f in t["features"]) and abs(sum(f["share"] for f in t["features"]) - 1) < 0.02)
+        check(f"{tag}: each caution has a kind and one sentence to show", all(c.get("kind") and isinstance(c.get("say"), str) and 0 < len(c["say"].split()) <= 40 for c in t.get("cautions") or []))
         for m in t.get("more_tables") or []:
             check(f"{tag}: the table '{m.get('table')}' has a note, results and models that exist", bool(m.get("table") and m.get("note") and m.get("results")) and all(r.get("model") in models and num(r.get("mae")) for r in m["results"]))
         need_skill = [r for r in res if not models.get(r.get("model"), {}).get("is_baseline")]

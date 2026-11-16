@@ -57,6 +57,24 @@ def _target(level, frame, kinds, chosen_from=None, extra=None):
             "more_tables": more}, chosen
 
 
+def _cautions(t):
+    """Where a planner should not lean on the model, said in words a screen can show. Built from the table: a horizon at which the chosen model loses
+    to the best naive forecast there, and a range that was kept less often than promised when somebody boarded."""
+    out = []; models = {m["model"]: m for m in t["models"]}; unit = "stops" if t.get("horizon_unit") == "stops" else "minutes"
+    for r in sorted((r for r in t["results"] if r["subset"] == "all" and r["model"] == t.get("chosen") and r["skill"] is not None and r["skill"] < 0), key=lambda r: r["horizon"]):
+        ahead = r["horizon"] if unit == "stops" else r["horizon"] // 60
+        out.append({"kind": "loses_at_horizon", "horizon": r["horizon"], "skill": r["skill"], "against": r["skill_vs"],
+                    "say": f"At {ahead} {unit} ahead the model misses by more than the naive forecast ({models[r['skill_vs']]['label'].lower()}). Use the naive forecast that far ahead."})
+    g = t.get("range") or {}
+    if g.get("kept_when_somebody_boarded") is not None and g["kept_when_somebody_boarded"] < g["promised"]:
+        out.append({"kind": "range_short", "kept": g["kept_when_somebody_boarded"], "promised": g["promised"],
+                    "say": f"When somebody boarded, the range held {round(100 * g['kept_when_somebody_boarded'])} times in 100, short of the {round(100 * g['promised'])} promised."})
+    best = next((r for r in t.get("pooled", []) if r["model"] == t.get("chosen")), None)
+    if best and best.get("skill_lo") is not None and best["skill_lo"] <= 0:
+        out.append({"kind": "gain_not_established", "skill_lo": best["skill_lo"], "skill_hi": best["skill_hi"], "say": "The range of the gain includes zero: on this day the model is not shown to beat the best naive forecast."})
+    return out
+
+
 def _lateness(day):
     """Target B: the table for lateness and the forecasts a screen can show. Returns (metrics entry, forecast file) or (None, None) when there is too little."""
     rows = D.build_rows(day["visits"])
@@ -78,9 +96,10 @@ def _lateness(day):
               "models": [{"model": m, "label": label, "is_baseline": True} for m, label in D.NAIVE.items()] + [{"model": m, "label": label, "is_baseline": False, "chosen": True} for m, label in D.MODELS.items()],
               "chosen": "gbt", "best_naive": best, "subsets": declared, "results": E.table(final, models, masks, naive_names=names, counts=False), "pooled": pooled,
               "range": {"promised": PROMISED, "kept": round(kept, 4), "model": "gbt", "n": len(final)}, "half_hours_with_too_little_to_learn_from": int(thin),
-              "more_tables": [{"table": "development", "note": "Forecasts made from 08:00 for arrivals up to 16:00. Read the main table first.",
+              "cautions": [], "more_tables": [{"table": "development", "note": "Forecasts made from 08:00 for arrivals up to 16:00. Read the main table first.",
                                "split": {"kind": "rolling_origin", "origins": sorted(int(x) for x in dev["origin"].unique())},
                                "results": E.table(dev, models, {"all": np.ones(len(dev), bool)}, naive_names=names, counts=False), "pooled": E.pooled(dev, models, naive_names=names, counts=False)[0]}]}
+    target["cautions"] = _cautions(target)
     series = []
     for rid, g in final.groupby("route_id", sort=True):
         g = g.iloc[:: max(1, len(g) // 600)]                           # at most about 600 rows a route, taken evenly through the evening
@@ -139,6 +158,8 @@ def build(day, fixture=True, generated_at=None, commit=None):
     t_route, _ = _target("route", route, route_kinds, chosen_from=chosen)
     t_stop, _ = _target("stop", stop, stop_kinds, chosen_from=chosen, extra=extra)
     date = pd.Timestamp(day["service_date"]).strftime("%A %-d %B %Y") if os.name != "nt" else day["service_date"]
+    for t in (t_route, t_stop):
+        t["cautions"] = _cautions(t)
     t_stop["features"] = F.importance(rows, F.UNTOUCHED[0])           # learned from the hours before 16:00 only
     for t in (t_route, t_stop):
         t["tested_on"] = f"Tested on one day only: {date}, in the school holidays."
