@@ -19,7 +19,8 @@ PROMISED = 0.9
 def _labels(day, rows):
     """The subset every row belongs to, for the stability table. Each label comes from the plan or the fleet, not from the target."""
     s = day["series"].iloc[rows["series"].to_numpy()].reset_index(drop=True)
-    kind = day["visits"].groupby("route_id")["bus_type"].agg(lambda x: x.value_counts().index[0])       # the kind of bus that ran most of the route's visits
+    early = day["visits"][day["visits"]["sched_arr"] < F.UNTOUCHED[0]]                                   # a label must not be set by the untouched hours either
+    kind = early.groupby("route_id")["bus_type"].agg(lambda x: x.value_counts().index[0])               # the kind of bus that ran most of the route's visits before 16:00
     route_group = F.groups_of(list(day["series"]["route_id"])); comm_group = F.groups_of(list(day["series"]["community_id"]))
     idx = rows["series"].to_numpy()
     return pd.DataFrame({"route_id": s["route_id"], "direction": s["direction"], "stop_id": s["stop_id"], "bus_type": s["route_id"].map(kind).fillna("UNKNOWN").to_numpy(),
@@ -35,7 +36,8 @@ def _target(level, frame, kinds, chosen_from=None, extra=None):
     chosen = chosen_from or E.choose(dev_pooled)                       # the choice is made on the development part alone
     declared, masks = E.subsets_of(final, kinds)
     final_pooled, best = E.pooled(final, models)
-    kept = float(((final["y"] >= final["lo"] - 1e-9) & (final["y"] <= final["hi"] + 1e-9)).mean())
+    inside = ((final["y"] >= final["lo"] - 1e-9) & (final["y"] <= final["hi"] + 1e-9)); kept = float(inside.mean()); some = final["y"] > 0
+    share = lambda m: None if not m.any() else round(float(inside[m].mean()), 4)
     _, dev_masks = E.subsets_of(dev, {"time_block": kinds["time_block"]})
     more = [{"table": "development", "note": "Forecasts made from 08:00 to 15:30 for quarters of an hour that had ended by 16:00. Every choice was made here, so these numbers flatter the model: read the main table first.",
              "split": {"kind": "rolling_origin", "origins": sorted(int(x) for x in dev["origin"].unique())}, "results": E.table(dev, models, dev_masks), "pooled": dev_pooled}]
@@ -50,7 +52,9 @@ def _target(level, frame, kinds, chosen_from=None, extra=None):
                       "test": "the quarter of an hour that ends at origin plus horizon, for origins from 16:00 to 21:30, set aside at the start and scored once"},
             "mape_rule": MAPE_RULE, "models": E.models_declared(chosen), "chosen": chosen, "chosen_on": "development", "best_naive": best,
             "subsets": declared, "results": E.table(final, models, masks), "pooled": final_pooled,
-            "range": {"promised": PROMISED, "kept": round(kept, 4), "model": chosen, "n": len(final)}, "more_tables": more}, chosen
+            "range": {"promised": PROMISED, "kept": round(kept, 4), "kept_when_nobody_boarded": share(~some), "kept_when_somebody_boarded": share(some), "n_nobody": int((~some).sum()), "n_somebody": int(some.sum()),
+                      "model": chosen, "n": len(final), "method": "set at each origin from the misses of forecasts that had already come true that day (conformal prediction, rolling), widened to whole passengers"},
+            "more_tables": more}, chosen
 
 
 def _lateness(day):
@@ -99,7 +103,7 @@ def _series_json(frame, keys, chosen, base, first_bin):
 def build(day, fixture=True, generated_at=None, commit=None):
     """Every stage after the tables are ready. Returns {file name: content}."""
     Y, S, series, first_bin = day["Y"], day["S"], day["series"], day["first_bin"]
-    rows = F.build_rows(Y, S, series, first_bin)
+    rows = F.build_rows(Y, S, series, first_bin, day=day)
     pred, thin = F.rolling(rows)
     for k in F.MODELS:
         rows[k] = pred[k]
@@ -135,6 +139,7 @@ def build(day, fixture=True, generated_at=None, commit=None):
     t_route, _ = _target("route", route, route_kinds, chosen_from=chosen)
     t_stop, _ = _target("stop", stop, stop_kinds, chosen_from=chosen, extra=extra)
     date = pd.Timestamp(day["service_date"]).strftime("%A %-d %B %Y") if os.name != "nt" else day["service_date"]
+    t_stop["features"] = F.importance(rows, F.UNTOUCHED[0])           # learned from the hours before 16:00 only
     for t in (t_route, t_stop):
         t["tested_on"] = f"later hours of one day, {date}, inside the winter break of most schools. Not tested on another day, and a school day may look different."
     base = t_stop["best_naive"]

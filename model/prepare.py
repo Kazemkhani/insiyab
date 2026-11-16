@@ -10,7 +10,9 @@ A vehicle leaves this file as a stand-in (v1, v2 ...), never as its body number.
 What the census must confirm on the real tables, each one constant below so it is changed in one place:
   DAY_START   a clock time before this hour belongs to the service day before (the day runs past midnight)
   DOOR_OPEN   the words in Door_Status that mean the door opened
-  one nol row is one tap (CKI or CKO is 1). If it turns out to be one journey, taps() is the only function to change."""
+  one nol row is one tap (CKI or CKO is 1). If it turns out to be one journey, the taps stage is the only one to change.
+  a tap after midnight carries the next calendar date. If the real table dates it the service day, the taps stage counts
+  such rows (taps_before_day_start_dated_the_service_day) and they must be moved past midnight there."""
 import os, re
 import numpy as np
 import pandas as pd
@@ -134,14 +136,15 @@ def prepare(tables, service_date=None):
     dup = t.duplicated(keep="first"); t = t[~dup].copy()
     t["time"] = seconds(t["clock"]) + np.where(t["date"].str.strip() > service_date, 86400, 0)
     t["on"] = pd.to_numeric(t["cki"], errors="coerce").fillna(0).eq(1); t["off"] = pd.to_numeric(t["cko"], errors="coerce").fillna(0).eq(1)
+    early = int(((seconds(t["clock"]) < DAY_START) & (t["date"].str.strip() == service_date)).sum())
     odd = t["time"].isna() | ~(t["on"] ^ t["off"])
     t = t[~odd].copy(); t["time"] = t["time"].astype(int)
     cards = t["card"].nunique()
     note("taps", "one row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out",
-         rows_in=len(raw), repeated_rows=dup.sum(), rows_neither_or_both_or_no_time=odd.sum(), rows_out=len(t), check_ins=t["on"].sum(), check_outs=t["off"].sum(), cards_counted=cards)
+         rows_in=len(raw), repeated_rows=dup.sum(), rows_neither_or_both_or_no_time=odd.sum(), rows_out=len(t), check_ins=t["on"].sum(), check_outs=t["off"].sum(), cards_counted=cards, taps_before_day_start_dated_the_service_day=early)
 
     # --- taps to trips: the tap belongs to the stop its vehicle reached last ------------------------------------
-    left = t[["time", "body", "on", "off", "stop_tapped"]].sort_values("time", kind="stable")
+    left = t[["time", "body", "on", "off", "stop_tapped", "card"]].sort_values("time", kind="stable")
     right = v[["act_arr", "body", "trip_id", "seq", "stop_id"]].sort_values("act_arr", kind="stable")
     j = pd.merge_asof(left, right, left_on="time", right_on="act_arr", by="body", direction="backward")
     lost = j["trip_id"].isna()
@@ -149,6 +152,10 @@ def prepare(tables, service_date=None):
     note("taps to trips", "a tap is given to the stop visit of its vehicle with the latest actual arrival at or before the tap; a tap whose vehicle is not in the runtime report, or that comes before its first arrival, cannot be placed and is left out of loads and counts",
          taps_in=len(j), taps_not_placed=lost.sum(), share_not_placed=lost.mean() if len(j) else 0, taps_whose_own_stop_differs_from_the_stop_placed=wrong.sum())
     j = j[~lost].copy(); j["seq"] = j["seq"].astype(int)
+    # people who will come back: for each alighting, when that card next tapped. Only the stop and the two times leave this file, never the card.
+    jc = j.sort_values(["card", "time"], kind="stable"); nxt = jc.groupby("card", sort=False)["time"].shift(-1)
+    came_back = pd.DataFrame({"stop_id": jc["stop_id"], "alighted": jc["time"], "next_tap": nxt.fillna(np.inf)})[jc["off"].to_numpy()].reset_index(drop=True)
+    j = j.drop(columns=["card"])
     per = j.groupby(["trip_id", "seq"]).agg(on=("on", "sum"), off_known=("off", "sum")).reset_index()
     v = v.merge(per, on=["trip_id", "seq"], how="left"); v[["on", "off_known"]] = v[["on", "off_known"]].fillna(0).astype(int)
 
@@ -251,6 +258,7 @@ def prepare(tables, service_date=None):
     v["vehicle"] = v["body"].map(names)
     visits = v[["trip_id", "route_id", "direction", "seq", "stop_id", "vehicle", "bus_type", "seats", "model_year", "sched_arr", "act_arr", "sched_dep", "act_dep", "door_opened", "on", "off", "load"]]
     return {"service_date": service_date, "visits": visits, "stops": s, "communities": comms, "routes": routes, "series": series, "Y": Y, "S": S, "first_bin": first_bin,
+            "alightings": came_back,
             "fleet_types": f.groupby("bus_type")["seats"].median().dropna().astype(int).reset_index().to_dict("records"), "log": log}
 
 

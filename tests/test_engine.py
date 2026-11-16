@@ -14,12 +14,12 @@ def check(name, ok, detail=""):
     print(("PASS " if ok else "FAIL ") + name + ("" if ok else f": {str(detail)[:300]}")); failed += 0 if ok else 1
 
 tables = load("fixtures/raw"); day = prepare(tables)
-rows = F.build_rows(day["Y"], day["S"], day["series"], day["first_bin"])
+rows = F.build_rows(day["Y"], day["S"], day["series"], day["first_bin"], day=day)
 
 # --- the clock ---------------------------------------------------------------------------------------------------
 ORIGIN = 12 * 3600; NEAR = [ORIGIN - 3600, ORIGIN - 1800, ORIGIN]
 def forecasts_at(tabs):
-    d = prepare(tabs); r = F.build_rows(d["Y"], d["S"], d["series"], d["first_bin"], origins=[o for o in F.ORIGINS if o <= ORIGIN])
+    d = prepare(tabs); r = F.build_rows(d["Y"], d["S"], d["series"], d["first_bin"], origins=[o for o in F.ORIGINS if o <= ORIGIN], day=d)
     p, _ = F.rolling(r, origins=NEAR); keep = r["origin"].isin(NEAR).to_numpy()
     return r.loc[keep, ["series", "origin", "horizon", "bin"] + F.FEATURES + list(naive.NAIVE)].to_numpy(dtype=float), np.column_stack([p[k][keep] for k in F.MODELS])
 later = copy.deepcopy(tables)
@@ -54,6 +54,12 @@ check("rolling origin: every row learned from had ended by the origin, and no ro
 route_group = F.groups_of(list(day["series"]["route_id"]))[rows["series"].to_numpy()]; route = day["series"]["route_id"].to_numpy()[rows["series"].to_numpy()]; both = []
 F.held_out_groups(rows, route_group, [17 * 3600], watch=lambda o, learn, test: both.append(len(set(route[learn]) & set(route[test]))))
 check("other routes: no route is in both learning and testing, in any of the five folds", len(both) == 5 and sum(both) == 0, both)
+comm = F.groups_of(list(day["series"]["community_id"]))[rows["series"].to_numpy()]; cname = day["series"]["community_id"].to_numpy()[rows["series"].to_numpy()]; cboth = []
+F.held_out_groups(rows, comm, [17 * 3600], watch=lambda o, learn, test: cboth.append(len(set(cname[learn]) & set(cname[test]))))
+check("other communities: no community is in both learning and testing, in any fold", len(cboth) >= 2 and sum(cboth) == 0, cboth)
+check("the features from buses on the road and from passengers yet to return are alive on the invented day", all(float(rows[c].abs().sum()) > 0 for c in ("buses_on_the_way", "their_lateness", "waiting_to_return", "alighted_nearby_so_far")),
+      {c: float(rows[c].abs().sum()) for c in ("buses_on_the_way", "their_lateness", "waiting_to_return", "alighted_nearby_so_far")})
+check("no card leaves the preparation with the alightings", list(day["alightings"].columns) == ["stop_id", "alighted", "next_tap"])
 check("every route is in exactly one group", len(set(zip(route, route_group))) == len(set(route)) and set(route_group) == {0, 1, 2, 3, 4})
 
 # --- loads -------------------------------------------------------------------------------------------------------
@@ -96,12 +102,15 @@ check("the four points of view: each starts with something measured, and every s
 
 stop = next(t for t in one["metrics.json"]["targets"] if t["level"] == "stop")
 check("every naive forecast and every model is in the table, at every horizon", {r["model"] for r in stop["results"]} == set(naive.NAIVE) | set(F.MODELS) and {r["horizon"] for r in stop["results"]} == set(F.HORIZONS))
-check("gain is stated against the best naive forecast on the same rows, never the worst", all(r["skill_vs"] == min((x for x in stop["results"] if x["model"] in naive.NAIVE and x["horizon"] == r["horizon"] and x["subset"] == r["subset"]), key=lambda x: (x["mae"], x["model"]))["model"]
+check("gain is stated against the best naive forecast on the same rows, never the worst", all(r["skill_vs"] == min((x for x in stop["results"] if x["model"] in naive.NAIVE and x["horizon"] == r["horizon"] and x["subset"] == r["subset"]), key=lambda x: (x["wape"] if x["wape"] is not None else x["mae"], x["model"]))["model"]
                                                                                            for r in stop["results"] if r["model"] in F.MODELS))
+rng_ = stop["range"]
+check("the range says how often it held when nobody boarded and when somebody did, apart", rng_["kept_when_nobody_boarded"] is not None and rng_["kept_when_somebody_boarded"] is not None and rng_["n_nobody"] + rng_["n_somebody"] == rng_["n"], rng_)
+check("the table of what the model leans on names every feature in plain words and adds up to one", len(stop["features"]) == len(F.FEATURES) and abs(sum(f["share"] for f in stop["features"]) - 1) < 0.01)
 scrambled = dict(day); Y = day["Y"].copy(); cut = F.UNTOUCHED[0] // BIN - day["first_bin"]; Y[:, cut:] = np.where(np.isnan(Y[:, cut:]), np.nan, 7.0); scrambled["Y"] = Y
 three = R.build(scrambled); dev = lambda files: json.dumps(R._clean([m for t in files["metrics.json"]["targets"] for m in t["more_tables"] if m["table"] == "development"]), sort_keys=True)
 check("the untouched part: rewriting everything that happened from 16:00 changes neither the development table nor the model chosen", dev(one) == dev(three) and one["meta.json"]["engine"]["chosen"] == three["meta.json"]["engine"]["chosen"])
 check("and that rewrite did change the untouched table, so the test could have failed", json.dumps(R._clean(stop["pooled"])) != json.dumps(R._clean(next(t for t in three["metrics.json"]["targets"] if t["level"] == "stop")["pooled"])))
-check("the development table uses no quarter of an hour that ended after 16:00", all(o + max(F.HORIZONS) >= 0 for o in [0]) and bool((F.development(rows)["origin"] + F.development(rows)["horizon"] <= F.UNTOUCHED[0]).all()) and len(F.development(rows)) > 0)
+check("the development table uses no quarter of an hour that ended after 16:00", bool((F.development(rows)["origin"] + F.development(rows)["horizon"] <= F.UNTOUCHED[0]).all()) and len(F.development(rows)) > 0)
 
 print("ALL PASS" if not failed else f"{failed} FAILED"); sys.exit(1 if failed else 0)

@@ -49,7 +49,8 @@ def table(frame, models, masks, naive_names=None, counts=True):
             if not len(part):
                 continue
             scores = {m: _score(part, m, counts) for m in models}
-            best = min(NAIVE_, key=lambda m: (scores[m]["mae"], m))
+            key = "wape" if counts else "mae"                             # the same yardstick as the table of every horizon together
+            best = min(NAIVE_, key=lambda m: (scores[m][key] if scores[m][key] is not None else scores[m]["mae"], m))
             for m in models:
                 is_naive = m in NAIVE_
                 results.append(dict(scores[m], model=m, horizon=int(h), subset=name, skill_vs=None if is_naive else best, skill=None if is_naive else _r(skill(scores[m]["mae"], scores[best]["mae"]))))

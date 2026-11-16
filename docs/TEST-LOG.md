@@ -85,4 +85,17 @@ Sources were opened by the reviewer; agency claims are marked as such.
 
 ### E. The statistician (leakage, splits, measures)
 
-Still running when this was written. Findings will be added below.
+He found no leak: the clock test, the rolling origin, the route and community splits, the count model's scaling, the join of taps to trips, the untouched part and the loads were each probed and held. What he did find:
+
+| # | Finding | State |
+|---|---|---|
+| S1 | The range claimed nine in ten and kept it overall, but only by being right about empty quarter-hours: it held 97 in 100 times when nobody boarded and 70 in 100 when somebody did. A range of 0 to 0.86 cannot hold one passenger. | Fixed. Ranges are widened to whole passengers, and metrics.json now reports how often the range held when nobody boarded and when somebody did, apart. On the invented day: 99.9 in 100 and 86 in 100. Open: 86 is still under the 90 promised where it matters, and the screen must show both numbers. TO LANE 2. |
+| S2 | At stop level the model did not beat the best naive forecast, and WAPE was above 1: worse than forecasting nobody, because nine in ten stop quarter-hours are empty. | Partly answered. After the new features and a denser invented day the gain at stop level is +5 in 100 with a range that still crosses zero, and at route level +21 in 100 (range -10 to +47). WAPE at stop level is still above 1. This is invented data, so the size means little; the method of saying it does: lead with the route table, show the stop table whole, say why. TO LANE 4. Open: a forecast of whether anybody boards at all, apart from how many. |
+| S3 | The plan's distinctive features did not exist: only timetable and same-day counts. | Two built: buses already on the road (where the timetable, moved by each bus's lateness now, puts them, and how many have boarded them), and passengers who got off within 300 metres today and have not travelled since. The clock test caught a leak in the first on its first run (a bus leaving at exactly the origin was counted as seen) and it was fixed before the commit. metrics.json has `features`: each feature in plain words with its share of the model's gain. Open: public data (lane 3's tables), the two-part model, levels made to add up above route. |
+| S4 | The ranges come from earlier hours and earlier models, so the promise is not a guarantee. | Answered in the code and in `range.method`: it is a promise to be checked, and the table checks it. |
+| S5 | A test clause that could never fail. | Removed. |
+| S6 | No test that a community is never on both sides of its split. | Added. |
+| S7 | A tap after midnight that the real table dates the service day would be lost. | The taps stage now counts such rows, so the census run shows it. Open until the census has run. |
+| S8 | "Best naive forecast" was chosen by MAE in one table and WAPE in another. | Fixed: WAPE for counts in both, MAE for lateness in both. He notes choosing the best naive forecast on the test rows makes the model's gain smaller, not larger. |
+| S9 | The kind-of-bus label for a route was set from the whole day, the untouched hours among them. | Fixed: from visits before 16:00. |
+| S10 | MAPE at stop level rests on very few quarter-hours. | Answered: the table gives the count beside it. TO LANE 4: say the count out loud. |
