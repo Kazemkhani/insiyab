@@ -7,31 +7,63 @@
    "label": "Boardings on the day",
    "source": "replay/",
    "unit": "boardings",
-   "value": 10750
+   "value": 6409
   },
   {
    "key": "doors_not_opened",
    "kind": "measured",
    "label": "Stop visits where the door did not open",
    "source": "replay/",
-   "unit": "of 4716",
-   "value": 348
+   "unit": "of 8265",
+   "value": 2057
+  },
+  {
+   "key": "visits_with_nobody",
+   "kind": "measured",
+   "label": "Stop visits where nobody boarded and nobody alighted",
+   "source": "replay/",
+   "unit": "of 8265",
+   "value": 3546
+  },
+  {
+   "key": "trips_over_seats",
+   "kind": "measured",
+   "label": "Trips with more passengers than seats",
+   "source": "replay/",
+   "unit": "of 551",
+   "value": 7
   },
   {
    "key": "wape_60",
    "kind": "measured",
-   "label": "Forecast error one hour ahead (WAPE)",
+   "label": "Forecast error one hour ahead, by route (WAPE)",
    "source": "metrics.json",
    "unit": "share",
-   "value": 0.1793
+   "value": 0.5314
   },
   {
    "key": "skill_60",
    "kind": "measured",
-   "label": "Better than the naive forecast, one hour ahead",
+   "label": "Better than the best naive forecast, one hour ahead",
    "source": "metrics.json",
    "unit": "share of error removed",
-   "value": 0.5434
+   "value": 0.1409
+  },
+  {
+   "key": "range_kept",
+   "kind": "measured",
+   "label": "How often the truth fell inside the stated range",
+   "source": "metrics.json",
+   "unit": "share, nine in ten promised",
+   "value": 0.9659
+  },
+  {
+   "key": "late_mae_5",
+   "kind": "measured",
+   "label": "Average miss on lateness five stops ahead",
+   "source": "metrics.json",
+   "unit": "seconds",
+   "value": 46.2728
   }
  ]
 }

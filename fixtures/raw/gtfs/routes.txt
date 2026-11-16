@@ -1,9 +1,9 @@
 route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
-R01,SI,8,Stand-in South Cross,3,0E5A5A,FFFFFF
-R02,SI,11A,Stand-in Middle Cross,3,0E5A5A,FFFFFF
-R03,SI,17,Stand-in North Cross,3,0E5A5A,FFFFFF
-R04,SI,21,Stand-in West Line,3,0E5A5A,FFFFFF
-R05,SI,F13,Stand-in Centre Line,3,0E5A5A,FFFFFF
-R06,SI,X28,Stand-in East Line,3,0E5A5A,FFFFFF
-R07,SI,C10,Stand-in Rising Line,3,0E5A5A,FFFFFF
-R08,SI,E100,Stand-in Falling Line,3,0E5A5A,FFFFFF
+R01,SI,901,Stand-in South Cross,3,0E5A5A,FFFFFF
+R02,SI,902A,Stand-in Middle Cross,3,0E5A5A,FFFFFF
+R03,SI,903,Stand-in North Cross,3,0E5A5A,FFFFFF
+R04,SI,904,Stand-in West Line,3,0E5A5A,FFFFFF
+R05,SI,Q13,Stand-in Centre Line,3,0E5A5A,FFFFFF
+R06,SI,Q28,Stand-in East Line,3,0E5A5A,FFFFFF
+R07,SI,K10,Stand-in Rising Line,3,0E5A5A,FFFFFF
+R08,SI,K900,Stand-in Falling Line,3,0E5A5A,FFFFFF

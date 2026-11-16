@@ -38,16 +38,16 @@ RIDERS = 1.35                                      # multiplies every boarding r
 N_STOPS = 15
 LON0, LAT0, CELL = 55.20, 25.10, 0.06              # nine invented communities in a 3 by 3 grid
 TYPES = {"STANDARD": 32, "ARTICULATED": 48, "DOUBLE": 64, "MIDI": 20, "COACH": 44}
-# short name, long name, from (lon, lat), to (lon, lat), how busy, the bus types its vehicles take in turn
+# short name (invented: none is meant to be a route that exists), long name, from (lon, lat), to (lon, lat), how busy, the bus types its vehicles take in turn
 ROUTES = [
-    ("8",    "Stand-in South Cross",  (55.21, 25.13), (55.37, 25.13), 1.6, ["MIDI", "STANDARD", "ARTICULATED"]),
-    ("11A",  "Stand-in Middle Cross", (55.21, 25.19), (55.37, 25.19), 1.2, ["STANDARD", "ARTICULATED"]),
-    ("17",   "Stand-in North Cross",  (55.21, 25.25), (55.37, 25.25), 0.8, ["STANDARD", "MIDI"]),
-    ("21",   "Stand-in West Line",    (55.23, 25.11), (55.23, 25.27), 1.0, ["STANDARD", "DOUBLE"]),
-    ("F13",  "Stand-in Centre Line",  (55.29, 25.11), (55.29, 25.27), 0.5, ["DOUBLE", "ARTICULATED"]),
-    ("X28",  "Stand-in East Line",    (55.35, 25.11), (55.35, 25.27), 1.4, ["MIDI", "STANDARD"]),
-    ("C10",  "Stand-in Rising Line",  (55.21, 25.11), (55.37, 25.27), 0.9, ["STANDARD", "COACH"]),
-    ("E100", "Stand-in Falling Line", (55.21, 25.27), (55.39, 25.09), 0.35, ["COACH", "DOUBLE"]),
+    ("901",  "Stand-in South Cross",  (55.21, 25.13), (55.37, 25.13), 1.6, ["MIDI", "STANDARD", "ARTICULATED"]),
+    ("902A", "Stand-in Middle Cross", (55.21, 25.19), (55.37, 25.19), 1.2, ["STANDARD", "ARTICULATED"]),
+    ("903",  "Stand-in North Cross",  (55.21, 25.25), (55.37, 25.25), 0.8, ["STANDARD", "MIDI"]),
+    ("904",  "Stand-in West Line",    (55.23, 25.11), (55.23, 25.27), 1.0, ["STANDARD", "DOUBLE"]),
+    ("Q13",  "Stand-in Centre Line",  (55.29, 25.11), (55.29, 25.27), 0.5, ["DOUBLE", "ARTICULATED"]),
+    ("Q28",  "Stand-in East Line",    (55.35, 25.11), (55.35, 25.27), 1.4, ["MIDI", "STANDARD"]),
+    ("K10",  "Stand-in Rising Line",  (55.21, 25.11), (55.37, 25.27), 0.9, ["STANDARD", "COACH"]),
+    ("K900", "Stand-in Falling Line", (55.21, 25.27), (55.39, 25.09), 0.35, ["COACH", "DOUBLE"]),
 ]
 MISSING_FROM_FLEET = (5, 11)          # the vehicles, by the order they first run, that the fleet table leaves out
 ODD_ROUTE_VEHICLES = ((3, 1), (4, 0))  # (route, which of its vehicles): taps on these write the route number another way

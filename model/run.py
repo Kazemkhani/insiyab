@@ -196,18 +196,32 @@ def _clean(x):
     return x
 
 
+def _text(name, content):
+    small = name.startswith(("forecast/", "replay/route-"))             # the large files are written without spaces
+    return json.dumps(_clean(content), ensure_ascii=False, sort_keys=True, allow_nan=False, **({"separators": (",", ":")} if small else {"indent": 1})) + "\n"
+
+
 def write(files, out):
     for name, content in files.items():
         path = os.path.join(out, name); os.makedirs(os.path.dirname(path), exist_ok=True)
-        small = name.startswith(("forecast/", "replay/route-"))         # the large files are written without spaces
         with open(path, "w", encoding="utf-8") as f:
-            f.write(json.dumps(_clean(content), ensure_ascii=False, sort_keys=True, allow_nan=False, **({"separators": (",", ":")} if small else {"indent": 1})) + "\n")
+            f.write(_text(name, content))
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--data", required=True); ap.add_argument("--out", required=True); ap.add_argument("--real", action="store_true", help="the tables are RTA's: write fixture false")
+    ap.add_argument("--data", required=True); ap.add_argument("--out"); ap.add_argument("--real", action="store_true", help="the tables are RTA's: write fixture false")
+    ap.add_argument("--plain", action="store_true", help="leave the time and the commit out of meta.json, so the bundle can be compared byte for byte (fixtures/ is written this way)")
+    ap.add_argument("--check", metavar="FOLDER", help="write nothing: run on the tables and say whether FOLDER equals the result, file for file")
     a = ap.parse_args()
+    if a.check:
+        fresh = {name: _text(name, content) for name, content in build(prepare(load(a.data)), fixture=not a.real).items()}
+        on_disk = {os.path.relpath(os.path.join(d, f), a.check) for d, _, fs in os.walk(a.check) for f in fs if f.endswith(".json") and os.sep + "raw" not in d}
+        bad = sorted(n for n, text in fresh.items() if not os.path.exists(os.path.join(a.check, n)) or open(os.path.join(a.check, n), encoding="utf-8").read() != text) + sorted(on_disk - set(fresh))
+        print(f"FAIL {a.check} differs from a fresh run of the engine on {a.data}: " + ", ".join(bad[:8]) if bad else f"PASS {a.check} equals a fresh run of the engine on {a.data} ({len(fresh)} files)")
+        print("ALL PASS" if not bad else "1 FAILED"); return 1 if bad else 0
+    if not a.out:
+        ap.error("--out is needed unless --check is given")
     marked = os.path.exists(os.path.join(a.data, "README.txt")) and open(os.path.join(a.data, "README.txt")).read().startswith("STAND-IN DATA")
     if a.real and marked:
         print("REFUSED: --real was given but these tables carry the stand-in mark"); return 1
@@ -220,7 +234,7 @@ def main():
         commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip() or None
     except OSError:
         commit = None
-    files = build(day, fixture=not a.real, generated_at=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), commit=commit)
+    files = build(day, fixture=not a.real, generated_at=None if a.plain else datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), commit=None if a.plain else commit)
     write(files, a.out)
     m = files["metrics.json"]["targets"]
     for t in m:

@@ -32,7 +32,8 @@ Set up on 16 November. The plan, the contract between lanes, the stand-in data a
 
 ```
 bash scripts/install-hooks.sh          # once: the guard that keeps raw data out of git
-python3 tools/make_fixture.py          # rebuild the stand-in bundle
+bash scripts/setup.sh                  # once: the engine's libraries, in .venv
+.venv/bin/python -m model.run --data fixtures/raw --out fixtures --plain   # rebuild the stand-in bundle: the engine, run on the invented tables
 python3 tools/contract_check.py fixtures
 bash scripts/gates.sh                  # every gate; the last line must be ALL GATES PASS
 ```

@@ -2,24 +2,44 @@
  "fixture": true,
  "routes": [
   {
-   "file": "replay/route-R1.json",
-   "route_id": "R1",
-   "trips": 144
+   "file": "replay/route-901.json",
+   "route_id": "901",
+   "trips": 71
   },
   {
-   "file": "replay/route-R2.json",
-   "route_id": "R2",
-   "trips": 144
+   "file": "replay/route-902A.json",
+   "route_id": "902A",
+   "trips": 69
   },
   {
-   "file": "replay/route-R3.json",
-   "route_id": "R3",
-   "trips": 108
+   "file": "replay/route-903.json",
+   "route_id": "903",
+   "trips": 70
   },
   {
-   "file": "replay/route-R4.json",
-   "route_id": "R4",
-   "trips": 72
+   "file": "replay/route-904.json",
+   "route_id": "904",
+   "trips": 68
+  },
+  {
+   "file": "replay/route-K10.json",
+   "route_id": "K10",
+   "trips": 69
+  },
+  {
+   "file": "replay/route-K900.json",
+   "route_id": "K900",
+   "trips": 67
+  },
+  {
+   "file": "replay/route-Q13.json",
+   "route_id": "Q13",
+   "trips": 70
+  },
+  {
+   "file": "replay/route-Q28.json",
+   "route_id": "Q28",
+   "trips": 67
   }
  ]
 }

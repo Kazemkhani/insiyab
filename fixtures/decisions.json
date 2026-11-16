@@ -1,131 +1,294 @@
 {
  "decisions": [
   {
-   "change": "Swap the double-deck buses on route R4 with the standard buses on route R1 between 06:30 and 09:00.",
+   "change": "Swap the vehicles on 6 pairs of trips that start within half an hour of each other, beginning with the 20-seat bus on route 901 at 16:59 and the 64-seat bus on route 904 at 16:52.",
    "confidence": "medium",
-   "cost_note": "No extra bus and no extra driver.",
+   "cost_note": "No extra bus and no extra driver. About 190.5 km of empty running. Not checked here: the blocks, the depots, and whether the bigger bus fits every stop and turn on the other route. A planner decides.",
    "effect": [
     {
-     "after": 900,
-     "assumption": "the same passengers board at the same times; only the vehicles change",
-     "before": 5400,
+     "after": 0,
+     "assumption": "the same passengers board at the same times and only the vehicles change. A pair is proposed only if each bus can reach the other trip's first stop in time at 25 km/h from where its trip before ended; a bus with no trip before comes from the depot, and that run is not in these records",
+     "before": 194,
      "kind": "simulated",
-     "metric": "passengers_over_seats_minutes"
+     "metric": "passenger_minutes_over_seats"
     }
    ],
    "evidence": [
     {
-     "label": "Largest load on the fullest trip",
-     "source": "replay/route-R1.json",
+     "label": "Largest load on the fullest route 901 trip",
+     "source": "replay/route-901.json",
      "unit": "passengers",
-     "value": 55
+     "value": 27
     },
     {
      "label": "Seats on that bus",
-     "source": "replay/route-R1.json",
+     "source": "replay/route-901.json",
      "unit": "seats",
-     "value": 35
+     "value": 20
     },
     {
-     "label": "Largest load on the emptiest R4 trip",
-     "source": "replay/route-R4.json",
+     "label": "Largest load on a route 904 trip starting within the hour",
+     "source": "replay/route-904.json",
      "unit": "passengers",
-     "value": 0
+     "value": 11
+    },
+    {
+     "label": "Seats on that bus",
+     "source": "replay/route-904.json",
+     "unit": "seats",
+     "value": 64
+    },
+    {
+     "label": "Trips paired this way across the day",
+     "source": "replay/",
+     "unit": "pairs of trips",
+     "value": 6
+    },
+    {
+     "label": "Kilometres the buses would run empty to change places, as straight lines times 1.3",
+     "source": "network.json",
+     "unit": "km",
+     "value": 190.5
+    },
+    {
+     "label": "Share of the day's boardings with no recorded alighting, spread along the trip to make the loads",
+     "source": "meta.json",
+     "unit": "share",
+     "value": 0.15
     }
    ],
    "id": "d001",
    "lever": "right_bus",
-   "passengers_affected": 640,
+   "passengers_affected": 282,
+   "related": [
+    "d003"
+   ],
    "swaps": [
     {
+     "empty_km": 31.2,
      "from": {
-      "bus_type": "STANDARD",
-      "largest_load": 55,
-      "route_id": "R1",
-      "seats": 35,
-      "start": 24300,
-      "trip_id": "R1-1-24300",
-      "vehicle": "v80"
+      "bus_type": "MIDI",
+      "largest_load": 27,
+      "route_id": "901",
+      "seats": 20,
+      "start": 61140,
+      "trip_id": "70327",
+      "vehicle": "v1"
      },
+     "minutes_to_spare": 9,
      "to": {
       "bus_type": "DOUBLE",
-      "largest_load": 0,
-      "route_id": "R4",
-      "seats": 78,
-      "start": 37800,
-      "trip_id": "R4-1-37800",
-      "vehicle": "v444"
+      "largest_load": 11,
+      "route_id": "904",
+      "seats": 64,
+      "start": 60720,
+      "trip_id": "70324",
+      "vehicle": "v29"
+     }
+    },
+    {
+     "empty_km": 24.3,
+     "from": {
+      "bus_type": "MIDI",
+      "largest_load": 26,
+      "route_id": "Q28",
+      "seats": 20,
+      "start": 65880,
+      "trip_id": "70390",
+      "vehicle": "v27"
+     },
+     "minutes_to_spare": 23,
+     "to": {
+      "bus_type": "DOUBLE",
+      "largest_load": 6,
+      "route_id": "K900",
+      "seats": 64,
+      "start": 66840,
+      "trip_id": "70403",
+      "vehicle": "v42"
+     }
+    },
+    {
+     "empty_km": 23.7,
+     "from": {
+      "bus_type": "MIDI",
+      "largest_load": 25,
+      "route_id": "Q28",
+      "seats": 20,
+      "start": 25020,
+      "trip_id": "70033",
+      "vehicle": "v8"
+     },
+     "minutes_to_spare": 22,
+     "to": {
+      "bus_type": "ARTICULATED",
+      "largest_load": 13,
+      "route_id": "902A",
+      "seats": 48,
+      "start": 26160,
+      "trip_id": "70045",
+      "vehicle": "v26"
+     }
+    },
+    {
+     "empty_km": 48.4,
+     "from": {
+      "bus_type": "MIDI",
+      "largest_load": 24,
+      "route_id": "901",
+      "seats": 20,
+      "start": 28380,
+      "trip_id": "70072",
+      "vehicle": "v38"
+     },
+     "minutes_to_spare": null,
+     "to": {
+      "bus_type": "DOUBLE",
+      "largest_load": 6,
+      "route_id": "K900",
+      "seats": 64,
+      "start": 28920,
+      "trip_id": "70083",
+      "vehicle": "v42"
+     }
+    },
+    {
+     "empty_km": 32.3,
+     "from": {
+      "bus_type": "MIDI",
+      "largest_load": 24,
+      "route_id": "Q28",
+      "seats": 20,
+      "start": 62280,
+      "trip_id": "70342",
+      "vehicle": "v27"
+     },
+     "minutes_to_spare": 16,
+     "to": {
+      "bus_type": "DOUBLE",
+      "largest_load": 11,
+      "route_id": "Q13",
+      "seats": 64,
+      "start": 62880,
+      "trip_id": "70350",
+      "vehicle": "v33"
+     }
+    },
+    {
+     "empty_km": 30.6,
+     "from": {
+      "bus_type": "MIDI",
+      "largest_load": 23,
+      "route_id": "901",
+      "seats": 20,
+      "start": 22620,
+      "trip_id": "70013",
+      "vehicle": "v1"
+     },
+     "minutes_to_spare": 5,
+     "to": {
+      "bus_type": "DOUBLE",
+      "largest_load": 3,
+      "route_id": "K900",
+      "seats": 64,
+      "start": 23460,
+      "trip_id": "70022",
+      "vehicle": "v18"
      }
     }
    ],
-   "title": "Put the big bus where the people are",
+   "title": "Put the bigger bus where the passengers are",
    "when": {
-    "from": 23400,
-    "to": 32400
+    "from": 21600,
+    "to": 68400
    },
    "where": {
-    "community_id": "c6",
-    "route_id": "R1",
+    "community_id": "901",
+    "route_id": "901",
     "stop_ids": [
-     "R1-S12"
+     "101042"
     ]
    },
-   "why": "The forecast puts more people on R1 than its buses seat, while R4's larger buses run mostly empty in the same hours."
+   "why": "Route 901 carried 27 passengers on a bus with 20 seats while a 64-seat bus on route 904 carried at most 11 in the same hour."
   },
   {
-   "change": "After 21:00, make three R4 stops request stops: the bus calls there when a passenger asks from the stop or from the bus.",
+   "change": "After 20:00, make 14 stops on route K900 request stops: the bus calls there when a passenger asks from the stop or from the bus.",
    "confidence": "low",
-   "cost_note": "A request button or a tap in the app at each stop.",
+   "cost_note": "A way to ask at each stop: a button, or a tap in the app. Nobody loses a stop: the bus calls whenever it is asked.",
    "effect": [
     {
-     "after": 2.5,
-     "assumption": "25 seconds saved for each stop the bus no longer slows for",
-     "before": 0,
+     "after": 0,
+     "assumption": "the bus calls at these stops only when a passenger asks, and on the day nobody boarded or alighted on these visits",
+     "before": 89,
      "kind": "simulated",
-     "metric": "minutes_saved_per_trip"
+     "metric": "calls_at_a_stop_with_nobody_there"
     }
    ],
    "evidence": [
     {
-     "label": "Stop visits where the door did not open",
-     "source": "replay/",
+     "label": "Visits to these stops after 20:00",
+     "source": "replay/route-K900.json",
      "unit": "visits",
-     "value": 348
+     "value": 94
     },
     {
-     "label": "All stop visits",
-     "source": "replay/",
+     "label": "Of those, visits where nobody boarded and nobody alighted",
+     "source": "replay/route-K900.json",
      "unit": "visits",
-     "value": 4716
+     "value": 89
+    },
+    {
+     "label": "Middle time a bus spent at such a visit",
+     "source": "replay/route-K900.json",
+     "unit": "seconds",
+     "value": 0
+    },
+    {
+     "label": "Days this rests on",
+     "source": "meta.json",
+     "unit": "day",
+     "value": 1
     }
    ],
    "id": "d002",
    "lever": "right_stop",
-   "passengers_affected": 12,
+   "passengers_affected": 5,
+   "related": [],
    "title": "Stop only when someone is there",
    "when": {
-    "from": 75600,
-    "to": 86400
+    "from": 72000,
+    "to": 90000
    },
    "where": {
     "community_id": null,
-    "route_id": "R4",
+    "route_id": "K900",
     "stop_ids": [
-     "R4-S03",
-     "R4-S04",
-     "R4-S05"
+     "108022",
+     "108032",
+     "108042",
+     "108052",
+     "108062",
+     "108072",
+     "108082",
+     "108092",
+     "108102",
+     "108112",
+     "108122",
+     "108132",
+     "108142",
+     "108152"
     ]
    },
-   "why": "At these stops and hours the forecast says nobody boards or alights on most visits."
+   "why": "At 14 stops on route K900, nobody boarded or alighted on 89 of 94 visits after 20:00. That is one day: RTA's own route planning already looks for little-used stops, and this adds the hours in which it holds. The time each such call costs is not in these records, so no time saved is claimed."
   },
   {
-   "change": "Offer Khutwa points to passengers at this stop who take route R2 from a stop nearby, or travel 20 minutes earlier.",
+   "change": "Offer Khutwa points to passengers at this stop who take a bus with room: one a little earlier or later, or one on another route a short walk away.",
    "confidence": "low",
-   "cost_note": "Points worth a few dirhams for each passenger who shifts.",
+   "cost_note": "Points for each passenger who shifts. Nobody is charged more, and an offer to walk is never made to someone who has said they cannot. Khutwa is this prototype's name for the points. RTA's nol Plus already gives points for spending; what is added here is offering them only where the day shows a gap.",
    "effect": [
     {
-     "after": 17,
-     "assumption": "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 10 in 100: docs/research/research-methods.md, section 6)",
+     "after": 0.9,
+     "assumption": "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 11 in 100: docs/research/research-methods.md, section 6). A planner can move this number.",
      "before": 0,
      "kind": "simulated",
      "metric": "passengers_shifted"
@@ -133,57 +296,67 @@
    ],
    "evidence": [
     {
-     "label": "Forecast boardings at the stop in the peak hour",
-     "source": "forecast/boardings-stop.json",
+     "label": "Passengers on board when the 17:17 bus left this stop",
+     "source": "replay/route-901.json",
      "unit": "passengers",
-     "value": 210
+     "value": 25
     },
     {
-     "label": "Free seats on route R2 within 400 metres in the same hour",
-     "source": "replay/route-R2.json",
+     "label": "Seats on that bus",
+     "source": "replay/route-901.json",
      "unit": "seats",
-     "value": 95
+     "value": 20
+    },
+    {
+     "label": "Passengers boarding at this stop within half an hour either side",
+     "source": "replay/route-901.json",
+     "unit": "passengers",
+     "value": 11
     }
    ],
    "id": "d003",
    "lever": "rewarded_choice",
    "offers": [
     {
-     "depart": 26700,
-     "extra_minutes": 6,
-     "kind": "other_route",
-     "points": 20,
-     "route_id": "R2",
-     "stop_id": "R2-S01",
-     "walk_metres": 320,
-     "walk_minutes": 4
-    },
-    {
-     "depart": 25200,
+     "depart": 60680,
      "extra_minutes": 0,
      "kind": "earlier",
-     "minutes_earlier": 20,
-     "points": 12,
-     "route_id": "R1",
-     "stop_id": "R1-S11",
+     "minutes_earlier": 26,
+     "points": 20,
+     "route_id": "901",
+     "stop_id": "101052",
+     "walk_metres": 0,
+     "walk_minutes": 0
+    },
+    {
+     "depart": 63560,
+     "extra_minutes": 0,
+     "kind": "later",
+     "minutes_later": 22,
+     "points": 18,
+     "route_id": "901",
+     "stop_id": "101052",
      "walk_metres": 0,
      "walk_minutes": 0
     }
    ],
-   "passengers_affected": 210,
+   "passengers_affected": 11,
+   "related": [
+    "d001"
+   ],
    "title": "Reward the passenger who takes the emptier bus",
    "when": {
-    "from": 25200,
-    "to": 30600
+    "from": 60440,
+    "to": 64040
    },
    "where": {
-    "community_id": null,
-    "route_id": "R1",
+    "community_id": "901",
+    "route_id": "901",
     "stop_ids": [
-     "R1-S11"
+     "101052"
     ]
    },
-   "why": "The forecast shows more passengers than seats here, and spare seats a short walk away."
+   "why": "The 17:17 bus on route 901 left this stop with 25 passengers and 20 seats, and a bus with room was close in time or place."
   }
  ],
  "fixture": true

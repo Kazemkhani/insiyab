@@ -3,7 +3,7 @@
  "personas": [
   {
    "anchor": {
-    "route_id": "R1",
+    "route_id": "901",
     "stop_id": null,
     "time": 21600
    },
@@ -12,23 +12,26 @@
    "steps": [
     {
      "after": null,
-     "before": null,
+     "before": {
+      "trips_over_seats": 7,
+      "trips_under_a_third_full": 444
+     },
      "decision_id": null,
      "kind": "measured",
-     "say": "At 06:00 the forecast shows where buses and passengers will not match by 07:30.",
+     "say": "On the day, 7 trips ran with more passengers than seats, and 444 ran less than a third full.",
      "scene": "control_room",
      "t": 21600
     },
     {
      "after": {
-      "passengers_over_seats_minutes": 900
+      "passenger_minutes_over_seats": 0
      },
      "before": {
-      "passengers_over_seats_minutes": 5400
+      "passenger_minutes_over_seats": 194
      },
      "decision_id": "d001",
      "kind": "simulated",
-     "say": "One decision closes the largest gap without a single extra bus.",
+     "say": "Swapping vehicles between those trips closes much of the gap without a single extra bus.",
      "scene": "control_room",
      "t": 22200
     }
@@ -37,9 +40,9 @@
   },
   {
    "anchor": {
-    "route_id": "R1",
-    "stop_id": "R1-S12",
-    "time": 24300
+    "route_id": "901",
+    "stop_id": "101072",
+    "time": 64995
    },
    "id": "site_worker",
    "label": "Fictional. Built from the day's totals, not from any one person.",
@@ -47,34 +50,34 @@
     {
      "after": null,
      "before": {
-      "load": 55,
-      "seats": 35
+      "load": 32,
+      "seats": 32
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, the 06:45 bus left this stop with more people than seats.",
+     "say": "On the day, the 17:55 bus left this stop with 32 people on board and 32 seats.",
      "scene": "stop",
-     "t": 24300
+     "t": 64995
     },
     {
      "after": {
-      "seats": 78
+      "seats": 64
      },
      "before": null,
      "decision_id": "d001",
      "kind": "simulated",
-     "say": "With the larger bus he sits down.",
+     "say": "With the bigger bus on this trip, he sits down.",
      "scene": "bus",
-     "t": 24300
+     "t": 64995
     }
    ],
    "title": "The site worker"
   },
   {
    "anchor": {
-    "route_id": "R1",
-    "stop_id": "R1-S11",
-    "time": 26400
+    "route_id": "901",
+    "stop_id": "101052",
+    "time": 62240
    },
    "id": "office_worker",
    "label": "Fictional. Built from the day's totals, not from any one person.",
@@ -82,14 +85,14 @@
     {
      "after": null,
      "before": {
-      "load": 31,
-      "seats": 35
+      "load": 25,
+      "seats": 20
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, her usual bus left this stop with 31 people on board and 35 seats.",
+     "say": "On the day, her usual bus left this stop with 25 people on board and 20 seats.",
      "scene": "stop",
-     "t": 26400
+     "t": 62240
     },
     {
      "after": {
@@ -98,18 +101,18 @@
      "before": null,
      "decision_id": "d003",
      "kind": "simulated",
-     "say": "Her usual bus will be full. A bus four minutes' walk away has seats, and taking it earns Khutwa points.",
+     "say": "Her phone shows a bus with room close by, and taking it earns Khutwa points.",
      "scene": "phone",
-     "t": 26400
+     "t": 61340
     }
    ],
    "title": "The office worker"
   },
   {
    "anchor": {
-    "route_id": "R4",
+    "route_id": "K900",
     "stop_id": null,
-    "time": 76500
+    "time": 72900
    },
    "id": "driver",
    "label": "Fictional. Built from the day's totals, not from any one person.",
@@ -117,24 +120,27 @@
     {
      "after": null,
      "before": {
-      "doors_not_opened": 348
+      "doors_not_opened": 2057,
+      "stop_visits": 8265
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "Late in the evening the bus slowed for stops where nobody was waiting.",
+     "say": "On the day, buses called at stops 2057 times without the door opening.",
      "scene": "bus",
-     "t": 76500
+     "t": 72900
     },
     {
      "after": {
-      "minutes_saved_per_trip": 2.5
+      "calls_at_a_stop_with_nobody_there": 0
      },
-     "before": null,
+     "before": {
+      "calls_at_a_stop_with_nobody_there": 89
+     },
      "decision_id": "d002",
      "kind": "simulated",
-     "say": "With request stops the timetable matches the road, and he is on time.",
+     "say": "With request stops late in the evening, the bus no longer slows for a stop where nobody is waiting.",
      "scene": "bus",
-     "t": 76500
+     "t": 72900
     }
    ],
    "title": "The driver"

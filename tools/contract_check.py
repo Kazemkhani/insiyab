@@ -109,8 +109,15 @@ def main():
                                 and num(r.get("baseline")) and r["baseline"] >= 0 and (r.get("actual") is None or num(r["actual"])) for r in rows)
         check(f"{name}: every row has a forecast inside its interval and the naive forecast for the same bin, for a bin that ends at origin plus horizon", ok)
         if f.get("level") == "stop":
-            check(f"{name}: every stop series names a stop and a route that exist", all(s.get("id") in stops and s.get("route_id") in routes for s in f.get("series", [])))
+            check(f"{name}: every stop series names a stop and a route that exist, and a direction of 0 or 1 if it gives one", all(s.get("id") in stops and s.get("route_id") in routes and s.get("direction", 0) in (0, 1) for s in f.get("series", [])))
         check(f"{name}: no forecast is made for a bin that had already ended at its origin", all(r["bin_start"] + f.get("bin_seconds", 0) > r["origin"] for r in rows))
+
+    late = load("forecast/delay-route.json")
+    if late is not None:
+        rows = [r for s in late.get("series", []) for r in s.get("rows", [])]
+        check("forecast/delay-route.json: carries the fixture flag, names routes that exist, and every row has its stops ahead, a forecast inside its range, the naive forecast and what happened",
+              late.get("fixture") == meta.get("fixture") and late.get("horizon_unit") == "stops" and bool(rows) and all(s.get("id") in routes for s in late["series"])
+              and all(num(r.get("origin")) and r.get("stops_ahead") in (1, 5, 10, 20) and num(r.get("forecast")) and num(r.get("lo")) and num(r.get("hi")) and r["lo"] <= r["forecast"] <= r["hi"] and num(r.get("baseline")) and (r.get("actual") is None or num(r["actual"])) for r in rows))
 
     # metrics: the table the judges read
     targets = metrics.get("targets", [])
@@ -130,6 +137,20 @@ def main():
         check(f"{tag}: error is reported on more than one kind of subset (the stability criterion)", len(kinds - {"all"}) >= 2, kinds)
         horizons = {r.get("horizon") for r in res}
         check(f"{tag}: error is reported at more than one horizon", len(horizons) >= 2, horizons)
+        share = lambda x: num(x) and 0 <= x <= 1
+        if "pooled" in t:
+            check(f"{tag}: the table of every horizon together names models that exist, and a gain with a range has the range around the gain",
+                  bool(t["pooled"]) and all(r.get("model") in models and num(r.get("n")) and num(r.get("mae")) and (r.get("skill") is None or (r.get("skill_vs") in models and num(r.get("skill_lo")) and num(r.get("skill_hi")) and r["skill_lo"] <= r["skill"] + 1e-9 and r["skill"] <= r["skill_hi"] + 1e-9)) for r in t["pooled"]))
+        if "chosen" in t or "best_naive" in t:
+            check(f"{tag}: the model chosen is a model, the best naive forecast is a naive forecast, and it says what it was tested on",
+                  not models.get(t.get("chosen"), {"is_baseline": True}).get("is_baseline") and models.get(t.get("best_naive"), {}).get("is_baseline") is True and isinstance(t.get("tested_on", ""), str))
+        if "range" in t:
+            g = t["range"]
+            check(f"{tag}: the range says what was promised and how often it was kept", share(g.get("promised")) and share(g.get("kept")) and all(g.get(k) is None or share(g[k]) for k in ("kept_when_nobody_boarded", "kept_when_somebody_boarded")), g)
+        if t.get("features"):
+            check(f"{tag}: what the model leans on is given in plain words with shares that add up to one", all(f.get("feature") and f.get("label") and share(f.get("share")) for f in t["features"]) and abs(sum(f["share"] for f in t["features"]) - 1) < 0.02)
+        for m in t.get("more_tables") or []:
+            check(f"{tag}: the table '{m.get('table')}' has a note, results and models that exist", bool(m.get("table") and m.get("note") and m.get("results")) and all(r.get("model") in models and num(r.get("mae")) for r in m["results"]))
         need_skill = [r for r in res if not models.get(r.get("model"), {}).get("is_baseline")]
         check(f"{tag}: every model that is not a baseline states its gain over a named baseline", all(r.get("skill_vs") in models and (r.get("skill") is None or num(r["skill"])) for r in need_skill))
 

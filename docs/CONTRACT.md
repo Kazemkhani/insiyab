@@ -6,7 +6,7 @@ A set of these files is a **bundle**. There are two:
 
 | Bundle | What it is | Who writes it |
 |---|---|---|
-| `fixtures/` | Stand-in data: invented network, invented numbers, the same shape as the real thing. Built by `python3 tools/make_fixture.py`. | The integrator. Nobody else edits it. |
+| `fixtures/` | Stand-in data: invented network, invented numbers, the same shape as the real thing. It is the engine's own output on the invented raw tables in `fixtures/raw/`, so its model table is a real model's, on invented data. Built by `python3 -m model.run --data fixtures/raw --out fixtures --plain`. | The integrator. Nobody else edits it. |
 | `artifacts/` | The real results, worked out from RTA's data. Totals only, never raw rows. | Lane 1's engine, and only when `docs/REQUIREMENTS.md` section 6 says totals may leave Dataiku. |
 
 Which bundle the public site shows is decided in `docs/LANES.md` (Deploying): stand-in data unless a mentor has said yes.
@@ -51,7 +51,9 @@ The checker requires: a bus leaves after it arrives and reaches the next stop la
 | `baseline` | what the naive forecast said for the same bin. Always present: the error counter on screen needs it. |
 | `actual` | what happened (null if not yet known) |
 
-The delay forecast, when it exists, is `forecast/delay-route.json` with `target` "arrival_delay_seconds" and `horizon_unit` "stops": its rows carry `stops_ahead` (1, 5, 10, 20) in place of `horizon` and `bin_start`, and the rest is the same.
+Each forecast file also names `model` (the model whose forecast it holds) and `baseline_model` (the naive forecast in `baseline`: the best one on the same rows). A stop series also has `direction` (0 or 1): one stop can be served in both directions of a route, as two series.
+
+The delay forecast, when it exists, is `forecast/delay-route.json` with `target` "arrival_delay_seconds" and `horizon_unit` "stops": its rows carry `stops_ahead` (1, 5, 10, 20) in place of `horizon` and `bin_start`, `origin` is the second the bus left a stop, `trip_id` and `stop_id` name the trip and the stop ahead, and the rest is the same. Its entry in `metrics.json` has `target` "arrival_delay_seconds", `horizon_unit` "stops", and no MAPE or WAPE: a bus can be exactly on time or early.
 
 ### `gap.json`: where buses and passengers do not match
 `bin_seconds` (3600), `index_note`, and `rows`: one for each route, direction and hour, with `route_id`, `direction`, `hour_start`, `trips`, `seats_offered`, `forecast_peak_load` (the largest load on each trip, added up), `over` (passengers above the seats, added over the trips), `spare` (seats above the largest load, added over the trips) and `index`: the Insiyab index, from 0.1 (every seat empty) to 10 (every passenger without a seat). The map is red where `over` is above zero and blue where `spare` is large.
@@ -60,6 +62,20 @@ The delay forecast, when it exists, is `forecast/delay-route.json` with `target`
 
 ### `metrics.json`: the table the judges read
 `targets`: each has `target`, `level`, `unit`, `split` {kind, origins, train, test}, `mape_rule` (a sentence saying over which bins MAPE is taken), `models` (each `model`, `label`, `is_baseline`), `subsets` (each `subset`, `kind`, `label`; kinds are `all`, `time_block`, `route`, `route_group`, `community_group`, `bus_type`, `direction`) and `results`. A result is one model at one horizon on one subset: `model`, `horizon`, `subset`, `n`, `mae`, `rmse`, `mape` (or null), `mape_n`, `wape`, `skill_vs` (the baseline it is compared with), `skill` (1 minus this model's MAE over the baseline's MAE).
+
+The main table of a target is its **untouched part**: forecasts set aside at the start and scored once. Beside it a target may carry, and the engine's bundles do:
+
+| Key | Meaning |
+|---|---|
+| `chosen` | the model shown first. It was chosen on the development part alone (`chosen_on`). In `models`, that model has `chosen: true`. |
+| `best_naive` | the naive forecast with the lowest error on the untouched part, every horizon together |
+| `tested_on` | one sentence saying what the numbers were tested on. Show it wherever a forecast number appears. |
+| `pooled` | one row a model, every horizon together: the same measures as a result, plus `skill` against `skill_vs`, `skill_measure` ("wape" or "mae") and `skill_lo`, `skill_hi`: the range the gain fell in 95 times in 100 when whole origins were drawn again and again. If the range holds zero, say so. |
+| `range` | `promised` (0.9), `kept` (how often the truth fell inside the range), `kept_when_nobody_boarded`, `kept_when_somebody_boarded`, `n_nobody`, `n_somebody`, `method`. Show the two apart: a range that is only right about empty quarter-hours has not kept its promise. |
+| `features` | (stop level) what the model leans on: `feature`, `label` in plain words, `share` of the model's gain. Shares add up to 1. |
+| `more_tables` | other tables with the same shape of `results` and `pooled`: `development` (where every choice was made: these numbers flatter the model), `other_routes` and `other_communities` (learn from four groups, forecast the fifth). Each has `table`, `note`, `split`. |
+
+In a result, `skill_vs` is the best naive forecast **on that horizon and subset**, so it can differ from row to row. Compare a model with the naive forecast its own row names, never with the first naive forecast in the list.
 
 The checker requires at least one baseline and one model that is not a baseline, more than one horizon, more than one kind of subset, and that RMSE is never below MAE.
 
