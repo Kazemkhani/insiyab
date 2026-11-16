@@ -4,7 +4,7 @@ Nothing here is typed by hand: metrics.json is whatever these functions return."
 import numpy as np
 import pandas as pd
 from . import naive
-from .measures import measures, skill, MAPE_RULE
+from .measures import measures, skill, MAPE_RULE, MAPE_MIN
 from .forecast import MODELS, SEED
 
 NAIVE = list(naive.NAIVE)
@@ -21,8 +21,11 @@ def _r(x, places=4):
     return None if x is None else round(float(x), places)
 
 
-def _score(frame, col):
-    m = measures(frame["y"].to_numpy(), frame[col].to_numpy())
+def _score(frame, col, counts=True):
+    """counts=False is for lateness, which can be zero or below: no share of what happened can be taken, so MAPE and WAPE are absent."""
+    m = measures(frame["y"].to_numpy(), frame[col].to_numpy(), mape_min=MAPE_MIN if counts else np.inf)
+    if not counts:
+        m["wape"] = None
     return {"n": m["n"], "mae": _r(m["mae"]), "rmse": _r(m["rmse"]), "mape": _r(m["mape"]), "mape_n": m["mape_n"], "wape": _r(m["wape"])}
 
 
@@ -36,39 +39,40 @@ def subsets_of(frame, kinds):
     return declared, masks
 
 
-def table(frame, models, masks):
+def table(frame, models, masks, naive_names=None, counts=True):
     """One result for each model, horizon and subset that has rows."""
-    results = []
+    results = []; NAIVE_ = naive_names or NAIVE
     for h in sorted(frame["horizon"].unique()):
         at_h = (frame["horizon"] == h).to_numpy()
         for name, mask in masks.items():
             part = frame[at_h & mask]
             if not len(part):
                 continue
-            scores = {m: _score(part, m) for m in models}
-            best = min(NAIVE, key=lambda m: (scores[m]["mae"], m))
+            scores = {m: _score(part, m, counts) for m in models}
+            best = min(NAIVE_, key=lambda m: (scores[m]["mae"], m))
             for m in models:
-                is_naive = m in NAIVE
+                is_naive = m in NAIVE_
                 results.append(dict(scores[m], model=m, horizon=int(h), subset=name, skill_vs=None if is_naive else best, skill=None if is_naive else _r(skill(scores[m]["mae"], scores[best]["mae"]))))
     return results
 
 
-def pooled(frame, models, draws=400):
+def pooled(frame, models, draws=400, naive_names=None, counts=True):
     """Every horizon together, with a range for the gain found by drawing whole origins again and again (a block bootstrap):
-    neighbouring bins at one origin rise and fall together, so single rows must not be drawn as if they were separate."""
-    scores = {m: _score(frame, m) for m in models}
-    best = min(NAIVE, key=lambda m: (scores[m]["wape"] if scores[m]["wape"] is not None else 9e9, m))
+    neighbouring bins at one origin rise and fall together, so single rows must not be drawn as if they were separate.
+    The gain is on WAPE for counts. For lateness it is on MAE, which over the same rows is the same ratio."""
+    NAIVE_ = naive_names or NAIVE; key = "wape" if counts else "mae"
+    scores = {m: _score(frame, m, counts) for m in models}
+    best = min(NAIVE_, key=lambda m: (scores[m][key] if scores[m][key] is not None else 9e9, m))
     origins = np.sort(frame["origin"].unique()); code = np.searchsorted(origins, frame["origin"].to_numpy())
-    total = np.bincount(code, frame["y"].to_numpy(), len(origins))
     miss = {m: np.bincount(code, np.abs(frame["y"].to_numpy() - frame[m].to_numpy()), len(origins)) for m in models}
     rng = np.random.default_rng(SEED); picks = rng.integers(0, len(origins), size=(draws, len(origins)))
     out = []
     for m in models:
-        row = dict(scores[m], model=m, subset="all", skill_vs=None, skill=None, skill_measure="wape", skill_lo=None, skill_hi=None)
-        if m not in NAIVE and scores[best]["wape"]:
+        row = dict(scores[m], model=m, subset="all", skill_vs=None, skill=None, skill_measure=key, skill_lo=None, skill_hi=None)
+        if m not in NAIVE_ and scores[best][key]:
             base = miss[best][picks].sum(axis=1); mine = miss[m][picks].sum(axis=1); ok = base > 0
             gains = 1 - mine[ok] / base[ok]
-            row.update(skill_vs=best, skill=_r(1 - scores[m]["wape"] / scores[best]["wape"]), skill_lo=_r(np.quantile(gains, 0.025)), skill_hi=_r(np.quantile(gains, 0.975)))
+            row.update(skill_vs=best, skill=_r(1 - scores[m][key] / scores[best][key]), skill_lo=_r(np.quantile(gains, 0.025)), skill_hi=_r(np.quantile(gains, 0.975)))
         out.append(row)
     return out, best
 

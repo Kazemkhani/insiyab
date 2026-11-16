@@ -9,7 +9,7 @@ Inside Dataiku: bundle = build(prepare(tables), fixture=False), with tables read
 import argparse, datetime, json, os, subprocess, sys
 import numpy as np
 import pandas as pd
-from . import bundle as B, evaluate as E, forecast as F, naive
+from . import bundle as B, delay as D, evaluate as E, forecast as F, naive
 from .measures import MAPE_RULE
 from .prepare import BIN, load, prepare
 
@@ -51,6 +51,38 @@ def _target(level, frame, kinds, chosen_from=None, extra=None):
             "mape_rule": MAPE_RULE, "models": E.models_declared(chosen), "chosen": chosen, "chosen_on": "development", "best_naive": best,
             "subsets": declared, "results": E.table(final, models, masks), "pooled": final_pooled,
             "range": {"promised": PROMISED, "kept": round(kept, 4), "model": chosen, "n": len(final)}, "more_tables": more}, chosen
+
+
+def _lateness(day):
+    """Target B: the table for lateness and the forecasts a screen can show. Returns (metrics entry, forecast file) or (None, None) when there is too little."""
+    rows = D.build_rows(day["visits"])
+    if len(rows) < 2 * D.MIN_ROWS:
+        return None, None
+    pred, thin = D.rolling(rows); rows["gbt"] = pred; rows["lo"], rows["hi"] = D.ranges(rows, pred, PROMISED)
+    rows["horizon"] = rows["stops_ahead"]; rows["time_block"] = E.time_block(rows["made_at"]); models = list(D.NAIVE) + list(D.MODELS); names = list(D.NAIVE)
+    dev, final = D.development(rows), D.untouched(rows)
+    if not len(dev) or not len(final):
+        return None, None
+    kinds = {"time_block": ("time_block", lambda x: E.BLOCK_LABEL[x]), "direction": ("direction", lambda x: f"Direction {x}"), "bus_type": ("bus_type", lambda x: f"Buses of type {x}")}
+    declared, masks = E.subsets_of(final, kinds); pooled, best = E.pooled(final, models, naive_names=names, counts=False)
+    kept = float(((final["y"] >= final["lo"]) & (final["y"] <= final["hi"])).mean())
+    target = {"target": "arrival_delay_seconds", "level": "route", "unit": "seconds late at a stop ahead (early is below zero)", "horizon_unit": "stops",
+              "split": {"kind": "rolling_origin", "part": "untouched", "origins": sorted(int(x) for x in final["origin"].unique()),
+                        "train": "at the start of each half hour, every trip that had finished by then; a trip is never split between learning and testing",
+                        "test": "buses leaving a stop in that half hour, from 16:00 on, set aside at the start and scored once"},
+              "mape_rule": "MAPE and WAPE are not taken for lateness: a bus can be exactly on time or early, so there is no share of what happened to take. MAE and RMSE are in seconds.",
+              "models": [{"model": m, "label": label, "is_baseline": True} for m, label in D.NAIVE.items()] + [{"model": m, "label": label, "is_baseline": False, "chosen": True} for m, label in D.MODELS.items()],
+              "chosen": "gbt", "best_naive": best, "subsets": declared, "results": E.table(final, models, masks, naive_names=names, counts=False), "pooled": pooled,
+              "range": {"promised": PROMISED, "kept": round(kept, 4), "model": "gbt", "n": len(final)}, "half_hours_with_too_little_to_learn_from": int(thin),
+              "more_tables": [{"table": "development", "note": "Forecasts made from 08:00 for arrivals up to 16:00. Read the main table first.",
+                               "split": {"kind": "rolling_origin", "origins": sorted(int(x) for x in dev["origin"].unique())},
+                               "results": E.table(dev, models, {"all": np.ones(len(dev), bool)}, naive_names=names, counts=False), "pooled": E.pooled(dev, models, naive_names=names, counts=False)[0]}]}
+    series = []
+    for rid, g in final.groupby("route_id", sort=True):
+        g = g.iloc[:: max(1, len(g) // 600)]                           # at most about 600 rows a route, taken evenly through the evening
+        series.append({"id": rid, "rows": [{"origin": int(r.made_at), "stops_ahead": int(r.stops_ahead), "trip_id": str(r.trip_id), "stop_id": r.target_stop, "forecast": round(float(r.gbt), 2),
+                                            "lo": round(min(float(r.lo), float(r.gbt)), 2), "hi": round(max(float(r.hi), float(r.gbt)), 2), "baseline": round(float(getattr(r, best)), 2), "actual": int(r.y)} for r in g.itertuples()]})
+    return target, {"target": "arrival_delay_seconds", "level": "route", "horizon_unit": "stops", "model": "gbt", "baseline_model": best, "series": series}
 
 
 def _series_json(frame, keys, chosen, base, first_bin):
@@ -135,6 +167,12 @@ def build(day, fixture=True, generated_at=None, commit=None):
              "replay/index.json": {"routes": [{"route_id": rid, "file": f"replay/route-{rid}.json", "trips": len(r["trips"])} for rid, r in replay.items()]}}
     for rid, r in replay.items():
         files[f"replay/route-{rid}.json"] = r
+    late, late_file = _lateness(day)
+    if late:
+        files["metrics.json"]["targets"].append(late); files["forecast/delay-route.json"] = late_file
+        row = next((r for r in late["results"] if r["model"] == "gbt" and r["horizon"] == 5 and r["subset"] == "all"), None)
+        if row:
+            summary.append({"key": "late_mae_5", "label": "Average miss on lateness five stops ahead", "value": row["mae"], "unit": "seconds", "kind": "measured", "source": "metrics.json"})
     return {name: {"fixture": bool(fixture), **content} for name, content in files.items()}
 
 
@@ -181,10 +219,11 @@ def main():
     write(files, a.out)
     m = files["metrics.json"]["targets"]
     for t in m:
-        print(f"TABLE boardings by {t['level']}, untouched part, every horizon together (best naive forecast: {t['best_naive']}; chosen on development: {t['chosen']})")
+        print(f"TABLE {t['target']} by {t['level']}, untouched part, every horizon together (best naive forecast: {t['best_naive']}; chosen on development: {t['chosen']})")
         for r in t["pooled"]:
             gain = "" if r["skill"] is None else f"  gain over {r['skill_vs']} {r['skill']:+.3f} ({r['skill_lo']:+.3f} to {r['skill_hi']:+.3f})"
-            print(f"  {r['model']:<16} n {r['n']:>6}  MAE {r['mae']:.3f}  RMSE {r['rmse']:.3f}  WAPE {r['wape']}  MAPE {r['mape']} over {r['mape_n']}{gain}")
+            shares = "" if r["wape"] is None else f"  WAPE {r['wape']}  MAPE {r['mape']} over {r['mape_n']}"
+            print(f"  {r['model']:<16} n {r['n']:>6}  MAE {r['mae']:.3f}  RMSE {r['rmse']:.3f}{shares}{gain}")
         print(f"  range promised {t['range']['promised']}, kept {t['range']['kept']}")
     print(f"WROTE {len(files)} files to {a.out} (fixture {not a.real})")
     return 0

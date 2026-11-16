@@ -33,6 +33,18 @@ check("the clock: changing every record after 12:00 changes no feature and no na
 check("the clock: and no model's forecast, to the last digit", np.array_equal(p1, p2, equal_nan=True), float(np.nanmax(np.abs(p1 - p2))) if p1.shape == p2.shape else "shapes differ")
 check("a forecast is only ever made for a quarter of an hour that had not ended at its origin", bool(((rows["bin"] + day["first_bin"] + 1) * BIN > rows["origin"]).all()))
 
+# --- the clock, for lateness --------------------------------------------------------------------------------------
+from model import delay as D
+def late_at(tabs):
+    r = D.build_rows(prepare(tabs)["visits"]); r = r[r["made_at"] < ORIGIN]
+    return r[["trip_id", "seq", "made_at"] + D.FEATURES + list(D.NAIVE)].astype({"trip_id": str}).sort_values(["trip_id", "seq", "stops_ahead"]).reset_index(drop=True)
+l1, l2 = late_at(tables), late_at(later)
+check("the clock, for lateness: changing every record after 12:00 changes no feature of a forecast made before 12:00", len(l1) > 500 and l1.equals(l2), (len(l1), len(l2)))
+lrows = D.build_rows(day["visits"]); trip = lrows["trip_id"].to_numpy(); split = []
+D.rolling(lrows[lrows["origin"] <= 9 * 3600].reset_index(drop=True), watch=lambda o, learn, test: split.append(len(set(trip[:len(learn)][learn]) & set(trip[:len(test)][test]))))
+check("lateness: no trip is both learned from and forecast, at any origin", len(split) > 3 and sum(split) == 0, split)
+check("lateness: the bus in front had reached the stop before the forecast was made", bool((lrows["front_arr"].isna() | (lrows["front_arr"] < lrows["made_at"])).all()))
+
 # --- nothing on both sides ---------------------------------------------------------------------------------------
 ended = (rows["origin"] + rows["horizon"]).to_numpy(); origin = rows["origin"].to_numpy(); seen = []
 F.rolling(rows, origins=[10 * 3600, 17 * 3600], watch=lambda o, learn, test: seen.append((ended[learn].max() <= o if learn.any() else True, (origin[test] == o).all(), not (learn & test).any())))
