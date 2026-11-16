@@ -80,6 +80,18 @@
    "label": "Fictional. Built from the day's totals, not from any one person.",
    "steps": [
     {
+     "after": null,
+     "before": {
+      "load": 31,
+      "seats": 35
+     },
+     "decision_id": null,
+     "kind": "measured",
+     "say": "On the day, her usual bus left this stop with 31 people on board and 35 seats.",
+     "scene": "stop",
+     "t": 26400
+    },
+    {
      "after": {
       "points": 20
      },

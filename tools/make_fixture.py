@@ -104,7 +104,7 @@ def build():
         return out
     f_route = {"fixture": True, "target": "boardings", "level": "route", "bin_seconds": BIN,
                "series": [{"id": rid, "rows": rows_for(s)} for rid, s in actual_route.items()]}
-    busiest = sorted({(rid, sid) for (rid, sid, _) in board}, key=lambda k: -sum(v for (r2, s2, _), v in board.items() if (r2, s2) == k))[:12]
+    busiest = sorted({(rid, sid) for (rid, sid, _) in board}, key=lambda k: -sum(v for (r2, s2, _), v in board.items() if (r2, s2) == k))
     f_stop = {"fixture": True, "target": "boardings", "level": "stop", "bin_seconds": BIN,
               "series": [{"id": sid, "route_id": rid, "rows": rows_for({b: board.get((rid, sid, b), 0) for b in bins})} for rid, sid in busiest]}
 
@@ -190,7 +190,8 @@ def build():
          "steps": [{"t": 6 * 3600 + 2700, "scene": "stop", "say": "On the day, the 06:45 bus left this stop with more people than seats.", "kind": "measured", "decision_id": None, "before": {"load": max(v["load"] for v in peak["visits"]), "seats": peak["seats"]}, "after": None},
                    {"t": 6 * 3600 + 2700, "scene": "bus", "say": "With the larger bus he sits down.", "kind": "simulated", "decision_id": "d001", "before": None, "after": {"seats": 78}}]},
         {"id": "office_worker", "title": "The office worker", "label": "Fictional. Built from the day's totals, not from any one person.", "anchor": {"route_id": "R1", "stop_id": peak["visits"][1]["stop_id"], "time": 7 * 3600 + 1200},
-         "steps": [{"t": 7 * 3600 + 1200, "scene": "phone", "say": "Her usual bus will be full. A bus four minutes' walk away has seats, and taking it earns Khutwa points.", "kind": "simulated", "decision_id": "d003", "before": None, "after": {"points": 20}}]},
+         "steps": [{"t": 7 * 3600 + 1200, "scene": "stop", "say": f"On the day, her usual bus left this stop with {peak['visits'][1]['load']} people on board and {peak['seats']} seats.", "kind": "measured", "decision_id": None, "before": {"load": peak["visits"][1]["load"], "seats": peak["seats"]}, "after": None},
+                   {"t": 7 * 3600 + 1200, "scene": "phone", "say": "Her usual bus will be full. A bus four minutes' walk away has seats, and taking it earns Khutwa points.", "kind": "simulated", "decision_id": "d003", "before": None, "after": {"points": 20}}]},
         {"id": "driver", "title": "The driver", "label": "Fictional. Built from the day's totals, not from any one person.", "anchor": {"route_id": "R4", "stop_id": None, "time": 21 * 3600 + 900},
          "steps": [{"t": 21 * 3600 + 900, "scene": "bus", "say": "Late in the evening the bus slowed for stops where nobody was waiting.", "kind": "measured", "decision_id": None, "before": {"doors_not_opened": closed}, "after": None},
                    {"t": 21 * 3600 + 900, "scene": "bus", "say": "With request stops the timetable matches the road, and he is on time.", "kind": "simulated", "decision_id": "d002", "before": None, "after": {"minutes_saved_per_trip": 2.5}}]}]}
