@@ -33,6 +33,7 @@ if [ -f artifacts/meta.json ]; then run "the real bundle meets the contract" pyt
 SUITES=(
   tests/test_measures.py
   tests/test_census.py
+  tests/test_engine.py
   web/tests/run.sh
 )
 for s in ${SUITES[@]+"${SUITES[@]}"}; do
