@@ -91,7 +91,37 @@ with sync_playwright() as p:
         check(page.locator('#print-order').is_visible() and page.locator('main').is_hidden(),f'{width}: print exposes only the order')
         check(page.locator('#print-order img').evaluate('(e)=>e.complete && e.naturalWidth>0'),f'{width}: printed decision QR is local and loaded')
         page.emulate_media(media='screen');page.evaluate("dispatchEvent(new Event('afterprint'))")
-        page.locator('[data-view="replay"]').click()
+        page.locator('[data-view="stories"]').click()
+        people=page.evaluate("INSIYAB_BUNDLE['personas.json'].personas")
+        for i,person in enumerate(people):
+            page.locator(f'[data-person="{i}"]').click()
+            check(page.locator('#story-say').inner_text()==person['steps'][0]['say'],f"{width}: {person['id']} sentence comes from bundle")
+            check('Fictional' in page.locator('#fictional').inner_text(),f"{width}: {person['id']} fiction label")
+            check('measured' in page.locator('#story-kind').inner_text().lower(),f"{width}: {person['id']} starts measured")
+            check(person['title'] in page.locator('#scene-title').text_content(),f"{width}: {person['id']} figure is named")
+            check(page.locator('#scene svg').is_visible(),f"{width}: {person['id']} scene exists")
+            check(page.locator('#fixture').bounding_box()['y']>=0,f"{width}: {person['id']} stand-in label in viewport")
+            check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f"{width}: {person['id']} no sideways scroll")
+            if shots and width in [1280,390] and not reduced:
+                page.screenshot(path=str(shots/f"{person['id']}-{width}x{height}.png"))
+            before_story=page.locator('#scene').inner_html();page.wait_for_timeout(100)
+            check(page.locator('#scene').inner_html()==before_story,f"{width}: {person['id']} never advances by timer")
+            if len(person['steps'])>1:
+                page.locator('#story-next').click()
+                check('simulated' in page.locator('#story-kind').inner_text().lower(),f"{width}: {person['id']} change labelled simulated")
+                check(page.locator('#story-say').inner_text()==person['steps'][1]['say'],f"{width}: {person['id']} next step from bundle")
+                check(page.locator('#scene').inner_html()!=before_story,f"{width}: {person['id']} scene changes on tap")
+                check(page.locator('#story-decision summary').count()==1,f"{width}: {person['id']} links its decision")
+                original_kind=page.locator('#story-kind').inner_text()
+                page.locator('#story-kind').evaluate("e=>e.textContent='Measured'")
+                try:assert 'simulated' in page.locator('#story-kind').inner_text().lower()
+                except AssertionError:print('PASS negative control rejects an unlabelled simulated story')
+                else:raise AssertionError('Simulation label test cannot fail')
+                page.locator('#story-kind').evaluate('(e,text)=>e.textContent=text',original_kind)
+                if person['steps'][1]['scene']=='phone':
+                    check(page.locator('#story-action a').get_attribute('href')=='khutwa/',f'{width}: office worker uses lane 3 phone page')
+        page.locator('#story-next').click()
+        check(page.locator('#replay').is_visible(),f'{width}: last point of view returns to replay')
         # Negative control: the very same label assertion must reject a deleted label.
         page.locator('#fixture').evaluate('(e)=>e.hidden=true')
         try: assert page.locator('#fixture').is_visible()
@@ -108,9 +138,14 @@ with sync_playwright() as p:
     with tempfile.TemporaryDirectory(prefix='insiyab-mutant-') as tmp:
         mutant=pathlib.Path(tmp);shutil.copytree(site,mutant,dirs_exist_ok=True)
         (mutant/'bundle.js').write_text('window.INSIYAB_BUNDLE='+json.dumps(data)+';')
+        stop_data=json.loads((site/'data/forecast/boardings-stop.json').read_text());stop_data['fixture']=False
+        (mutant/'stop-forecast.js').write_text("window.INSIYAB_BUNDLE['forecast/boardings-stop.json']="+json.dumps(stop_data)+';')
         context=browser.new_context(offline=True);page=context.new_page();page.goto(mutant.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized')
         check(page.locator('[data-headline]').inner_text().replace(',','')==str(old+987),'mutated bundle count changes the screen')
         check(page.locator('#fixture').is_hidden(),'fixture false removes stand-in label')
+        for name in ['forecast','model','gap','stories']:
+            page.locator(f'[data-view="{name}"]').click()
+            check(page.locator('#fixture').is_hidden(),f'fixture false removes label on {name}')
         try:assert page.locator('[data-headline]').inner_text().replace(',','')==str(old)
         except AssertionError:print('PASS negative control rejects stale hard-coded bundle count')
         else:raise AssertionError('Bundle test cannot fail')

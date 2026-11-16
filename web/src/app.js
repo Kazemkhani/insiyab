@@ -1,3 +1,4 @@
+import {sceneSVG} from './scene.mjs';
 import {Deck, OrthographicView, COORDINATE_SYSTEM} from '@deck.gl/core';
 import {PathLayer,ScatterplotLayer,PolygonLayer,TextLayer} from '@deck.gl/layers';
 import {createModel, busesAt, boardingsAt, fitPaths, pointAlong, clock, number, rollingError, originRows} from './model.mjs';
@@ -90,13 +91,14 @@ function renderError(){
 async function setView(next){
   view=next;playing=false;$('play').textContent='Play';
   document.querySelectorAll('nav button').forEach(e=>e.setAttribute('aria-current',e.dataset.view===next?'page':'false'));
-  $('replay').hidden=next==='model';$('model').hidden=next!=='model';
+  $('replay').hidden=['model','stories'].includes(next);$('model').hidden=next!=='model';$('stories').hidden=next!=='stories';
   $('gap-controls').hidden=next!=='gap';$('gap-results').hidden=next!=='gap';$('replay').classList.toggle('gap-view',next==='gap');
   $('forecast-controls').hidden=next!=='forecast';$('pick-stop').hidden=next!=='forecast';
   $('map-caption').textContent=next==='forecast'?'The forecast meeting reality':next==='gap'?'Where seats and passengers do not match':'The day, replayed';
   if(next==='forecast'){await ensureStopForecast();freezeForecast();}
   if(next==='model')renderModel();
   if(next==='gap'){renderGap();pollRoom();}
+  if(next==='stories')renderStory();
   render();window.scrollTo(0,0);
 }
 document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.dataset.view));
@@ -199,3 +201,34 @@ async function pollRoom(){
 }
 setInterval(()=>{if(view==='gap')pollRoom();},1500);
 if(location.hash.startsWith('#decision-')){closedGaps=true;setView('gap');setTimeout(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView(),0);}
+
+let personIndex=0,stepIndex=0;
+$('people').innerHTML=B['personas.json'].personas.map((p,i)=>`<button data-person="${i}">${escape(p.title)}</button>`).join('');
+document.querySelectorAll('[data-person]').forEach(e=>e.onclick=()=>{personIndex=+e.dataset.person;stepIndex=0;renderStory();window.scrollTo(0,0);});
+function renderStory(){
+  const person=B['personas.json'].personas[personIndex],step=person.steps[stepIndex],simulated=step.kind==='simulated';
+  time=step.t;playing=false;$('play').textContent='Play';
+  if(person.anchor.stop_id){selected=person.anchor.stop_id;$('entity-type').value='stop';records();}
+  document.querySelectorAll('[data-person]').forEach(e=>e.setAttribute('aria-pressed',String(+e.dataset.person===personIndex)));
+  $('fictional').textContent=person.label;
+  $('story-place').textContent=person.anchor.stop_id?M.stops.get(person.anchor.stop_id).name:M.routes.get(person.anchor.route_id).long_name;
+  $('story-time').textContent=`${clock(step.t)} · ${M.meta.service_date}`;
+  $('scene').innerHTML=sceneSVG(person,step,M,escape);
+  $('scene-caption').textContent='Illustrative street and figure. Waiting count is not supplied. Route and time from personas.json.';
+  $('story-kind').textContent=simulated?'With Insiyab · simulated':'What happened · measured';$('story-kind').classList.toggle('simulated',simulated);
+  $('story-say').textContent=step.say;
+  $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).map(([key,value])=>`<p class="${simulated?'simulated':''}"><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
+  $('story-source').textContent=`personas.json · ${M.meta.service_date} · Step ${stepIndex+1} of ${person.steps.length}`;
+  const decision=B['decisions.json'].decisions.find(d=>d.id===step.decision_id);
+  $('story-decision').innerHTML=decision?`<details><summary>The decision behind this change</summary>${decisionHTML(decision).replace(/<button data-print=.*?<\/button>/,'')}</details>`:'';
+  if(step.scene==='phone')$('story-action').innerHTML='<a class="button-link primary" href="khutwa/">See the offer on her phone</a>';
+  else if(stepIndex<person.steps.length-1)$('story-action').innerHTML='<button id="story-next" class="primary">See what changes</button>';
+  else $('story-action').innerHTML=`<button id="story-next" class="primary">${personIndex<B['personas.json'].personas.length-1?'Meet '+escape(B['personas.json'].personas[personIndex+1].title.toLowerCase()):'Return to the day'}</button>`;
+  if($('story-next'))$('story-next').onclick=()=>{if(stepIndex<person.steps.length-1)stepIndex++;else if(personIndex<B['personas.json'].personas.length-1){personIndex++;stepIndex=0;}else{setView('replay');return;}renderStory();};
+  const visits=M.visits.filter(v=>v.route_id===person.anchor.route_id&&(!person.anchor.stop_id||v.stop_id===person.anchor.stop_id));
+  const closest=visits.reduce((a,b)=>Math.abs(a.act_dep-step.t)<Math.abs(b.act_dep-step.t)?a:b);
+  const bin=Math.floor(step.t/M.meta.bin_seconds)*M.meta.bin_seconds;
+  const boardings=visits.filter(v=>v.act_dep>=bin&&v.act_dep<bin+M.meta.bin_seconds).reduce((sum,v)=>sum+v.on,0);
+  $('story-record').innerHTML=`<details><summary>Look at the recorded context</summary><p>${number(boardings)} boardings ${person.anchor.stop_id?'at this stop':'on this route'} in the quarter hour beginning ${clock(bin)}. Measured, not a count of people waiting.</p><p>Nearest recorded departure: ${clock(closest.act_dep)}, ${escape(closest.trip_id)}. ${closest.load} passengers on board; ${closest.seats} seats. ${number((closest.act_dep-closest.sched_dep)/60)} minutes relative to the timetable. Measured.</p><p class="source">replay/route-${escape(person.anchor.route_id)}.json · ${M.meta.service_date}. Story values above use personas.json; this is the nearest replay record, not a reconstructed personal journey.</p></details>`;
+  render();
+}
