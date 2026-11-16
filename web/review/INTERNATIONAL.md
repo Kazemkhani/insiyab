@@ -16,8 +16,8 @@ Research checked 16 November 2026. These are outside examples, not evidence that
 
 The strongest opportunity is a verifiable chain: a passenger has no seat, the forecast identifies where that will recur, a planner sees a feasible exchange or voluntary alternative, and the measured outcome is checked later. A generic live map alone does not establish that chain.
 
-Implemented in this review: route focus; a selected bus's passengers against seats; a comparison against the lowest-error naive forecast at the displayed horizon; explicit route-series choice in the stop challenge; an inside/outside interval result; and exact supplied trip pairs in printed proposals. The renderer uses actual paths and stop times. Community names no longer obscure the network overview.
+Implemented in this review: route focus; a selected bus's passengers against seats; a comparison against the naive forecast named by each checked result; explicit route-series choice in the stop challenge; an inside/outside interval result; and exact supplied trip pairs in printed proposals. The renderer uses actual paths and stop times. Community names no longer obscure the network overview.
 
 Keep incentives voluntary. Site workers with fixed start times and passengers who cannot walk should not become the assumed source of capacity. The planner's printed exchange explicitly requires review of depot, vehicle blocks, access and duties. These are constraints to validate, not claims that the present data proves feasibility.
 
-Deferred to the owning lanes: service-level waiting-time measures; checked model-selection and uncertainty metadata; room authentication and the live depot reply; passenger-page walking and timing eligibility. No external uptake rate, cost saving or invented journey result is written into the bundle or the interface.
+Checked model-selection, uncertainty metadata and room authentication are now integrated. Remaining with the owning lanes: service-level waiting-time measures, the live depot reply, and passenger-page walking and timing eligibility. No external uptake rate, cost saving or invented journey result is written into the bundle or the interface.

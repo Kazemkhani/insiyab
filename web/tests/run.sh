@@ -7,4 +7,5 @@ node web/build.mjs --bundle "${INSIYAB_BUNDLE:-fixtures}" --out "$SITE"
 node web/tests/model.test.mjs
 python3 web/tests/browser.py "$SITE" ${INSIYAB_SHOTS:+--shots "$INSIYAB_SHOTS"}
 python3 web/tests/review.py "$SITE"
+python3 web/tests/room.py "$SITE"
 echo 'ALL PASS'

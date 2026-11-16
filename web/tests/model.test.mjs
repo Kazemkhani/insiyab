@@ -20,7 +20,7 @@ for(const [w,h] of [[900,330],[358,280]]){const f=fitPaths(m.paths,w,h);assert.o
 console.log('PASS fitted map at laptop and phone sizes');
 // Measure each semantic foreground against its actual background.
 const css=fs.readFileSync(path.join(root,'web/src/style.css'),'utf8');
-const tokens=Object.fromEntries([...css.matchAll(/--([\w-]+):#([0-9a-fA-F]{6})/g)].map(m=>[m[1],m[2]]));
+const tokens=Object.fromEntries([...css.matchAll(/--([\w-]+):\s*#([0-9a-fA-F]{6})/g)].map(m=>[m[1],m[2]]));
 function lum(hex){const rgb=hex.match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;}
 for(const name of ['ink','flow','over','spare','simulated','muted','dark-grey']){const ratio=(lum(tokens.paper)+.05)/(lum(tokens[name])+.05);assert.ok(ratio>=4.5,`${name} ${ratio}`);console.log(`PASS contrast ${name} / paper ${ratio.toFixed(2)}:1`);}
 const {rollingError}=await import('../src/model.mjs');

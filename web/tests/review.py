@@ -10,6 +10,8 @@ with tempfile.TemporaryDirectory(prefix='insiyab-review-') as tmp, sync_playwrig
  data=json.loads((site/'bundle.js').read_text().removeprefix('window.INSIYAB_BUNDLE=').rstrip(';\n'))
  target=data['metrics.json']['targets'][0];naive=next(m for m in target['models'] if m['is_baseline']);target['models'].append({'model':'review_strong_naive','label':'Review strong naive','is_baseline':True})
  target['results'] += [dict(r,model='review_strong_naive',mae=.01,rmse=.02) for r in list(target['results']) if r['model']==naive['model']]
+ for r in target['results']:
+  if r['model'] not in [m['model'] for m in target['models'] if m['is_baseline']]:r['skill_vs']='review_strong_naive'
  (mutant/'bundle.js').write_text('window.INSIYAB_BUNDLE='+json.dumps(data)+';')
  stop=json.loads((site/'data/forecast/boardings-stop.json').read_text());first=stop['series'][0];duplicate=json.loads(json.dumps(first))
  for r in duplicate['rows']:r.update(forecast=999.25,lo=998,hi=1001,actual=None)

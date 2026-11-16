@@ -8,7 +8,9 @@ const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 const css=getComputedStyle(document.documentElement);
 const colour=name=>css.getPropertyValue('--'+name).trim().match(/\w\w/g).map(v=>parseInt(v,16));
 const C=Object.fromEntries(['ink','paper','flow','over','spare','simulated','line','grey','muted'].map(n=>[n,colour(n)]));
-let time=Math.min(M.max,Math.max(M.min,M.meta.origins[0]+3600)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1,focusRoute='',closedGaps=false,roomState=null,playbackCount=null;
+const routeTarget=B['metrics.json'].targets.find(t=>t.target==='boardings'&&t.level==='route');
+const openingTime=routeTarget?.split.origins[0]??M.meta.origins[0]+3600;
+let time=Math.min(M.max,Math.max(M.min,openingTime)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1,focusRoute='',closedGaps=false,roomState=null,playbackCount=null;
 const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Room';
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 $('fixture').hidden=!M.meta.fixture;
@@ -92,8 +94,12 @@ start().catch(e=>{console.error(e);$('map-failure').hidden=false;});
 
 const oneHour=3600;
 const limit=B['metrics.json'].targets.find(t=>t.target==='boardings'&&t.level==='route')?.tested_on??`Tested on later hours of one day, ${new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(M.meta.service_date+'T00:00:00Z'))}. Not tested on another day.`;
-document.querySelectorAll('.forecast-limit').forEach(e=>e.textContent=limit);
+document.querySelectorAll('.forecast-limit').forEach(e=>e.textContent=limit.startsWith('Tested')?limit:'Tested on '+limit);
 document.querySelectorAll('.date').forEach(e=>e.textContent=M.meta.service_date);
+const openingModel=routeTarget?.pooled?.find(r=>r.model===routeTarget.chosen),openingNaive=routeTarget?.pooled?.find(r=>r.model===routeTarget.best_naive);
+if(openingModel&&openingNaive){
+  $('evaluation').innerHTML=`<p class="eyebrow">Untouched hours · route forecast</p><div class="evaluation-numbers"><div><strong>${number(openingModel.mae)}</strong><span>model</span></div><div><strong>${number(openingNaive.mae)}</strong><span>naive forecast</span></div></div><p class="small">Average miss: ${escape(routeTarget.unit)}. Every look-ahead together. Gain range: ${number(openingModel.skill_lo*100)}% to ${number(openingModel.skill_hi*100)}%. ${openingModel.skill_lo<=0&&openingModel.skill_hi>=0?'Includes zero; improvement is not established.':''}</p><p class="source">metrics.json · untouched part · ${M.meta.service_date}</p>`;
+}
 function renderError(){
   const score=rollingError(B['forecast/boardings-route.json'],time,3600);
   $('error-counter').innerHTML=score.n?`<span class="error-title">Miss so far at ${clock(time)}</span><strong>${number(score.model)} <small>forecast</small></strong><strong>${number(score.naive)} <small>naive forecast</small></strong><span class="source">passengers / route / ${M.meta.bin_seconds/60} min · ${score.n} completed bins<br>forecast/boardings-route.json · ${M.meta.service_date}</span>`:'<span>Waiting for the first one-hour forecast bin to finish. No error is known yet.</span>';
@@ -146,7 +152,7 @@ function renderChallenge(){
   document.querySelectorAll('[data-chart-bin]').forEach(e=>{const reveal=()=>{$('forecast-time').value=e.dataset.chartBin;challengeRevealed=true;renderChallenge();};e.onclick=reveal;e.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();reveal();}};});
   $('reveal').textContent=challengeRevealed?'Hide what happened':'Reveal what happened';
 }
-$('pick-stop').querySelector('.forecast-limit').textContent=B['metrics.json'].targets.find(t=>t.level==='stop'&&t.target==='boardings')?.tested_on??limit;
+$('pick-stop').querySelector('.forecast-limit').textContent='Tested on '+(B['metrics.json'].targets.find(t=>t.level==='stop'&&t.target==='boardings')?.tested_on??limit).replace(/^Tested on /,'');
 $('forecast-stop').onchange=forecastSeries;$('forecast-series').onchange=forecastTimes;$('forecast-time').onchange=()=>{challengeRevealed=false;renderChallenge();};$('reveal').onclick=()=>{challengeRevealed=!challengeRevealed;renderChallenge();};
 $('model-target').innerHTML=B['metrics.json'].targets.map((t,i)=>`<option value="${i}">${escape(t.target.replaceAll('_',' '))} · ${escape(t.level)}</option>`).join('');
 let metricsTarget;
@@ -158,10 +164,10 @@ function renderModel(){
   const h=+$('model-horizon').value,choices=t.models.filter(m=>!m.is_baseline),oldChoice=metricsTarget===$('model-target').value?$('model-choice').value:t.chosen;metricsTarget=$('model-target').value;
   $('model-choice').innerHTML=choices.map(m=>`<option value="${escape(m.model)}">${escape(m.label)}</option>`).join('');if(choices.some(m=>m.model===oldChoice))$('model-choice').value=oldChoice;
   const chosen=t.models.find(m=>m.model===$('model-choice').value),best=result(chosen.model,h,all);
-  const baselines=t.models.filter(m=>m.is_baseline).map(m=>({m,r:result(m.model,h,all)})).filter(x=>x.r).sort((a,b)=>a.r.mae-b.r.mae),naive=baselines[0]?.m,base=baselines[0]?.r;
+  const baselines=t.models.filter(m=>m.is_baseline).map(m=>({m,r:result(m.model,h,all)})).filter(x=>x.r).sort((a,b)=>a.r.mae-b.r.mae),comparison=baselines.find(x=>x.m.model===best?.skill_vs)??baselines[0],naive=comparison?.m,base=comparison?.r;
   $('model-sentence').textContent=`${hLabel(h)} ahead: ${number(best?.mae)} ${unit} average miss. Best naive forecast in this table: ${number(base?.mae)}.${best&&base?(best.mae<base.mae?' The model misses less.':best.mae>base.mae?' The naive forecast misses less.':' The two have the same average miss.'):''}`;
-  $('comparison-note').textContent=`Comparing ${chosen.label} with ${naive?.label??'no supplied naive result'}. The naive comparison is the lowest MAE at this horizon, on the same held-out bins. This table comparison does not select a model for deployment.`;
-  $('model').querySelector('.forecast-limit').textContent=t.tested_on??limit;
+  $('comparison-note').textContent=`Comparing ${chosen.label} with ${naive?.label??'no supplied naive result'}. The naive comparison is the one named by this result, on the same held-out bins. The line keeps that comparator across horizons. This table comparison does not select a model for deployment.`;
+  $('model').querySelector('.forecast-limit').textContent='Tested on '+(t.tested_on??limit).replace(/^Tested on /,'');
   const pooled=t.pooled?.find(r=>r.model===chosen.model),range=t.range;
   if(pooled?.skill_lo<=0&&pooled?.skill_hi>=0)$('model-sentence').textContent+=' Across all horizons, the gain range includes zero; improvement is not established.';
   $('model-reliability').innerHTML=pooled?.skill!==null&&pooled?.skill!==undefined?`<h2>Does the improvement hold?</h2><p>${number(pooled.skill*100)}% error removed against ${escape(t.models.find(m=>m.model===pooled.skill_vs)?.label??pooled.skill_vs)}, across all horizons together. ${pooled.n} scored rows.</p>${gainChart(pooled)}<p>${pooled.skill_lo<=0&&pooled.skill_hi>=0?'The range includes zero. An improvement is not established.':pooled.skill_hi<0?'The whole range is below zero. The naive forecast did better.':'The range stays above zero on this held-out day.'}</p><p class="small">The supplied range covers 95 in 100 resamples of whole forecast origins. It does not test another day.</p>`:'';
@@ -174,7 +180,7 @@ function renderModel(){
   const horizon=+$('model-horizon').value;
   const worst=new Map(t.models.map(m=>[m.model,Math.max(...t.results.filter(r=>r.model===m.model&&r.horizon===horizon&&r.subset!==all).map(r=>r.mae))]));
   $('subset-table').innerHTML=`<div class="table-scroll"><table class="metrics"><thead><tr><th>Subset / model</th><th>MAE</th><th>RMSE</th><th>MAPE</th><th>WAPE</th><th>Bins / MAPE bins</th></tr></thead><tbody>${t.subsets.filter(s=>s.subset!==all).map(s=>t.models.map(m=>{const r=result(m.model,horizon,s.subset);return r?`<tr class="${r.mae===worst.get(m.model)?'worst':''}"><th>${escape(s.label)}<small>${m.is_baseline?'Naive forecast':escape(m.label)}${r.mae===worst.get(m.model)?' · Largest miss':''}</small></th><td>${number(r.mae)}</td><td>${number(r.rmse)}</td><td>${r.mape===null?'—':number(r.mape*100)+'%'}</td><td>${r.wape===null?'—':number(r.wape*100)+'%'}</td><td>${r.n} / ${r.mape_n}</td></tr>`:'';}).join('')).join('')}</tbody></table></div>`;
-  const subsets=t.subsets.filter(s=>s.subset!==all).map(s=>({label:s.label,model:result(chosen.model,horizon,s.subset)?.mae,naive:result(naive?.model,horizon,s.subset)?.mae})).filter(s=>Number.isFinite(s.model)).sort((a,b)=>b.model-a.model);
+  const subsets=t.subsets.filter(s=>s.subset!==all).map(s=>({label:s.label,model:result(chosen.model,horizon,s.subset)?.mae,naive:result(result(chosen.model,horizon,s.subset)?.skill_vs??naive?.model,horizon,s.subset)?.mae})).filter(s=>Number.isFinite(s.model)).sort((a,b)=>b.model-a.model);
   $('worst-subset').textContent=subsets.length?`Largest average miss: ${subsets[0].label}, ${number(subsets[0].model)} ${unit}. Showing the ${Math.min(8,subsets.length)} largest subset misses; every supplied row is in More measures.`:'No subset results supplied.';
   $('subset-chart').innerHTML=subsetChart(subsets.slice(0,8));
   $('mape-rule').textContent=t.mape_rule;$('split-rule').textContent=`Learning: ${t.split.train}. Held-out: ${t.split.test}.`;
@@ -201,10 +207,12 @@ function renderGap(){
   $('gap-routes').innerHTML=rows.length?gapChart(rows,id=>M.routes.get(id).short_name)+`<p class="small">${escape(B['gap.json'].index_note)} Source: gap.json · ${M.meta.service_date}. Above seats is a passenger count; spare is a seat count.</p>`:'<p>No gap forecast is supplied for this hour.</p>';
   if(closedGaps)renderDecisions();renderRoom();
 }
-function decisionHTML(d,print=false){
+function decisionHTML(d,print=false,idPrefix=print?'order-':'decision-'){
   const depot=roomState?.decision_id===d.id?roomState.depot:null;
   const state=depot==='confirmed'?'Confirmed by the depot':depot==='ringing'?'Ringing the team member':depot==='declined'?'Declined by the depot':'Proposed';
-  return `<article class="decision" id="${print?'order-':'decision-'}${escape(d.id)}"><div class="decision-top"><p class="eyebrow">${escape(d.lever.replaceAll('_',' '))}</p><span class="decision-state">${state}</span></div><h2>${escape(d.title)}</h2><p>${escape(d.change)}</p><p class="small">${escape(M.routes.get(d.where.route_id)?.long_name??d.where.route_id)} · ${clock(d.when.from)} to ${clock(d.when.to)} · ${M.meta.service_date}</p><p>${escape(d.why)}</p><dl class="evidence">${d.evidence.map(e=>`<div><dt>${escape(e.label)}</dt><dd>${number(e.value)} ${escape(e.unit)}<span class="source">${escape(e.source)} · ${M.meta.service_date}</span></dd></div>`).join('')}</dl><div class="effects">${d.effect.map(e=>`<p class="${e.kind==='simulated'?'simulated':''}"><strong>${escape(e.kind)}:</strong> ${number(e.before)} before; ${number(e.after)} after. ${escape(metricLabel(e.metric))}.<small>${escape(e.assumption??'')}</small></p>`).join('')}</div><p>${number(d.passengers_affected)} passengers affected. Source: decisions.json · ${M.meta.service_date}. Confidence: ${escape(d.confidence)}.</p><p class="small">${escape(d.cost_note)}</p>${depot&&depot!=='none'?'<p class="small">A real call to a team member’s phone. No RTA system was contacted.</p>':''}${print?'':`<button data-print="${escape(d.id)}">Print the order</button>${d.lever==='rewarded_choice'?'<a class="button-link" href="khutwa/">Open the passenger’s offer</a>':''}`}</article>`;
+  const evidence=`<p>${escape(d.why)}</p><dl class="evidence">${d.evidence.map(e=>`<div><dt>${escape(e.label)}</dt><dd>${number(e.value)} ${escape(e.unit)}<span class="source">${escape(e.source)} · ${M.meta.service_date}</span></dd></div>`).join('')}</dl>${d.effect.filter(e=>e.assumption).map(e=>`<p class="small simulated">Simulated assumption: ${escape(e.assumption)}</p>`).join('')}<p>${number(d.passengers_affected)} passengers affected. Confidence: ${escape(d.confidence)}; this is the supplied judgement, not a probability.</p><p class="small">${escape(d.cost_note)}</p><p class="source">decisions.json · ${M.meta.service_date}</p>`;
+  return `<article class="decision" id="${idPrefix}${escape(d.id)}"><div class="decision-top"><p class="eyebrow">${escape(d.lever.replaceAll('_',' '))}</p><span class="decision-state">${state}</span></div><h2>${escape(d.title)}</h2><p>${escape(d.change)}</p><p class="small">${escape(M.routes.get(d.where.route_id)?.long_name??d.where.route_id)} · ${clock(d.when.from)} to ${clock(d.when.to)} · ${M.meta.service_date}</p><div class="effects">${d.effect.map(e=>`<div class="decision-effect ${e.kind==='simulated'?'simulated':''}"><p>${escape(e.kind)} · ${escape(metricLabel(e.metric))}</p><p><span>${number(e.before)} before</span><strong>${number(e.after)}</strong> after</p></div>`).join('')}</div>${print?evidence:`<details class="decision-evidence"><summary>Evidence, assumptions and cost</summary>${evidence}</details>`}${depot&&depot!=='none'?'<p class="small">A real call to a team member’s phone. No RTA system was contacted.</p>':''}${print?'':`<button data-print="${escape(d.id)}">Print the order</button>${d.lever==='rewarded_choice'?'<a class="button-link" href="khutwa/">Open the passenger’s offer</a>':''}`}</article>`;
+
 }
 function renderDecisions(){
   $('decisions').innerHTML='<div class="section-heading"><p class="eyebrow">A planner decides</p><h2>The changes behind the totals</h2><p>Proposals only. Nothing was sent to a depot or changed in an RTA system.</p></div>'+B['decisions.json'].decisions.map(d=>decisionHTML(d)).join('');
@@ -217,20 +225,40 @@ async function printOrder(id){
 }
 window.addEventListener('afterprint',()=>{$('print-order').hidden=true;});
 $('gap-metric').onchange=renderGap;
-$('close-gaps').onclick=()=>{closedGaps=!closedGaps;renderGap();render();};
+let presenterCode='',roomPolling=false;
+$('presenter-form').onsubmit=event=>{event.preventDefault();presenterCode=$('presenter-code').value;$('presenter-code').value='';$('presenter-status').textContent='Code held in this tab. Close the gaps to open the room offer.';$('end-offer').hidden=false;};
+function validRoom(data){return ['waiting','offer','closed'].includes(data?.phase)&&['none','ringing','confirmed','declined'].includes(data.depot)&&['joined','accepted','declined'].every(k=>Number.isInteger(data[k])&&data[k]>=0)&&data.accepted+data.declined<=data.joined;}
+async function setRoomPhase(phase){
+  if(!presenterCode||!roomState)return;
+  try{
+    const decision=B['decisions.json'].decisions.find(d=>d.lever==='rewarded_choice');
+    const response=await fetch('api/room/phase',{method:'POST',headers:{'content-type':'application/json','x-presenter-code':presenterCode},body:JSON.stringify({phase,...(decision?{decision_id:decision.id}:{})}),signal:AbortSignal.timeout(2000)});
+    if(response.status===401){presenterCode='';$('end-offer').hidden=true;throw Error('Presenter code refused. Enter it again.');}
+    if(!response.ok)throw Error('The room did not accept the change.');
+    const data=await response.json();if(!validRoom(data))throw Error('The room returned an invalid state.');
+    roomState=data;playbackCount=null;$('presenter-status').textContent=phase==='offer'?'The room offer is open.':'The room offer has ended.';
+  }catch(error){$('presenter-status').textContent=error.message+' The local proposal still works; no live change is confirmed.';}
+  renderRoom();
+}
+$('end-offer').onclick=()=>setRoomPhase('closed');
+$('close-gaps').onclick=()=>{closedGaps=!closedGaps;renderGap();render();if(closedGaps)setRoomPhase('offer');};
 function renderRoom(){
   if(playbackCount!==null){
     const d=B['decisions.json'].decisions.find(d=>d.lever==='rewarded_choice'),effect=d?.effect.find(e=>e.metric==='passengers_shifted');
     $('room-count').textContent=`Played back, nobody is connected. ${number(playbackCount)} of ${number(d?.passengers_affected)} passengers shift in the simulated offer. ${effect?.assumption??''}`;
   }else if(roomState){$('room-count').textContent=`In this room: ${roomState.accepted} of ${roomState.joined} took the offer. ${roomState.declined} declined. Room responses are not measured commuting behaviour.`;}
   else $('room-count').textContent='Room unavailable. Play the simulated offer back; the decisions still work.';
-  $('playback').hidden=!!roomState;
+  $('playback').hidden=!!roomState;$('presenter').hidden=!roomState;
 }
 $('playback').onclick=()=>{const d=B['decisions.json'].decisions.find(d=>d.lever==='rewarded_choice'),effect=d?.effect.find(e=>e.metric==='passengers_shifted');playbackCount=effect?.after??0;closedGaps=true;renderGap();render();};
 async function pollRoom(){
-  if(view!=='gap'||!/^https?:$/.test(location.protocol))return;
-  try{const response=await fetch('api/room/state',{signal:AbortSignal.timeout(2000),cache:'no-store'});if(!response.ok)throw Error('Room absent');const data=await response.json();if(!['waiting','offer','closed'].includes(data.phase)||!['joined','accepted','declined'].every(k=>Number.isInteger(data[k])&&data[k]>=0))throw Error('Invalid room');roomState=data;playbackCount=null;}
-  catch{roomState=null;}renderRoom();if(closedGaps)renderDecisions();
+  if(roomPolling||view!=='gap'||!/^https?:$/.test(location.protocol))return;
+  roomPolling=true;const previous=roomState;
+  try{const response=await fetch('api/room/state',{signal:AbortSignal.timeout(2000),cache:'no-store'});if(!response.ok)throw Error('Room absent');const data=await response.json();if(!validRoom(data))throw Error('Invalid room');roomState=data;playbackCount=null;}
+  catch{roomState=null;}finally{roomPolling=false;}
+  renderRoom();if(closedGaps&&(previous?.depot!==roomState?.depot||previous?.decision_id!==roomState?.decision_id)){
+    const open=[...document.querySelectorAll('.decision-evidence[open]')].map(e=>e.closest('.decision').id);renderDecisions();open.forEach(id=>document.getElementById(id)?.querySelector('details')?.setAttribute('open',''));
+  }
 }
 setInterval(()=>{if(view==='gap')pollRoom();},1500);
 if(location.hash.startsWith('#decision-')){closedGaps=true;setView('gap');setTimeout(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView(),0);}
@@ -254,7 +282,7 @@ function renderStory(){
   $('story-seats').innerHTML=seatDiagram(step);
   $('story-source').textContent=`personas.json · ${M.meta.service_date} · Step ${stepIndex+1} of ${person.steps.length}`;
   const decision=B['decisions.json'].decisions.find(d=>d.id===step.decision_id);
-  $('story-decision').innerHTML=decision?`<details><summary>The decision behind this change</summary>${decisionHTML(decision).replace(/<button data-print=.*?<\/button>/,'')}</details>`:'';
+  $('story-decision').innerHTML=decision?`<details><summary>The decision behind this change</summary>${decisionHTML(decision,false,'story-decision-').replace(/<button data-print=.*?<\/button>/,'')}</details>`:'';
   if(step.scene==='phone')$('story-action').innerHTML='<a class="button-link primary" href="khutwa/">See the offer on her phone</a>';
   else if(stepIndex<person.steps.length-1)$('story-action').innerHTML='<button id="story-next" class="primary">See what changes</button>';
   else $('story-action').innerHTML=`<button id="story-next" class="primary">${personIndex<B['personas.json'].personas.length-1?'Meet '+escape(B['personas.json'].personas[personIndex+1].title.toLowerCase()):'Return to the day'}</button>`;
