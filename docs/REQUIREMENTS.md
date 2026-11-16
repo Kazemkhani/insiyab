@@ -105,3 +105,7 @@ A person writes each answer in `docs/team/MENTOR-ANSWERS.md`, with who said it a
 | Answer | Who said it, and when |
 |---|---|
 | (none yet) | |
+
+The deploy script reads the next line, and shows real totals only when it says YES and the real bundle exists. Lane 1 changes it, and only from an answer recorded in `docs/team/MENTOR-ANSWERS.md`.
+
+TOTALS MAY LEAVE DATAIKU: NOT ANSWERED
