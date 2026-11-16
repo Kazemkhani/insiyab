@@ -85,18 +85,18 @@ h1,h2,h3,output,.big-number {
   font-weight: 600;
 }
 h1 {
-  font-size: 38px;
+  font-size: 32px;
   line-height: 1.08;
   letter-spacing: -1.2px;
   margin: 5px 0 7px;
 }
 h2 {
-  font-size: 30px;
+  font-size: 32px;
   line-height: 1.15;
   margin: 8px 0 14px;
 }
 h3 {
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1.2;
   margin: 10px 0;
 }
@@ -104,12 +104,12 @@ p {
   margin: 8px 0 14px;
 }
 .small,small {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 .eyebrow {
   text-transform: uppercase;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 1.5px;
   margin: 0;
@@ -118,7 +118,7 @@ p {
   background: var(--simulated);
   color: var(--paper);
   padding: 4px 24px;
-  font: 500 10px/1.5 Plex;
+  font: 500 11px/1.5 Plex;
   letter-spacing: 1.5px;
   position: sticky;
   top: 0;
@@ -132,12 +132,12 @@ header {
   border-bottom: 1px solid var(--line);
 }
 .brand {
-  font: 600 26px Overpass;
+  font: 600 32px Overpass;
   text-decoration: none;
   white-space: nowrap;
 }
 .brand span {
-  font: 400 19px Kufi;
+  font: 400 20px Kufi;
   margin-left: 10px;
 }
 nav {
@@ -164,7 +164,7 @@ main {
 }
 .purpose {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--dark-grey);
 }
 .qr {
@@ -172,7 +172,7 @@ main {
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 13px;
   width: 170px;
   flex-shrink: 0;
 }
@@ -193,13 +193,13 @@ main {
   padding: 8px 0;
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   gap: 12px;
 }
 .map-heading span:last-child {
   font-family: Mono;
-  font-size: 10px;
+  font-size: 11px;
 }
 .route-focus {
   display: flex;
@@ -209,7 +209,7 @@ main {
 }
 .route-focus button {
   border: 0;
-  font-size: 12px;
+  font-size: 13px;
   flex-shrink: 0;
   padding: 8px 18px;
 }
@@ -232,7 +232,7 @@ main {
   position: absolute;
   right: 12px;
   top: 12px;
-  font: 10px/1.8 Mono;
+  font: 11px/1.8 Mono;
   color: var(--muted);
   text-align: right;
   pointer-events: none;
@@ -269,7 +269,7 @@ main {
   padding-top: 10px;
 }
 output {
-  font-size: 26px;
+  font-size: 32px;
   min-width: 72px;
   font-variant-numeric: tabular-nums;
 }
@@ -281,7 +281,7 @@ input[type=range] {
   width: 100%;
 }
 .speed-label {
-  font-size: 10px;
+  font-size: 11px;
   display: flex;
   flex-direction: column;
 }
@@ -303,7 +303,7 @@ input[type=range] {
   padding: 11px 0;
 }
 .record-heading span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
 }
 .inspect-controls {
@@ -322,11 +322,11 @@ input[type=range] {
 .inspect-controls select {
   display: block;
   width: 100%;
-  font-size: 12px;
+  font-size: 13px;
   padding: 6px;
 }
 #detail {
-  font-size: 12px;
+  font-size: 13px;
   padding-top: 10px;
   overflow-wrap: anywhere;
 }
@@ -343,7 +343,7 @@ input[type=range] {
   margin: 12px 0;
 }
 .load-reading strong {
-  font: 600 58px/1 Overpass;
+  font: 600 52px/1 Overpass;
 }
 .load-reading span {
   font-size: 13px;
@@ -360,7 +360,7 @@ input[type=range] {
 }
 .source {
   display: block;
-  font: 10px/1.5 Mono;
+  font: 11px/1.5 Mono;
   color: var(--muted);
   overflow-wrap: anywhere;
 }
@@ -374,7 +374,7 @@ input[type=range] {
   grid-template-columns: 1fr 1fr;
   gap: 5px 16px;
   padding: 7px 0;
-  font-size: 12px;
+  font-size: 13px;
 }
 .error-title,.error-strip>.source {
   grid-column: 1/-1;
@@ -383,10 +383,10 @@ input[type=range] {
   color: var(--muted);
 }
 .error-strip strong {
-  font: 600 30px Overpass;
+  font: 600 32px Overpass;
 }
 .error-strip strong small {
-  font: 12px Plex;
+  font: 13px Plex;
   display: block;
 }
 .error-strip .source {
@@ -419,7 +419,7 @@ summary {
 .documentation {
   border-top: 1px solid var(--line);
   margin-top: 26px;
-  font-size: 14px;
+  font-size: 13px;
 }
 .documentation p {
   max-width: 850px;
@@ -432,7 +432,7 @@ footer {
 table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 12px;
+  font-size: 13px;
 }
 th,td {
   padding: 10px 8px;
@@ -478,7 +478,7 @@ th {
   display: grid;
   gap: 6px;
   max-width: 100%;
-  font-size: 12px;
+  font-size: 13px;
 }
 .model-controls label {
   flex: 1;
@@ -535,7 +535,7 @@ th {
   gap: 20px;
 }
 .gap-action h2 {
-  font-size: 28px;
+  font-size: 32px;
   margin: 6px 0;
 }
 .gap-action p {
@@ -556,17 +556,17 @@ th {
   flex-direction: column;
 }
 #gap-totals strong {
-  font: 600 38px Overpass;
+  font: 600 32px Overpass;
 }
 #gap-totals span {
-  font-size: 12px;
+  font-size: 13px;
 }
 #gap-totals small {
   font-size: 11px;
 }
 #gap-assumption {
   max-width: 900px;
-  font-size: 12px;
+  font-size: 13px;
   margin: 8px 0;
 }
 .gap-view .intro,.gap-view .reading {
@@ -596,7 +596,7 @@ th {
   scroll-margin-top: 30px;
 }
 .decision h2 {
-  font-size: 28px;
+  font-size: 32px;
 }
 .decision-top {
   display: flex;
@@ -604,7 +604,7 @@ th {
   align-items: center;
 }
 .decision-state {
-  font-size: 12px;
+  font-size: 13px;
   border-bottom: 2px solid var(--simulated);
 }
 .evidence {
@@ -636,7 +636,7 @@ th {
   min-height: 44px;
   padding: 8px 16px;
   margin-left: 12px;
-  font-size: 14px;
+  font-size: 13px;
 }
 #print-order {
   display: none;
@@ -650,7 +650,7 @@ th {
 .people button {
   flex: 1;
   border: 0;
-  font-size: 14px;
+  font-size: 13px;
 }
 .story-grid {
   display: grid;
@@ -680,10 +680,10 @@ th {
 }
 #story-values strong {
   display: block;
-  font: 600 35px Overpass;
+  font: 600 32px Overpass;
 }
 #story-values small {
-  font-size: 10px;
+  font-size: 11px;
   max-width: 200px;
 }
 #story-source {
@@ -711,10 +711,10 @@ header {
   flex-wrap: wrap;
 }
 .brand {
-  font-size: 24px;
+  font-size: 20px;
 }
 .brand span {
-  font-size: 18px;
+  font-size: 16px;
 }
 nav {
   width: 100%;
@@ -734,7 +734,7 @@ main {
   padding: 4px 16px;
 }
 .intro h1 {
-  font-size: 30px;
+  font-size: 32px;
 }
 .purpose {
   font-size: 13px;
@@ -757,21 +757,21 @@ main {
   font-size: 11px;
 }
 .map-heading span:last-child {
-  font-size: 9px;
+  font-size: 11px;
 }
 .legend {
-  font-size: 9px;
+  font-size: 11px;
   gap: 5px 12px;
 }
 .clock-controls button {
   padding: 8px 12px;
 }
 output {
-  font-size: 24px;
+  font-size: 20px;
   min-width: 62px;
 }
 .speed-label select {
-  font-size: 10px;
+  font-size: 11px;
   padding: 4px;
 }
 .reading {
@@ -797,16 +797,16 @@ output {
   padding: 0;
 }
 .replay-grid>.forecast-summary .error-title {
-  font-size: 10px;
+  font-size: 11px;
 }
 .error-strip strong {
-  font-size: 27px;
+  font-size: 32px;
 }
 #detail .load-reading {
   margin: 8px 0;
 }
 .load-reading strong {
-  font-size: 46px;
+  font-size: 52px;
 }
 .documentation {
   margin-top: 18px;
@@ -829,30 +829,30 @@ footer {
   gap: 24px;
 }
 .challenge-numbers strong {
-  font-size: 40px;
+  font-size: 32px;
 }
 .challenge-numbers span {
-  font-size: 12px;
+  font-size: 13px;
 }
 .metrics {
   min-width: 590px;
-  font-size: 12px;
+  font-size: 13px;
 }
 #model-sentence {
-  font-size: 17px;
+  font-size: 16px;
 }
 .gap-action {
   gap: 16px;
 }
 .gap-action h2 {
-  font-size: 23px;
+  font-size: 20px;
 }
 .gap-action p {
-  font-size: 12px;
+  font-size: 13px;
 }
 .gap-action button {
   width: 110px;
-  font-size: 12px;
+  font-size: 13px;
   padding: 8px;
 }
 #gap-totals {
@@ -868,7 +868,7 @@ footer {
   font-size: 11px;
 }
 .decision h2 {
-  font-size: 24px;
+  font-size: 20px;
 }
 .evidence>div {
   gap: 12px;
@@ -885,7 +885,7 @@ footer {
   gap: 0;
 }
 .people button {
-  font-size: 12px;
+  font-size: 13px;
 }
 .story-grid {
   display: block;
@@ -917,7 +917,7 @@ footer {
   height: 260px;
 }
 .intro h1 {
-  font-size: 28px;
+  font-size: 32px;
 }
 }
 @media(prefers-reduced-motion:reduce) {
@@ -1372,7 +1372,7 @@ body>#print-order {
   max-width: 350px;
 }
 .story-copy h2 {
-  font-size: 25px;
+  font-size: 20px;
 }
 #stories .intro .eyebrow {
   display: none;
