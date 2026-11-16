@@ -136,7 +136,7 @@ def build(day, fixture=True, generated_at=None, commit=None):
     t_stop, _ = _target("stop", stop, stop_kinds, chosen_from=chosen, extra=extra)
     date = pd.Timestamp(day["service_date"]).strftime("%A %-d %B %Y") if os.name != "nt" else day["service_date"]
     for t in (t_route, t_stop):
-        t["tested_on"] = f"later hours of one day, {date}. Not tested on another day."
+        t["tested_on"] = f"later hours of one day, {date}, inside the winter break of most schools. Not tested on another day, and a school day may look different."
     base = t_stop["best_naive"]
 
     gap, decisions, v, trips = B.gap_and_decisions(day)

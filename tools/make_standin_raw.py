@@ -18,7 +18,7 @@ Choices made here, because the real answers are not known until the census has r
   The nol table writes the calendar date, so a tap after midnight is dated 2025-12-16.
 - GTFS times run above 24:00:00, as the standard says.
 - Every identifier is invented and begins STANDIN-.
-- Each file stays under the guard's limit for an invented table (400,000 bytes), which is why the day is thin:
+- Each file stays under the guard's limit for an invented table (3,000,000 bytes), which is why the day is thinner than a real one:
   PEAK_HEADWAY, OFF_HEADWAY and RIDERS below are the three numbers to change if that limit is ever raised.
 
 Mess planted on purpose, for the census to count (the test recounts each from the files, nothing is typed twice):
@@ -33,7 +33,7 @@ SEED = 20251215
 DATE, NEXT_DATE = "2025-12-15", "2025-12-16"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "fixtures", "raw")
-PEAK_HEADWAY, OFF_HEADWAY = 75 * 60, 150 * 60      # seconds between buses in one direction
+PEAK_HEADWAY, OFF_HEADWAY = 20 * 60, 45 * 60      # seconds between buses in one direction
 RIDERS = 1.35                                      # multiplies every boarding rate
 N_STOPS = 15
 LON0, LAT0, CELL = 55.20, 25.10, 0.06              # nine invented communities in a 3 by 3 grid
@@ -302,7 +302,7 @@ def main():
     if shape not in ("tap", "journey"):
         print("--nol-shape is tap or journey"); return 2
     files = build(shape)
-    big = [n for n, t in files.items() if len(t.encode("utf-8")) > 400_000]
+    big = [n for n, t in files.items() if len(t.encode("utf-8")) > 3_000_000]
     if "--check" in args:
         def same(n):
             p = os.path.join(out, n)

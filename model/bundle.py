@@ -9,15 +9,20 @@ import pandas as pd
 
 LABEL = "Fictional. Built from the day's totals, not from any one person."
 SPARE_SHARE = 1 / 3            # right bus: a trip whose largest load is under this share of its seats has a bus too big for it
-SWAP_WITHIN = 3600             # right bus: the two trips start within this many seconds of each other
+SWAP_WITHIN = 1800             # right bus: the two trips start within this many seconds of each other
+EMPTY_KMH = 25                 # right bus: the speed of a bus running empty to the other route's first stop, over the straight line times ROAD_FACTOR
+ROAD_FACTOR = 1.3              # a road is the straight line times this
+MIN_SAVING = 5                 # right stop: a time saved is stated only if the middle time at an empty visit is at least this many seconds
+SHIFT_MAX = 1800               # rewarded choice: never offer a bus more than this many seconds earlier or later
 EMPTY_SHARE = 0.8              # right stop: at least this share of visits had nobody boarding and nobody alighting
-EMPTY_VISITS = 3               # right stop: over at least this many visits
+EMPTY_VISITS = 5               # right stop: over at least this many visits
 EVENING = 20 * 3600            # right stop: looked for from this time on
 WALK_MAX = 400                 # rewarded choice: never offer a walk longer than this, in metres
 WALK_FACTOR = 1.3              # a walk is the straight line times this
 WALK_SPEED = 75                # metres a minute
 TAKE_UP = 0.08                 # rewarded choice: the share of passengers who take an offer
-TAKE_UP_NOTE = "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 11 in 100: docs/research/research-methods.md, section 6)"
+TAKE_UP_NOTE = "8 in 100 passengers who get the offer take it (trials in San Francisco and Singapore found about 7 to 11 in 100: docs/research/research-methods.md, section 6). A planner can move this number."
+KHUTWA_NOTE = "Khutwa is this prototype's name for the points. RTA's nol Plus already gives points for spending; what is added here is offering them only where the day shows a gap."
 
 
 def clock(t):
@@ -43,7 +48,8 @@ def trips_of(day):
     v["km_to_next"] = np.where(same, metres(v["lon"], v["lat"], v["lon"].shift(-1), v["lat"].shift(-1)) / 1000, 0.0)
     v["km_to_next"] = v["km_to_next"].fillna(0.0)
     t = v.groupby("trip_id", sort=False).agg(route_id=("route_id", "first"), direction=("direction", "first"), vehicle=("vehicle", "first"), bus_type=("bus_type", "first"),
-                                             seats=("seats", "first"), start=("sched_arr", "first"), peak=("load", "max"), boardings=("on", "sum")).reset_index()
+                                             seats=("seats", "first"), start=("sched_arr", "first"), peak=("load", "max"), boardings=("on", "sum"),
+                                             end=("act_arr", "max"), first_stop=("stop_id", "first"), last_stop=("stop_id", "last")).reset_index()
     return v, t
 
 
@@ -69,35 +75,49 @@ def replay(day):
     return files, left_out
 
 
-def swaps(t):
-    """Right bus: pair each trip that ran over its seats with a trip starting within the hour whose bus is bigger and mostly empty,
-    and whose own passengers fit on the smaller bus. Each trip is used once. Returns the new seats for every trip."""
+def swaps(t, stops):
+    """Right bus: pair each trip that ran over its seats with a trip starting within half an hour whose bus is bigger and mostly empty,
+    and whose own passengers fit on the smaller bus. A pair is kept only if each bus can reach the other trip's first stop in time,
+    running empty from where its trip before ended. Each trip is used once. Returns the new seats for every trip, and the pairs."""
     seats = dict(zip(t["trip_id"], t["seats"])); pairs = []; used = set()
+    def reach(bus, trip):
+        """Kilometres run empty and minutes to spare for the bus of one trip to start the other trip. None if it cannot be there in time."""
+        before = t[(t["vehicle"] == bus.vehicle) & (t["end"] <= bus.start) & (t["trip_id"] != bus.trip_id)].sort_values("end").tail(1)
+        here, free = (before.iloc[0].last_stop, before.iloc[0].end) if len(before) else (bus.first_stop, None)      # with no trip before, the bus comes out of the depot: where from is not in these records
+        if here not in stops.index or trip.first_stop not in stops.index:
+            return None
+        km = float(metres(stops.at[here, "lon"], stops.at[here, "lat"], stops.at[trip.first_stop, "lon"], stops.at[trip.first_stop, "lat"])) * ROAD_FACTOR / 1000
+        spare = None if free is None else (trip.start - free) / 60 - km / EMPTY_KMH * 60
+        return None if spare is not None and spare < 0 else (km, spare)
     over = t[t["peak"] > t["seats"]].assign(short=lambda d: d["peak"] - d["seats"]).sort_values(["short", "trip_id"], ascending=[False, True])
     for o in over.itertuples():
         can = t[(t["seats"] > o.seats) & (t["peak"] < t["seats"] * SPARE_SHARE) & (t["peak"] <= o.seats) & ((t["start"] - o.start).abs() <= SWAP_WITHIN) & (t["vehicle"] != o.vehicle) & ~t["trip_id"].isin(used)]
-        if not len(can):
-            continue
-        d = can.sort_values(["seats", "peak", "trip_id"], ascending=[False, True, True]).iloc[0]
-        used |= {o.trip_id, d.trip_id}; seats[o.trip_id], seats[d.trip_id] = int(d.seats), int(o.seats); pairs.append((o, d))
+        for d in can.sort_values(["seats", "peak", "trip_id"], ascending=[False, True, True]).itertuples():
+            a, b = reach(d, o), reach(o, d)
+            if a is None or b is None:
+                continue
+            spare = [x for x in (a[1], b[1]) if x is not None]
+            used |= {o.trip_id, d.trip_id}; seats[o.trip_id], seats[d.trip_id] = int(d.seats), int(o.seats)
+            pairs.append((o, d, round(a[0] + b[0], 1), None if not spare else int(min(spare)))); break
     return seats, pairs
 
 
 def gap_and_decisions(day):
     v, t = trips_of(day); stops = day["stops"].set_index("stop_id"); decisions = []
+    unknown_share = next((x.get("share_of_boardings_with_no_recorded_alighting", 0) for x in day["log"] if x["stage"] == "loads"), 0)
     t["hour"] = (t["start"] // 3600) * 3600; t["over"] = np.clip(t["peak"] - t["seats"], 0, None); t["spare"] = np.clip(t["seats"] - t["peak"], 0, None)
     rows = []
     for (rid, d, hour), g in t.groupby(["route_id", "direction", "hour"], sort=True):
         over, spare = int(g["over"].sum()), int(g["spare"].sum())
-        rows.append({"route_id": rid, "direction": int(d), "hour_start": int(hour), "trips": len(g), "seats_offered": int(g["seats"].sum()), "forecast_peak_load": int(g["peak"].sum()),
+        rows.append({"route_id": rid, "direction": int(d), "hour_start": int(hour), "trips": len(g), "seats_offered": int(g["seats"].sum()), "forecast_peak_load": int(g["peak"].sum()), "peak_load": int(g["peak"].sum()),
                      "over": over, "spare": spare, "index": round(0.1 + 9.9 * over / (over + spare), 1) if over + spare else 0.1})
     before = over_and_empty(v, v["seats"])
 
     # --- right bus -----------------------------------------------------------------------------------------------
-    new_seats, pairs = swaps(t); after = over_and_empty(v, v["trip_id"].map(new_seats))
+    new_seats, pairs = swaps(t, stops); after = over_and_empty(v, v["trip_id"].map(new_seats))
     if pairs:
         side = lambda x: {"route_id": x.route_id, "trip_id": str(x.trip_id), "vehicle": x.vehicle, "bus_type": x.bus_type, "seats": int(x.seats), "start": int(x.start), "largest_load": int(x.peak)}
-        o, d = pairs[0]; ids = [p[0].trip_id for p in pairs] + [p[1].trip_id for p in pairs]; part = v[v["trip_id"].isin(ids)]
+        o, d = pairs[0][:2]; ids = [p[0].trip_id for p in pairs] + [p[1].trip_id for p in pairs]; empty_km = round(sum(p[2] for p in pairs), 1); part = v[v["trip_id"].isin(ids)]
         b = over_and_empty(part, part["seats"])[0]; a = over_and_empty(part, part["trip_id"].map(new_seats))[0]
         top = v[v["trip_id"] == o.trip_id].sort_values("load", ascending=False).iloc[0]
         starts = [p[0].start for p in pairs]
@@ -108,13 +128,15 @@ def gap_and_decisions(day):
                          {"label": "Seats on that bus", "value": int(o.seats), "unit": "seats", "source": f"replay/route-{o.route_id}.json"},
                          {"label": f"Largest load on a route {d.route_id} trip starting within the hour", "value": int(d.peak), "unit": "passengers", "source": f"replay/route-{d.route_id}.json"},
                          {"label": "Seats on that bus", "value": int(d.seats), "unit": "seats", "source": f"replay/route-{d.route_id}.json"},
-                         {"label": "Trips paired this way across the day", "value": len(pairs), "unit": "pairs of trips", "source": "replay/"}],
-            "change": f"Swap the vehicles on {len(pairs)} pairs of trips that start within an hour of each other, beginning with the {o.seats}-seat bus on route {o.route_id} at {clock(o.start)} and the {d.seats}-seat bus on route {d.route_id} at {clock(d.start)}.",
+                         {"label": "Trips paired this way across the day", "value": len(pairs), "unit": "pairs of trips", "source": "replay/"},
+                         {"label": "Kilometres the buses would run empty to change places, as straight lines times 1.3", "value": empty_km, "unit": "km", "source": "network.json"},
+                         {"label": "Share of the day's boardings with no recorded alighting, spread along the trip to make the loads", "value": round(unknown_share, 3), "unit": "share", "source": "meta.json"}],
+            "change": f"Swap the vehicles on {len(pairs)} pairs of trips that start within half an hour of each other, beginning with the {o.seats}-seat bus on route {o.route_id} at {clock(o.start)} and the {d.seats}-seat bus on route {d.route_id} at {clock(d.start)}.",
             "effect": [{"metric": "passenger_minutes_over_seats", "before": round(b), "after": round(a), "kind": "simulated",
-                        "assumption": "the same passengers board at the same times and only the vehicles change; the time to bring each bus to the other route's first stop is not counted"}],
-            "passengers_affected": int(sum(p[0].boardings for p in pairs)), "cost_note": "No extra bus and no extra driver. Moving buses between routes has a cost in empty running that is not counted here.",
+                        "assumption": f"the same passengers board at the same times and only the vehicles change. A pair is proposed only if each bus can reach the other trip's first stop in time at {EMPTY_KMH} km/h from where its trip before ended; a bus with no trip before comes from the depot, and that run is not in these records"}],
+            "passengers_affected": int(sum(p[0].boardings for p in pairs)), "cost_note": f"No extra bus and no extra driver. About {empty_km} km of empty running. Not checked here: the blocks, the depots, and whether the bigger bus fits every stop and turn on the other route. A planner decides.",
             "confidence": "medium",
-            "swaps": [{"from": side(a_), "to": side(b_)} for a_, b_ in pairs],
+            "swaps": [{"from": side(a_), "to": side(b_), "empty_km": km_, "minutes_to_spare": spare_} for a_, b_, km_, spare_ in pairs],
             "why": f"Route {o.route_id} carried {int(o.peak)} passengers on a bus with {int(o.seats)} seats while a {int(d.seats)}-seat bus on route {d.route_id} carried at most {int(d.peak)} in the same hour."})
 
     # --- right stop ----------------------------------------------------------------------------------------------
@@ -126,23 +148,29 @@ def gap_and_decisions(day):
         q = quiet[(quiet["route_id"] == best.route_id) & (quiet["direction"] == best.direction)]
         there = late[(late["route_id"] == best.route_id) & (late["direction"] == best.direction) & late["stop_id"].isin(q["stop_id"])]
         dwell = float(there.loc[there["nobody"], "dwell"].median()) if there["nobody"].any() else 0.0
+        calls = int(q["nobody"].sum())
+        effect = [{"metric": "calls_at_a_stop_with_nobody_there", "before": calls, "after": 0, "kind": "simulated", "assumption": "the bus calls at these stops only when a passenger asks, and on the day nobody boarded or alighted on these visits"}]
+        if dwell >= MIN_SAVING:
+            effect.append({"metric": "minutes_saved_per_trip", "before": 0, "after": round(dwell * len(q) / 60, 1), "kind": "simulated",
+                           "assumption": "a bus that is not asked to call saves the middle time buses spent at these stops when nobody boarded or alighted; slowing down and pulling away are not counted, so this is an under-count"})
         decisions.append({"lever": "right_stop", "title": "Stop only when someone is there",
             "where": {"route_id": best.route_id, "stop_ids": sorted(q["stop_id"]), "community_id": None}, "when": {"from": EVENING, "to": int(late["sched_arr"].max() // 3600 * 3600 + 3600)},
             "evidence": [{"label": f"Visits to these stops after {clock(EVENING)}", "value": int(q["visits"].sum()), "unit": "visits", "source": f"replay/route-{best.route_id}.json"},
                          {"label": "Of those, visits where nobody boarded and nobody alighted", "value": int(q["nobody"].sum()), "unit": "visits", "source": f"replay/route-{best.route_id}.json"},
-                         {"label": "Middle time a bus spent at such a visit", "value": round(dwell), "unit": "seconds", "source": f"replay/route-{best.route_id}.json"}],
+                         {"label": "Middle time a bus spent at such a visit", "value": round(dwell), "unit": "seconds", "source": f"replay/route-{best.route_id}.json"},
+                         {"label": "Days this rests on", "value": 1, "unit": "day", "source": "meta.json"}],
             "change": f"After {clock(EVENING)}, make {len(q)} stops on route {best.route_id} request stops: the bus calls there when a passenger asks from the stop or from the bus.",
-            "effect": [{"metric": "minutes_saved_per_trip", "before": 0, "after": round(dwell * len(q) / 60, 1), "kind": "simulated",
-                        "assumption": "a bus that is not asked to call saves the middle time buses spent at these stops when nobody boarded or alighted; slowing down and pulling away are not counted, so this is an under-count"}],
+            "effect": effect,
             "passengers_affected": int(q["people"].sum() + q["off"].sum()), "cost_note": "A way to ask at each stop: a button, or a tap in the app. Nobody loses a stop: the bus calls whenever it is asked.",
             "confidence": "low",
-            "why": f"At {len(q)} stops on route {best.route_id}, nobody boarded or alighted on {int(q['nobody'].sum())} of {int(q['visits'].sum())} visits after {clock(EVENING)}."})
+            "why": f"At {len(q)} stops on route {best.route_id}, nobody boarded or alighted on {calls} of {int(q['visits'].sum())} visits after {clock(EVENING)}. That is one day: RTA's own route planning already looks for little-used stops, and this adds the hours in which it holds." + ("" if dwell >= MIN_SAVING else " The time each such call costs is not in these records, so no time saved is claimed.")})
 
     # --- rewarded choice -----------------------------------------------------------------------------------------
     full = v[(v["load"] > v["seats"]) & (v["on"] > 0)].sort_values(["on", "trip_id", "seq"], ascending=[False, True, True])
     if len(full):
         f = full.iloc[0]; offers = []
         line = v[(v["route_id"] == f.route_id) & (v["direction"] == f.direction) & (v["stop_id"] == f.stop_id)].sort_values("sched_dep")
+        line = line[(line["sched_dep"] - f.sched_dep).abs() <= SHIFT_MAX]            # an offer of a bus an hour away is no offer
         for kind, cand in (("earlier", line[line["sched_dep"] < f.sched_dep].tail(1)), ("later", line[line["sched_dep"] > f.sched_dep].head(1))):
             if len(cand) and cand.iloc[0].load < cand.iloc[0].seats:
                 c = cand.iloc[0]; shift = int(round(abs(f.sched_dep - c.sched_dep) / 60))
@@ -166,14 +194,16 @@ def gap_and_decisions(day):
                              {"label": "Passengers boarding at this stop within half an hour either side", "value": asked, "unit": "passengers", "source": f"replay/route-{f.route_id}.json"}],
                 "change": "Offer Khutwa points to passengers at this stop who take a bus with room: one a little earlier or later, or one on another route a short walk away.",
                 "effect": [{"metric": "passengers_shifted", "before": 0, "after": round(asked * TAKE_UP, 1), "kind": "simulated", "assumption": TAKE_UP_NOTE}],
-                "passengers_affected": asked, "cost_note": "Points for each passenger who shifts. Nobody is charged more, and an offer to walk is never made to someone who has said they cannot.",
+                "passengers_affected": asked, "cost_note": "Points for each passenger who shifts. Nobody is charged more, and an offer to walk is never made to someone who has said they cannot. " + KHUTWA_NOTE,
                 "confidence": "low", "offers": offers,
                 "why": f"The {clock(f.sched_dep)} bus on route {f.route_id} left this stop with {int(f.load)} passengers and {int(f.seats)} seats, and a bus with room was close in time or place."})
     for i, d in enumerate(decisions):
         decisions[i] = {"id": f"d{i + 1:03d}", **d}
+    for d in decisions:                                                # a planner asked to do two things on one route should see both
+        d["related"] = [x["id"] for x in decisions if x is not d and x["where"]["route_id"] == d["where"]["route_id"]]
 
     gap = {"bin_seconds": 3600, "load_kind": "measured",
-           "index_note": "The Insiyab index runs from 0.1 (every seat empty) to 10 (every passenger without a seat): the share of the gap that is people without seats. Loads here are the day's own, counted from taps; seats only.",
+           "index_note": f"The Insiyab index runs from 0.1 to 10. In each route, direction and hour, add the passengers above the seats and the seats above the passengers over its trips: the index is 0.1 when all of that is empty seats and 10 when all of it is passengers without a seat. Loads here are the day's own, made from taps (forecast_peak_load holds the same measured number as peak_load until a forecast of load exists); {round(unknown_share * 100)} in 100 boardings had no recorded alighting and were spread along the trip. Seats only.",
            "rows": rows, "totals": {"kind": "simulated", "assumption": "the vehicle swaps in the right-bus decision are made; the same passengers travel at the same times. A stretch between stops is measured as a straight line, so empty seat-kilometres are an under-count.",
                                     "before": {"passenger_minutes_over_seats": round(before[0]), "empty_seat_km": round(before[1])},
                                     "after": {"passenger_minutes_over_seats": round(min(after[0], before[0])), "empty_seat_km": round(after[1])}}}
@@ -214,6 +244,6 @@ def personas(day, decisions, v, t):
     closed = int((~v["door_opened"]).sum())
     steps = [step(EVENING + 900, "bus", f"On the day, buses called at stops {closed} times without the door opening.", "measured", before={"doors_not_opened": closed, "stop_visits": len(v)})]
     if rs:
-        steps.append(step(EVENING + 900, "bus", "With request stops late in the evening, the timetable matches the road and he keeps time.", "simulated", rs["id"], after={rs["effect"][0]["metric"]: rs["effect"][0]["after"]}))
+        steps.append(step(EVENING + 900, "bus", "With request stops late in the evening, the bus no longer slows for a stop where nobody is waiting.", "simulated", rs["id"], before={rs["effect"][0]["metric"]: rs["effect"][0]["before"]}, after={rs["effect"][0]["metric"]: rs["effect"][0]["after"]}))
     out.append({"id": "driver", "title": "The driver", "label": LABEL, "anchor": {"route_id": (rs or {"where": {"route_id": busiest.route_id}})["where"]["route_id"], "stop_id": None, "time": EVENING + 900}, "steps": steps})
     return out

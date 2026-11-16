@@ -26,7 +26,9 @@ later = copy.deepcopy(tables)
 nol = later["nol"]; after = (seconds(nol["Transaction_Time"]) >= ORIGIN) | (nol["Transaction_date"] > day["service_date"])
 later["nol"] = pd.concat([nol[~after], nol[after].iloc[::3], nol[after].iloc[::3]], ignore_index=True)       # after the origin: two taps in three vanish, the rest double
 avl = later["avl"].copy(); t = seconds(avl["Act_Arr"]); late = (t >= ORIGIN) | (t < 4 * 3600)
-avl.loc[late, "Door_Status"] = "Closed"; avl.loc[late, "Act_Arr"] = avl.loc[late, "Sched_Arr"]; avl.loc[late, "Act_Dep"] = avl.loc[late, "Sched_Dep"]; later["avl"] = avl
+hms = lambda x: (x % 86400).map(lambda n: f"{int(n) // 3600:02d}:{int(n) % 3600 // 60:02d}:{int(n) % 60:02d}")
+avl.loc[late, "Door_Status"] = "Closed"                              # after the origin every door stays shut and every bus runs ten minutes later: a changed record stays after the origin
+avl.loc[late, "Act_Arr"] = hms(seconds(avl.loc[late, "Act_Arr"]) + 600); avl.loc[late, "Act_Dep"] = hms(seconds(avl.loc[late, "Act_Dep"]) + 600); later["avl"] = avl
 check("the test of the clock really changed the day after 12:00", int(after.sum()) > 100 and int(late.sum()) > 100, (int(after.sum()), int(late.sum())))
 (f1, p1), (f2, p2) = forecasts_at(tables), forecasts_at(later)
 check("the clock: changing every record after 12:00 changes no feature and no naive forecast made at or before 12:00", f1.shape == f2.shape and np.array_equal(f1, f2, equal_nan=True))
@@ -74,6 +76,24 @@ check("the bundle from the invented tables meets the contract", res[-1] == "ALL 
 check("the bundle says it is stand-in data in every file", all(x["fixture"] is True for x in one.values()))
 ids = set(tables["nol"]["NOL_ID"]) | set(tables["nol"]["device_id"]) | set(tables["nol"]["device_id_hex"]) | set(tables["avl"]["Driver_id"]) | set(tables["avl"]["Body"]) | set(tables["fleet"]["Body_number"])
 check(f"none of the {len(ids)} card, device, driver and vehicle numbers in the tables appears anywhere in the bundle", not [i for i in ids if i and i in text])
+# --- the levers ---------------------------------------------------------------------------------------------------
+from model import bundle as B
+ds = {d["lever"]: d for d in one["decisions.json"]["decisions"]}
+check("the invented day is busy enough to raise a right-bus, a right-stop and a rewarded-choice decision", set(ds) >= {"right_bus", "right_stop", "rewarded_choice"}, list(ds))
+sw = ds.get("right_bus", {}).get("swaps", [])
+check("right bus: every pair starts within half an hour, the bigger bus goes to the fuller trip, both loads fit, and no bus is asked to be somewhere before it can get there",
+      bool(sw) and all(abs(w["from"]["start"] - w["to"]["start"]) <= B.SWAP_WITHIN and w["to"]["seats"] > w["from"]["seats"] and w["from"]["largest_load"] > w["from"]["seats"] and w["to"]["largest_load"] <= w["from"]["seats"]
+                       and (w["minutes_to_spare"] is None or w["minutes_to_spare"] >= 0) and w["empty_km"] >= 0 for w in sw), sw[:2])
+check("right bus: no trip is in two pairs", len({x for w in sw for x in (w["from"]["trip_id"], w["to"]["trip_id"])}) == 2 * len(sw))
+e = ds.get("right_bus", {}).get("effect", [{}])[0]
+check("right bus: the simulated effect is marked simulated, states its assumption, and is no worse than before", e.get("kind") == "simulated" and bool(e.get("assumption")) and e.get("after", 1) <= e.get("before", 0), e)
+of = ds.get("rewarded_choice", {}).get("offers", [])
+check("rewarded choice: no offer is more than half an hour earlier or later, or a walk of more than 400 metres", bool(of) and all(o.get("minutes_earlier", o.get("minutes_later", 0)) * 60 <= B.SHIFT_MAX and o["walk_metres"] <= B.WALK_MAX for o in of), of)
+rs = ds.get("right_stop", {})
+check("right stop: a time saved is claimed only where the records hold one, and the card says it rests on one day", all(x["metric"] != "minutes_saved_per_trip" or x["after"] * 60 >= B.MIN_SAVING for x in rs.get("effect", [])) and any(x["label"] == "Days this rests on" for x in rs.get("evidence", [])))
+says = [st for p in one["personas.json"]["personas"] for st in p["steps"]]
+check("the four points of view: each starts with something measured, and every simulated step names its decision", all(p["steps"][0]["kind"] == "measured" for p in one["personas.json"]["personas"]) and all(st["decision_id"] for st in says if st["kind"] == "simulated"))
+
 stop = next(t for t in one["metrics.json"]["targets"] if t["level"] == "stop")
 check("every naive forecast and every model is in the table, at every horizon", {r["model"] for r in stop["results"]} == set(naive.NAIVE) | set(F.MODELS) and {r["horizon"] for r in stop["results"]} == set(F.HORIZONS))
 check("gain is stated against the best naive forecast on the same rows, never the worst", all(r["skill_vs"] == min((x for x in stop["results"] if x["model"] in naive.NAIVE and x["horizon"] == r["horizon"] and x["subset"] == r["subset"]), key=lambda x: (x["mae"], x["model"]))["model"]
