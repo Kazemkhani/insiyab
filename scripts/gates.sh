@@ -36,6 +36,7 @@ SUITES=(
   tests/test_measures.py
   tests/test_census.py
   tests/test_engine.py
+  tests/test_notebook.py
   live/tests/run.sh
   web/tests/run.sh
 )
