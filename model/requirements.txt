@@ -1,0 +1,5 @@
+# The engine's libraries. Few and common, so the same code runs in a Dataiku notebook (docs/MODEL-PLAN.md, section 9).
+# LightGBM is optional: where it is missing the engine uses scikit-learn's own boosted trees and says so in meta.json.
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3

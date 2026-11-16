@@ -4,6 +4,9 @@
 set -u
 cd "$(dirname "$0")/.." || exit 1
 FAIL=0
+# The engine's tests need pandas, numpy and scikit-learn. bash scripts/setup.sh puts them in .venv; python3 is used if it has them.
+PY=python3; [ -x .venv/bin/python ] && PY=.venv/bin/python
+"$PY" -c "import pandas, numpy, sklearn" 2>/dev/null || { echo "FAIL the engine's libraries are missing: run bash scripts/setup.sh once (it makes .venv from model/requirements.txt)"; FAIL=1; }
 BEFORE="$(git status --porcelain --untracked-files=no)"
 echo "gates on $(git rev-parse --short HEAD 2>/dev/null || echo 'no commit yet') ($(git rev-parse --abbrev-ref HEAD 2>/dev/null))"
 
@@ -28,10 +31,13 @@ if [ -f artifacts/meta.json ]; then run "the real bundle meets the contract" pyt
 
 # Each lane adds its own suite here as one line, when the suite exists. A missing file is a failure, not a skip.
 SUITES=(
+  tests/test_measures.py
+  tests/test_census.py
+  web/tests/run.sh
 )
 for s in ${SUITES[@]+"${SUITES[@]}"}; do
   if [ ! -f "$s" ]; then echo "FAIL $s (missing)"; FAIL=1; continue; fi
-  case "$s" in *.py) run "$s" python3 "$s" ;; *.sh) run "$s" bash "$s" ;; *) run "$s" node "$s" ;; esac
+  case "$s" in *.py) run "$s" "$PY" "$s" ;; *.sh) run "$s" bash "$s" ;; *) run "$s" node "$s" ;; esac
 done
 
 AFTER="$(git status --porcelain --untracked-files=no)"

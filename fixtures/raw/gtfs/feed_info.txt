@@ -1,0 +1,2 @@
+feed_publisher_name,feed_publisher_url,feed_start_date,feed_end_date
+"STAND-IN, invented by tools/make_standin_raw.py",https://example.invalid,20251201,20251231
