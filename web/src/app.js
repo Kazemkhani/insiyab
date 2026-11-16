@@ -282,7 +282,7 @@ function renderStory(){
   $('scene-caption').textContent='Illustration. It does not show a real passenger or a count of people waiting.';
   $('story-kind').textContent=simulated?'With Insiyab · simulated':'What happened · measured';$('story-kind').classList.toggle('simulated',simulated);
   $('story-say').textContent=step.say;
-  $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).map(([key,value])=>`<p class="${simulated?'simulated':''}"><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
+  $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).filter(([key])=>!(['load','seats'].includes(key)&&Number.isInteger((step.after??step.before)?.seats))).map(([key,value])=>`<p class="${simulated?'simulated':''}"><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
   $('story-seats').innerHTML=seatDiagram(step);
   $('story-source').textContent=`personas.json · ${M.meta.service_date} · Step ${stepIndex+1} of ${person.steps.length}`;
   const decision=B['decisions.json'].decisions.find(d=>d.id===step.decision_id);

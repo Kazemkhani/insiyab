@@ -1559,3 +1559,12 @@ body>#print-order {
 .gap-name{font:500 13px "IBM Plex Sans",sans-serif;fill:var(--ink)}
 .gap-fold{font-size:13px;color:var(--muted);margin:8px 0 0}
 .gap-none{margin:0 0 8px}
+
+/* The four people: the count is the picture. */
+.seat-diagram{display:flex;flex-wrap:wrap;gap:24px 32px;margin:16px 0 24px}
+.seat-figure{margin:0;min-width:0}
+.seat-figure figcaption{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.seat-figure figcaption strong{font:600 32px/1.1 Overpass,sans-serif;color:var(--ink)}
+.seat-figure figcaption strong.over{color:var(--over)}
+.seat-figure figcaption span:last-child{font-size:13px;color:var(--muted)}
+.seat-figure svg{display:block;width:100%;height:auto}

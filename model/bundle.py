@@ -228,16 +228,22 @@ def personas(day, decisions, v, t):
         e = rb["effect"][0]; steps.append(step(6 * 3600 + 600, "control_room", "Swapping vehicles between those trips closes much of the gap without a single extra bus.", "simulated", rb["id"], {e["metric"]: e["before"]}, {e["metric"]: e["after"]}))
     out.append({"id": "planner", "title": "The planner", "label": LABEL, "anchor": {"route_id": busiest.route_id, "stop_id": None, "time": 6 * 3600}, "steps": steps})
 
-    top = v[v["trip_id"] == busiest.trip_id].sort_values(["load", "seq"], ascending=[False, True]).iloc[0]
+    # The site worker stands where a bus really left with more passengers than seats: the first trip of the right-bus decision if there is one.
+    swap = rb["swaps"][0] if rb and rb.get("swaps") else None
+    his = swap["from"]["trip_id"] if swap else busiest.trip_id
+    top = v[v["trip_id"].astype(str) == str(his)].sort_values(["load", "seq"], ascending=[False, True]).iloc[0]
     steps = [step(top.act_dep, "stop", f"On the day, the {clock(top.sched_dep)} bus left this stop with {int(top.load)} people on board and {int(top.seats)} seats.", "measured", before={"load": int(top.load), "seats": int(top.seats)})]
-    if rb:
-        steps.append(step(top.act_dep, "bus", "With the bigger bus on this trip, he sits down.", "simulated", rb["id"], after={"seats": int(max(x["value"] for x in rb["evidence"] if x["unit"] == "seats"))}))
-    out.append({"id": "site_worker", "title": "The site worker", "label": LABEL, "anchor": {"route_id": busiest.route_id, "stop_id": top.stop_id, "time": int(top.act_dep)}, "steps": steps})
+    if swap:
+        bigger = int(swap["to"]["seats"])
+        steps.append(step(top.act_dep, "bus", f"With the {bigger}-seat bus on this trip, the same {int(top.load)} passengers all have a seat.", "simulated", rb["id"], before={"load": int(top.load), "seats": int(top.seats)}, after={"load": int(top.load), "seats": bigger}))
+    out.append({"id": "site_worker", "title": "The site worker", "label": LABEL, "anchor": {"route_id": top.route_id, "stop_id": top.stop_id, "time": int(top.act_dep)}, "steps": steps})
 
     if rc:
         sid = rc["where"]["stop_ids"][0]; e = rc["evidence"]; when = (rc["when"]["from"] + rc["when"]["to"]) // 2
+        roomy = max(rc["offers"], key=lambda o: ((o.get("seats") or 0) - (o.get("load") or 0), -o["depart"]))       # the offer with the most room, as the passenger page leads with
         steps = [step(when, "stop", f"On the day, her usual bus left this stop with {int(e[0]['value'])} people on board and {int(e[1]['value'])} seats.", "measured", before={"load": int(e[0]["value"]), "seats": int(e[1]["value"])}),
-                 step(when - 900, "phone", "Her phone shows a bus with room close by, and taking it earns Khutwa points.", "simulated", rc["id"], after={"points": max(o["points"] for o in rc["offers"])})]
+                 step(when - 900, "phone", "Her phone shows a bus with room close by, and taking it earns Khutwa points.", "simulated", rc["id"], before={"load": int(e[0]["value"]), "seats": int(e[1]["value"])},
+                      after={**({"load": roomy["load"], "seats": roomy["seats"]} if roomy.get("seats") else {}), "points": roomy["points"]})]
         anchor = {"route_id": rc["where"]["route_id"], "stop_id": sid, "time": int(when)}
     else:
         steps = [step(top.act_dep, "stop", f"On the day, the fullest bus she could have taken carried {int(top.load)} people and had {int(top.seats)} seats.", "measured", before={"load": int(top.load), "seats": int(top.seats)})]

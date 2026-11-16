@@ -41,8 +41,8 @@
   {
    "anchor": {
     "route_id": "901",
-    "stop_id": "101072",
-    "time": 64995
+    "stop_id": "101042",
+    "time": 62862
    },
    "id": "site_worker",
    "label": "Fictional. Built from the day's totals, not from any one person.",
@@ -50,25 +50,29 @@
     {
      "after": null,
      "before": {
-      "load": 32,
-      "seats": 32
+      "load": 27,
+      "seats": 20
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, the 17:55 bus left this stop with 32 people on board and 32 seats.",
+     "say": "On the day, the 17:19 bus left this stop with 27 people on board and 20 seats.",
      "scene": "stop",
-     "t": 64995
+     "t": 62862
     },
     {
      "after": {
+      "load": 27,
       "seats": 64
      },
-     "before": null,
+     "before": {
+      "load": 27,
+      "seats": 20
+     },
      "decision_id": "d001",
      "kind": "simulated",
-     "say": "With the bigger bus on this trip, he sits down.",
+     "say": "With the 64-seat bus on this trip, the same 27 passengers all have a seat.",
      "scene": "bus",
-     "t": 64995
+     "t": 62862
     }
    ],
    "title": "The site worker"
@@ -96,9 +100,14 @@
     },
     {
      "after": {
-      "points": 20
+      "load": 19,
+      "points": 20,
+      "seats": 48
      },
-     "before": null,
+     "before": {
+      "load": 25,
+      "seats": 20
+     },
      "decision_id": "d003",
      "kind": "simulated",
      "say": "Her phone shows a bus with room close by, and taking it earns Khutwa points.",

@@ -145,6 +145,11 @@ with sync_playwright() as p:
                 page.locator('#story-next').click()
                 check('simulated' in page.locator('#story-kind').inner_text().lower(),f"{width}: {person['id']} change labelled simulated")
                 check(page.locator('#story-say').inner_text()==person['steps'][1]['say'],f"{width}: {person['id']} next step from bundle")
+                after=person['steps'][1].get('after') or {};was=person['steps'][1].get('before') or {}
+                if isinstance(after.get('seats'),int) and isinstance(after.get('load'),int) and isinstance(was.get('seats'),int):
+                    figs=page.locator('#story-seats .seat-figure')
+                    check(figs.count()==2,f"{width}: {person['id']} the change is drawn as two counts, the day and the change")
+                    check(figs.nth(0).locator('[data-seat]').count()==was['seats'] and figs.nth(1).locator('[data-seat]').count()==after['seats'] and figs.nth(1).locator('[data-excess]').count()==max(0,after['load']-after['seats']),f"{width}: {person['id']} each count equals the bundle's seats and shortfall")
                 check(page.locator('#scene').inner_html()!=before_story,f"{width}: {person['id']} scene changes on tap")
                 check(page.locator('#story-decision > details > summary').count()==1,f"{width}: {person['id']} links its decision")
                 original_kind=page.locator('#story-kind').inner_text()

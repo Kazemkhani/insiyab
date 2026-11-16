@@ -13,9 +13,17 @@ export function sceneSVG(person,step,model,escape){
  return `<svg viewBox="0 0 710 426" role="img" aria-labelledby="scene-title scene-description"><title id="scene-title">${escape(person.title)}, a fictional faceless figure</title><desc id="scene-description">Blender-rendered illustrative ${escape(setting.replaceAll('_',' '))}. ${escape(step.kind)} context. Furniture and vehicle geometry are not surveyed records or a reconstruction of one person.</desc><image width="710" height="426" href="scenes/${escape(person.id)}-${setting}.png"/>${route}</svg>`;
 }
 export function seatDiagram(step){
- const load=step.after?.load??step.before?.load,seats=step.after?.seats??step.before?.seats;
- if(!Number.isInteger(load)||!Number.isInteger(seats)||load<0||seats<1||Math.max(load,seats)>220)return '';
- const count=Math.max(load,seats),columns=20,size=12,rows=Math.ceil(count/columns);
- const cells=Array.from({length:count},(_,i)=>{const x=i%columns*size+2,y=Math.floor(i/columns)*size+2;return i>=seats?`<path data-excess d="M${x+4} ${y}l5 9h-10Z" fill="var(--over)"/>`:`<rect data-seat="${i<load?'occupied':'empty'}" x="${x}" y="${y}" width="8" height="8" fill="${i<load?'var(--ink)':'none'}" stroke="var(--ink)"/>`;}).join('');
- return `<div class="seat-diagram"><p class="eyebrow">Passengers against seats · ${step.kind}</p><svg viewBox="0 0 ${columns*size+4} ${rows*size+4}" role="img" aria-label="${load} passengers for ${seats} seats. ${Math.max(0,load-seats)} passengers above seats.">${cells}</svg><p class="small">Each square is one seat. Filled: occupied. Outline: empty. Each triangle is one passenger above seats.</p></div>`;
+ // The count, drawn: one square a seat, filled when taken, and one red mark for each passenger with no seat.
+ // A step that changes the bus shows both, so "see what changes" changes the picture and not only a sentence.
+ const one=(v,label)=>{
+  const load=v?.load,seats=v?.seats;
+  if(!Number.isInteger(load)||!Number.isInteger(seats)||load<0||seats<1||Math.max(load,seats)>220)return '';
+  const count=Math.max(load,seats),columns=16,size=18,rows=Math.ceil(count/columns),over=Math.max(0,load-seats),free=Math.max(0,seats-load);
+  const cells=Array.from({length:count},(_,i)=>{const x=i%columns*size+1,y=Math.floor(i/columns)*size+1;return i>=seats?`<rect data-excess x="${x}" y="${y}" width="14" height="14" fill="var(--over)"/>`:`<rect data-seat="${i<load?'occupied':'empty'}" x="${x}" y="${y}" width="14" height="14" fill="${i<load?'var(--ink)':'none'}" stroke="var(--ink)" stroke-width="1.5"/>`;}).join('');
+  const says=over?`${over} without a seat`:free?`${free} ${free===1?'seat':'seats'} free`:'every seat taken';
+  return `<figure class="seat-figure"><figcaption><span class="eyebrow">${label}</span><strong class="${over?'over':''}">${says}</strong><span>${load} passengers, ${seats} seats</span></figcaption><svg viewBox="0 0 ${columns*size} ${rows*size}" style="max-width:${columns*size}px" role="img" aria-label="${load} passengers for ${seats} seats. ${says}.">${cells}</svg></figure>`;
+ };
+ const simulated=step.kind==='simulated',both=step.before&&step.after&&Number.isInteger(step.after.seats);
+ const parts=both?one(step.before,'On the day · measured')+one(step.after,'With the change · simulated'):one(step.after??step.before,simulated?'With the change · simulated':'On the day · measured');
+ return parts?`<div class="seat-diagram${both?' pair':''}">${parts}</div>`:'';
 }
