@@ -35,6 +35,7 @@ SUITES=(
   tests/test_measures.py
   tests/test_census.py
   tests/test_engine.py
+  live/tests/run.sh
   web/tests/run.sh
 )
 for s in ${SUITES[@]+"${SUITES[@]}"}; do

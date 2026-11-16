@@ -48,6 +48,12 @@ if [ -f "$WORK/src/rider/build.mjs" ]; then
   ( cd "$WORK/src" && node rider/build.mjs --bundle "$BUNDLE" --out "$UP/khutwa" ) > "$LOCK/rider.txt" 2>&1 || { tail -15 "$LOCK/rider.txt"; stop "lane 3's build failed"; }
   [ -s "$UP/khutwa/index.html" ] || stop "the Khutwa build has no index.html"; KHUTWA=1
 else echo "NOTE rider/build.mjs does not exist yet: this deploy has no Khutwa page"; fi
+# The room relay (live/api): six small calls under /api/room/. It is the only thing in the upload that is not a plain file.
+RELAY=0
+if [ -d "$WORK/src/live/api" ]; then
+  [ -e "$UP/api" ] && stop "a build wrote something under api/: that address belongs to the room relay"
+  cp -R "$WORK/src/live/api" "$UP/api"; RELAY=1
+fi
 # The deployer's own files: the page asks not to be indexed whatever the builds contain, and says which commit it is.
 [ -f "$UP/vercel.json" ] || cat > "$UP/vercel.json" <<'JSON'
 {"headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"}, {"key": "X-Content-Type-Options", "value": "nosniff"}]}]}
@@ -82,7 +88,9 @@ for p, why in bad: print("FAIL", p[5:], why)
 sys.exit(1 if bad else 0)
 PY
 # Nothing but static files, and one bundle only: stand-in and real are never mixed.
-[ -z "$(find "$UP" \( -name '.env*' -o -name '*.db' -o -name '*.py' -o -name '*.sh' -o -name '.git*' -o -path '*/api/*' -o -name 'node_modules' \) -print -quit)" ] || stop "the upload holds a file that must not be public"
+[ -z "$(find "$UP" \( -name '.env*' -o -name '*.db' -o -name '*.py' -o -name '*.sh' -o -name '.git*' -o -name 'node_modules' \) -print -quit)" ] || stop "the upload holds a file that must not be public"
+[ -z "$(find "$UP" -path '*/api/*' ! -path "$UP/api/*" -print -quit)" ] || stop "the upload holds an api folder that is not the room relay's"
+if [ "$RELAY" = "1" ]; then diff -rq "$WORK/src/live/api" "$UP/api" >/dev/null || stop "the relay in the upload is not the relay in the commit"; fi
 python3 - "$UP" "$FIXTURE" > "$LOCK/mix.txt" 2>&1 <<'PY' || { cat "$LOCK/mix.txt"; stop "the upload mixes stand-in and real data, or a data file does not say which it is"; }
 import json, os, sys
 up, want = sys.argv[1], sys.argv[2] == "true"; n = 0; bad = 0
@@ -122,18 +130,30 @@ curl -s -o /dev/null --max-time 20 "$PUBLIC/deploy.json" || { CHECK="$VERCEL_ADD
 echo "deployed $SHORT to $DEPLOYED; checking $CHECK"
 
 # 12. Served equals built, by hash, for every file. The old version can be served briefly, so wait up to 90 seconds.
-same() { ( cd "$UP" && find . -type f ! -path './.vercel/*' ! -name vercel.json | sed 's|^\./||' ) | while read -r f; do
+same() { ( cd "$UP" && find . -type f ! -path './.vercel/*' ! -path './api/*' ! -name vercel.json | sed 's|^\./||' ) | while read -r f; do
     want="$(shasum -a 256 "$UP/$f" | cut -d' ' -f1)"; got="$(curl -sL --max-time 30 "$CHECK/$f" | shasum -a 256 | cut -d' ' -f1)"
     [ "$want" = "$got" ] || { echo "$f"; return 1; }; done; }
 OKAY=0; BAD=""; for wait in 0 10 20 30 30; do sleep "$wait"; BAD="$(same)"; [ -z "$BAD" ] && { OKAY=1; break; }; done
 [ "$OKAY" = "1" ] || stop "served differs from built: $BAD"
-echo "PASS served equals built: every one of $(find "$UP" -type f ! -path '*/.vercel/*' ! -name vercel.json | wc -l | tr -d ' ') files, by hash"
+echo "PASS served equals built: every one of $(find "$UP" -type f ! -path '*/.vercel/*' ! -path "$UP/api/*" ! -name vercel.json | wc -l | tr -d ' ') files, by hash"
 
 # 13. Things that must not be reachable, and the page must ask not to be indexed.
 for f in .env .git/config .vercel/project.json scripts/deploy.sh tools/guard.py model/run.py docs/STRATEGY.md fixtures/raw/nol_transactions.csv data/CENSUS-LOCAL.md; do
   code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$CHECK/$f")"; [ "$code" = "404" ] || [ "$code" = "403" ] || stop "$f answers $code on $CHECK"; done
 curl -sI --max-time 20 "$CHECK/index.html" | grep -qi '^x-robots-tag:.*noindex' || stop "$CHECK does not send noindex"
 echo "PASS closed paths answer 404 and the site asks not to be indexed"
+
+# The room relay answers, says which store holds the room, and refuses a visitor the presenter's calls.
+if [ "$RELAY" = "1" ]; then
+  STATE="$(curl -s --max-time 20 "$CHECK/api/room/state")"
+  printf '%s' "$STATE" | python3 -c "import json,sys; s=json.load(sys.stdin); assert s['phase'] in ('waiting','offer','closed') and isinstance(s['joined'], int) and s['store'] in ('memory','shared'); print('the room is held in a', s['store'], 'store')" > "$LOCK/room.txt" 2>&1 || stop "the room relay does not answer on $CHECK: $(printf '%s' "$STATE" | head -c 200)"
+  for call in phase reset call; do
+    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -X POST -H 'content-type: application/json' -d '{"phase":"offer"}' "$CHECK/api/room/$call")"; [ "$code" = "401" ] || stop "a visitor's POST to /api/room/$call answered $code, not 401"
+    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -X POST -H 'content-type: application/json' -H 'x-presenter-code: not-the-code' -d '{"phase":"offer"}' "$CHECK/api/room/$call")"; [ "$code" = "401" ] || stop "a wrong presenter code on /api/room/$call answered $code, not 401"
+  done
+  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$CHECK/api/_room.js")"; [ "$code" = "404" ] || stop "the relay's source answers $code on $CHECK"
+  echo "PASS the room relay answers ($(cat "$LOCK/room.txt")), and refuses a visitor all three presenter calls"
+fi
 
 # 14. A real browser on the served address, at laptop and phone size.
 BROWSER_ARGS=(); [ "$FIXTURE" = "true" ] && BROWSER_ARGS+=(--fixture); [ "$KHUTWA" = "1" ] && BROWSER_ARGS+=(--khutwa); [ -n "$SHOTS" ] && BROWSER_ARGS+=(--shots "$SHOTS/served")
