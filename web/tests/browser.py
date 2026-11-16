@@ -58,6 +58,8 @@ with sync_playwright() as p:
         check(page.locator('[data-actual]').inner_text()=='?',f'{width}: challenge hides actual')
         started=time.monotonic();page.locator('#reveal').click()
         check(page.locator('[data-actual]').inner_text()!='?' and time.monotonic()-started<2,f'{width}: one tap reveals actual in under two seconds')
+        if shots and width in [1280,390] and not reduced:
+            page.evaluate('window.scrollTo(0,0)');page.screenshot(path=str(shots/f'forecast-{width}x{height}.png'))
         check('miss' in page.locator('[data-miss]').inner_text().lower(),f'{width}: miss and naive comparison shown')
         page.locator('#forecast-time').select_option(index=1)
         check(page.locator('[data-actual]').inner_text()=='?',f'{width}: new time hides the answer again')
@@ -76,6 +78,13 @@ with sync_playwright() as p:
         check(f'Best naive forecast in this table: {expected}.' in page.locator('#model-sentence').inner_text(),f'{width}: headline uses strongest naive at selected horizon')
         page.locator('#model summary').filter(has_text='How these errors are counted').click()
         check('MAPE' in page.locator('#mape-rule').inner_text(),f'{width}: MAPE denominator rule visible')
+        targets=page.evaluate("INSIYAB_BUNDLE['metrics.json'].targets")
+        for ti,target in enumerate(targets):
+            page.locator('#model-target').select_option(str(ti))
+            if target.get('tested_on'):check(target['tested_on'] in page.locator('#model .forecast-limit').inner_text(),f'{width}: exact target testing limitation shown')
+            if target['target']=='arrival_delay_seconds':check('stops ahead' in page.locator('#model-chart').text_content() and 'seconds' in page.locator('#model-numbers').inner_text(),f'{width}: delay uses stops and seconds')
+            chosen=target.get('chosen');pool=next((r for r in target.get('pooled',[]) if r['model']==chosen),None)
+            if pool and pool.get('skill_lo',1)<=0<=pool.get('skill_hi',-1):check('includes zero' in page.locator('#model-reliability').inner_text(),f'{width}: uncertain gain is explicit')
         page.locator('[data-view="gap"]').click()
         check(page.locator('#gap-routes svg').count()==1,f'{width}: route-hour gap comparison chart')
         before=page.locator('[data-total="passenger_minutes_over_seats"]').inner_text()
@@ -102,6 +111,8 @@ with sync_playwright() as p:
         check('SIMULATION. NOTHING WAS SENT.' in page.locator('#print-order').text_content(),f'{width}: print order carries simulation warning')
         page.emulate_media(media='print')
         check(page.locator('#print-order').is_visible() and page.locator('main').is_hidden(),f'{width}: print exposes only the order')
+        pdf=page.pdf(format='A4',prefer_css_page_size=True)
+        check(len(re.findall(rb'/Type /Page\b',pdf))==1,f'{width}: order renders as exactly one A4 page')
         check(page.locator('#print-order img').evaluate('(e)=>e.complete && e.naturalWidth>0'),f'{width}: printed decision QR is local and loaded')
         page.emulate_media(media='screen');page.evaluate("dispatchEvent(new Event('afterprint'))")
         page.locator('[data-view="stories"]').click()
@@ -112,11 +123,17 @@ with sync_playwright() as p:
             check('Fictional' in page.locator('#fictional').inner_text(),f"{width}: {person['id']} fiction label")
             check('measured' in page.locator('#story-kind').inner_text().lower(),f"{width}: {person['id']} starts measured")
             check(person['title'] in page.locator('#scene-title').text_content(),f"{width}: {person['id']} figure is named")
+            page.evaluate("async()=>{for(const el of document.querySelectorAll('#scene image')){const image=new Image();image.src=el.getAttribute('href');await image.decode();}}")
+            check(page.locator('#scene image').count()==1,f"{width}: {person['id']} local Blender render decoded offline")
             check(page.locator('#scene svg').is_visible(),f"{width}: {person['id']} scene exists")
             check(page.locator('#fixture').bounding_box()['y']>=0,f"{width}: {person['id']} stand-in label in viewport")
             check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f"{width}: {person['id']} no sideways scroll")
             if shots and width in [1280,390] and not reduced:
                 page.screenshot(path=str(shots/f"{person['id']}-{width}x{height}.png"))
+            before=person['steps'][0]['before']
+            if 'load' in before and 'seats' in before and max(before['load'],before['seats'])<=220:
+                check(page.locator('[data-seat]').count()==before['seats'],f"{width}: {person['id']} seat squares equal supplied seats")
+                check(page.locator('[data-excess]').count()==max(0,before['load']-before['seats']),f"{width}: {person['id']} excess triangles equal supplied shortfall")
             before_story=page.locator('#scene').inner_html();page.wait_for_timeout(100)
             check(page.locator('#scene').inner_html()==before_story,f"{width}: {person['id']} never advances by timer")
             if len(person['steps'])>1:

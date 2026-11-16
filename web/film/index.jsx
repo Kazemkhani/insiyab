@@ -1,0 +1,12 @@
+import React,{useEffect,useState} from 'react';
+import {registerRoot,Composition,AbsoluteFill,Sequence,OffthreadVideo,Img,staticFile,delayRender,continueRender,cancelRender} from 'remotion';
+// Timing follows the captured interaction. No transport numbers are written here.
+const FPS=30,scenes=[['replay',8,'Replay the day. Choose a bus.'],['forecast',6,'Choose a stop. Reveal what happened.'],['planner',3,'The planner'],['site_worker',3,'The site worker'],['office_worker',3,'The office worker'],['driver',3,'The driver'],['gap',6,'A proposal a planner can inspect.']];
+function Film(){
+ const [handle]=useState(()=>delayRender('Local font and bundle provenance'));
+ const [meta,setMeta]=useState(null);
+ useEffect(()=>{Promise.all([fetch(staticFile('manifest.json')).then(r=>r.json()),document.fonts.load('600 36px Overpass')]).then(([m])=>{setMeta(m);continueRender(handle)}).catch(cancelRender)},[handle]);
+ let cursor=0;
+ return <AbsoluteFill style={{background:'#F6F5F1',fontFamily:'Overpass',color:'#12263A'}}><style>{`@font-face{font-family:Overpass;font-weight:600;src:url('${staticFile('fonts/overpass-600.woff2')}')}`}</style>{scenes.map(([name,seconds,caption])=>{const from=cursor;cursor+=seconds*FPS;return <Sequence key={name} from={from} durationInFrames={seconds*FPS}><AbsoluteFill><OffthreadVideo src={staticFile(name+'.webm')} startFrom={30} muted style={{width:1280,height:720}}/><div style={{position:'absolute',bottom:0,left:0,right:0,background:'#12263A',color:'#F6F5F1',padding:'18px 26px',fontSize:28,fontWeight:600}}>{caption}</div></AbsoluteFill></Sequence>})}<Sequence from={32*FPS} durationInFrames={6*FPS}><AbsoluteFill style={{padding:64,justifyContent:'center',alignItems:'center'}}>{meta?.fixture&&<div style={{position:'absolute',top:0,left:0,right:0,background:'#8A5A00',color:'#F6F5F1',padding:12,textAlign:'center',fontSize:18}}>STAND-IN DATA, NOT A RESULT</div>}<div style={{fontSize:60,fontWeight:600}}>Insiyab</div><div style={{fontSize:28,margin:'12px 0 28px'}}>Continue in the live prototype.</div><Img src={staticFile('qr.svg')} style={{width:210,height:210}}/><div style={{fontSize:20,marginTop:22}}>insiyab.amirkazemkhani.com</div><div style={{fontSize:16,marginTop:26}}>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</div></AbsoluteFill></Sequence></AbsoluteFill>
+}
+registerRoot(()=> <Composition id="InsiyabOpening" component={Film} durationInFrames={38*FPS} fps={FPS} width={1280} height={720}/>);

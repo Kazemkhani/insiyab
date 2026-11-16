@@ -17,6 +17,7 @@ const checked = spawnSync('python3', [path.join(root, 'tools/contract_check.py')
 if (checked.status) throw Error(checked.stdout + checked.stderr);
 const names = ['meta.json','network.json','replay/index.json','forecast/boardings-route.json','forecast/boardings-stop.json','metrics.json','gap.json','decisions.json','personas.json','summary.json'];
 const data = {};
+for(const name of ['forecast/boardings-community.json','forecast/delay-route.json']){try{await fs.access(path.join(bundle,name));names.push(name);}catch(e){if(e.code!=='ENOENT')throw e;}}
 for (const name of names) data[name] = JSON.parse(await fs.readFile(path.join(bundle,name),'utf8'));
 for (const route of data['replay/index.json'].routes) {
   if (!/^replay\/[^/]+\.json$/.test(route.file)) throw Error('Unsafe replay path');
@@ -29,11 +30,12 @@ for (const [name,value] of Object.entries(data)) {
   await fs.mkdir(path.dirname(path.join(out,'data',name)),{recursive:true});
   await fs.writeFile(path.join(out,'data',name),JSON.stringify(value));
 }
-const firstScreenData={...data};delete firstScreenData['forecast/boardings-stop.json'];
+const firstScreenData={...data};for(const name of ['forecast/boardings-stop.json','forecast/boardings-community.json','forecast/delay-route.json'])delete firstScreenData[name];
 await fs.writeFile(path.join(out,'bundle.js'), 'window.INSIYAB_BUNDLE=' + JSON.stringify(firstScreenData).replace(/</g,'\\u003c') + ';\n');
 await fs.writeFile(path.join(out,'stop-forecast.js'), "window.INSIYAB_BUNDLE['forecast/boardings-stop.json']=" + JSON.stringify(data['forecast/boardings-stop.json']).replace(/</g,'\\u003c') + ';\n');
 await build({entryPoints:[path.join(here,'src/app.js')],outfile:path.join(out,'app.js'),bundle:true,format:'iife',target:'es2022',minify:true,legalComments:'linked'});
 for (const name of ['index.html','style.css']) await fs.copyFile(path.join(here,'src',name),path.join(out,name));
+await fs.cp(path.join(here,'assets/scenes'),path.join(out,'scenes'),{recursive:true});
 await fs.mkdir(path.join(out,'fonts'),{recursive:true});
 for (const [font,subset,weights] of [['overpass','latin',[400,600]],['ibm-plex-sans','latin',[400,500]],['ibm-plex-mono','latin',[400]],['noto-kufi-arabic','arabic',[400]]]) {
   for (const weight of weights) await fs.copyFile(path.join(here,`node_modules/@fontsource/${font}/files/${font}-${subset}-${weight}-normal.woff2`),path.join(out,`fonts/${font}-${weight}.woff2`));

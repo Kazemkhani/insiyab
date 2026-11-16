@@ -1,5 +1,5 @@
-import {horizonChart,subsetChart,forecastChart,gapChart} from './charts.mjs';
-import {sceneSVG} from './scene.mjs';
+import {horizonChart,subsetChart,forecastChart,gapChart,gainChart} from './charts.mjs';
+import {sceneSVG,seatDiagram} from './scene.mjs';
 import {Deck, OrthographicView, COORDINATE_SYSTEM} from '@deck.gl/core';
 import {PathLayer,ScatterplotLayer,PolygonLayer,TextLayer} from '@deck.gl/layers';
 import {createModel, busesAt, boardingsAt, fitPaths, pointAlong, clock, number, rollingError, originRows} from './model.mjs';
@@ -45,6 +45,7 @@ function pick(kind,id){$('entity-type').value=kind;selected=id;records();render(
 function render() {
   if(Math.floor(time/M.meta.bin_seconds)!==lastErrorBin){renderError();lastErrorBin=Math.floor(time/M.meta.bin_seconds);}
 
+  const errorTitle=$('error-counter').querySelector('.error-title');if(errorTitle)errorTitle.textContent='Miss so far at '+clock(time);
   $('clock').value=clock(time);$('time').value=time;
   const bin=Math.floor(time/M.meta.bin_seconds);
   if(bin!==lastBin){stopData=boardingsAt(M,time);lastBin=bin;detail();if(view==='gap')renderGap();if(view==='forecast'&&B['forecast/boardings-stop.json'])renderChallenge();}
@@ -90,7 +91,7 @@ async function start(){
 start().catch(e=>{console.error(e);$('map-failure').hidden=false;});
 
 const oneHour=3600;
-const limit=`Tested on later hours of one day, ${new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(M.meta.service_date+'T00:00:00Z'))}. Not tested on another day.`;
+const limit=B['metrics.json'].targets.find(t=>t.target==='boardings'&&t.level==='route')?.tested_on??`Tested on later hours of one day, ${new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(M.meta.service_date+'T00:00:00Z'))}. Not tested on another day.`;
 document.querySelectorAll('.forecast-limit').forEach(e=>e.textContent=limit);
 document.querySelectorAll('.date').forEach(e=>e.textContent=M.meta.service_date);
 function renderError(){
@@ -130,7 +131,7 @@ function ensureStopForecast(){
   return stopForecastPromise;
 }
 let challengeRows=[],challengeRevealed=false;
-function forecastSeries(){const candidates=B['forecast/boardings-stop.json']?.series.map((s,i)=>({...s,index:i})).filter(s=>s.id===$('forecast-stop').value)??[];$('forecast-series').innerHTML=candidates.map((s,i)=>`<option value="${s.index}">${escape(M.routes.get(s.route_id).short_name)}${candidates.filter(c=>c.route_id===s.route_id).length>1?' · series '+(i+1):''}</option>`).join('');forecastTimes();}
+function forecastSeries(){const candidates=B['forecast/boardings-stop.json']?.series.map((s,i)=>({...s,index:i})).filter(s=>s.id===$('forecast-stop').value)??[];$('forecast-series').innerHTML=candidates.map((s,i)=>`<option value="${s.index}">${escape(M.routes.get(s.route_id).short_name)}${s.direction!==undefined?' · direction '+s.direction:''}${candidates.filter(c=>c.route_id===s.route_id&&c.direction===s.direction).length>1?' · series '+(i+1):''}</option>`).join('');forecastTimes();}
 function forecastTimes(){
   const series=$('forecast-series').value===''?null:B['forecast/boardings-stop.json']?.series[+$('forecast-series').value];
   challengeRows=(series?.rows??[]).filter(r=>r.horizon===oneHour && r.bin_start>=12*3600).sort((a,b)=>a.bin_start-b.bin_start);
@@ -145,19 +146,27 @@ function renderChallenge(){
   document.querySelectorAll('[data-chart-bin]').forEach(e=>{const reveal=()=>{$('forecast-time').value=e.dataset.chartBin;challengeRevealed=true;renderChallenge();};e.onclick=reveal;e.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();reveal();}};});
   $('reveal').textContent=challengeRevealed?'Hide what happened':'Reveal what happened';
 }
+$('pick-stop').querySelector('.forecast-limit').textContent=B['metrics.json'].targets.find(t=>t.level==='stop'&&t.target==='boardings')?.tested_on??limit;
 $('forecast-stop').onchange=forecastSeries;$('forecast-series').onchange=forecastTimes;$('forecast-time').onchange=()=>{challengeRevealed=false;renderChallenge();};$('reveal').onclick=()=>{challengeRevealed=!challengeRevealed;renderChallenge();};
 $('model-target').innerHTML=B['metrics.json'].targets.map((t,i)=>`<option value="${i}">${escape(t.target.replaceAll('_',' '))} · ${escape(t.level)}</option>`).join('');
+let metricsTarget;
 function renderModel(){
   const t=B['metrics.json'].targets[+$('model-target').value],horizons=[...new Set(t.results.map(r=>r.horizon))].sort((a,b)=>a-b),all=t.subsets.find(s=>s.kind==='all')?.subset;
   const delay=t.target==='arrival_delay_seconds',hLabel=h=>delay?`${h} stops`:`${h/60} minutes`,unit=delay?'seconds':'passengers';
   const result=(model,horizon,subset)=>t.results.find(r=>r.model===model&&r.horizon===horizon&&r.subset===subset);
   const selectedH=$('model-horizon').value;$('model-horizon').innerHTML=horizons.map(h=>`<option value="${h}">${hLabel(h)}</option>`).join('');$('model-horizon').value=horizons.includes(+selectedH)?selectedH:(horizons.includes(oneHour)?oneHour:horizons[0]);
-  const h=+$('model-horizon').value,choices=t.models.filter(m=>!m.is_baseline),oldChoice=$('model-choice').value;
+  const h=+$('model-horizon').value,choices=t.models.filter(m=>!m.is_baseline),oldChoice=metricsTarget===$('model-target').value?$('model-choice').value:t.chosen;metricsTarget=$('model-target').value;
   $('model-choice').innerHTML=choices.map(m=>`<option value="${escape(m.model)}">${escape(m.label)}</option>`).join('');if(choices.some(m=>m.model===oldChoice))$('model-choice').value=oldChoice;
   const chosen=t.models.find(m=>m.model===$('model-choice').value),best=result(chosen.model,h,all);
   const baselines=t.models.filter(m=>m.is_baseline).map(m=>({m,r:result(m.model,h,all)})).filter(x=>x.r).sort((a,b)=>a.r.mae-b.r.mae),naive=baselines[0]?.m,base=baselines[0]?.r;
   $('model-sentence').textContent=`${hLabel(h)} ahead: ${number(best?.mae)} ${unit} average miss. Best naive forecast in this table: ${number(base?.mae)}.${best&&base?(best.mae<base.mae?' The model misses less.':best.mae>base.mae?' The naive forecast misses less.':' The two have the same average miss.'):''}`;
   $('comparison-note').textContent=`Comparing ${chosen.label} with ${naive?.label??'no supplied naive result'}. The naive comparison is the lowest MAE at this horizon, on the same held-out bins. This table comparison does not select a model for deployment.`;
+  $('model').querySelector('.forecast-limit').textContent=t.tested_on??limit;
+  const pooled=t.pooled?.find(r=>r.model===chosen.model),range=t.range;
+  if(pooled?.skill_lo<=0&&pooled?.skill_hi>=0)$('model-sentence').textContent+=' Across all horizons, the gain range includes zero; improvement is not established.';
+  $('model-reliability').innerHTML=pooled?.skill!==null&&pooled?.skill!==undefined?`<h2>Does the improvement hold?</h2><p>${number(pooled.skill*100)}% error removed against ${escape(t.models.find(m=>m.model===pooled.skill_vs)?.label??pooled.skill_vs)}, across all horizons together. ${pooled.n} scored rows.</p>${gainChart(pooled)}<p>${pooled.skill_lo<=0&&pooled.skill_hi>=0?'The range includes zero. An improvement is not established.':pooled.skill_hi<0?'The whole range is below zero. The naive forecast did better.':'The range stays above zero on this held-out day.'}</p><p class="small">The supplied range covers 95 in 100 resamples of whole forecast origins. It does not test another day.</p>`:'';
+  if(range)$('model-reliability').innerHTML+=`<h2>Did the forecast range hold?</h2><p>${number(range.promised*100)}% intended coverage; ${number(range.kept*100)}% observed coverage across the supplied rows.</p><div class="coverage">${[['Nobody boarded','kept_when_nobody_boarded'],['Somebody boarded','kept_when_somebody_boarded']].filter(([,key])=>range[key]!==null&&range[key]!==undefined).map(([label,key])=>`<p><strong>${number(range[key]*100)}%</strong>${label}</p>`).join('')}</div><p class="small">Coverage belongs to the bundle-selected forecast ranges. A range that covers empty bins can still miss when passengers board.</p>`;
+  $('model-features').innerHTML=t.features?.length?`<h2>What the model uses</h2>${[...t.features].sort((a,b)=>b.share-a.share).map(f=>`<div class="feature-row"><span>${escape(f.label)}</span><span>${number(f.share*100)}%</span><i style="width:${f.share*100}%"></i></div>`).join('')}<p class="small">Share of the supplied model's split gain. This is global importance, not a reason for one forecast or evidence of cause.</p>`:'';
   $('model-numbers').innerHTML=`<div><strong>${number(best?.mae)}</strong><span>Model · ${unit}</span></div><div><strong>${number(base?.mae)}</strong><span>Naive forecast · ${unit}</span></div>`;
   $('model-chart').innerHTML=horizonChart(horizons.map(h=>({horizon:delay?h:h/60,model:result(chosen.model,h,all)?.mae,naive:result(naive?.model,h,all)?.mae})),delay?h:h/60,delay?'stops ahead':'minutes ahead');
   $('model-unit').textContent=`Average absolute miss (MAE). ${t.unit}. Lower is better.`;
@@ -178,7 +187,7 @@ function gapLayers(shared,unit){
   const rows=gapRows().map(r=>({...r,path:M.paths.find(p=>p.route_id===r.route_id&&p.direction===r.direction)}));
   const decisions=closedGaps?B['decisions.json'].decisions:[];
   const positions=decisions.flatMap(d=>d.where.stop_ids.map(id=>({id:d.id,title:d.title,position:M.stops.get(id).position})));
-  return [new PathLayer({...shared,id:'gaps',data:rows,getPath:r=>r.path.points.map(p=>[p[0]+(r.direction?4:-4)*unit,p[1]]),getColor:r=>[...(r.over>0?C.over:C.spare),closedGaps?100:230],getWidth:7,widthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('gap-hour').textContent=`${M.routes.get(object.route_id).short_name}, direction ${object.direction}: ${object.over} passengers above seats; ${object.spare} spare seats. Forecast route-hour totals. gap.json · ${M.meta.service_date}`;}}}),new ScatterplotLayer({...shared,id:'decision-places',data:positions,getPosition:d=>d.position,getRadius:13,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.simulated,getLineWidth:3,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>object&&document.getElementById('decision-'+object.id)?.scrollIntoView({behavior:'instant',block:'start'})})];
+  return [new PathLayer({...shared,id:'gaps',data:rows,getPath:r=>r.path.points.map(p=>[p[0]+(r.direction?4:-4)*unit,p[1]]),getColor:r=>[...(r.over>0?C.over:C.spare),closedGaps?100:230],getWidth:7,widthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('gap-hour').textContent=`${M.routes.get(object.route_id).short_name}, direction ${object.direction}: ${object.over} passengers above seats; ${object.spare} spare seats. Supplied route-hour totals. gap.json · ${M.meta.service_date}`;}}}),new ScatterplotLayer({...shared,id:'decision-places',data:positions,getPosition:d=>d.position,getRadius:13,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.simulated,getLineWidth:3,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>object&&document.getElementById('decision-'+object.id)?.scrollIntoView({behavior:'instant',block:'start'})})];
 }
 const metricLabel=key=>({passenger_minutes_over_seats:'passenger-minutes without a seat',passengers_over_seats_minutes:'passenger-minutes without a seat',empty_seat_km:'seat-kilometres run empty',minutes_saved_per_trip:'minutes saved per trip',passengers_shifted:'passengers shifted',load:'passengers on board',seats:'seats',points:'Khutwa points',doors_not_opened:'stop visits with doors closed'}[key]??key.replaceAll('_',' '));
 function renderGap(){
@@ -203,7 +212,7 @@ function renderDecisions(){
 }
 async function printOrder(id){
   const d=B['decisions.json'].decisions.find(d=>d.id===id);
-  $('print-order').innerHTML=`<p class="fixture">${M.meta.fixture?'STAND-IN DATA, NOT A RESULT':'Aggregate records only'}</p><h1>SIMULATION. NOTHING WAS SENT.</h1>${decisionHTML(d,true)}${d.swaps?.length?`<h2>Proposed vehicle exchange</h2>${d.swaps.map(pair=>`<table><thead><tr><th>Trip</th><th>Start</th><th>Vehicle</th><th>Seats / peak load</th></tr></thead><tbody>${[pair.from,pair.to].map(t=>`<tr><td>${escape(t.route_id)} · ${escape(t.trip_id)}</td><td>${clock(t.start)}</td><td>${escape(t.vehicle)} · ${escape(t.bus_type)}</td><td>${t.seats} / ${t.largest_load}</td></tr>`).join('')}</tbody></table>`).join('')}<p>Swap the listed vehicles. Planner review required: depot, vehicle blocks, access and driver duties have not been validated.</p>`:'<p>No specific vehicle exchange supplied. A planner must validate and assign trips.</p>'}<img width="90" height="90" src="qr-${encodeURIComponent(d.id)}.svg" alt="QR code back to this decision"><p class="source">insiyab.amirkazemkhani.com/#decision-${escape(d.id)}</p><p>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</p>`;
+  $('print-order').innerHTML=`<p class="fixture">${M.meta.fixture?'STAND-IN DATA, NOT A RESULT':'Aggregate records only'}</p><h1>SIMULATION. NOTHING WAS SENT.</h1>${decisionHTML(d,true)}${d.swaps?.length?`<h2>Proposed vehicle exchange</h2><table class="swap-table"><thead><tr><th>Pair</th><th>Route · trip</th><th>Start</th><th>Current vehicle</th><th>Seats / peak load</th></tr></thead><tbody>${d.swaps.map((pair,i)=>[pair.from,pair.to].map((t,j)=>`<tr class="${j===0?'pair-start':''}"><td>${j===0?i+1:'↳'}</td><td>${escape(t.route_id)} · ${escape(t.trip_id)}</td><td>${clock(t.start)}</td><td>${escape(t.vehicle)} · ${escape(t.bus_type)}</td><td>${t.seats} / ${t.largest_load}</td></tr>`).join('')).join('')}</tbody></table><p>Exchange the two vehicles within each numbered pair. Planner review required: depot, vehicle blocks, access and driver duties have not been validated.</p>`:'<p>No specific vehicle exchange supplied. A planner must validate and assign trips.</p>'}<img width="90" height="90" src="qr-${encodeURIComponent(d.id)}.svg" alt="QR code back to this decision"><p class="source">insiyab.amirkazemkhani.com/#decision-${escape(d.id)}</p><p>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</p>`;
   $('print-order').hidden=false;await $('print-order').querySelector('img').decode();await document.fonts.ready;window.print();
 }
 window.addEventListener('afterprint',()=>{$('print-order').hidden=true;});
@@ -238,10 +247,11 @@ function renderStory(){
   $('story-place').textContent=person.anchor.stop_id?M.stops.get(person.anchor.stop_id).name:M.routes.get(person.anchor.route_id).long_name;
   $('story-time').textContent=`${clock(step.t)} · ${M.meta.service_date}`;
   $('scene').innerHTML=sceneSVG(person,step,M,escape);
-  $('scene-caption').textContent='Illustrative street and figure. Waiting count is not supplied. Route and time from personas.json.';
+  $('scene-caption').textContent='Fictional Blender scene; the seated view is a cutaway. No waiting count is inferred. Route and time: personas.json.';
   $('story-kind').textContent=simulated?'With Insiyab · simulated':'What happened · measured';$('story-kind').classList.toggle('simulated',simulated);
   $('story-say').textContent=step.say;
   $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).map(([key,value])=>`<p class="${simulated?'simulated':''}"><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
+  $('story-seats').innerHTML=seatDiagram(step);
   $('story-source').textContent=`personas.json · ${M.meta.service_date} · Step ${stepIndex+1} of ${person.steps.length}`;
   const decision=B['decisions.json'].decisions.find(d=>d.id===step.decision_id);
   $('story-decision').innerHTML=decision?`<details><summary>The decision behind this change</summary>${decisionHTML(decision).replace(/<button data-print=.*?<\/button>/,'')}</details>`:'';

@@ -1,24 +1,21 @@
-// A flat, oblique illustration. Geometry is illustrative; all record labels and
-// route geometry are passed from the bundle. No queue size is inferred.
-export function sceneSVG(person,step,model,escape) {
-  const simulated=step.kind==='simulated',ink='var(--ink)',paper='var(--paper)',pale='var(--pale)';
-  const load=step.before?.load,seats=step.after?.seats??step.before?.seats;
-  const state=simulated?'var(--simulated)':load>seats?'var(--over)':'var(--flow)';
-  const point=model.paths.find(p=>p.route_id===person.anchor.route_id&&p.direction===0);
-  const xs=point.points.map(p=>p[0]),ys=point.points.map(p=>p[1]);
-  const minX=Math.min(...xs),minY=Math.min(...ys),scale=Math.min(180/(Math.max(...xs)-minX||1),90/(Math.max(...ys)-minY||1));
-  const routePoints=point.points.map(p=>`${(p[0]-minX)*scale+330},${(p[1]-minY)*scale+75}`).join(' ');
-  const personShape=(x,y,role,seated=false)=>`<g transform="translate(${x} ${y})" class="figure ${role}"><ellipse cx="4" cy="79" rx="32" ry="10" fill="${pale}"/><path d="${seated?'M-11 43 L-4 63 L24 63 M10 43 L16 56 L35 56':'M-10 39 L-14 74 M10 39 L17 74'}" fill="none" stroke="${ink}" stroke-width="10" stroke-linecap="round"/><path d="M-20 8 Q0 -1 20 8 L16 44 Q0 50 -16 44Z" fill="${paper}" stroke="${ink}" stroke-width="3"/><path d="M-18 12 L-28 37 M18 12 L${seated?'39 23':'28 35'}" fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round"/><ellipse cx="0" cy="-10" rx="15" ry="18" fill="${paper}" stroke="${ink}" stroke-width="3"/>${role==='site_worker'?`<path d="M-19 -13 Q-18 -33 0 -33 Q18 -33 19 -13Z M-23 -12H23" fill="${pale}" stroke="${ink}" stroke-width="3"/><path d="M-12 10 L-12 35 M12 10L12 35 M-16 28H16" stroke="${ink}" stroke-width="2"/>`:''}${role==='office_worker'?`<path d="M20 25 Q32 17 37 28 L40 49 L21 49Z" fill="${pale}" stroke="${ink}" stroke-width="3"/>`:''}${role==='driver'?`<ellipse cx="42" cy="24" rx="18" ry="13" fill="none" stroke="${ink}" stroke-width="4"/><path d="M25 24H58 M42 12V36" stroke="${ink}" stroke-width="2"/>`:''}${role==='planner'?`<path d="M-28 36 L-17 38 L-13 22 L-23 20Z" fill="${paper}" stroke="${ink}" stroke-width="2"/>`:''}</g>`;
-  const bus=`<g class="scene-bus"><path d="M220 190 L515 190 L580 235 L285 235Z" fill="${paper}" stroke="${ink}" stroke-width="3"/><path d="M285 235 L580 235 L580 300 L285 300Z" fill="${paper}" stroke="${ink}" stroke-width="3"/><path d="M220 190 L285 235 L285 300 L220 255Z" fill="${pale}" stroke="${ink}" stroke-width="3"/><path d="M299 249H562V270H299Z" fill="${pale}" stroke="${ink}" stroke-width="2"/><path d="M285 280H580" stroke="${state}" stroke-width="7"/><path d="M339 249V270 M390 249V270 M441 249V270 M492 249V270" stroke="${ink}" stroke-width="3"/><ellipse cx="330" cy="302" rx="17" ry="20" fill="${ink}"/><ellipse cx="534" cy="302" rx="17" ry="20" fill="${ink}"/><text x="385" y="219" font-size="20" fill="${ink}" font-family="Mono">${escape(model.routes.get(person.anchor.route_id).short_name)}</text></g>`;
-  const street=`<path d="M15 168 L545 168 L690 268 L690 362 L160 362 L15 262Z" fill="${pale}"/><path d="M15 168H545L690 268" fill="none" stroke="var(--line)" stroke-width="3"/><path d="M51 253L192 350 M154 253L295 350 M610 275L680 324" stroke="${paper}" stroke-width="3"/><path d="M94 121L143 149V212L94 184Z" fill="${paper}" stroke="${ink}" stroke-width="3"/><path d="M94 121L157 121L206 149H143Z M143 149H206V212H143" fill="${paper}" stroke="${ink}" stroke-width="3"/><path d="M172 146V226" stroke="${ink}" stroke-width="3"/><path d="M139 204H193" stroke="${ink}" stroke-width="5"/>`;
-  let drawing;
-  if(person.id==='planner') {
-    drawing=`<path d="M140 250L480 250L615 340L275 340Z" fill="${pale}"/><path d="M285 55H560V185H285Z" fill="${paper}" stroke="${ink}" stroke-width="4"/><polyline points="${routePoints}" fill="none" stroke="${state}" stroke-width="6"/><path d="M422 185V226 M386 226H458" stroke="${ink}" stroke-width="5"/><path d="M215 238L490 238L562 286L287 286Z" fill="${paper}" stroke="${ink}" stroke-width="3"/><path d="M287 286V330 M540 286V330" stroke="${ink}" stroke-width="4"/>${personShape(220,223,'planner',true)}`;
-  } else if(person.id==='driver') {
-    drawing=`${street}<g transform="translate(-65 -35)">${bus}</g><path d="M490 102L625 181L625 278L490 199Z" fill="${paper}" stroke="${ink}" stroke-width="3"/>${personShape(510,160,'driver',true)}`;
-  } else {
-    drawing=street+bus+personShape(simulated&&step.scene==='bus'?175:150,simulated&&step.scene==='bus'?210:250,person.id,simulated&&step.scene==='bus');
-    if(step.scene==='phone')drawing+=`<g transform="translate(595 78)"><rect width="60" height="106" rx="5" fill="${paper}" stroke="${ink}" stroke-width="3"/><path d="M9 20H51 M9 35H51 M9 50H40 M9 77H51" stroke="${state}" stroke-width="4"/><circle cx="30" cy="94" r="3" fill="${ink}"/></g>`;
-  }
-  return `<svg viewBox="0 0 710 380" role="img" aria-labelledby="scene-title scene-description"><title id="scene-title">${escape(person.title)}, seen from above and to one side</title><desc id="scene-description">A plain fictional figure with no face. ${simulated?'A simulated change.':'The recorded context.'} The street and figure are illustrative, not surveyed geometry.</desc>${drawing}<text x="24" y="36" font-family="Overpass" font-size="22" fill="${ink}">${escape(person.title)}</text><text x="24" y="60" font-family="Plex" font-size="13" fill="${simulated?'var(--simulated)':ink}">${simulated?'With Insiyab · simulated':'What happened · measured'}</text></svg>`;
+import layout from '../assets/scenes/layout.json';
+// Scripted Blender geometry is illustrative. Only the route drawn on the
+// planner's screen and the separate seat diagram carry transport information.
+export function sceneSVG(person,step,model,escape){
+ const setting=person.id==='planner'?'control_room':person.id==='driver'?'bus':person.id==='site_worker'?(step.scene==='bus'?'bus':'stop'):(step.scene==='phone'?'phone':'stop');
+ let route='';
+ if(person.id==='planner'){
+  const path=model.paths.find(p=>p.route_id===person.anchor.route_id&&p.direction===0),points=path.points,xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),minX=Math.min(...xs),minY=Math.min(...ys),dx=Math.max(...xs)-minX||1,dy=Math.max(...ys)-minY||1;
+  const [a,b,c]=layout.planner;
+  const mapped=points.map(p=>{const u=.12+.76*(p[0]-minX)/dx,v=.12+.76*(p[1]-minY)/dy;return [a[0]+u*(b[0]-a[0])+v*(c[0]-a[0]),a[1]+u*(b[1]-a[1])+v*(c[1]-a[1])].join(',')}).join(' ');
+  route=`<polyline points="${mapped}" fill="none" stroke="var(--${step.kind==='simulated'?'simulated':'flow'})" stroke-width="3"/>`;
+ }
+ return `<svg viewBox="0 0 710 426" role="img" aria-labelledby="scene-title scene-description"><title id="scene-title">${escape(person.title)}, a fictional faceless figure</title><desc id="scene-description">Blender-rendered illustrative ${escape(setting.replaceAll('_',' '))}. ${escape(step.kind)} context. Furniture and vehicle geometry are not surveyed records or a reconstruction of one person.</desc><image width="710" height="426" href="scenes/${escape(person.id)}-${setting}.png"/>${route}</svg>`;
+}
+export function seatDiagram(step){
+ const load=step.after?.load??step.before?.load,seats=step.after?.seats??step.before?.seats;
+ if(!Number.isInteger(load)||!Number.isInteger(seats)||load<0||seats<1||Math.max(load,seats)>220)return '';
+ const count=Math.max(load,seats),columns=20,size=12,rows=Math.ceil(count/columns);
+ const cells=Array.from({length:count},(_,i)=>{const x=i%columns*size+2,y=Math.floor(i/columns)*size+2;return i>=seats?`<path data-excess d="M${x+4} ${y}l5 9h-10Z" fill="var(--over)"/>`:`<rect data-seat="${i<load?'occupied':'empty'}" x="${x}" y="${y}" width="8" height="8" fill="${i<load?'var(--ink)':'none'}" stroke="var(--ink)"/>`;}).join('');
+ return `<div class="seat-diagram"><p class="eyebrow">Passengers against seats · ${step.kind}</p><svg viewBox="0 0 ${columns*size+4} ${rows*size+4}" role="img" aria-label="${load} passengers for ${seats} seats. ${Math.max(0,load-seats)} passengers above seats.">${cells}</svg><p class="small">Each square is one seat. Filled: occupied. Outline: empty. Each triangle is one passenger above seats.</p></div>`;
 }

@@ -44,3 +44,8 @@ export function gapChart(rows,routeName){
  active.forEach((v,i)=>{const y=top+i*step+(phone?23:3);out+=text(phone?l:0,phone?y-9:y+12,`${routeName(v.route_id)} / ${v.direction}`);if(v.over)out+=`<rect class="over-fill" x="${centre-v.over*scale}" y="${y}" width="${v.over*scale}" height="15"/>${text(centre-v.over*scale-6,y+12,v.over,'text-anchor="end"')}`;if(v.spare)out+=`<rect class="spare-fill" x="${centre}" y="${y+3}" width="${v.spare*scale}" height="9"/>${text(centre+v.spare*scale+6,y+12,v.spare)}`;});
  return svg(w,h,'Route-hour passengers above seats on the left; spare seats on the right.',out)+(zero?`<p class="small">${zero} route-direction rows have neither an excess nor spare seats.</p>`:'');
 }
+export function gainChart(row){
+ const w=width(),l=35,r=w-35,min=Math.min(0,row.skill_lo)*1.15,max=Math.max(0,row.skill_hi)*1.15,span=max-min||1,x=v=>l+(v-min)/span*(r-l);
+ const body=`<path class="chart-guide" d="M${x(0)} 15V85"/><path class="model-line" d="M${x(row.skill_lo)} 48H${x(row.skill_hi)}"/><path class="model-line" d="M${x(row.skill_lo)} 40V56M${x(row.skill_hi)} 40V56"/><circle class="model-line chart-dot" cx="${x(row.skill)}" cy="48" r="6"/>${text(x(row.skill_lo),106,number(row.skill_lo*100)+'%','text-anchor="middle"')}${text(x(row.skill_hi),106,number(row.skill_hi*100)+'%','text-anchor="middle"')}${text(x(0),14,'Zero','text-anchor="middle"')}${text(l,135,'More error')}${text(r,135,'Less error','text-anchor="end"')}`;
+ return svg(w,150,'Gain over the named naive forecast, all horizons together. The vertical reference is zero gain.',body);
+}
