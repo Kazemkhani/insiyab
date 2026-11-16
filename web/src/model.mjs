@@ -1,7 +1,7 @@
 // All transport values come from the contract bundle. Geometry uses a local
 // equirectangular projection, then distance along the supplied route shape.
 export const clock = s => `${String(Math.floor(s / 3600)).padStart(2,'0')}:${String(Math.floor(s % 3600 / 60)).padStart(2,'0')}`;
-export const number = n => n == null ? 'Not available' : new Intl.NumberFormat('en-GB',{maximumFractionDigits:2}).format(n);
+export const number = n => n == null ? 'Not available' : new Intl.NumberFormat('en-GB',{maximumFractionDigits:Math.abs(n)>0&&Math.abs(n)<.01?4:2}).format(n);
 export function createModel(bundle) {
   const meta = bundle['meta.json'], network = bundle['network.json'];
   const coords = network.routes.flatMap(r=>r.directions.flatMap(d=>d.shape));
@@ -61,7 +61,8 @@ export function boardingsAt(model,time) {
 export function fitPaths(paths,width,height) {
   const points=paths.flatMap(p=>p.points),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
   const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const scale=Math.min((width-72)/(maxX-minX||1),(height-72)/(maxY-minY||1));
+  const padding=Math.min(48,width*.15,height*.15);
+  const scale=Math.min((width-padding)/(maxX-minX||1),(height-padding)/(maxY-minY||1));
   return {target:[(minX+maxX)/2,(minY+maxY)/2,0],zoom:Math.log2(Math.max(.01,scale)),scale};
 }
 // Score only bins whose end is at or behind the clock. Null actuals never score.
