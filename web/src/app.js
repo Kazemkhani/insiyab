@@ -6,7 +6,7 @@ const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>'
 const css=getComputedStyle(document.documentElement);
 const colour=name=>css.getPropertyValue('--'+name).trim().match(/\w\w/g).map(v=>parseInt(v,16));
 const C=Object.fromEntries(['ink','paper','flow','over','spare','simulated','line','grey'].map(n=>[n,colour(n)]));
-let time=Math.min(M.max,Math.max(M.min,M.meta.origins[0]+3600)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1;
+let time=Math.min(M.max,Math.max(M.min,M.meta.origins[0]+3600)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1,closedGaps=false,roomState=null,playbackCount=null;
 const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Room';
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 $('fixture').hidden=!M.meta.fixture;
@@ -45,13 +45,14 @@ function render() {
 
   $('clock').value=clock(time);$('time').value=time;
   const bin=Math.floor(time/M.meta.bin_seconds);
-  if(bin!==lastBin){stopData=boardingsAt(M,time);lastBin=bin;detail();}
+  if(bin!==lastBin){stopData=boardingsAt(M,time);lastBin=bin;detail();if(view==='gap')renderGap();}
   if(!deck||!fit)return;
   const buses=busesAt(M,time),unit=1/fit.scale;
   const shared={coordinateSystem:COORDINATE_SYSTEM.CARTESIAN};
   deck.setProps({layers:[
     ...forecastLayers(shared,unit),
-    new PathLayer({...shared,id:'routes',data:M.paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:C.grey,getWidth:3,widthUnits:'pixels'}),
+    ...gapLayers(shared,unit),
+    new PathLayer({...shared,id:'routes',data:M.paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:view==='gap'?[...C.grey,50]:C.grey,getWidth:3,widthUnits:'pixels'}),
     new PathLayer({...shared,id:'boardings',data:stopData,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*5*unit]],getColor:C.ink,getWidth:3,widthUnits:'pixels'}),
     new ScatterplotLayer({...shared,id:'stops',data:stopData,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
     new PathLayer({...shared,id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*unit)),b.position],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
@@ -90,10 +91,12 @@ function setView(next){
   view=next;playing=false;$('play').textContent='Play';
   document.querySelectorAll('nav button').forEach(e=>e.setAttribute('aria-current',e.dataset.view===next?'page':'false'));
   $('replay').hidden=next==='model';$('model').hidden=next!=='model';
+  $('gap-controls').hidden=next!=='gap';$('gap-results').hidden=next!=='gap';$('replay').classList.toggle('gap-view',next==='gap');
   $('forecast-controls').hidden=next!=='forecast';$('pick-stop').hidden=next!=='forecast';
-  $('map-caption').textContent=next==='forecast'?'The forecast meeting reality':'The day, replayed';
+  $('map-caption').textContent=next==='forecast'?'The forecast meeting reality':next==='gap'?'Where seats and passengers do not match':'The day, replayed';
   if(next==='forecast')freezeForecast();
   if(next==='model')renderModel();
+  if(next==='gap'){renderGap();pollRoom();}
   render();window.scrollTo(0,0);
 }
 document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.dataset.view));
@@ -140,3 +143,55 @@ function renderModel(){
   $('mape-rule').textContent=t.mape_rule;$('split-rule').textContent=`Learning: ${t.split.train}. Held-out: ${t.split.test}.`;
 }
 $('model-target').onchange=renderModel;$('model-horizon').onchange=renderModel;
+
+function gapRows(){const hour=Math.floor(time/B['gap.json'].bin_seconds)*B['gap.json'].bin_seconds;return B['gap.json'].rows.filter(r=>r.hour_start===hour);}
+function gapLayers(shared,unit){
+  if(view!=='gap')return [];
+  const rows=gapRows().map(r=>({...r,path:M.paths.find(p=>p.route_id===r.route_id&&p.direction===r.direction)}));
+  const decisions=closedGaps?B['decisions.json'].decisions:[];
+  const positions=decisions.flatMap(d=>d.where.stop_ids.map(id=>({id:d.id,title:d.title,position:M.stops.get(id).position})));
+  return [new PathLayer({...shared,id:'gaps',data:rows,getPath:r=>r.path.points.map(p=>[p[0]+(r.direction?4:-4)*unit,p[1]]),getColor:r=>[...(r.over>0?C.over:C.spare),closedGaps?100:230],getWidth:7,widthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('gap-hour').textContent=`${M.routes.get(object.route_id).short_name}, direction ${object.direction}: ${object.over} passengers above seats; ${object.spare} spare seats. Forecast route-hour totals. gap.json · ${M.meta.service_date}`;}}}),new ScatterplotLayer({...shared,id:'decision-places',data:positions,getPosition:d=>d.position,getRadius:13,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.simulated,getLineWidth:3,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>object&&document.getElementById('decision-'+object.id)?.scrollIntoView({behavior:'instant',block:'start'})})];
+}
+const metricLabel=key=>({passenger_minutes_over_seats:'passenger-minutes without a seat',passengers_over_seats_minutes:'passenger-minutes without a seat',empty_seat_km:'seat-kilometres run empty',minutes_saved_per_trip:'minutes saved per trip',passengers_shifted:'passengers shifted',load:'passengers on board',seats:'seats',points:'Khutwa points',doors_not_opened:'stop visits with doors closed'}[key]??key.replaceAll('_',' '));
+function renderGap(){
+  const totals=B['gap.json'].totals,which=closedGaps?'after':'before',values=totals[which],kind=values.kind??totals.kind;
+  $('gap-totals').innerHTML=['passenger_minutes_over_seats','empty_seat_km'].map(key=>`<div><span class="eyebrow">${which==='before'?'Before the decisions':'With the decisions'}</span><strong data-total="${key}">${number(values[key])}</strong><span>${metricLabel(key)} · <b class="${kind==='simulated'?'simulated':''}">${escape(kind)}</b></span>${closedGaps?`<small>Before: ${number(totals.before[key])} · ${escape(totals.before.kind??totals.kind)}</small>`:''}</div>`).join('');
+  $('gap-assumption').textContent=`Simulated assumption: ${values.assumption??totals.assumption??'See each decision.'}`;
+  $('close-gaps').textContent=closedGaps?'Show before':'Close the gaps';$('close-gaps').setAttribute('aria-pressed',String(closedGaps));
+  $('decisions').hidden=!closedGaps;
+  const rows=gapRows();$('gap-hour').textContent=`Hour beginning ${clock(Math.floor(time/B['gap.json'].bin_seconds)*B['gap.json'].bin_seconds)}. The colours show route-hour totals, not the load of each stretch.${closedGaps?' Rings locate proposed decisions. Faded routes show the scenario, not recalculated route loads.':''}`;
+  $('gap-routes').innerHTML=rows.length?`<div class="table-scroll"><table><thead><tr><th>Route / direction</th><th>Above seats</th><th>Spare seats</th><th>Insiyab index</th></tr></thead><tbody>${rows.map(r=>`<tr><th>${escape(M.routes.get(r.route_id).short_name)} / ${r.direction}</th><td class="${r.over?'over':''}">${r.over} passengers</td><td class="spare">${r.spare} seats</td><td>${number(r.index)}</td></tr>`).join('')}</tbody></table></div><p class="small">${escape(B['gap.json'].index_note)} Source: gap.json · ${M.meta.service_date} · Forecast.</p>`:'<p>No gap forecast is supplied for this hour.</p>';
+  if(closedGaps)renderDecisions();renderRoom();
+}
+function decisionHTML(d,print=false){
+  const depot=roomState?.decision_id===d.id?roomState.depot:null;
+  const state=depot==='confirmed'?'Confirmed by the depot':depot==='ringing'?'Ringing the team member':depot==='declined'?'Declined by the depot':'Proposed';
+  return `<article class="decision" id="${print?'order-':'decision-'}${escape(d.id)}"><div class="decision-top"><p class="eyebrow">${escape(d.lever.replaceAll('_',' '))}</p><span class="decision-state">${state}</span></div><h2>${escape(d.title)}</h2><p>${escape(d.change)}</p><p class="small">${escape(M.routes.get(d.where.route_id)?.long_name??d.where.route_id)} · ${clock(d.when.from)} to ${clock(d.when.to)} · ${M.meta.service_date}</p><p>${escape(d.why)}</p><dl class="evidence">${d.evidence.map(e=>`<div><dt>${escape(e.label)}</dt><dd>${number(e.value)} ${escape(e.unit)}<span class="source">${escape(e.source)} · ${M.meta.service_date}</span></dd></div>`).join('')}</dl><div class="effects">${d.effect.map(e=>`<p class="${e.kind==='simulated'?'simulated':''}"><strong>${escape(e.kind)}:</strong> ${number(e.before)} before; ${number(e.after)} after. ${escape(metricLabel(e.metric))}.<small>${escape(e.assumption??'')}</small></p>`).join('')}</div><p>${number(d.passengers_affected)} passengers affected. Source: decisions.json · ${M.meta.service_date}. Confidence: ${escape(d.confidence)}.</p><p class="small">${escape(d.cost_note)}</p>${depot&&depot!=='none'?'<p class="small">A real call to a team member’s phone. No RTA system was contacted.</p>':''}${print?'':`<button data-print="${escape(d.id)}">Print the order</button>${d.lever==='rewarded_choice'?'<a class="button-link" href="khutwa/">Open the passenger’s offer</a>':''}`}</article>`;
+}
+function renderDecisions(){
+  $('decisions').innerHTML='<div class="section-heading"><p class="eyebrow">A planner decides</p><h2>The changes behind the totals</h2><p>Proposals only. Nothing was sent to a depot or changed in an RTA system.</p></div>'+B['decisions.json'].decisions.map(d=>decisionHTML(d)).join('');
+  document.querySelectorAll('[data-print]').forEach(e=>e.onclick=()=>printOrder(e.dataset.print));
+}
+async function printOrder(id){
+  const d=B['decisions.json'].decisions.find(d=>d.id===id);
+  $('print-order').innerHTML=`<p class="fixture">${M.meta.fixture?'STAND-IN DATA, NOT A RESULT':'Aggregate records only'}</p><h1>SIMULATION. NOTHING WAS SENT.</h1>${decisionHTML(d,true)}<p>Specific vehicle and trip assignments are not supplied in this decision. A planner must validate and assign them.</p><img width="90" height="90" src="qr-${encodeURIComponent(d.id)}.svg" alt="QR code back to this decision"><p class="source">insiyab.amirkazemkhani.com/#decision-${escape(d.id)}</p><p>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</p>`;
+  $('print-order').hidden=false;await $('print-order').querySelector('img').decode();await document.fonts.ready;window.print();
+}
+window.addEventListener('afterprint',()=>{$('print-order').hidden=true;});
+$('close-gaps').onclick=()=>{closedGaps=!closedGaps;renderGap();render();};
+function renderRoom(){
+  if(playbackCount!==null){
+    const d=B['decisions.json'].decisions.find(d=>d.lever==='rewarded_choice'),effect=d?.effect.find(e=>e.metric==='passengers_shifted');
+    $('room-count').textContent=`Played back, nobody is connected. ${number(playbackCount)} of ${number(d?.passengers_affected)} passengers shift in the simulated offer. ${effect?.assumption??''}`;
+  }else if(roomState){$('room-count').textContent=`In this room: ${roomState.accepted} of ${roomState.joined} took the offer. ${roomState.declined} declined. Room responses are not measured commuting behaviour.`;}
+  else $('room-count').textContent='Room unavailable. Play the simulated offer back; the decisions still work.';
+  $('playback').hidden=!!roomState;
+}
+$('playback').onclick=()=>{const d=B['decisions.json'].decisions.find(d=>d.lever==='rewarded_choice'),effect=d?.effect.find(e=>e.metric==='passengers_shifted');playbackCount=effect?.after??0;closedGaps=true;renderGap();render();};
+async function pollRoom(){
+  if(view!=='gap'||!/^https?:$/.test(location.protocol))return;
+  try{const response=await fetch('api/room/state',{signal:AbortSignal.timeout(2000),cache:'no-store'});if(!response.ok)throw Error('Room absent');const data=await response.json();if(!['waiting','offer','closed'].includes(data.phase)||!['joined','accepted','declined'].every(k=>Number.isInteger(data[k])&&data[k]>=0))throw Error('Invalid room');roomState=data;playbackCount=null;}
+  catch{roomState=null;}renderRoom();if(closedGaps)renderDecisions();
+}
+setInterval(()=>{if(view==='gap')pollRoom();},1500);
+if(location.hash.startsWith('#decision-')){closedGaps=true;setView('gap');setTimeout(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView(),0);}

@@ -38,4 +38,5 @@ for (const [font,subset,weights] of [['overpass','latin',[400,600]],['ibm-plex-s
   await fs.copyFile(path.join(here,`node_modules/@fontsource/${font}/LICENSE`),path.join(out,`fonts/LICENSE-${font}.txt`));
 }
 await fs.writeFile(path.join(out,'qr.svg'),await QRCode.toString('https://insiyab.amirkazemkhani.com',{type:'svg',margin:2,color:{dark:'#12263A',light:'#F6F5F1'}}));
+for (const decision of data['decisions.json'].decisions) await fs.writeFile(path.join(out,`qr-${encodeURIComponent(decision.id)}.svg`),await QRCode.toString('https://insiyab.amirkazemkhani.com/#decision-'+decision.id,{type:'svg',margin:2,color:{dark:'#12263A',light:'#F6F5F1'}}));
 console.log(`BUILT ${out}: ${Object.keys(data).length} bundle files; fixture=${data['meta.json'].fixture}; local fonts, deck.gl and QR. Open index.html directly, including offline.`);
