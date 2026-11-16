@@ -58,6 +58,8 @@ The delay forecast, when it exists, is `forecast/delay-route.json` with `target`
 ### `gap.json`: where buses and passengers do not match
 `bin_seconds` (3600), `index_note`, and `rows`: one for each route, direction and hour, with `route_id`, `direction`, `hour_start`, `trips`, `seats_offered`, `forecast_peak_load` (the largest load on each trip, added up), `over` (passengers above the seats, added over the trips), `spare` (seats above the largest load, added over the trips) and `index`: the Insiyab index, from 0.1 (every seat empty) to 10 (every passenger without a seat). The map is red where `over` is above zero and blue where `spare` is large.
 
+`index_note` is one line a screen may show; `index_method` is how the score is made, for a fold. `load_kind` says whether the loads are measured or forecast, and `peak_load` holds the same number as `forecast_peak_load` while they are measured.
+
 `totals` has `before` and `after`, each with `passenger_minutes_over_seats` and `empty_seat_km`, a `kind`, and for a simulated one its `assumption`. "Close the gaps" moves the two totals from before to after.
 
 ### `metrics.json`: the table the judges read
@@ -69,7 +71,7 @@ The main table of a target is its **untouched part**: forecasts set aside at the
 |---|---|
 | `chosen` | the model shown first. It was chosen on the development part alone (`chosen_on`). In `models`, that model has `chosen: true`. |
 | `best_naive` | the naive forecast with the lowest error on the untouched part, every horizon together |
-| `tested_on` | one sentence saying what the numbers were tested on. Show it wherever a forecast number appears. |
+| `tested_on` | one short sentence saying what the numbers were tested on. Show it once on any screen with a forecast number. `tested_on_more` holds the longer account, for a "sources and limits" fold. |
 | `pooled` | one row a model, every horizon together: the same measures as a result, plus `skill` against `skill_vs`, `skill_measure` ("wape" or "mae") and `skill_lo`, `skill_hi`: the range the gain fell in 95 times in 100 when whole origins were drawn again and again. If the range holds zero, say so. |
 | `range` | `promised` (0.9), `kept` (how often the truth fell inside the range), `kept_when_nobody_boarded`, `kept_when_somebody_boarded`, `n_nobody`, `n_somebody`, `method`. Show the two apart: a range that is only right about empty quarter-hours has not kept its promise. |
 | `features` | (stop level) what the model leans on: `feature`, `label` in plain words, `share` of the model's gain. Shares add up to 1. |
@@ -81,6 +83,8 @@ The checker requires at least one baseline and one model that is not a baseline,
 
 ### `decisions.json`: patterns turned into decisions
 `decisions`: each has `id`, `lever` (one of `right_bus`, `right_time`, `right_stop`, `rewarded_choice`, `on_demand`), `title`, `where` {route_id, stop_ids, community_id}, `when` {from, to}, `evidence` (each `label`, `value`, `unit`, `source`: the file the number came from), `change` (what RTA would do, in one sentence), `effect` (each `metric`, `before`, `after`, `kind`, and for a simulated one its `assumption`), `passengers_affected`, `cost_note`, `confidence` ("high", "medium", "low"), `why` (one plain sentence built from the evidence).
+
+An effect may carry `source`: where its assumption comes from. An assumption is a plain sentence a passenger could read, with no file path in it.
 
 `kind` is `measured` (counted from the day's records) or `simulated` (what we expect if the change were made). A screen always shows which.
 
