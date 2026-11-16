@@ -3,7 +3,7 @@
  "targets": [
   {
    "level": "route",
-   "mape_rule": "MAPE is worked out only over bins where the true count is at least 5; mape_n says how many that was",
+   "mape_rule": "MAPE is worked out only over quarters of an hour in which at least 5 passengers boarded, and the table says how many those were",
    "models": [
     {
      "is_baseline": false,

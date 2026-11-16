@@ -141,7 +141,7 @@ def build():
     metrics = {"fixture": True, "targets": [{
         "target": "boardings", "level": "route", "unit": "passengers boarding per route per 15 minutes",
         "split": {"kind": "rolling_origin", "origins": ORIGINS, "train": "every bin that ended before the origin", "test": "the bin that ends at origin plus horizon"},
-        "mape_rule": "MAPE is worked out only over bins where the true count is at least 5; mape_n says how many that was",
+        "mape_rule": "MAPE is worked out only over quarters of an hour in which at least 5 passengers boarded, and the table says how many those were",
         "models": [{"model": "insiyab", "label": "Stand-in for the real model", "is_baseline": False},
                    {"model": "persistence", "label": "Same as the last 15 minutes seen", "is_baseline": True}],
         "subsets": subsets, "results": results}]}

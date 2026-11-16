@@ -6,7 +6,7 @@ bins with at least MAPE_MIN boardings, and mape_n says how many bins that was. W
 import numpy as np
 
 MAPE_MIN = 5
-MAPE_RULE = f"MAPE is taken only over bins where at least {MAPE_MIN} passengers boarded; mape_n is the number of such bins. WAPE (total miss over total boardings) covers every bin, zeros included."
+MAPE_RULE = f"MAPE is taken only over quarters of an hour in which at least {MAPE_MIN} passengers boarded, and the table says how many those were. WAPE (the total miss over the total boardings) covers every quarter of an hour, the empty ones included."
 
 
 def measures(actual, forecast, mape_min=MAPE_MIN):
