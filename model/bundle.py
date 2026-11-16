@@ -251,7 +251,7 @@ def personas(day, decisions, v, t):
     out.append({"id": "office_worker", "title": "The office worker", "label": LABEL, "anchor": anchor, "steps": steps})
 
     closed = int((~v["door_opened"]).sum())
-    steps = [step(EVENING + 900, "bus", f"On the day, buses called at stops {closed} times without the door opening.", "measured", before={"doors_not_opened": closed, "stop_visits": len(v)})]
+    steps = [step(EVENING + 900, "bus", f"On the day, buses called at stops {closed:,} times without the door opening.", "measured", before={"doors_not_opened": closed, "stop_visits": len(v)})]
     if rs:
         steps.append(step(EVENING + 900, "bus", "With request stops late in the evening, the bus no longer slows for a stop where nobody is waiting.", "simulated", rs["id"], before={rs["effect"][0]["metric"]: rs["effect"][0]["before"]}, after={rs["effect"][0]["metric"]: rs["effect"][0]["after"]}))
     out.append({"id": "driver", "title": "The driver", "label": LABEL, "anchor": {"route_id": (rs or {"where": {"route_id": busiest.route_id}})["where"]["route_id"], "stop_id": None, "time": EVENING + 900}, "steps": steps})

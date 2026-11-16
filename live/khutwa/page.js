@@ -26,9 +26,10 @@
   $('where').textContent = U.stop + ' · route ' + U.route;
   $('headline').textContent = over > 0 ? 'Your ' + clock(U.depart) + ' bus is full.' : 'Your ' + clock(U.depart) + ' bus has room.';
   drawBus($('usual-bus'), U.load, U.seats);
-  $('usual-load').textContent = over > 0 ? over + ' without a seat' : (U.seats - U.load) + ' seats free';
-  $('usual-load').className = over > 0 ? 'over' : '';
-  $('usual-words').textContent = plural(U.load, 'passenger', 'passengers') + ' on board, ' + plural(U.seats, 'seat', 'seats') + '.';
+  // one number, large, and its words beside it: the squares above already say how many seats and how many passengers
+  $('usual-load').textContent = over > 0 ? over : (U.seats - U.load);
+  $('usual-words').textContent = over > 0 ? 'without a seat' : 'seats free';
+  $('usual-count').className = 'count' + (over > 0 ? ' over' : '');
   $('usual-source').textContent = 'From card taps on ' + D.service_date + '. Counts seats, not standing room.';
 
   function describe(o) {
@@ -46,7 +47,7 @@
       li.innerHTML = '<div class="choice-head"><h2></h2><span class="earn"></span></div><p class="detail"></p>' +
         (free === null ? '' : '<div class="meter"><b style="width:' + Math.min(100, Math.round(100 * o.load / o.seats)) + '%"></b></div><p class="room-left"></p>') + '<button type="button">I will take it</button>';
       li.querySelector('h2').textContent = t.title; li.querySelector('.earn').textContent = '+' + o.points + ' points'; li.querySelector('.detail').textContent = t.detail;
-      if (free !== null) li.querySelector('.room-left').textContent = free > 0 ? o.load + ' on board, ' + plural(free, 'seat', 'seats') + ' free of ' + o.seats + ' when it left on the day' : 'Full when it left on the day';
+      if (free !== null) li.querySelector('.room-left').textContent = free > 0 ? o.load + ' on board and ' + free + ' of ' + o.seats + ' seats free on the day' : 'Full when it left on the day';
       if (o === roomiest) li.querySelector('button').className = 'primary';       // one obvious next step: the bus with the most room
       li.querySelector('button').addEventListener('click', function () { finish(o); });
       list.appendChild(li);
@@ -69,7 +70,7 @@
       $('done-eyebrow').textContent = 'Your usual bus'; $('done-headline').textContent = 'No change. Your ' + clock(U.depart) + ' bus still runs.';
       $('points').hidden = true; $('done-room').textContent = ''; $('done-words').textContent = 'Nothing is charged and nothing is lost. The offer was only ever a way to earn points.';
     }
-    $('simulated').textContent = D.offer.take_up ? 'Simulated: ' + D.offer.take_up : '';
+    $('simulated').textContent = D.offer.take_up ? 'Simulated: ' + D.offer.take_up.split('. ').slice(0, 2).join('. ').replace(/\.?$/, '.') : '';      // the planner's sentence is not for a passenger
     show('s-done');
   }
 

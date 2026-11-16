@@ -16,12 +16,15 @@ export function horizonChart(rows,horizon,label){
  }
  out+=rows.map((v,i)=>text(x(i),bottom+25,v.horizon,'text-anchor="middle"')).join('');out+=text((l+r)/2,h-5,label,'text-anchor="middle"');
  const active=rows.findIndex(v=>v.horizon===horizon);if(active>=0)out+=`<path class="chart-guide" d="M${x(active)} ${top}V${bottom}"/>`;
+ // the finding, said in the chart: from where the model misses by more than the naive forecast
+ const worse=rows.findIndex((v,i)=>Number.isFinite(v.model)&&Number.isFinite(v.naive)&&v.model>v.naive&&rows.slice(i).every(u=>u.model>u.naive));
+ if(worse>=0)out+=text(x(worse),y(rows[worse].model)-12,worse===0?'The model misses more throughout':'The model misses more from here','text-anchor="end" class="chart-note"');
  return svg(w,h,'Average absolute miss by '+label,out);
 }
 export function subsetChart(rows){
- const w=width(),phone=w<500,left=phone?12:275,right=w-55,step=phone?64:42,top=30,h=top+rows.length*step+25,max=Math.max(...rows.flatMap(r=>[r.model,r.naive].filter(Number.isFinite)),.01)*1.05,x=v=>left+v/max*(right-left);
+ const w=width(),phone=w<500,left=phone?12:400,right=w-55,step=phone?64:42,top=30,h=top+rows.length*step+25,max=Math.max(...rows.flatMap(r=>[r.model,r.naive].filter(Number.isFinite)),.01)*1.05,x=v=>left+v/max*(right-left);
  let out=text(left,15,'Less miss','class="chart-muted"')+text(right,15,'More miss','text-anchor="end" class="chart-muted"');
- rows.forEach((r,i)=>{const y=top+i*step+(phone?28:10);out+=text(phone?12:0,phone?y-14:y+4,r.label.length>(phone?42:34)?r.label.slice(0,phone?39:31)+'…':r.label);out+=`<path class="chart-grid" d="M${left} ${y}H${right}"/>`;
+ rows.forEach((r,i)=>{const y=top+i*step+(phone?28:10);out+=text(phone?12:0,phone?y-14:y+4,r.label.length>(phone?46:58)?r.label.slice(0,phone?45:57)+'…':r.label);out+=`<path class="chart-grid" d="M${left} ${y}H${right}"/>`;
   if(Number.isFinite(r.naive))out+=`<path class="chart-pair" d="M${x(r.model)} ${y}H${x(r.naive)}"/><circle class="naive-line chart-dot" cx="${x(r.naive)}" cy="${y}" r="5"/>`;
   out+=`<circle class="model-line chart-dot" cx="${x(r.model)}" cy="${y}" r="5"/>${text(right+8,y+4,number(r.model))}`;
  });return svg(w,h,'Subset average miss. Filled dots are the model; hollow dots the same naive comparison.',out);

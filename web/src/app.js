@@ -98,7 +98,7 @@ document.querySelectorAll('.forecast-limit').forEach(e=>e.textContent=limit.star
 document.querySelectorAll('.date').forEach(e=>e.textContent=M.meta.service_date);
 const openingModel=routeTarget?.pooled?.find(r=>r.model===routeTarget.chosen),openingNaive=routeTarget?.pooled?.find(r=>r.model===routeTarget.best_naive);
 if(openingModel&&openingNaive){
-  $('evaluation').innerHTML=`<p class="eyebrow">Untouched hours · route forecast</p><div class="evaluation-numbers"><div><strong>${number(openingModel.mae)}</strong><span>model</span></div><div><strong>${number(openingNaive.mae)}</strong><span>naive forecast</span></div></div><p class="small">Average miss: ${escape(routeTarget.unit)}. Every look-ahead together. Gain range: ${number(openingModel.skill_lo*100)}% to ${number(openingModel.skill_hi*100)}%. ${openingModel.skill_lo<=0&&openingModel.skill_hi>=0?'Includes zero; improvement is not established.':''}</p><p class="source">metrics.json · untouched part · ${M.meta.service_date}</p>`;
+  $('evaluation').innerHTML=`<p class="eyebrow">Hours the model had not seen · by route</p><div class="evaluation-numbers"><div><strong>${number(openingModel.mae)}</strong><span>model</span></div><div><strong>${number(openingNaive.mae)}</strong><span>naive forecast</span></div></div><p class="small">Average miss: ${escape(routeTarget.unit)}. Every look-ahead together. Gain range: ${number(openingModel.skill_lo*100)}% to ${number(openingModel.skill_hi*100)}%. ${openingModel.skill_lo<=0&&openingModel.skill_hi>=0?'Includes zero; improvement is not established.':''}</p><p class="source">metrics.json · untouched part · ${M.meta.service_date}</p>`;
 }
 function renderError(){
   const score=rollingError(B['forecast/boardings-route.json'],time,3600);
@@ -280,9 +280,9 @@ function renderStory(){
   $('story-time').textContent=`${clock(step.t)} · ${M.meta.service_date}`;
   $('scene').innerHTML=sceneSVG(person,step,M,escape);
   $('scene-caption').textContent='Illustration. It does not show a real passenger or a count of people waiting.';
-  $('story-kind').textContent=simulated?'With Insiyab · simulated':'What happened · measured';$('story-kind').classList.toggle('simulated',simulated);
+  $('story-kind').textContent=simulated?'If RTA made this change · simulated':'What happened · measured';$('story-kind').classList.toggle('simulated',simulated);
   $('story-say').textContent=step.say;
-  $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).filter(([key])=>!(['load','seats'].includes(key)&&Number.isInteger((step.after??step.before)?.seats))).map(([key,value])=>`<p class="${simulated?'simulated':''}"><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
+  $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).filter(([key])=>!(['load','seats'].includes(key)&&Number.isInteger((step.after??step.before)?.seats))).map(([key,value])=>`<p class="${simulated?'simulated':''}"><span class="which">${which==='before'?'On the day':'With the change'}</span><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
   $('story-seats').innerHTML=seatDiagram(step);
   $('story-source').textContent=`personas.json · ${M.meta.service_date} · Step ${stepIndex+1} of ${person.steps.length}`;
   const decision=B['decisions.json'].decisions.find(d=>d.id===step.decision_id);
@@ -295,6 +295,6 @@ function renderStory(){
   const closest=visits.reduce((a,b)=>Math.abs(a.act_dep-step.t)<Math.abs(b.act_dep-step.t)?a:b);
   const bin=Math.floor(step.t/M.meta.bin_seconds)*M.meta.bin_seconds;
   const boardings=visits.filter(v=>v.act_dep>=bin&&v.act_dep<bin+M.meta.bin_seconds).reduce((sum,v)=>sum+v.on,0);
-  $('story-record').innerHTML=`<details><summary>Look at the recorded context</summary><p>${number(boardings)} boardings ${person.anchor.stop_id?'at this stop':'on this route'} in the quarter hour beginning ${clock(bin)}. Measured, not a count of people waiting.</p><p>Nearest recorded departure: ${clock(closest.act_dep)}, ${escape(closest.trip_id)}. ${closest.load} passengers on board; ${closest.seats} seats. ${number((closest.act_dep-closest.sched_dep)/60)} minutes relative to the timetable. Measured.</p><p class="source">replay/route-${escape(person.anchor.route_id)}.json · ${M.meta.service_date}. Story values above use personas.json; this is the nearest replay record, not a reconstructed personal journey.</p></details>`;
+  $('story-record').innerHTML=`<details><summary>See the day’s records for this stop or route</summary><p>${number(boardings)} boardings ${person.anchor.stop_id?'at this stop':'on this route'} in the quarter hour beginning ${clock(bin)}. Measured, not a count of people waiting.</p><p>Nearest recorded departure: ${clock(closest.act_dep)}, ${escape(closest.trip_id)}. ${closest.load} passengers on board; ${closest.seats} seats. ${number((closest.act_dep-closest.sched_dep)/60)} minutes relative to the timetable. Measured.</p><p class="source">replay/route-${escape(person.anchor.route_id)}.json · ${M.meta.service_date}. Story values above use personas.json; this is the nearest replay record, not a reconstructed personal journey.</p></details>`;
   render();
 }

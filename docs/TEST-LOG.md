@@ -180,3 +180,27 @@ Lane 2's clone had not moved for an hour and two notes had no answer, so lane 1 
 | G4: six type sizes | Fixed at b59adcd: 52, 32, 20, 16, 13 and 11 on the screen, where the stylesheet had twenty-seven sizes. The printed order keeps its own sizes: at the screen's sizes it ran to a second page, and a test caught it. |
 | G1: the second step showed the same picture, and the picture carried no count | Fixed in the data and on the screen. The site worker now stands at a bus that really left with more passengers than seats (the first trip of the right-bus decision), and his second step and the office worker's carry the load and the seats before and after. The screen draws each as a count: one square a seat, one red square a passenger without one, under the finding in words ("7 without a seat", then "37 seats free"). A test holds that the two counts equal the bundle's. |
 | G1: the figures themselves are soft clay renders in a different language from the rest of the site | **Not done.** The renders are still there, beside the counts. Redrawing four figures as flat pictograms is the one large piece of the design review still open. |
+
+## Review 3, the designer a third time, on commit 63c490b (17 November, about 02:05; a local build, not a real graphics chip, not the live address)
+
+He confirmed in the render: six sizes on the main site; no null, "1 stops", "Room unavailable", "held-out" or "Insiyab index" on any screen; the cautions shown; related decisions linked; the gap chart reduced to the one route-direction with passengers above the seats; the counts on the four people equal to the bundle; and the Khutwa changes.
+
+**One claim of lane 1's was false.** The log said the charts were "as wide as the page". They were drawn 1184 units wide and then capped at 880 pixels by `style.css:1011`, so on a laptop every chart sat left with 350 pixels of nothing beside it and its 13 pixel labels rendered at 9.7. The code's own comment said the opposite. The lesson is the one in docs/RULES.md 8.4: the claim was checked against the code that draws the chart and not against the chart as rendered.
+
+| # | Finding | State |
+|---|---|---|
+| R1 | Charts capped at 880 pixels; labels 9.7 pixels on a laptop | Fixed: the three caps are gone. Measured in the browser afterwards: the model chart is 1232 pixels wide and its labels 13.5. |
+| R2 | Every section heading was 32 pixels, the same as the screen's title, so nothing below the large numerals had an order | Fixed: 52 for the one number, 32 for a screen's title, 20 for a section or a card. |
+| R3 | The line that says what was tested, and the caveat under the headline number, were at 11 pixels | Fixed for the tested-on line, the caveat and the illustration's caption: 13. Eleven is left for a source line and the band. |
+| R4 | The model's line was drawn in the blue that the identity keeps for seats with nobody in them | Fixed: the model is drawn in the brand's own colour (flow, 7.3 to 1). |
+| R5 | No chart said its own finding | Partly: the look-ahead chart now says "The model misses more from here" where that begins. Open: the forecast chart and the gap chart. |
+| R6 | Subset labels cut at 31 letters, so two different rows read the same | Fixed: the label column is wider and labels are whole. |
+| R7 | The four people: the render in a different language; no mark on the chosen person; before and after not told apart; the brand named as the actor | Partly. The render is set to ink on paper so it sits with the page; the chosen person is underlined; each number is headed "On the day" or "With the change"; "With Insiyab" is now "If RTA made this change". Open: the renders themselves, and the planner's and driver's pictures do not change between steps. |
+| R8 | Khutwa used 44 and 28 pixels; "5 without a seat" said three times; a planner's sentence on a passenger's screen | Fixed: 52 and 32; the number once, large, with its words beside it; the confirmation keeps two sentences. |
+| R9 | "2057" in a sentence with no separator | Fixed in the engine: "2,057". |
+| R10 | The forecast screen repeats the whole day screen under its chart, and still opens on a quiet stop where the chart shows nothing | **Open.** The repeat is tied to the frozen-forecast control and its tests; taking it out needs care. |
+| R11 | The day has three large numerals and a network 400 pixels wide in a 920 pixel canvas | **Open.** |
+| R12 | The gap map's 14 pixel ribbons; two of three decision cards show a result of zero at 52 pixels | **Open.** |
+| R13 | First-view words still to change: "naive forecast" with no gloss, "MAE", "Comparing Boosted trees...", sentences over 25 words on the gap and model screens | **Open.** |
+
+His line on each screen: the day, almost; the forecast, partly; the gap, partly; the model, almost; four people, no; a decision's evidence, yes; Khutwa, almost.

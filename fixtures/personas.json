@@ -134,7 +134,7 @@
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, buses called at stops 2057 times without the door opening.",
+     "say": "On the day, buses called at stops 2,057 times without the door opening.",
      "scene": "bus",
      "t": 72900
     },

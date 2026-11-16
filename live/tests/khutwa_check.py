@@ -45,7 +45,7 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
     page.goto(url("stand-in"), wait_until="load")
     check("the page says STAND-IN DATA, NOT A RESULT when the bundle is stand-in data", page.get_by_text("STAND-IN DATA, NOT A RESULT").is_visible())
     over = u["load"] - u["seats"]
-    check("the first screen shows the usual bus's own numbers from the bundle", f"{over} without a seat" in page.inner_text("#usual-load") and f"{u['load']} passengers on board, {u['seats']} seats" in page.inner_text("#usual-words"), page.inner_text("#s-usual"))
+    check("the first screen shows the usual bus's own numbers from the bundle", page.inner_text("#usual-load") == str(over) and page.inner_text("#usual-words") == "without a seat" and f"{u['seats']} seats" in page.inner_text("#usual-bus"), page.inner_text("#s-usual"))
     check("the bus is drawn from the count: one square a seat, one mark a passenger without one", page.locator("#usual-bus .seats i").count() == u["seats"] and page.locator("#usual-bus .seats i.taken").count() == min(u["load"], u["seats"]) and page.locator("#usual-bus .standing i").count() == max(0, over))
     page.wait_for_selector("#show", state="visible", timeout=4000)
     check("with no room to be reached, the page offers 'Show me the offer' within two seconds or so and does not claim to be in a room", page.inner_text("#show") == "Show me the offer" and not page.locator("#waiting").is_visible())
@@ -58,7 +58,7 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
     check("the page does not scroll sideways at 390 wide", page.evaluate("document.documentElement.scrollWidth - innerWidth") <= 1)
     if shots: os.makedirs(shots, exist_ok=True); page.screenshot(path=os.path.join(shots, "khutwa-offer.png"), full_page=True)
     page.click("#choices li button"); first = d["offers"][0]
-    check("taking a choice shows its points and marks the expected effect as simulated", f"{first['points']} Khutwa points" in page.inner_text("#done-headline") and page.inner_text("#simulated").startswith("Simulated:"), page.inner_text("#s-done"))
+    check("taking a choice shows its points and marks the expected effect as simulated", f"{first['points']} Khutwa points" in page.inner_text("#done-headline") and page.inner_text("#simulated").startswith("Simulated:") and "planner" not in page.inner_text("#simulated"), page.inner_text("#s-done"))
     check("taking a choice promises no seat: it says how much room that bus had on the day, and that a seat is not reserved", "not reserved" in page.inner_text("#done-room") and "seat" not in page.inner_text("#done-headline"), page.inner_text("#s-done"))
     page.click("#again"); page.click("#decline")
     check("declining says nothing is charged and shows no points", "No change" in page.inner_text("#done-headline") and not page.locator("#points").is_visible())
