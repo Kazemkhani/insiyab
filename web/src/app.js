@@ -235,7 +235,7 @@ async function setRoomPhase(phase){
     const response=await fetch('api/room/phase',{method:'POST',headers:{'content-type':'application/json','x-presenter-code':presenterCode},body:JSON.stringify({phase,...(decision?{decision_id:decision.id}:{})}),signal:AbortSignal.timeout(2000)});
     if(response.status===401){presenterCode='';$('end-offer').hidden=true;throw Error('Presenter code refused. Enter it again.');}
     if(!response.ok)throw Error('The room did not accept the change.');
-    const data=await response.json();if(!validRoom(data))throw Error('The room returned an invalid state.');
+    const data=await response.json();if(!validRoom(data)||data.store!=='shared'){roomState=null;throw Error('The live room is not ready.');}
     roomState=data;playbackCount=null;$('presenter-status').textContent=phase==='offer'?'The room offer is open.':'The room offer has ended.';
   }catch(error){$('presenter-status').textContent=error.message+' The local proposal still works; no live change is confirmed.';}
   renderRoom();
@@ -254,7 +254,7 @@ $('playback').onclick=()=>{const d=B['decisions.json'].decisions.find(d=>d.lever
 async function pollRoom(){
   if(roomPolling||view!=='gap'||!/^https?:$/.test(location.protocol))return;
   roomPolling=true;const previous=roomState;
-  try{const response=await fetch('api/room/state',{signal:AbortSignal.timeout(2000),cache:'no-store'});if(!response.ok)throw Error('Room absent');const data=await response.json();if(!validRoom(data))throw Error('Invalid room');roomState=data;playbackCount=null;}
+  try{const response=await fetch('api/room/state',{signal:AbortSignal.timeout(2000),cache:'no-store'});if(!response.ok)throw Error('Room absent');const data=await response.json();if(!validRoom(data)||data.store!=='shared')throw Error('Shared room absent');roomState=data;playbackCount=null;}
   catch{roomState=null;}finally{roomPolling=false;}
   renderRoom();if(closedGaps&&(previous?.depot!==roomState?.depot||previous?.decision_id!==roomState?.decision_id)){
     const open=[...document.querySelectorAll('.decision-evidence[open]')].map(e=>e.closest('.decision').id);renderDecisions();open.forEach(id=>document.getElementById(id)?.querySelector('details')?.setAttribute('open',''));

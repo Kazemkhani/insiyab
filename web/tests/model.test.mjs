@@ -36,3 +36,11 @@ const dots=[...chart.matchAll(/class="model-line chart-dot" cx="([\d.]+)"/g)].ma
 assert.equal(dots.length,4);assert.ok(Math.abs((dots[2]-dots[1])/(dots[1]-dots[0])-2)<.001);
 assert.throws(()=>assert.ok(Math.abs((dots[2]-dots[1])/(dots[1]-dots[0])-1)<.001));
 console.log('PASS horizon chart uses elapsed time, not equally spaced categories; negative control rejects uniform spacing');
+
+const {forecastChart}=await import('../src/charts.mjs');
+const challengeRows=[{bin_start:0,forecast:2,baseline:3,lo:0,hi:4,actual:99},{bin_start:900,forecast:2,baseline:3,lo:0,hi:4,actual:3}];
+const hiddenChart=forecastChart(challengeRows,0,false,1800,900),revealedChart=forecastChart(challengeRows,0,true,1800,900);
+assert.ok(!hiddenChart.includes('data-actual-bin="0"')&&hiddenChart.includes('data-actual-bin="1"'));
+assert.ok(revealedChart.includes('data-actual-bin="0"'));
+assert.throws(()=>assert.ok(hiddenChart.includes('data-actual-bin="0"')));
+console.log('PASS challenge chart hides its selected actual even behind the clock; negative control rejects early reveal');

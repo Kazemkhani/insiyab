@@ -8,11 +8,16 @@ def check(ok,label):
 try:
  port=server.stdout.readline().strip();assert port.isdigit(),'test relay failed to start'
  url='http://127.0.0.1:'+port
+ subprocess.run(['node','live/khutwa/build.mjs','--bundle',sys.argv[2] if len(sys.argv)>2 else 'fixtures','--out',str(pathlib.Path(sys.argv[1])/'khutwa')],check=True,capture_output=True)
  with sync_playwright() as p:
   b=p.chromium.launch(args=['--use-angle=metal']);c=b.new_context();page=c.new_page();errors=[];writes=[]
   page.on('pageerror',lambda e:errors.append(str(e)))
   page.on('request',lambda r:writes.append(r) if r.method=='POST' and '/api/room/phase' in r.url else None)
-  page.goto(url);page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.locator('[data-view=gap]').click();page.locator('#presenter').wait_for(state='visible')
+  page.goto(url);page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.locator('[data-view=gap]').click();page.locator('#playback').wait_for(state='visible');page.wait_for_timeout(1700)
+  check(page.locator('#presenter').is_hidden(),'memory-only relay keeps playback primary and hides presenter mutations')
+  page.locator('#playback').click();page.wait_for_timeout(1700);check('Played back' in page.locator('#room-count').inner_text(),'polling a memory-only relay preserves playback')
+  c.request.post(url+'/__test/store',data={'kind':'shared'});page.locator('#presenter').wait_for(state='visible')
+  page.locator('#close-gaps').click()
   page.locator('#close-gaps').click();check(not writes,'visitor can inspect proposals without a presenter mutation')
   page.locator('#presenter summary').click();page.locator('#presenter-code').fill('wrong-code');page.locator('#presenter-form button').click()
   page.locator('#close-gaps').click();page.locator('#close-gaps').click();page.wait_for_function("document.querySelector('#presenter-status').textContent.includes('refused')")
@@ -20,7 +25,10 @@ try:
   page.locator('#presenter-code').fill('local-test-code');page.locator('#presenter-form button').click();check(page.locator('#presenter-code').input_value()=='','code is removed from input after use')
   page.locator('#close-gaps').click();page.locator('#close-gaps').click();page.wait_for_function("document.querySelector('#presenter-status').textContent.includes('offer is open')")
   state=c.request.get(url+'/api/room/state').json();check(state['phase']=='offer' and state['decision_id'],'presenter opens the bundle decision through the actual relay')
-  seat=c.request.post(url+'/api/room/join',data={}).json()['seat'];c.request.post(url+'/api/room/answer',data={'seat':seat,'accept':True})
+  phone_context=b.new_context(viewport={'width':390,'height':844});phone=phone_context.new_page();phone.on('pageerror',lambda e:errors.append(str(e)))
+  phone.goto(url+'/khutwa/');phone.locator('#choices button').first.wait_for(state='visible');phone.locator('#no-walk').check();phone.locator('#choices button').first.click();phone.locator('#s-done').wait_for(state='visible');phone.wait_for_function("getComputedStyle(document.querySelector('#s-done')).opacity==='1'")
+  check('points' in phone.locator('#done-headline').inner_text(),'actual Khutwa page accepts a no-extra-walk offer at phone size')
+  if os.environ.get('INSIYAB_SHOTS'):phone.screenshot(path=str(pathlib.Path(os.environ['INSIYAB_SHOTS'])/'khutwa-390x844.png'))
   page.wait_for_function("document.querySelector('#room-count').textContent.includes('1 of 1 took')")
   check('not measured commuting behaviour' in page.locator('#room-count').inner_text(),'real local audience count remains distinct from commuting evidence')
   page.locator('.decision-evidence summary').first.click();page.wait_for_timeout(1700);check(page.locator('.decision-evidence').first.get_attribute('open') is not None,'polling preserves an opened evidence panel')
@@ -33,7 +41,7 @@ try:
   page.locator('#end-offer').click();page.wait_for_function("document.querySelector('#presenter-status').textContent.includes('has ended')");check(c.request.get(url+'/api/room/state').json()['phase']=='closed','presenter can end the room offer')
   count=len(writes);page.reload();page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.locator('[data-view=gap]').click();page.locator('#presenter').wait_for(state='visible');page.locator('#close-gaps').click();check(len(writes)==count,'reload forgets presenter authority')
   c.request.post(url+'/__test/fail',data={'fail':True});page.locator('#playback').wait_for(state='visible');page.locator('#playback').click();check('Played back, nobody is connected' in page.locator('#room-count').inner_text(),'store failure falls back to explicitly labelled playback')
-  check(not errors,'room journey has no unhandled page errors');c.close();b.close()
+  check(not errors,'room journey has no unhandled page errors');phone_context.close();c.close();b.close()
 finally:
  server.terminate();server.wait(timeout=5)
 print('ROOM BROWSER PASS')

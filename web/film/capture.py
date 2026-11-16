@@ -1,12 +1,12 @@
 """Capture the actual built app, with networking disabled, for the opening film."""
-import argparse,json,pathlib,shutil,subprocess
+import argparse,json,pathlib,shutil,subprocess,hashlib
 from playwright.sync_api import sync_playwright
 p=argparse.ArgumentParser();p.add_argument('--site',required=True);p.add_argument('--out',required=True);a=p.parse_args();site=pathlib.Path(a.site).resolve();out=pathlib.Path(a.out).resolve();out.mkdir(parents=True,exist_ok=True)
 for name in ['qr.svg','fonts']:
  src=site/name
  if src.is_dir():shutil.copytree(src,out/name,dirs_exist_ok=True)
  else:shutil.copyfile(src,out/name)
-meta=json.loads((site/'data/meta.json').read_text());(out/'manifest.json').write_text(json.dumps({'fixture':meta['fixture'],'service_date':meta['service_date'],'bundle_commit':meta['commit'],'frontend_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'captions':True,'audio':False},indent=2))
+meta=json.loads((site/'data/meta.json').read_text());(out/'manifest.json').write_text(json.dumps({'fixture':meta['fixture'],'service_date':meta['service_date'],'bundle_commit':meta['commit'],'frontend_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'app_sha256':hashlib.sha256((site/'app.js').read_bytes()).hexdigest(),'bundle_sha256':hashlib.sha256((site/'bundle.js').read_bytes()).hexdigest(),'captions':True,'audio':False},indent=2))
 with sync_playwright() as p:
  b=p.chromium.launch(args=['--use-angle=metal'])
  for name,view,duration in [('replay','replay',8),('forecast','forecast',6),('gap','gap',6),('planner','stories',3),('site_worker','stories',3),('office_worker','stories',3),('driver','stories',3)]:

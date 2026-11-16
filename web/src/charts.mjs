@@ -28,14 +28,15 @@ export function subsetChart(rows){
 }
 export function forecastChart(rows,selected,revealed,time,bin){
  if(!rows.length)return '';
- const w=width(),h=270,l=38,r=w-18,top=32,bottom=220,max=Math.max(...rows.flatMap(x=>[x.forecast,x.baseline,x.hi,x.actual??0]),1)*1.1;
+ const known=(v,i)=>v.actual!==null&&(i===selected?revealed:v.bin_start+bin<=time);
+ const w=width(),h=270,l=38,r=w-18,top=32,bottom=220,max=Math.max(...rows.flatMap((v,i)=>[v.forecast,v.baseline,v.hi,known(v,i)?v.actual:0]),1)*1.1;
  const x=i=>l+(rows[i].bin_start-rows[0].bin_start)/Math.max(1,rows.at(-1).bin_start-rows[0].bin_start)*(r-l),y=v=>bottom-v/max*(bottom-top);
  let out=`<rect class="chart-heldout" x="${l}" y="${top}" width="${r-l}" height="${bottom-top}"/>${text(l,16,'Not seen in learning')}`;
  out+=[0,.5,1].map(f=>`<path class="chart-grid" d="M${l} ${y(max*f)}H${r}"/>${text(l-7,y(max*f)+4,number(max*f),'text-anchor="end"')}`).join('');
  out+=`<path class="chart-range" d="${rows.map((v,i)=>`${i?'L':'M'}${x(i)} ${y(v.hi)}`).join(' ')} ${rows.map((v,i)=>({v,i})).reverse().map(({v,i})=>`L${x(i)} ${y(v.lo)}`).join(' ')} Z"/>`;
  for(const [key,cls] of [['baseline','naive-line'],['forecast','model-line']])out+=`<path class="${cls}" d="${rows.map((v,i)=>`${i?'L':'M'}${x(i)} ${y(v[key])}`).join(' ')}"/>`;
- let connected=false,d='';rows.forEach((v,i)=>{const known=v.actual!==null&&(v.bin_start+bin<=time||(revealed&&i===selected));if(known){d+=`${connected?'L':'M'}${x(i)} ${y(v.actual)} `;connected=true;}else connected=false;});out+=`<path class="actual-line" d="${d}"/>`;
- rows.forEach((v,i)=>{const known=v.actual!==null&&(v.bin_start+bin<=time||(revealed&&i===selected));if(known)out+=`<circle class="actual-dot" cx="${x(i)}" cy="${y(v.actual)}" r="4"/>`;out+=`<g tabindex="0" role="button" aria-label="Reveal ${clock(v.bin_start)}" data-chart-bin="${i}"><circle class="chart-hit" cx="${x(i)}" cy="${y(v.forecast)}" r="22"/><circle class="model-line chart-dot" cx="${x(i)}" cy="${y(v.forecast)}" r="${i===selected?6:3}"/></g>`;});
+ let connected=false,d='';rows.forEach((v,i)=>{if(known(v,i)){d+=`${connected?'L':'M'}${x(i)} ${y(v.actual)} `;connected=true;}else connected=false;});out+=`<path class="actual-line" d="${d}"/>`;
+ rows.forEach((v,i)=>{if(known(v,i))out+=`<circle class="actual-dot" data-actual-bin="${i}" cx="${x(i)}" cy="${y(v.actual)}" r="4"/>`;out+=`<g tabindex="0" role="button" aria-label="Reveal ${clock(v.bin_start)}" data-chart-bin="${i}"><circle class="chart-hit" cx="${x(i)}" cy="${y(v.forecast)}" r="22"/><circle class="model-line chart-dot" cx="${x(i)}" cy="${y(v.forecast)}" r="${i===selected?6:3}"/></g>`;});
  out+=[0,Math.floor((rows.length-1)/2),rows.length-1].map(i=>text(x(i),bottom+25,clock(rows[i].bin_start),'text-anchor="middle"')).join('');return svg(w,h,'Boardings forecast, supplied range, naive forecast and revealed actual counts through the day.',out);
 }
 export function gapChart(rows,routeName){
