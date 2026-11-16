@@ -68,6 +68,8 @@ The checker requires at least one baseline and one model that is not a baseline,
 
 `kind` is `measured` (counted from the day's records) or `simulated` (what we expect if the change were made). A screen always shows which.
 
+A decision whose lever is `right_bus` may also have `swaps`: the pairs of trips whose vehicles would change places. Each has `from` and `to`, and each of those has `route_id`, `trip_id`, `vehicle` (the stand-in name), `bus_type`, `seats`, `start` (the trip's first scheduled time) and `largest_load`. A printed order is built from these and from nothing else; it is still a proposal for a planner, who knows the blocks and the depots.
+
 A decision whose lever is `rewarded_choice` also has `offers`: the choices put to the passenger. Each has `kind` ("other_route", "earlier" or "later"), `route_id`, `stop_id`, `depart`, `walk_metres`, `walk_minutes`, `extra_minutes` (how much longer the journey takes), `points`, and for an earlier or later bus `minutes_earlier` or `minutes_later`. The Khutwa page is built from these. An offer with `walk_metres` above zero is never shown to a passenger who has said they cannot walk further.
 
 ### `personas.json`: the same morning from four places
@@ -88,6 +90,8 @@ A small relay, owned by lane 1, served from the public address. It holds one roo
 | `POST /api/room/phase` | the presenter only (needs the presenter's code) | `{"phase": "offer"}` |
 | `POST /api/room/call` | the presenter only | rings the team member's phone for the decision named; the state's `depot` follows the call |
 | `POST /api/room/reset` | the presenter only | back to waiting, counts to zero |
+
+**The presenter's code.** The three presenter calls carry the header `x-presenter-code: <code>`. The presenter types the code once on the big screen (the page keeps it in memory for that tab only, never in the address, never in storage that outlives the tab, and never in the build). A call with no code or a wrong one gets status 401 and `{"error": "presenter code needed"}` and changes nothing. Every call sends and returns JSON. `POST /api/room/join` takes an empty body. `POST /api/room/answer` returns `{"ok": true}`, and a seat's later answer replaces its earlier one. `POST /api/room/phase` takes `{"phase": "waiting" or "offer" or "closed", "decision_id": "d003"}` (the decision is optional and kept from the last call if left out) and returns the state. `POST /api/room/call` takes `{"decision_id": "d001"}` and returns the state with `depot` "ringing". `POST /api/room/reset` takes an empty body and returns the state. Any call may answer 503 when the store is unreachable: treat that as the room being absent.
 
 A page that gets no answer within two seconds treats the room as absent: the phone offers "Show me the offer", and the big screen offers "Play it back", labelled "Played back, nobody is connected".
 

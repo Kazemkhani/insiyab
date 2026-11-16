@@ -36,6 +36,28 @@
    "id": "d001",
    "lever": "right_bus",
    "passengers_affected": 640,
+   "swaps": [
+    {
+     "from": {
+      "bus_type": "STANDARD",
+      "largest_load": 55,
+      "route_id": "R1",
+      "seats": 35,
+      "start": 24300,
+      "trip_id": "R1-1-24300",
+      "vehicle": "v80"
+     },
+     "to": {
+      "bus_type": "DOUBLE",
+      "largest_load": 0,
+      "route_id": "R4",
+      "seats": 78,
+      "start": 37800,
+      "trip_id": "R4-1-37800",
+      "vehicle": "v444"
+     }
+    }
+   ],
    "title": "Put the big bus where the people are",
    "when": {
     "from": 23400,

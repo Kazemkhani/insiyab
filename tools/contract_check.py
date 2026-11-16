@@ -145,6 +145,9 @@ def main():
     check("decisions: a rewarded choice carries its offers, each with its walk in metres and minutes, the extra minutes, the points, and a stop and route that exist",
           all(d.get("offers") and all(o.get("kind") in ("other_route", "earlier", "later") and o.get("route_id") in routes and o.get("stop_id") in stops and num(o.get("depart"))
                                       and all(num(o.get(k)) and o[k] >= 0 for k in ("walk_metres", "walk_minutes", "extra_minutes", "points")) for o in d["offers"]) for d in rc))
+    side = lambda x: isinstance(x, dict) and x.get("route_id") in routes and isinstance(x.get("trip_id"), str) and isinstance(x.get("vehicle"), str) and isinstance(x.get("bus_type"), str) and all(num(x.get(k)) and x[k] >= 0 for k in ("seats", "start", "largest_load"))
+    check("decisions: where a right-bus decision lists its swaps, each names two trips with their route, stand-in vehicle, seats, start and largest load",
+          all(side(w.get("from")) and side(w.get("to")) for d in ds if d.get("lever") == "right_bus" for w in d.get("swaps") or []))
     gap = got["gap.json"]
     grows = gap.get("rows", [])
     check("gap: every row is a route and direction that exist, in one hour, with seats, the largest loads, people over seats, seats spare and an index from 0.1 to 10",

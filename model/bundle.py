@@ -96,6 +96,7 @@ def gap_and_decisions(day):
     # --- right bus -----------------------------------------------------------------------------------------------
     new_seats, pairs = swaps(t); after = over_and_empty(v, v["trip_id"].map(new_seats))
     if pairs:
+        side = lambda x: {"route_id": x.route_id, "trip_id": str(x.trip_id), "vehicle": x.vehicle, "bus_type": x.bus_type, "seats": int(x.seats), "start": int(x.start), "largest_load": int(x.peak)}
         o, d = pairs[0]; ids = [p[0].trip_id for p in pairs] + [p[1].trip_id for p in pairs]; part = v[v["trip_id"].isin(ids)]
         b = over_and_empty(part, part["seats"])[0]; a = over_and_empty(part, part["trip_id"].map(new_seats))[0]
         top = v[v["trip_id"] == o.trip_id].sort_values("load", ascending=False).iloc[0]
@@ -113,6 +114,7 @@ def gap_and_decisions(day):
                         "assumption": "the same passengers board at the same times and only the vehicles change; the time to bring each bus to the other route's first stop is not counted"}],
             "passengers_affected": int(sum(p[0].boardings for p in pairs)), "cost_note": "No extra bus and no extra driver. Moving buses between routes has a cost in empty running that is not counted here.",
             "confidence": "medium",
+            "swaps": [{"from": side(a_), "to": side(b_)} for a_, b_ in pairs],
             "why": f"Route {o.route_id} carried {int(o.peak)} passengers on a bus with {int(o.seats)} seats while a {int(d.seats)}-seat bus on route {d.route_id} carried at most {int(d.peak)} in the same hour."})
 
     # --- right stop ----------------------------------------------------------------------------------------------

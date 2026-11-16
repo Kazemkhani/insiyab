@@ -161,6 +161,8 @@ def build():
          "change": "Swap the double-deck buses on route R4 with the standard buses on route R1 between 06:30 and 09:00.",
          "effect": [{"metric": "passengers_over_seats_minutes", "before": 5400, "after": 900, "kind": "simulated", "assumption": "the same passengers board at the same times; only the vehicles change"}],
          "passengers_affected": 640, "cost_note": "No extra bus and no extra driver.", "confidence": "medium",
+         "swaps": [{"from": {"route_id": "R1", "trip_id": peak["trip_id"], "vehicle": peak["vehicle"], "bus_type": peak["bus_type"], "seats": peak["seats"], "start": peak["visits"][0]["sched_arr"], "largest_load": max(v["load"] for v in peak["visits"])},
+                    "to": {"route_id": "R4", "trip_id": quiet["trip_id"], "vehicle": quiet["vehicle"], "bus_type": quiet["bus_type"], "seats": quiet["seats"], "start": quiet["visits"][0]["sched_arr"], "largest_load": max(v["load"] for v in quiet["visits"])}}],
          "why": "The forecast puts more people on R1 than its buses seat, while R4's larger buses run mostly empty in the same hours."},
         {"id": "d002", "lever": "right_stop", "title": "Stop only when someone is there",
          "where": {"route_id": "R4", "stop_ids": [s for s in routes[3]["directions"][0]["stops"][2:5]], "community_id": None},
