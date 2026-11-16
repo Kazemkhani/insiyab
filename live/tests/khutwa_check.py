@@ -58,6 +58,7 @@ with tempfile.TemporaryDirectory() as tmp, sync_playwright() as p:
     if shots: os.makedirs(shots, exist_ok=True); page.screenshot(path=os.path.join(shots, "khutwa-offer.png"), full_page=True)
     page.click("#choices li button"); first = d["offers"][0]
     check("taking a choice shows its points and marks the expected effect as simulated", f"{first['points']} Khutwa points" in page.inner_text("#done-headline") and page.inner_text("#simulated").startswith("Simulated:"), page.inner_text("#s-done"))
+    check("taking a choice promises no seat: it says how much room that bus had on the day, and that a seat is not reserved", "not reserved" in page.inner_text("#done-room") and "seat" not in page.inner_text("#done-headline"), page.inner_text("#s-done"))
     page.click("#again"); page.click("#decline")
     check("declining says nothing is charged and shows no points", "No change" in page.inner_text("#done-headline") and not page.locator("#points").is_visible())
 

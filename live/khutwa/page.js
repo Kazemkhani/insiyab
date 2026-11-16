@@ -57,12 +57,15 @@
     if (o) {
       var t = describe(o), filled = Math.max(1, Math.round(10 * o.points / FARE)), bars = '';
       for (var i = 0; i < 10; i++) bars += '<i' + (i < filled ? ' class="on"' : '') + '></i>';
-      $('done-eyebrow').textContent = t.title; $('done-headline').textContent = o.points + ' Khutwa points, and a seat.';
+      var free = o.seats === null ? null : Math.max(0, o.seats - o.load);
+      $('done-eyebrow').textContent = t.title; $('done-headline').textContent = o.points + ' Khutwa points.';
+      // The records show room on that bus on the day. That is not a reserved seat, and the page must not say it is.
+      $('done-room').textContent = free === null ? '' : (free > 0 ? 'That bus left with ' + plural(free, 'seat', 'seats') + ' free on the day. A seat is likely, not reserved.' : 'That bus was full when it left on the day.');
       $('points').innerHTML = bars; $('points').hidden = false; $('points').setAttribute('aria-label', o.points + ' of ' + FARE + ' points');
       $('done-words').textContent = 'In this prototype ' + FARE + ' points stand for one bus fare, so this is ' + o.points + ' of the ' + FARE + '. RTA would set the real value.';
     } else {
       $('done-eyebrow').textContent = 'Your usual bus'; $('done-headline').textContent = 'No change. Your ' + clock(U.depart) + ' bus still runs.';
-      $('points').hidden = true; $('done-words').textContent = 'Nothing is charged and nothing is lost. The offer was only ever a way to earn points.';
+      $('points').hidden = true; $('done-room').textContent = ''; $('done-words').textContent = 'Nothing is charged and nothing is lost. The offer was only ever a way to earn points.';
     }
     $('simulated').textContent = D.offer.take_up ? 'Simulated: ' + D.offer.take_up : '';
     show('s-done');
