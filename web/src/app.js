@@ -111,7 +111,7 @@ async function setView(next){
   $('gap-controls').hidden=next!=='gap';$('gap-results').hidden=next!=='gap';$('replay').classList.toggle('gap-view',next==='gap');
   $('forecast-controls').hidden=next!=='forecast';$('pick-stop').hidden=next!=='forecast';
   $('replay').classList.toggle('forecast-view',next==='forecast');
-  $('map-caption').textContent=next==='forecast'?'Forecast against what happened':next==='gap'?'Where seats and passengers do not match':'The day, replayed';
+  $('map-caption').textContent=next==='forecast'?'The same forecast on the map, one hour ahead':next==='gap'?'Where seats and passengers do not match':'The day, replayed';
   if(next==='forecast'){try{await ensureStopForecast();freezeForecast();}catch{$('challenge').textContent='The local forecast file could not be opened. Return to this view to try again.';stopForecastPromise=null;render();return;}}
   if(next==='model')renderModel();
   if(next==='gap'){renderGap();pollRoom();}
@@ -144,6 +144,8 @@ function forecastTimes(){
   const series=$('forecast-series').value===''?null:B['forecast/boardings-stop.json']?.series[+$('forecast-series').value];
   challengeRows=(series?.rows??[]).filter(r=>r.horizon===oneHour && r.bin_start>=12*3600).sort((a,b)=>a.bin_start-b.bin_start);
   $('forecast-time').innerHTML=challengeRows.map((r,i)=>`<option value="${i}">${clock(r.bin_start)} to ${clock(r.bin_start+B['forecast/boardings-stop.json'].bin_seconds)}</option>`).join('');
+  // Open on the quarter of an hour the forecast expects to be busiest: a point at the edge of the chart, forecasting next to nothing, shows a stranger nothing.
+  if(challengeRows.length)$('forecast-time').value=String(challengeRows.reduce((best,r,i)=>r.forecast>challengeRows[best].forecast?i:best,0));
   challengeRevealed=false;renderChallenge();
 }
 function renderChallenge(){

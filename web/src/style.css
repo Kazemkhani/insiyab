@@ -1583,3 +1583,8 @@ h2,.decision h2,.cautions h2{font-size:20px;line-height:1.25}
 #scene{background:var(--paper)}
 .people button[aria-pressed=true]{box-shadow:inset 0 -3px 0 var(--ink);font-weight:500}
 #story-values .which{display:block;font:500 11px/1.4 "IBM Plex Sans",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* The forecast screen is about one chart. The day's numbers and the record panel belong to The day and are not repeated beside the map here. */
+.forecast-view .reading,.forecast-view .replay-grid>.forecast-summary{display:none!important}
+.forecast-view .replay-grid{display:block;border-top:2px solid var(--ink);margin-top:40px;padding-top:24px}
+.forecast-view #pick-stop>.section-heading h2{font-size:32px;line-height:1.15}   /* on this screen that heading is the screen's title */
