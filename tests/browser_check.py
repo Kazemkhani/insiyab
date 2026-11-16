@@ -39,7 +39,9 @@ def look(browser, base, path, tag, size, fixture, shots):
     ctx = browser.new_context(viewport={"width": w, "height": h})
     page = ctx.new_page(); thrown = []; missing = []
     page.on("pageerror", lambda e: thrown.append(str(e)[:200]))
-    page.on("console", lambda m: thrown.append(m.text[:200]) if m.type == "error" else None)
+    # A file that fails to load also writes a console line with no address in it. Those are judged below, by address, where the room relay's
+    # calls are let through (a built folder has no relay); here only what the page's own code logged as an error is kept.
+    page.on("console", lambda m: thrown.append(m.text[:200]) if m.type == "error" and not m.text.startswith("Failed to load resource") else None)
     page.on("requestfailed", lambda r: missing.append(r.url) if not r.url.startswith(base + "api/") else None)
     page.on("response", lambda r: missing.append(f"{r.status} {r.url}") if r.status >= 400 and r.url.startswith(base) and not r.url.startswith(base + "api/") else None)
     name = f"{tag} at {size}"
