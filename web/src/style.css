@@ -1545,3 +1545,17 @@ body>#print-order {
   background: var(--paper);
   max-width: 100%;
 }
+
+/* Review 2 (docs/TEST-LOG.md, sections G and K): the forecast rail must not show on the gap screen at any width; cautions; related decisions. */
+.gap-view .replay-grid>.forecast-summary{display:none!important}
+.cautions{border-top:2px solid var(--ink);padding-top:16px;margin-bottom:32px}
+.cautions h2{margin-bottom:8px}
+.cautions p{margin:0 0 8px;max-width:64ch}
+.see-also{font-size:13px;margin:16px 0 0}
+.see-also a{color:var(--ink);text-underline-offset:3px}
+.chart-axis-title{font:500 13px "IBM Plex Sans",sans-serif;fill:var(--muted)}
+.chart-chosen{fill:none;stroke:var(--ink);stroke-width:2}
+.chart-chosen-label{font:500 13px "IBM Plex Sans",sans-serif;fill:var(--ink)}
+.gap-name{font:500 13px "IBM Plex Sans",sans-serif;fill:var(--ink)}
+.gap-fold{font-size:13px;color:var(--muted);margin:8px 0 0}
+.gap-none{margin:0 0 8px}

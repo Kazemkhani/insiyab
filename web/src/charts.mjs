@@ -2,7 +2,7 @@
 // trend, interval or transport quantity is invented by the renderer.
 import {number,clock} from './model.mjs';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const width=()=>Math.min(880,Math.max(300,document.documentElement.clientWidth-48));
+const width=()=>Math.min(1184,Math.max(300,document.documentElement.clientWidth-48));   // the page's own measure: a chart capped short of it leaves a dead strip beside every chart
 const svg=(w,h,title,body)=>`<svg class="data-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(title)}"><title>${esc(title)}</title>${body}</svg>`;
 const text=(x,y,label,extra='')=>`<text x="${x}" y="${y}" ${extra}>${esc(label)}</text>`;
 export function horizonChart(rows,horizon,label){
@@ -27,23 +27,35 @@ export function subsetChart(rows){
  });return svg(w,h,'Subset average miss. Filled dots are the model; hollow dots the same naive comparison.',out);
 }
 export function forecastChart(rows,selected,revealed,time,bin){
+ // One stop through the hours the model had not seen. Every row here is such an hour, so nothing is shaded: shading all of a plot says nothing.
  if(!rows.length)return '';
  const known=(v,i)=>v.actual!==null&&(i===selected?revealed:v.bin_start+bin<=time);
- const w=width(),h=270,l=38,r=w-18,top=32,bottom=220,max=Math.max(...rows.flatMap((v,i)=>[v.forecast,v.baseline,v.hi,known(v,i)?v.actual:0]),1)*1.1;
+ const w=width(),phone=w<500,h=320,l=38,r=w-(phone?52:70),top=64,bottom=264,max=Math.max(...rows.flatMap((v,i)=>[v.forecast,v.baseline,v.hi,known(v,i)?v.actual:0]),1)*1.1;
  const x=i=>l+(rows[i].bin_start-rows[0].bin_start)/Math.max(1,rows.at(-1).bin_start-rows[0].bin_start)*(r-l),y=v=>bottom-v/max*(bottom-top);
- let out=`<rect class="chart-heldout" x="${l}" y="${top}" width="${r-l}" height="${bottom-top}"/>${text(l,16,'Not seen in learning')}`;
+ let out=text(0,14,'Passengers boarding in 15 minutes','class="chart-axis-title"');
  out+=[0,.5,1].map(f=>`<path class="chart-grid" d="M${l} ${y(max*f)}H${r}"/>${text(l-7,y(max*f)+4,number(max*f),'text-anchor="end"')}`).join('');
  out+=`<path class="chart-range" d="${rows.map((v,i)=>`${i?'L':'M'}${x(i)} ${y(v.hi)}`).join(' ')} ${rows.map((v,i)=>({v,i})).reverse().map(({v,i})=>`L${x(i)} ${y(v.lo)}`).join(' ')} Z"/>`;
  for(const [key,cls] of [['baseline','naive-line'],['forecast','model-line']])out+=`<path class="${cls}" d="${rows.map((v,i)=>`${i?'L':'M'}${x(i)} ${y(v[key])}`).join(' ')}"/>`;
+ // the lines are named where they end, as on the look-ahead chart; the two names are kept apart when the lines end close together
+ const end=rows.at(-1),yn=y(end.baseline),ym=y(end.forecast),apart=Math.abs(yn-ym)<14?(ym<=yn?[-9,9]:[9,-9]):[0,0];
+ out+=text(r+8,ym+4+apart[0],'Model','class="model-line"')+text(r+8,yn+4+apart[1],'Naive','class="naive-line"');
  let connected=false,d='';rows.forEach((v,i)=>{if(known(v,i)){d+=`${connected?'L':'M'}${x(i)} ${y(v.actual)} `;connected=true;}else connected=false;});out+=`<path class="actual-line" d="${d}"/>`;
- rows.forEach((v,i)=>{if(known(v,i))out+=`<circle class="actual-dot" data-actual-bin="${i}" cx="${x(i)}" cy="${y(v.actual)}" r="4"/>`;out+=`<g tabindex="0" role="button" aria-label="Reveal ${clock(v.bin_start)}" data-chart-bin="${i}"><circle class="chart-hit" cx="${x(i)}" cy="${y(v.forecast)}" r="22"/><circle class="model-line chart-dot" cx="${x(i)}" cy="${y(v.forecast)}" r="${i===selected?6:3}"/></g>`;});
- out+=[0,Math.floor((rows.length-1)/2),rows.length-1].map(i=>text(x(i),bottom+25,clock(rows[i].bin_start),'text-anchor="middle"')).join('');return svg(w,h,'Boardings forecast, supplied range, naive forecast and revealed actual counts through the day.',out);
+ rows.forEach((v,i)=>{if(known(v,i))out+=`<circle class="actual-dot" data-actual-bin="${i}" cx="${x(i)}" cy="${y(v.actual)}" r="4"/>`;out+=`<g tabindex="0" role="button" aria-label="Reveal ${clock(v.bin_start)}" data-chart-bin="${i}"><circle class="chart-hit" cx="${x(i)}" cy="${y(v.forecast)}" r="22"/><circle class="model-line chart-dot" cx="${x(i)}" cy="${y(v.forecast)}" r="3"/></g>`;});
+ // the quarter of an hour the visitor chose: a ring, with its time above it
+ if(rows[selected]){const sx=x(selected),sy=y(rows[selected].forecast),anchor=sx<l+60?'start':sx>r-60?'end':'middle';out+=`<circle class="chart-chosen" cx="${sx}" cy="${sy}" r="10"/><path class="chart-guide" d="M${sx} ${top}V${bottom}"/>${text(sx,top-14,`You chose ${clock(rows[selected].bin_start)} to ${clock(rows[selected].bin_start+bin)}`,`text-anchor="${anchor}" class="chart-chosen-label"`)}`;}
+ out+=[0,Math.floor((rows.length-1)/2),rows.length-1].map(i=>text(x(i),bottom+25,clock(rows[i].bin_start),'text-anchor="middle"')).join('');return svg(w,h,'Boardings at this stop through the hours the model had not seen: the forecast with its range, the naive forecast, and what happened where it has been revealed.',out);
 }
 export function gapChart(rows,routeName){
- const active=rows.filter(r=>r.over||r.spare),zero=rows.length-active.length,w=width(),phone=w<500,l=phone?10:160,r=w-16,centre=(l+r)/2,top=32,step=phone?60:38,h=top+active.length*step+32,max=Math.max(...active.flatMap(r=>[r.over,r.spare]),1),scale=(r-l)/2/max*.82;
- let out=text(l,15,'Above seats','class="over"')+text(r,15,'Spare seats','text-anchor="end" class="spare"');out+=`<path class="chart-guide" d="M${centre} ${top-10}V${h-24}"/>`;
- active.forEach((v,i)=>{const y=top+i*step+(phone?23:3);out+=text(phone?l:0,phone?y-9:y+12,`${routeName(v.route_id)} / ${v.direction}`);if(v.over)out+=`<rect class="over-fill" x="${centre-v.over*scale}" y="${y}" width="${v.over*scale}" height="15"/>${text(centre-v.over*scale-6,y+12,v.over,'text-anchor="end"')}`;if(v.spare)out+=`<rect class="spare-fill" x="${centre}" y="${y+3}" width="${v.spare*scale}" height="9"/>${text(centre+v.spare*scale+6,y+12,v.spare)}`;});
- return svg(w,h,'Route-hour passengers above seats on the left; spare seats on the right.',out)+(zero?`<p class="small">${zero} route-direction rows have neither an excess nor spare seats.</p>`:'');
+ // Only the route-directions with passengers above the seats are drawn, fullest first. The rest are one line: sixteen bars for one finding hide the finding.
+ const short=rows.filter(r=>r.over>0).sort((a,b)=>b.over-a.over||a.route_id.localeCompare(b.route_id)),rest=rows.filter(r=>!(r.over>0)),spare=rest.map(r=>r.spare).filter(v=>v>0).sort((a,b)=>a-b);
+ const fold=rest.length?`<p class="gap-fold">${rest.length} other route-direction${rest.length===1?'':'s'}: nobody above the seats${spare.length?`, ${spare[0]===spare.at(-1)?spare[0]:`${spare[0]} to ${spare.at(-1)}`} seats spare`:''}.</p>`:'';
+ if(!short.length)return `<p class="gap-none"><strong>Nobody above the seats in this hour.</strong></p>${fold}`;
+ const w=width(),phone=w<500,l=phone?10:170,r=w-16,top=12,step=phone?66:44,h=top+short.length*step+8,max=Math.max(...short.flatMap(v=>[v.over,v.spare]),1),scale=(r-l-(phone?150:230))/max;   // room is kept at the right for the words beside each bar
+ let out='';
+ short.forEach((v,i)=>{const y=top+i*step+(phone?24:4),name=`Route ${routeName(v.route_id)}, direction ${v.direction}`;out+=text(phone?l:0,phone?y-8:y+13,name,'class="gap-name"');
+  const wo=Math.max(4,v.over*scale);out+=`<rect class="over-fill" x="${l}" y="${y}" width="${wo}" height="14"/>${text(l+wo+8,y+12,`${v.over} above the seats`,'class="over"')}`;
+  if(v.spare)out+=`<rect class="spare-fill" x="${l}" y="${y+19}" width="${Math.max(4,v.spare*scale)}" height="6"/>${text(l+Math.max(4,v.spare*scale)+8,y+27,`${v.spare} seats spare, other trips`,'class="spare"')}`;});
+ return svg(w,h,'Route-directions with passengers above the seats in this hour, fullest first, each with the seats spare on its other trips.',out)+fold;
 }
 export function gainChart(row){
  const w=width(),l=35,r=w-35,min=Math.min(0,row.skill_lo)*1.15,max=Math.max(0,row.skill_hi)*1.15,span=max-min||1,x=v=>l+(v-min)/span*(r-l);

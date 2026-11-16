@@ -160,3 +160,21 @@ Really fixed, checked by her on the live address: every planner finding but one 
 | K7 | The error counter moves with the clock and nothing says so (J6). | TO LANE 2. Partly met already: the first screen now leads with the untouched table's fixed number. |
 | K8 | No census, no public data, no picture of the Dataiku flow. | The census waits on a person in Dataiku. Public data is lane 3's. The flow is lane 1's, on Tuesday, with the real tables. |
 | K9 | Her hardest question with no answer anywhere: how one December Monday carries over to Ramadan or summer. | Answered in docs/PITCH-DRAFT.md: it does not, and we do not claim it. |
+
+## What lane 1 changed in web/ on 17 November from 01:15, while lane 2 was idle
+
+Lane 2's clone had not moved for an hour and two notes had no answer, so lane 1 took these, said so in coordination/lane-1.md first, and kept web/tests/run.sh passing.
+
+| Finding | State |
+|---|---|
+| G3: the forecast rail showed on the gap screen at 390 wide | Fixed: hidden on the gap view at every width. |
+| G3: "model year null" | Fixed: left out when there is none; the test now fails if "null" is on the screen. |
+| G3: "1 stops" | Fixed. |
+| G3: "error removed against In proportion to the timetable", "11520" | Fixed: "Its misses are 20 in 100 smaller than the best naive forecast's (in proportion to the timetable), every look-ahead together, over 384 forecasts." |
+| G3 and K6: "Room unavailable.", "held-out", a bus's state "Room" | Fixed: "No phones are connected to this page...", "the hours the model had not seen", "Has room". |
+| G1, in part: the caption named the tool | Fixed: "Illustration. It does not show a real passenger or a count of people waiting." |
+| K1: `related` shown nowhere | Fixed: "On the same route:" with a link, on the card (not on the one-page printed order, which it pushed to two pages; a test caught that). |
+| K3, K4: no sentence where the model loses or its range falls short | Fixed: the model screen opens its evidence with "Where not to lean on it", from `cautions`. |
+| G2: the forecast chart | Mostly fixed: no shading, the lines named at their ends, the axis titled "Passengers boarding in 15 minutes", the chosen quarter-hour ringed and labelled, the chart as wide as the page. Open: it still opens on a quiet stop, and the day's map still repeats under it. |
+| G5: the gap chart | Fixed: only route-directions with passengers above the seats are drawn, fullest first, each labelled in words; the rest are one line ("15 other route-directions: nobody above the seats, 26 to 112 seats spare"). Open: the map's ribbons. |
+| G1: the four figures; G4: six type sizes | **Not done.** These are the two largest pieces of the design review still open. |

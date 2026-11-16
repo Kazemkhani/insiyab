@@ -27,7 +27,7 @@ with tempfile.TemporaryDirectory(prefix='insiyab-review-') as tmp, sync_playwrig
  pg.locator('[data-view=forecast]').click();pg.wait_for_function("!!INSIYAB_BUNDLE['forecast/boardings-stop.json']")
  pg.locator('#forecast-series').select_option('1');check('999.25' in pg.locator('#challenge').inner_text(),'second series for the same stop can be inspected')
  pg.locator('#reveal').click();check('No actual count supplied.' in pg.locator('[data-miss]').inner_text(),'missing actual is not displayed as zero or scored')
- pg.locator('#forecast-stop').select_option(missing);check(pg.locator('#reveal').is_hidden() and 'No held-out afternoon forecast supplied' in pg.locator('#challenge').inner_text(),'stop with no series never borrows another stop forecast')
+ pg.locator('#forecast-stop').select_option(missing);check(pg.locator('#reveal').is_hidden() and 'No forecast was supplied for this stop' in pg.locator('#challenge').inner_text(),'stop with no series never borrows another stop forecast')
  local_file.unlink();open_page();pg.locator('[data-view=forecast]').click();pg.wait_for_function("document.querySelector('#challenge').textContent.includes('could not be opened')")
  check(not errors,'missing local forecast is handled without an unhandled page error')
  pg.locator('[data-view=replay]').click();check(pg.locator('#map').is_visible(),'replay still works after forecast file failure')

@@ -47,7 +47,7 @@ with sync_playwright() as p:
         check(page.evaluate('new Set(insiyab.buses.map(b=>b.route_id)).size<=1'),f'{width}: focus filters buses to one route')
         page.locator('[data-route]').first.click()
         check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='communities').props.data.length===0"),f'{width}: overview has no overlapping community labels')
-        page.locator('#entity-type').select_option('bus');check('model year' in page.locator('#detail').inner_text(),f'{width}: bus details')
+        page.locator('#entity-type').select_option('bus');check('seats' in page.locator('#detail').inner_text() and 'null' not in page.locator('#detail').inner_text(),f'{width}: bus details, with no null shown')
         page.locator('#entity-type').select_option('community');check('boardings over the service day' in page.locator('#detail').inner_text(),f'{width}: community totals')
         page.locator('[data-view="forecast"]').click()
         check(page.locator('#forecast-controls').is_visible(),f'{width}: forecast switch responds')
@@ -71,7 +71,7 @@ with sync_playwright() as p:
         missing=page.evaluate("insiyab.model.network.stops.find(s=>!INSIYAB_BUNDLE['forecast/boardings-stop.json'].series.some(f=>f.id===s.stop_id))?.stop_id")
         if missing:
             page.locator('#forecast-stop').select_option(missing)
-            check('No held-out afternoon forecast supplied' in page.locator('#challenge').inner_text(),f'{width}: missing stop forecast is explicit')
+            check('No forecast was supplied for this stop' in page.locator('#challenge').inner_text(),f'{width}: missing stop forecast is explicit')
         page.locator('[data-view="model"]').click()
         check('naive forecast' in page.locator('#model-sentence').inner_text(),f'{width}: model sentence from bundle')
         check(page.locator('#subset-chart svg').count()==1,f'{width}: subset comparison chart exists')
