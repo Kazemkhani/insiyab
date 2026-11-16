@@ -28,6 +28,7 @@ if [ -d fixtures/raw ]; then
 fi
 # The stand-in bundle the site shows is the engine's own output on the invented tables: a real model's table on invented data.
 run "the stand-in bundle equals a fresh run of the engine on the invented tables" "$PY" -m model.run --data fixtures/raw --check fixtures
+run "the model card equals a fresh one written from the stand-in bundle" python3 -m model.card --bundle fixtures --check docs/MODEL-CARD.md
 if [ -f artifacts/meta.json ]; then run "the real bundle meets the contract" python3 tools/contract_check.py artifacts; else echo "NOTE artifacts/ is empty: no real result exists yet"; fi
 
 # Each lane adds its own suite here as one line, when the suite exists. A missing file is a failure, not a skip.
