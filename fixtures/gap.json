@@ -3595,12 +3595,12 @@
  ],
  "totals": {
   "after": {
-   "empty_seat_km": 385463,
+   "empty_seat_km": 394776,
    "passenger_minutes_over_seats": 27
   },
   "assumption": "the vehicle swaps in the right-bus decision are made; the same passengers travel at the same times. A stretch between stops is measured as a straight line, so empty seat-kilometres are an under-count.",
   "before": {
-   "empty_seat_km": 386954,
+   "empty_seat_km": 396230,
    "passenger_minutes_over_seats": 221
   },
   "kind": "simulated"

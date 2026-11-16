@@ -144,6 +144,8 @@ def build(day, fixture=True, generated_at=None, commit=None):
         t["tested_on"] = f"later hours of one day, {date}, inside the winter break of most schools. Not tested on another day, and a school day may look different."
     base = t_stop["best_naive"]
 
+    # At an origin with too little of the day behind it, a model can only repeat the timetable. Those forecasts are learned from but not shown as the model's.
+    shown_stop, shown_route = stop[~stop["origin"].isin(thin)], route[~route["origin"].isin(thin)]
     gap, decisions, v, trips = B.gap_and_decisions(day)
     replay, left_out = B.replay(day)
     net = B.network(day)
@@ -158,17 +160,17 @@ def build(day, fixture=True, generated_at=None, commit=None):
                {"key": "wape_60", "label": "Forecast error one hour ahead, by route (WAPE)", "value": hour and hour["wape"], "unit": "share", "kind": "measured", "source": "metrics.json"},
                {"key": "skill_60", "label": "Better than the best naive forecast, one hour ahead", "value": hour and hour["skill"], "unit": "share of error removed", "kind": "measured", "source": "metrics.json"},
                {"key": "range_kept", "label": "How often the truth fell inside the stated range", "value": t_stop["range"]["kept"], "unit": "share, nine in ten promised", "kind": "measured", "source": "metrics.json"}]
-    origins = sorted(int(x) for x in rows["origin"].unique())
+    origins = sorted(int(x) for x in shown_stop["origin"].unique())
     meta = {"contract_version": 1, "service_date": day["service_date"], "generated_at": generated_at, "commit": commit, "bin_seconds": BIN, "origins": origins, "horizons_seconds": F.HORIZONS,
             "counts": {"routes": len(net["routes"]), "stops": len(net["stops"]), "trips": int(sum(len(r["trips"]) for r in replay.values())), "stop_visits": len(v), "boardings": boardings},
             "notes": ("Stand-in data. Invented network, invented numbers. " if fixture else "") + "Seat counts only: standing capacity is marked not verified in the supplied data. One day: nothing here was tested on another day.",
-            "engine": {"boosted_trees": F.boosted_trees_library(), "chosen": chosen, "origins_with_too_little_to_learn_from": int(thin), "trips_left_out_of_the_replay": int(left_out)},
+            "engine": {"boosted_trees": F.boosted_trees_library(), "chosen": chosen, "origins_with_too_little_to_learn_from": [int(x) for x in thin], "trips_left_out_of_the_replay": int(left_out)},
             "stages": day["log"]}
     files = {"meta.json": meta, "network.json": net, "metrics.json": {"targets": [t_route, t_stop]}, "decisions.json": {"decisions": decisions}, "personas.json": {"personas": people},
              "summary.json": {"headline": summary}, "gap.json": gap,
-             "forecast/boardings-route.json": {"target": "boardings", "level": "route", "bin_seconds": BIN, "model": chosen, "baseline_model": base, "series": [{"id": s.pop("route_id"), **s} for s in _series_json(route, ["route_id"], chosen, base, first_bin)]},
+             "forecast/boardings-route.json": {"target": "boardings", "level": "route", "bin_seconds": BIN, "model": chosen, "baseline_model": base, "series": [{"id": s.pop("route_id"), **s} for s in _series_json(shown_route, ["route_id"], chosen, base, first_bin)]},
              "forecast/boardings-stop.json": {"target": "boardings", "level": "stop", "bin_seconds": BIN, "model": chosen, "baseline_model": base,
-                                              "series": [{"id": s.pop("stop_id"), **s} for s in _series_json(stop, ["stop_id", "route_id", "direction"], chosen, base, first_bin)]},
+                                              "series": [{"id": s.pop("stop_id"), **s} for s in _series_json(shown_stop, ["stop_id", "route_id", "direction"], chosen, base, first_bin)]},
              "replay/index.json": {"routes": [{"route_id": rid, "file": f"replay/route-{rid}.json", "trips": len(r["trips"])} for rid, r in replay.items()]}}
     for rid, r in replay.items():
         files[f"replay/route-{rid}.json"] = r

@@ -12,7 +12,9 @@
  "engine": {
   "boosted_trees": "lightgbm 4.7.0",
   "chosen": "gbt",
-  "origins_with_too_little_to_learn_from": 1,
+  "origins_with_too_little_to_learn_from": [
+   21600
+  ],
   "trips_left_out_of_the_replay": 0
  },
  "fixture": true,
@@ -25,7 +27,6 @@
  ],
  "notes": "Stand-in data. Invented network, invented numbers. Seat counts only: standing capacity is marked not verified in the supplied data. One day: nothing here was tested on another day.",
  "origins": [
-  21600,
   23400,
   25200,
   27000,

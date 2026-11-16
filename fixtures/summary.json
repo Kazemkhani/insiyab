@@ -39,7 +39,7 @@
    "label": "Forecast error one hour ahead, by route (WAPE)",
    "source": "metrics.json",
    "unit": "share",
-   "value": 0.5314
+   "value": 0.5334
   },
   {
    "key": "skill_60",
@@ -47,7 +47,7 @@
    "label": "Better than the best naive forecast, one hour ahead",
    "source": "metrics.json",
    "unit": "share of error removed",
-   "value": 0.1409
+   "value": 0.1376
   },
   {
    "key": "range_kept",
@@ -55,7 +55,7 @@
    "label": "How often the truth fell inside the stated range",
    "source": "metrics.json",
    "unit": "share, nine in ten promised",
-   "value": 0.9659
+   "value": 0.9654
   },
   {
    "key": "late_mae_5",

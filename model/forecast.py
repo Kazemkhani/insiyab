@@ -165,7 +165,7 @@ def rolling(rows, learn_mask=None, test_mask=None, origins=None, watch=None):
     learn_mask and test_mask narrow who is learned from and who is forecast: that is how a route or a community is held out."""
     X = rows[FEATURES].to_numpy(dtype=float); y = rows["y"].to_numpy(); o_all = rows["origin"].to_numpy(); ended = o_all + rows["horizon"].to_numpy()
     learn_mask = np.ones(len(rows), bool) if learn_mask is None else learn_mask; test_mask = np.ones(len(rows), bool) if test_mask is None else test_mask
-    pred = {k: np.full(len(rows), np.nan) for k in MODELS}; thin = 0
+    pred = {k: np.full(len(rows), np.nan) for k in MODELS}; thin = []
     for o in sorted(set(o_all) if origins is None else origins):
         test = (o_all == o) & test_mask; learn = (ended <= o) & learn_mask
         if not test.any():
@@ -174,9 +174,9 @@ def rolling(rows, learn_mask=None, test_mask=None, origins=None, watch=None):
             watch(o, learn, test)                                     # a test looks over the shoulder: who is learned from, who is forecast
         for kind in MODELS:
             if learn.sum() < MIN_ROWS or y[learn].sum() == 0:
-                pred[kind][test] = rows["naive_timetable"].to_numpy()[test]; thin += 1; continue
+                pred[kind][test] = rows["naive_timetable"].to_numpy()[test]; thin.append(int(o)); continue
             pred[kind][test] = _predict(kind, _fit(kind, X[learn], y[learn]), X[test])
-    return pred, thin // len(MODELS)
+    return pred, sorted(set(thin))                                    # the origins at which there was too little to learn from: no model's forecast is shown for them
 
 
 def importance(rows, up_to):

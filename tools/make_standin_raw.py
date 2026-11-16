@@ -49,6 +49,17 @@ ROUTES = [
     ("K10",  "Stand-in Rising Line",  (55.21, 25.11), (55.37, 25.27), 0.9, ["STANDARD", "COACH"]),
     ("K900", "Stand-in Falling Line", (55.21, 25.27), (55.39, 25.09), 0.35, ["COACH", "DOUBLE"]),
 ]
+# Where each route bends on its way, so the invented network reads as roads and not as a grid. One list of (lon, lat) a route, in the order of ROUTES.
+VIA = [
+    [(55.26, 25.125), (55.30, 25.145), (55.33, 25.14)],
+    [(55.25, 25.20), (55.29, 25.185), (55.33, 25.20)],
+    [(55.26, 25.262), (55.31, 25.24)],
+    [(55.222, 25.16), (55.24, 25.21)],
+    [(55.30, 25.15), (55.285, 25.20), (55.295, 25.24)],
+    [(55.36, 25.16), (55.345, 25.22)],
+    [(55.25, 25.16), (55.30, 25.19), (55.33, 25.24)],
+    [(55.24, 25.23), (55.29, 25.20), (55.33, 25.15)],
+]
 MISSING_FROM_FLEET = (5, 11)          # the vehicles, by the order they first run, that the fleet table leaves out
 ODD_ROUTE_VEHICLES = ((3, 1), (4, 0))  # (route, which of its vehicles): taps on these write the route number another way
 NOT_RUN = (40, 97, 133)               # scheduled trips, by order, that did not run
@@ -118,7 +129,12 @@ def build(nol_shape="tap"):
     for ri, (short, long_name, a, b, weight, pool) in enumerate(ROUTES):
         rid = "R%02d" % (ri + 1)
         seg = 110 + 12 * (ri % 5)                                    # scheduled seconds between stops
-        line = [(a[0] + (b[0] - a[0]) * i / (N_STOPS - 1), a[1] + (b[1] - a[1]) * i / (N_STOPS - 1)) for i in range(N_STOPS)]
+        path = [a] + VIA[ri] + [b]; legs = [math.hypot(q[0] - p[0], q[1] - p[1]) for p, q in zip(path, path[1:])]; line = []
+        for i in range(N_STOPS):                                    # stops at equal steps along the bent path
+            want = sum(legs) * i / (N_STOPS - 1); k = 0
+            while k < len(legs) - 1 and want > legs[k]:
+                want -= legs[k]; k += 1
+            f = min(1.0, want / legs[k]); line.append((path[k][0] + (path[k + 1][0] - path[k][0]) * f, path[k][1] + (path[k + 1][1] - path[k][1]) * f))
         dirs = []
         for d in (0, 1):
             pts = line if d == 0 else line[::-1]
