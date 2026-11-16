@@ -64,3 +64,12 @@ export function fitPaths(paths,width,height) {
   const scale=Math.min((width-72)/(maxX-minX||1),(height-72)/(maxY-minY||1));
   return {target:[(minX+maxX)/2,(minY+maxY)/2,0],zoom:Math.log2(Math.max(.01,scale)),scale};
 }
+// Score only bins whose end is at or behind the clock. Null actuals never score.
+export function rollingError(forecast,time,horizon) {
+  const rows=forecast.series.flatMap(s=>s.rows).filter(r=>r.horizon===horizon && r.bin_start+forecast.bin_seconds<=time && r.actual!==null);
+  const mean=key=>rows.length?rows.reduce((s,r)=>s+Math.abs(r[key]-r.actual),0)/rows.length:null;
+  return {n:rows.length,model:mean('forecast'),naive:mean('baseline')};
+}
+export function originRows(forecast,origin,horizon) {
+  return forecast.series.flatMap(s=>s.rows.filter(r=>r.origin===origin && r.horizon<=horizon).map(r=>({...r,id:s.id,route_id:s.route_id})));
+}

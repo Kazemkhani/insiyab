@@ -23,3 +23,9 @@ const css=fs.readFileSync(path.join(root,'web/src/style.css'),'utf8');
 const tokens=Object.fromEntries([...css.matchAll(/--([\w-]+):#([0-9a-fA-F]{6})/g)].map(m=>[m[1],m[2]]));
 function lum(hex){const rgb=hex.match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;}
 for(const name of ['ink','flow','over','spare','simulated','muted','dark-grey']){const ratio=(lum(tokens.paper)+.05)/(lum(tokens[name])+.05);assert.ok(ratio>=4.5,`${name} ${ratio}`);console.log(`PASS contrast ${name} / paper ${ratio.toFixed(2)}:1`);}
+const {rollingError}=await import('../src/model.mjs');
+const forecasts={bin_seconds:10,series:[{rows:[{horizon:20,bin_start:20,forecast:4,baseline:8,actual:6},{horizon:20,bin_start:30,forecast:100,baseline:1,actual:4},{horizon:20,bin_start:10,forecast:5,baseline:8,actual:null}]}]};
+assert.deepEqual(rollingError(forecasts,29,20),{n:0,model:null,naive:null});
+assert.deepEqual(rollingError(forecasts,30,20),{n:1,model:2,naive:2});
+assert.throws(()=>assert.equal(rollingError(forecasts,30,20).n,3));
+console.log('PASS rolling error excludes future bins and missing actuals; negative control rejects leakage');

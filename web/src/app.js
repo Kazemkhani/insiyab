@@ -1,12 +1,12 @@
 import {Deck, OrthographicView, COORDINATE_SYSTEM} from '@deck.gl/core';
 import {PathLayer,ScatterplotLayer,PolygonLayer,TextLayer} from '@deck.gl/layers';
-import {createModel, busesAt, boardingsAt, fitPaths, pointAlong, clock, number} from './model.mjs';
+import {createModel, busesAt, boardingsAt, fitPaths, pointAlong, clock, number, rollingError, originRows} from './model.mjs';
 const B=window.INSIYAB_BUNDLE, M=createModel(B), $=id=>document.getElementById(id);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const css=getComputedStyle(document.documentElement);
 const colour=name=>css.getPropertyValue('--'+name).trim().match(/\w\w/g).map(v=>parseInt(v,16));
 const C=Object.fromEntries(['ink','paper','flow','over','spare','simulated','line','grey'].map(n=>[n,colour(n)]));
-let time=Math.min(M.max,Math.max(M.min,M.meta.origins[0]+M.meta.bin_seconds)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[];
+let time=Math.min(M.max,Math.max(M.min,M.meta.origins[0]+3600)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1;
 const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Room';
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 $('fixture').hidden=!M.meta.fixture;
@@ -39,8 +39,10 @@ function detail() {
   }
   $('detail').innerHTML=html;
 }
-function pick(kind,id){$('entity-type').value=kind;selected=id;records();}
+function pick(kind,id){$('entity-type').value=kind;selected=id;records();if(view==='forecast'&&kind==='stop'){$('forecast-stop').value=id;forecastTimes();}}
 function render() {
+  if(Math.floor(time/M.meta.bin_seconds)!==lastErrorBin){renderError();lastErrorBin=Math.floor(time/M.meta.bin_seconds);}
+
   $('clock').value=clock(time);$('time').value=time;
   const bin=Math.floor(time/M.meta.bin_seconds);
   if(bin!==lastBin){stopData=boardingsAt(M,time);lastBin=bin;detail();}
@@ -48,6 +50,7 @@ function render() {
   const buses=busesAt(M,time),unit=1/fit.scale;
   const shared={coordinateSystem:COORDINATE_SYSTEM.CARTESIAN};
   deck.setProps({layers:[
+    ...forecastLayers(shared,unit),
     new PathLayer({...shared,id:'routes',data:M.paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:C.grey,getWidth:3,widthUnits:'pixels'}),
     new PathLayer({...shared,id:'boardings',data:stopData,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*5*unit]],getColor:C.ink,getWidth:3,widthUnits:'pixels'}),
     new ScatterplotLayer({...shared,id:'stops',data:stopData,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
@@ -58,7 +61,7 @@ function render() {
     new TextLayer({...shared,id:'communities',data:$('map').clientWidth<600?[]:M.network.communities,getPosition:c=>M.project(c.centroid),getText:c=>c.name_en,getPixelOffset:[0,-18],getSize:10,getColor:C.ink,fontFamily:'Plex',pickable:true,onClick:({object})=>object&&pick('community',object.community_id)})
   ]});
   // The browser checks rendered layer data, not a separate animation model.
-  window.insiyab={model:M,time,buses,fit,deck,setTime:t=>{time=+t;playing=false;$('play').textContent='Play';render();},get selected(){return selected;}};
+  window.insiyab={model:M,time,buses,fit,deck,setTime:t=>{time=+t;playing=false;$('play').textContent='Play';render();},get selected(){return selected;},get view(){return view;},get forecastOrigin(){return forecastOrigin;}};
 }
 $('entity-type').onchange=records;$('entity').onchange=()=>{selected=$('entity').value;detail();};
 $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pause':'Play';};
@@ -74,3 +77,66 @@ async function start(){
   requestAnimationFrame(tick);
 }
 start().catch(e=>{console.error(e);$('map-failure').hidden=false;});
+
+const oneHour=3600;
+const limit=`Tested on later hours of one day, ${new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(M.meta.service_date+'T00:00:00Z'))}. Not tested on another day.`;
+document.querySelectorAll('.forecast-limit').forEach(e=>e.textContent=limit);
+document.querySelectorAll('.date').forEach(e=>e.textContent=M.meta.service_date);
+function renderError(){
+  const score=rollingError(B['forecast/boardings-route.json'],time,3600);
+  $('error-counter').innerHTML=score.n?`<span>Average miss so far<br><small>One hour ahead</small></span><strong>${number(score.model)} <small>forecast</small></strong><strong>${number(score.naive)} <small>naive forecast</small></strong><span class="source">passengers / route / ${M.meta.bin_seconds/60} min · <br>${score.n} held-out bins · forecast/boardings-route.json</span>`:'<span>Waiting for the first one-hour forecast bin to finish. No error is known yet.</span>';
+}
+function setView(next){
+  view=next;playing=false;$('play').textContent='Play';
+  document.querySelectorAll('nav button').forEach(e=>e.setAttribute('aria-current',e.dataset.view===next?'page':'false'));
+  $('replay').hidden=next==='model';$('model').hidden=next!=='model';
+  $('forecast-controls').hidden=next!=='forecast';$('pick-stop').hidden=next!=='forecast';
+  $('map-caption').textContent=next==='forecast'?'The forecast meeting reality':'The day, replayed';
+  if(next==='forecast')freezeForecast();
+  if(next==='model')renderModel();
+  render();window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.dataset.view));
+function freezeForecast(){forecastOrigin=[...M.meta.origins].reverse().find(o=>o<=time)??M.meta.origins[0];$('frozen-at').textContent=`Made at ${clock(forecastOrigin)}. Quarter hour ending ${clock(forecastOrigin+3600)}. forecast/boardings-stop.json · ${M.meta.service_date}`;render();}
+$('freeze').onclick=freezeForecast;
+function forecastLayers(shared,unit){
+  if(view!=='forecast')return [];
+  const rows=originRows(B['forecast/boardings-stop.json'],forecastOrigin,3600).filter(r=>r.horizon===3600);
+  const data=[...new Set(rows.map(r=>r.id))].map(id=>{
+    const bins=rows.filter(r=>r.id===id),known=bins.filter(r=>r.bin_start+B['forecast/boardings-stop.json'].bin_seconds<=time && r.actual!==null);
+    return {id,position:M.stops.get(id).position,forecast:bins.reduce((s,r)=>s+r.forecast,0),actual:known.length?known.reduce((s,r)=>s+r.actual,0):null};
+  });
+  return [new ScatterplotLayer({...shared,id:'forecast-halos',data,getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.forecast)*4,radiusUnits:'pixels',radiusMaxPixels:34,filled:false,stroked:true,getLineColor:[...C.spare,130],getLineWidth:2,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('forecast-stop').value=object.id;forecastTimes();pick('stop',object.id);}}}),new ScatterplotLayer({...shared,id:'actual-halos',data:data.filter(d=>d.actual!==null),getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.actual)*4,radiusUnits:'pixels',radiusMaxPixels:34,getFillColor:[...C.flow,90]})];
+}
+$('forecast-stop').innerHTML=M.network.stops.map(s=>`<option value="${escape(s.stop_id)}">${escape(s.name)}</option>`).join('');
+$('forecast-stop').value=B['forecast/boardings-stop.json'].series[0]?.id;
+let challengeRows=[],challengeRevealed=false;
+function forecastTimes(){
+  const series=B['forecast/boardings-stop.json'].series.find(s=>s.id===$('forecast-stop').value);
+  challengeRows=(series?.rows??[]).filter(r=>r.horizon===oneHour && r.bin_start>=12*3600).sort((a,b)=>a.bin_start-b.bin_start);
+  $('forecast-time').innerHTML=challengeRows.map((r,i)=>`<option value="${i}">${clock(r.bin_start)} to ${clock(r.bin_start+B['forecast/boardings-stop.json'].bin_seconds)}</option>`).join('');
+  challengeRevealed=false;renderChallenge();
+}
+function renderChallenge(){
+  const row=challengeRows[+$('forecast-time').value];
+  $('reveal').hidden=!row;$('forecast-time').disabled=!row;
+  if(!row){$('challenge').innerHTML='<p>No held-out afternoon forecast supplied for this stop. Choose another stop; no value has been invented.</p>';return;}
+  $('challenge').innerHTML=`<p>Forecast made at ${clock(row.origin)} for the bin ending ${clock(row.origin+row.horizon)}. The model had seen no records after ${clock(row.origin)}.</p><div class="challenge-numbers"><div><span class="eyebrow">Forecast</span><strong>${number(row.forecast)}</strong><span>passengers boarding</span><small>Range ${number(row.lo)} to ${number(row.hi)}</small></div><div><span class="eyebrow">What happened · measured</span><strong data-actual>${challengeRevealed?number(row.actual):'?'}</strong><span>${challengeRevealed?'passengers boarded':'Hidden until you reveal'}</span></div></div>${challengeRevealed?`<p data-miss>${row.actual===null?'No actual count supplied.':`A miss of ${number(Math.abs(row.forecast-row.actual))} passengers. The naive forecast said ${number(row.baseline)} and missed by ${number(Math.abs(row.baseline-row.actual))}.`}</p>`:''}`;
+  $('reveal').textContent=challengeRevealed?'Hide what happened':'Reveal what happened';
+}
+$('forecast-stop').onchange=forecastTimes;$('forecast-time').onchange=()=>{challengeRevealed=false;renderChallenge();};$('reveal').onclick=()=>{challengeRevealed=!challengeRevealed;renderChallenge();};forecastTimes();
+$('model-target').innerHTML=B['metrics.json'].targets.map((t,i)=>`<option value="${i}">${escape(t.target.replaceAll('_',' '))} · ${escape(t.level)}</option>`).join('');
+function renderModel(){
+  const t=B['metrics.json'].targets[+$('model-target').value],horizons=[...new Set(t.results.map(r=>r.horizon))].sort((a,b)=>a-b),all=t.subsets.find(s=>s.kind==='all')?.subset,chosen=t.models.find(m=>!m.is_baseline),naive=t.models.find(m=>m.is_baseline);
+  const h=horizons.includes(oneHour)?oneHour:horizons[0],result=(model,horizon,subset)=>t.results.find(r=>r.model===model&&r.horizon===horizon&&r.subset===subset);
+  const best=result(chosen.model,h,all),base=result(naive.model,h,all);
+  $('model-sentence').textContent=`${h/60} minutes ahead, the forecast misses by ${number(best?.mae)} on average. The naive forecast misses by ${number(base?.mae)}. Unit: ${t.unit}.`;
+  $('model-unit').textContent=`Average absolute miss (MAE). ${t.unit}. Lower is better.`;
+  $('model-table').innerHTML=`<div class="table-scroll"><table class="metrics"><thead><tr><th>Model</th>${horizons.map(h=>`<th>${h/60} min ahead</th>`).join('')}</tr></thead><tbody>${t.models.map(m=>`<tr><th>${m.is_baseline?'Naive forecast: ':''}${escape(m.label)}</th>${horizons.map(h=>`<td>${number(result(m.model,h,all)?.mae)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const selected=$('model-horizon').value;$('model-horizon').innerHTML=horizons.map(h=>`<option value="${h}">${h/60} minutes</option>`).join('');$('model-horizon').value=horizons.includes(+selected)?selected:h;
+  const horizon=+$('model-horizon').value;
+  const worst=new Map(t.models.map(m=>[m.model,Math.max(...t.results.filter(r=>r.model===m.model&&r.horizon===horizon&&r.subset!==all).map(r=>r.mae))]));
+  $('subset-table').innerHTML=`<div class="table-scroll"><table class="metrics"><thead><tr><th>Subset / model</th><th>MAE</th><th>RMSE</th><th>MAPE</th><th>WAPE</th><th>Bins / MAPE bins</th></tr></thead><tbody>${t.subsets.filter(s=>s.subset!==all).map(s=>t.models.map(m=>{const r=result(m.model,horizon,s.subset);return r?`<tr class="${r.mae===worst.get(m.model)?'worst':''}"><th>${escape(s.label)}<small>${m.is_baseline?'Naive forecast':escape(m.label)}${r.mae===worst.get(m.model)?' · Largest miss':''}</small></th><td>${number(r.mae)}</td><td>${number(r.rmse)}</td><td>${r.mape===null?'—':number(r.mape*100)+'%'}</td><td>${r.wape===null?'—':number(r.wape*100)+'%'}</td><td>${r.n} / ${r.mape_n}</td></tr>`:'';}).join('')).join('')}</tbody></table></div>`;
+  $('mape-rule').textContent=t.mape_rule;$('split-rule').textContent=`Learning: ${t.split.train}. Held-out: ${t.split.test}.`;
+}
+$('model-target').onchange=renderModel;$('model-horizon').onchange=renderModel;
