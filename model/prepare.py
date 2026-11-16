@@ -92,8 +92,19 @@ def prepare(tables, service_date=None):
     v["route_id"] = route_name(v["route_raw"]); v["stop_id"] = v["stop_id"].str.strip()
     v["direction"] = pd.to_numeric(v["direction"], errors="coerce").fillna(0).astype(int).clip(0, 1)
     v["seq"] = pd.to_numeric(v["seq"], errors="coerce")
+    # The day runs past midnight, and on a real network past 04:00 too: a night bus is still out at 04:10, written as 04:10 on the day's date.
+    # So a clock time is not placed by a fixed hour. Each vehicle's rows are followed in the order the report gives them: when its clock
+    # falls back by more than six hours it has passed midnight. Only a vehicle's first row needs a rule: before DAY_START it is past midnight.
     for c in ("sched_arr", "act_arr", "sched_dep", "act_dep"):
-        t = seconds(v[c]); v[c] = t + np.where(t < DAY_START, 86400, 0)        # the day runs past midnight: 00:12 is 24:12
+        v[c] = seconds(v[c])
+    base = v["sched_arr"].fillna(v["sched_dep"]); prev = base.groupby(v["body"], sort=False).shift(1)
+    wrapped = (base < prev - 6 * 3600).astype(int).groupby(v["body"], sort=False).cumsum()
+    first = base.groupby(v["body"], sort=False).transform("first")
+    day_of_row = (wrapped + (first < DAY_START).astype(int)).clip(upper=1) * 86400
+    anchor = base + day_of_row
+    for c in ("sched_arr", "act_arr", "sched_dep", "act_dep"):
+        t = v[c] + day_of_row
+        v[c] = t + np.where(t < anchor - 12 * 3600, 86400, 0) - np.where(t > anchor + 12 * 3600, 86400, 0)      # a row that itself straddles midnight
     no_time = v[["sched_arr", "sched_dep"]].isna().any(axis=1) | v["seq"].isna()
     v = v[~no_time].copy()
     filled = int(v["act_arr"].isna().sum() + v["act_dep"].isna().sum())
@@ -113,7 +124,8 @@ def prepare(tables, service_date=None):
     moved = int((before != v[["act_arr", "act_dep"]].to_numpy()).any(axis=1).sum())
     note("runtime report", "one row is one bus at one stop; rows with no scheduled time or no stop sequence are left out; a missing actual time takes the scheduled one; a time that ran backwards is moved up to the time before it",
          rows_in=len(raw), rows_out=len(v), rows_without_a_scheduled_time=no_time.sum(), actual_times_filled_from_schedule=filled, rows_whose_clock_ran_backwards=moved,
-         route_numbers_rewritten=(v["route_raw"].str.strip() != v["route_id"]).sum(), trips=v["trip_id"].nunique(), door_not_opened=(~v["door_opened"]).sum())
+         route_numbers_rewritten=(v["route_raw"].str.strip() != v["route_id"]).sum(), trips=v["trip_id"].nunique(), door_not_opened=(~v["door_opened"]).sum(),
+         rows_placed_after_midnight=(v["sched_arr"] >= 86400).sum(), latest_scheduled_hour=int(v["sched_arr"].max() // 3600))
 
     # --- the fleet: seats for each vehicle ----------------------------------------------------------------------
     f = cols(tables["fleet"], "Body_number", "Bus_Type", "Model Year", "No_of_Seats")

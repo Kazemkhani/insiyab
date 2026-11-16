@@ -11,7 +11,7 @@ import os, re, subprocess, sys, tempfile
 RAW_EXT = (".csv", ".tsv", ".xlsx", ".xls", ".parquet", ".kml", ".kmz", ".feather", ".sqlite", ".db", ".pkl", ".gz", ".ipynb")
 # the twelve files of a transit feed: allowed only as invented tables or as public data with its source
 FEED = {"agency.txt", "routes.txt", "trips.txt", "stop_times.txt", "stops.txt", "calendar.txt", "calendar_dates.txt", "frequencies.txt", "shapes.txt", "transfers.txt", "translations.txt", "feed_info.txt"}
-STANDIN_MAX = 3_000_000        # an invented table is small: a real day of taps is hundreds of times this. It was 400,000 until the invented day proved too thin to exercise every lever.
+STANDIN_MAX = 8_000_000        # an invented table is small: a real day of taps is hundreds of times this. It was 400,000 until the invented day proved too thin to exercise every lever.
 # the provided tables' identifier columns: these words may appear in docs and code, never as a column of data
 ID_HEADER = re.compile(r'(NOL_ID|device_id_hex|device_id|Driver_id|Body_EVD_ID)', re.I)
 ALLOWED_DIRS = ("docs/", "tools/", "model/", "handoff/", "scripts/", "tests/", "coordination/", "README", "AGENTS", "CLAUDE")

@@ -1,555 +1,800 @@
 route_id,service_id,trip_id,shape_id,trip_headsign,direction_id,block_id,trip_short_name
-R01,WK,R01-0-0500,P10,Stand-in east end,0,,
-R03,WK,R03-1-0503,P31,Stand-in west end,1,,
-R05,WK,R05-0-0514,P50,Stand-in east end,0,,
-R07,WK,R07-1-0517,P71,Stand-in west end,1,,
-R01,WK,R01-0-0541,P10,Stand-in east end,0,,
-R02,WK,R02-0-0541,P20,Stand-in east end,0,,
-R03,WK,R03-1-0544,P31,Stand-in west end,1,,
-R04,WK,R04-1-0544,P41,Stand-in west end,1,,
-R05,WK,R05-0-0554,P50,Stand-in east end,0,,
-R06,WK,R06-0-0555,P60,Stand-in east end,0,,
-R07,WK,R07-1-0556,P71,Stand-in west end,1,,
-R08,WK,R08-1-0558,P81,Stand-in west end,1,,
-R01,WK,R01-1-0611,P11,Stand-in west end,1,,
-R01,WK,R01-0-0617,P10,Stand-in east end,0,,
-R02,WK,R02-0-0617,P20,Stand-in east end,0,,
-R03,WK,R03-1-0620,P31,Stand-in west end,1,,
-R04,WK,R04-1-0620,P41,Stand-in west end,1,,
-R03,WK,R03-0-0622,P30,Stand-in east end,0,,
-R05,WK,R05-1-0625,P51,Stand-in west end,1,,
-R05,WK,R05-0-0628,P50,Stand-in east end,0,,
-R06,WK,R06-0-0629,P60,Stand-in east end,0,,
-R07,WK,R07-1-0630,P71,Stand-in west end,1,,
-R08,WK,R08-1-0631,P81,Stand-in west end,1,,
-R07,WK,R07-0-0636,P70,Stand-in east end,0,,
-R01,WK,R01-1-0642,P11,Stand-in west end,1,,
-R01,WK,R01-0-0647,P10,Stand-in east end,0,,
-R02,WK,R02-0-0647,P20,Stand-in east end,0,,
-R03,WK,R03-1-0650,P31,Stand-in west end,1,,
-R04,WK,R04-1-0650,P41,Stand-in west end,1,,
-R03,WK,R03-0-0651,P30,Stand-in east end,0,,
-R02,WK,R02-1-0652,P21,Stand-in west end,1,,
-R05,WK,R05-1-0654,P51,Stand-in west end,1,,
-R05,WK,R05-0-0656,P50,Stand-in east end,0,,
-R06,WK,R06-0-0657,P60,Stand-in east end,0,,
-R07,WK,R07-1-0658,P71,Stand-in west end,1,,
-R08,WK,R08-1-0659,P81,Stand-in west end,1,,
-R04,WK,R04-0-0703,P40,Stand-in east end,0,,
-R07,WK,R07-0-0703,P70,Stand-in east end,0,,
-R06,WK,R06-1-0706,P61,Stand-in west end,1,,
-R01,WK,R01-1-0708,P11,Stand-in west end,1,,
-R01,WK,R01-0-0712,P10,Stand-in east end,0,,
-R02,WK,R02-0-0712,P20,Stand-in east end,0,,
-R03,WK,R03-1-0714,P31,Stand-in west end,1,,
-R04,WK,R04-1-0714,P41,Stand-in west end,1,,
-R03,WK,R03-0-0715,P30,Stand-in east end,0,,
-R02,WK,R02-1-0716,P21,Stand-in west end,1,,
-R08,WK,R08-0-0717,P80,Stand-in east end,0,,
-R05,WK,R05-1-0718,P51,Stand-in west end,1,,
-R05,WK,R05-0-0719,P50,Stand-in east end,0,,
-R06,WK,R06-0-0720,P60,Stand-in east end,0,,
-R07,WK,R07-1-0721,P71,Stand-in west end,1,,
-R08,WK,R08-1-0722,P81,Stand-in west end,1,,
-R04,WK,R04-0-0725,P40,Stand-in east end,0,,
-R07,WK,R07-0-0725,P70,Stand-in east end,0,,
-R06,WK,R06-1-0728,P61,Stand-in west end,1,,
-R01,WK,R01-1-0730,P11,Stand-in west end,1,,
-R01,WK,R01-0-0733,P10,Stand-in east end,0,,
-R02,WK,R02-0-0733,P20,Stand-in east end,0,,
-R03,WK,R03-1-0735,P31,Stand-in west end,1,,
-R04,WK,R04-1-0735,P41,Stand-in west end,1,,
-R03,WK,R03-0-0736,P30,Stand-in east end,0,,
-R02,WK,R02-1-0737,P21,Stand-in west end,1,,
-R08,WK,R08-0-0738,P80,Stand-in east end,0,,
-R05,WK,R05-1-0739,P51,Stand-in west end,1,,
-R05,WK,R05-0-0740,P50,Stand-in east end,0,,
-R06,WK,R06-0-0741,P60,Stand-in east end,0,,
-R07,WK,R07-1-0741,P71,Stand-in west end,1,,
-R08,WK,R08-1-0742,P81,Stand-in west end,1,,
-R04,WK,R04-0-0745,P40,Stand-in east end,0,,
-R07,WK,R07-0-0745,P70,Stand-in east end,0,,
-R06,WK,R06-1-0748,P61,Stand-in west end,1,,
-R01,WK,R01-1-0750,P11,Stand-in west end,1,,
-R01,WK,R01-0-0753,P10,Stand-in east end,0,,
-R02,WK,R02-0-0753,P20,Stand-in east end,0,,
-R03,WK,R03-1-0755,P31,Stand-in west end,1,,
-R04,WK,R04-1-0755,P41,Stand-in west end,1,,
-R03,WK,R03-0-0756,P30,Stand-in east end,0,,
-R02,WK,R02-1-0757,P21,Stand-in west end,1,,
-R08,WK,R08-0-0758,P80,Stand-in east end,0,,
-R05,WK,R05-1-0759,P51,Stand-in west end,1,,
-R05,WK,R05-0-0800,P50,Stand-in east end,0,,
-R06,WK,R06-0-0801,P60,Stand-in east end,0,,
-R07,WK,R07-1-0801,P71,Stand-in west end,1,,
-R08,WK,R08-1-0802,P81,Stand-in west end,1,,
-R04,WK,R04-0-0805,P40,Stand-in east end,0,,
-R07,WK,R07-0-0805,P70,Stand-in east end,0,,
-R06,WK,R06-1-0808,P61,Stand-in west end,1,,
-R01,WK,R01-1-0810,P11,Stand-in west end,1,,
-R01,WK,R01-0-0813,P10,Stand-in east end,0,,
-R02,WK,R02-0-0813,P20,Stand-in east end,0,,
-R03,WK,R03-1-0815,P31,Stand-in west end,1,,
-R04,WK,R04-1-0815,P41,Stand-in west end,1,,
-R03,WK,R03-0-0816,P30,Stand-in east end,0,,
-R02,WK,R02-1-0817,P21,Stand-in west end,1,,
-R08,WK,R08-0-0818,P80,Stand-in east end,0,,
-R05,WK,R05-1-0819,P51,Stand-in west end,1,,
-R05,WK,R05-0-0820,P50,Stand-in east end,0,,
-R06,WK,R06-0-0821,P60,Stand-in east end,0,,
-R07,WK,R07-1-0821,P71,Stand-in west end,1,,
-R08,WK,R08-1-0822,P81,Stand-in west end,1,,
-R04,WK,R04-0-0825,P40,Stand-in east end,0,,
-R07,WK,R07-0-0825,P70,Stand-in east end,0,,
-R06,WK,R06-1-0828,P61,Stand-in west end,1,,
-R01,WK,R01-1-0831,P11,Stand-in west end,1,,
-R01,WK,R01-0-0834,P10,Stand-in east end,0,,
-R02,WK,R02-0-0834,P20,Stand-in east end,0,,
-R03,WK,R03-1-0836,P31,Stand-in west end,1,,
-R04,WK,R04-1-0836,P41,Stand-in west end,1,,
-R03,WK,R03-0-0837,P30,Stand-in east end,0,,
-R02,WK,R02-1-0838,P21,Stand-in west end,1,,
-R08,WK,R08-0-0839,P80,Stand-in east end,0,,
-R05,WK,R05-1-0840,P51,Stand-in west end,1,,
-R05,WK,R05-0-0842,P50,Stand-in east end,0,,
-R06,WK,R06-0-0843,P60,Stand-in east end,0,,
-R07,WK,R07-1-0843,P71,Stand-in west end,1,,
-R08,WK,R08-1-0844,P81,Stand-in west end,1,,
-R04,WK,R04-0-0847,P40,Stand-in east end,0,,
-R07,WK,R07-0-0847,P70,Stand-in east end,0,,
-R06,WK,R06-1-0851,P61,Stand-in west end,1,,
-R01,WK,R01-1-0854,P11,Stand-in west end,1,,
-R01,WK,R01-0-0857,P10,Stand-in east end,0,,
-R02,WK,R02-0-0857,P20,Stand-in east end,0,,
-R03,WK,R03-1-0900,P31,Stand-in west end,1,,
-R04,WK,R04-1-0900,P41,Stand-in west end,1,,
-R03,WK,R03-0-0901,P30,Stand-in east end,0,,
-R02,WK,R02-1-0902,P21,Stand-in west end,1,,
-R08,WK,R08-0-0903,P80,Stand-in east end,0,,
-R05,WK,R05-1-0904,P51,Stand-in west end,1,,
-R05,WK,R05-0-0907,P50,Stand-in east end,0,,
-R06,WK,R06-0-0908,P60,Stand-in east end,0,,
-R07,WK,R07-1-0908,P71,Stand-in west end,1,,
-R08,WK,R08-1-0909,P81,Stand-in west end,1,,
-R04,WK,R04-0-0912,P40,Stand-in east end,0,,
-R07,WK,R07-0-0912,P70,Stand-in east end,0,,
-R06,WK,R06-1-0917,P61,Stand-in west end,1,,
-R01,WK,R01-1-0921,P11,Stand-in west end,1,,
-R01,WK,R01-0-0924,P10,Stand-in east end,0,,
-R02,WK,R02-0-0924,P20,Stand-in east end,0,,
-R03,WK,R03-1-0928,P31,Stand-in west end,1,,
-R04,WK,R04-1-0928,P41,Stand-in west end,1,,
-R03,WK,R03-0-0929,P30,Stand-in east end,0,,
-R02,WK,R02-1-0930,P21,Stand-in west end,1,,
-R08,WK,R08-0-0931,P80,Stand-in east end,0,,
-R05,WK,R05-1-0932,P51,Stand-in west end,1,,
-R05,WK,R05-0-0936,P50,Stand-in east end,0,,
-R06,WK,R06-0-0937,P60,Stand-in east end,0,,
-R07,WK,R07-1-0937,P71,Stand-in west end,1,,
-R08,WK,R08-1-0938,P81,Stand-in west end,1,,
-R04,WK,R04-0-0942,P40,Stand-in east end,0,,
-R07,WK,R07-0-0942,P70,Stand-in east end,0,,
-R06,WK,R06-1-0948,P61,Stand-in west end,1,,
-R01,WK,R01-1-0952,P11,Stand-in west end,1,,
-R01,WK,R01-0-0956,P10,Stand-in east end,0,,
-R02,WK,R02-0-0956,P20,Stand-in east end,0,,
-R03,WK,R03-1-1001,P31,Stand-in west end,1,,
-R04,WK,R04-1-1001,P41,Stand-in west end,1,,
-R03,WK,R03-0-1002,P30,Stand-in east end,0,,
-R02,WK,R02-1-1003,P21,Stand-in west end,1,,
-R08,WK,R08-0-1004,P80,Stand-in east end,0,,
-R05,WK,R05-1-1005,P51,Stand-in west end,1,,
-R05,WK,R05-0-1010,P50,Stand-in east end,0,,
-R06,WK,R06-0-1011,P60,Stand-in east end,0,,
-R07,WK,R07-1-1011,P71,Stand-in west end,1,,
-R08,WK,R08-1-1012,P81,Stand-in west end,1,,
-R04,WK,R04-0-1017,P40,Stand-in east end,0,,
-R07,WK,R07-0-1017,P70,Stand-in east end,0,,
-R06,WK,R06-1-1024,P61,Stand-in west end,1,,
-R01,WK,R01-1-1029,P11,Stand-in west end,1,,
-R01,WK,R01-0-1033,P10,Stand-in east end,0,,
-R02,WK,R02-0-1033,P20,Stand-in east end,0,,
-R03,WK,R03-1-1039,P31,Stand-in west end,1,,
-R04,WK,R04-1-1039,P41,Stand-in west end,1,,
-R03,WK,R03-0-1040,P30,Stand-in east end,0,,
-R02,WK,R02-1-1041,P21,Stand-in west end,1,,
-R08,WK,R08-0-1042,P80,Stand-in east end,0,,
-R05,WK,R05-1-1043,P51,Stand-in west end,1,,
-R05,WK,R05-0-1049,P50,Stand-in east end,0,,
-R06,WK,R06-0-1050,P60,Stand-in east end,0,,
-R07,WK,R07-1-1050,P71,Stand-in west end,1,,
-R08,WK,R08-1-1051,P81,Stand-in west end,1,,
-R04,WK,R04-0-1057,P40,Stand-in east end,0,,
-R07,WK,R07-0-1057,P70,Stand-in east end,0,,
-R06,WK,R06-1-1104,P61,Stand-in west end,1,,
-R01,WK,R01-1-1110,P11,Stand-in west end,1,,
-R01,WK,R01-0-1114,P10,Stand-in east end,0,,
-R02,WK,R02-0-1114,P20,Stand-in east end,0,,
-R03,WK,R03-1-1121,P31,Stand-in west end,1,,
-R04,WK,R04-1-1121,P41,Stand-in west end,1,,
-R03,WK,R03-0-1122,P30,Stand-in east end,0,,
-R02,WK,R02-1-1123,P21,Stand-in west end,1,,
-R08,WK,R08-0-1124,P80,Stand-in east end,0,,
-R05,WK,R05-1-1125,P51,Stand-in west end,1,,
-R05,WK,R05-0-1131,P50,Stand-in east end,0,,
-R06,WK,R06-0-1132,P60,Stand-in east end,0,,
-R07,WK,R07-1-1132,P71,Stand-in west end,1,,
-R08,WK,R08-1-1133,P81,Stand-in west end,1,,
-R04,WK,R04-0-1140,P40,Stand-in east end,0,,
-R07,WK,R07-0-1140,P70,Stand-in east end,0,,
-R06,WK,R06-1-1147,P61,Stand-in west end,1,,
-R01,WK,R01-1-1153,P11,Stand-in west end,1,,
-R01,WK,R01-0-1157,P10,Stand-in east end,0,,
-R02,WK,R02-0-1157,P20,Stand-in east end,0,,
-R03,WK,R03-1-1205,P31,Stand-in west end,1,,
-R04,WK,R04-1-1205,P41,Stand-in west end,1,,
-R03,WK,R03-0-1206,P30,Stand-in east end,0,,
-R02,WK,R02-1-1207,P21,Stand-in west end,1,,
-R08,WK,R08-0-1208,P80,Stand-in east end,0,,
-R05,WK,R05-1-1209,P51,Stand-in west end,1,,
-R05,WK,R05-0-1215,P50,Stand-in east end,0,,
-R06,WK,R06-0-1216,P60,Stand-in east end,0,,
-R07,WK,R07-1-1216,P71,Stand-in west end,1,,
-R08,WK,R08-1-1217,P81,Stand-in west end,1,,
-R04,WK,R04-0-1224,P40,Stand-in east end,0,,
-R07,WK,R07-0-1224,P70,Stand-in east end,0,,
-R06,WK,R06-1-1231,P61,Stand-in west end,1,,
-R01,WK,R01-1-1237,P11,Stand-in west end,1,,
-R01,WK,R01-0-1241,P10,Stand-in east end,0,,
-R02,WK,R02-0-1241,P20,Stand-in east end,0,,
-R03,WK,R03-1-1249,P31,Stand-in west end,1,,
-R04,WK,R04-1-1249,P41,Stand-in west end,1,,
-R03,WK,R03-0-1250,P30,Stand-in east end,0,,
-R02,WK,R02-1-1251,P21,Stand-in west end,1,,
-R08,WK,R08-0-1252,P80,Stand-in east end,0,,
-R05,WK,R05-1-1253,P51,Stand-in west end,1,,
-R05,WK,R05-0-1259,P50,Stand-in east end,0,,
-R06,WK,R06-0-1300,P60,Stand-in east end,0,,
-R07,WK,R07-1-1300,P71,Stand-in west end,1,,
-R08,WK,R08-1-1301,P81,Stand-in west end,1,,
-R04,WK,R04-0-1308,P40,Stand-in east end,0,,
-R07,WK,R07-0-1308,P70,Stand-in east end,0,,
-R06,WK,R06-1-1315,P61,Stand-in west end,1,,
-R01,WK,R01-1-1321,P11,Stand-in west end,1,,
-R01,WK,R01-0-1325,P10,Stand-in east end,0,,
-R02,WK,R02-0-1325,P20,Stand-in east end,0,,
-R03,WK,R03-1-1333,P31,Stand-in west end,1,,
-R04,WK,R04-1-1333,P41,Stand-in west end,1,,
-R03,WK,R03-0-1334,P30,Stand-in east end,0,,
-R02,WK,R02-1-1335,P21,Stand-in west end,1,,
-R08,WK,R08-0-1336,P80,Stand-in east end,0,,
-R05,WK,R05-1-1337,P51,Stand-in west end,1,,
-R05,WK,R05-0-1343,P50,Stand-in east end,0,,
-R06,WK,R06-0-1344,P60,Stand-in east end,0,,
-R07,WK,R07-1-1344,P71,Stand-in west end,1,,
-R08,WK,R08-1-1345,P81,Stand-in west end,1,,
-R04,WK,R04-0-1352,P40,Stand-in east end,0,,
-R07,WK,R07-0-1352,P70,Stand-in east end,0,,
-R06,WK,R06-1-1359,P61,Stand-in west end,1,,
-R01,WK,R01-1-1405,P11,Stand-in west end,1,,
-R01,WK,R01-0-1409,P10,Stand-in east end,0,,
-R02,WK,R02-0-1409,P20,Stand-in east end,0,,
-R03,WK,R03-1-1417,P31,Stand-in west end,1,,
-R04,WK,R04-1-1417,P41,Stand-in west end,1,,
-R03,WK,R03-0-1418,P30,Stand-in east end,0,,
-R02,WK,R02-1-1419,P21,Stand-in west end,1,,
-R08,WK,R08-0-1420,P80,Stand-in east end,0,,
-R05,WK,R05-1-1421,P51,Stand-in west end,1,,
-R05,WK,R05-0-1426,P50,Stand-in east end,0,,
-R06,WK,R06-0-1427,P60,Stand-in east end,0,,
-R07,WK,R07-1-1427,P71,Stand-in west end,1,,
-R08,WK,R08-1-1428,P81,Stand-in west end,1,,
-R04,WK,R04-0-1435,P40,Stand-in east end,0,,
-R07,WK,R07-0-1435,P70,Stand-in east end,0,,
-R06,WK,R06-1-1442,P61,Stand-in west end,1,,
-R01,WK,R01-1-1448,P11,Stand-in west end,1,,
-R01,WK,R01-0-1452,P10,Stand-in east end,0,,
-R02,WK,R02-0-1452,P20,Stand-in east end,0,,
-R03,WK,R03-1-1459,P31,Stand-in west end,1,,
-R04,WK,R04-1-1459,P41,Stand-in west end,1,,
-R03,WK,R03-0-1500,P30,Stand-in east end,0,,
-R02,WK,R02-1-1501,P21,Stand-in west end,1,,
-R08,WK,R08-0-1502,P80,Stand-in east end,0,,
-R05,WK,R05-1-1503,P51,Stand-in west end,1,,
-R05,WK,R05-0-1508,P50,Stand-in east end,0,,
-R06,WK,R06-0-1509,P60,Stand-in east end,0,,
-R07,WK,R07-1-1509,P71,Stand-in west end,1,,
-R08,WK,R08-1-1509,P81,Stand-in west end,1,,
-R04,WK,R04-0-1516,P40,Stand-in east end,0,,
-R07,WK,R07-0-1516,P70,Stand-in east end,0,,
-R06,WK,R06-1-1522,P61,Stand-in west end,1,,
-R01,WK,R01-1-1528,P11,Stand-in west end,1,,
-R01,WK,R01-0-1532,P10,Stand-in east end,0,,
-R02,WK,R02-0-1532,P20,Stand-in east end,0,,
-R03,WK,R03-1-1538,P31,Stand-in west end,1,,
-R04,WK,R04-1-1538,P41,Stand-in west end,1,,
-R03,WK,R03-0-1539,P30,Stand-in east end,0,,
-R02,WK,R02-1-1540,P21,Stand-in west end,1,,
-R05,WK,R05-1-1541,P51,Stand-in west end,1,,
-R08,WK,R08-0-1541,P80,Stand-in east end,0,,
-R05,WK,R05-0-1546,P50,Stand-in east end,0,,
-R06,WK,R06-0-1547,P60,Stand-in east end,0,,
-R07,WK,R07-1-1547,P71,Stand-in west end,1,,
-R08,WK,R08-1-1547,P81,Stand-in west end,1,,
-R04,WK,R04-0-1553,P40,Stand-in east end,0,,
-R07,WK,R07-0-1553,P70,Stand-in east end,0,,
-R06,WK,R06-1-1558,P61,Stand-in west end,1,,
-R01,WK,R01-1-1603,P11,Stand-in west end,1,,
-R01,WK,R01-0-1607,P10,Stand-in east end,0,,
-R02,WK,R02-0-1607,P20,Stand-in east end,0,,
-R03,WK,R03-1-1612,P31,Stand-in west end,1,,
-R04,WK,R04-1-1612,P41,Stand-in west end,1,,
-R03,WK,R03-0-1613,P30,Stand-in east end,0,,
-R02,WK,R02-1-1614,P21,Stand-in west end,1,,
-R05,WK,R05-1-1615,P51,Stand-in west end,1,,
-R08,WK,R08-0-1615,P80,Stand-in east end,0,,
-R05,WK,R05-0-1619,P50,Stand-in east end,0,,
-R06,WK,R06-0-1620,P60,Stand-in east end,0,,
-R07,WK,R07-1-1620,P71,Stand-in west end,1,,
-R08,WK,R08-1-1620,P81,Stand-in west end,1,,
-R04,WK,R04-0-1625,P40,Stand-in east end,0,,
-R07,WK,R07-0-1625,P70,Stand-in east end,0,,
-R06,WK,R06-1-1629,P61,Stand-in west end,1,,
-R01,WK,R01-1-1633,P11,Stand-in west end,1,,
-R01,WK,R01-0-1637,P10,Stand-in east end,0,,
-R02,WK,R02-0-1637,P20,Stand-in east end,0,,
-R03,WK,R03-1-1641,P31,Stand-in west end,1,,
-R04,WK,R04-1-1641,P41,Stand-in west end,1,,
-R03,WK,R03-0-1642,P30,Stand-in east end,0,,
-R02,WK,R02-1-1643,P21,Stand-in west end,1,,
-R05,WK,R05-1-1643,P51,Stand-in west end,1,,
-R08,WK,R08-0-1643,P80,Stand-in east end,0,,
-R05,WK,R05-0-1647,P50,Stand-in east end,0,,
-R06,WK,R06-0-1648,P60,Stand-in east end,0,,
-R07,WK,R07-1-1648,P71,Stand-in west end,1,,
-R08,WK,R08-1-1648,P81,Stand-in west end,1,,
-R04,WK,R04-0-1652,P40,Stand-in east end,0,,
-R07,WK,R07-0-1652,P70,Stand-in east end,0,,
-R06,WK,R06-1-1655,P61,Stand-in west end,1,,
-R01,WK,R01-1-1659,P11,Stand-in west end,1,,
-R01,WK,R01-0-1702,P10,Stand-in east end,0,,
-R02,WK,R02-0-1702,P20,Stand-in east end,0,,
-R03,WK,R03-1-1705,P31,Stand-in west end,1,,
-R04,WK,R04-1-1705,P41,Stand-in west end,1,,
-R03,WK,R03-0-1706,P30,Stand-in east end,0,,
-R02,WK,R02-1-1707,P21,Stand-in west end,1,,
-R05,WK,R05-1-1707,P51,Stand-in west end,1,,
-R08,WK,R08-0-1707,P80,Stand-in east end,0,,
-R05,WK,R05-0-1711,P50,Stand-in east end,0,,
-R06,WK,R06-0-1712,P60,Stand-in east end,0,,
-R07,WK,R07-1-1712,P71,Stand-in west end,1,,
-R08,WK,R08-1-1712,P81,Stand-in west end,1,,
-R04,WK,R04-0-1715,P40,Stand-in east end,0,,
-R07,WK,R07-0-1715,P70,Stand-in east end,0,,
-R06,WK,R06-1-1718,P61,Stand-in west end,1,,
-R01,WK,R01-1-1721,P11,Stand-in west end,1,,
-R01,WK,R01-0-1724,P10,Stand-in east end,0,,
-R02,WK,R02-0-1724,P20,Stand-in east end,0,,
-R03,WK,R03-0-1727,P30,Stand-in east end,0,,
-R03,WK,R03-1-1727,P31,Stand-in west end,1,,
-R04,WK,R04-1-1727,P41,Stand-in west end,1,,
-R02,WK,R02-1-1728,P21,Stand-in west end,1,,
-R05,WK,R05-1-1728,P51,Stand-in west end,1,,
-R08,WK,R08-0-1728,P80,Stand-in east end,0,,
-R05,WK,R05-0-1732,P50,Stand-in east end,0,,
-R06,WK,R06-0-1733,P60,Stand-in east end,0,,
-R07,WK,R07-1-1733,P71,Stand-in west end,1,,
-R08,WK,R08-1-1733,P81,Stand-in west end,1,,
-R04,WK,R04-0-1736,P40,Stand-in east end,0,,
-R07,WK,R07-0-1736,P70,Stand-in east end,0,,
-R06,WK,R06-1-1738,P61,Stand-in west end,1,,
-R01,WK,R01-1-1741,P11,Stand-in west end,1,,
-R01,WK,R01-0-1744,P10,Stand-in east end,0,,
-R02,WK,R02-0-1744,P20,Stand-in east end,0,,
-R03,WK,R03-0-1747,P30,Stand-in east end,0,,
-R03,WK,R03-1-1747,P31,Stand-in west end,1,,
-R04,WK,R04-1-1747,P41,Stand-in west end,1,,
-R02,WK,R02-1-1748,P21,Stand-in west end,1,,
-R05,WK,R05-1-1748,P51,Stand-in west end,1,,
-R08,WK,R08-0-1748,P80,Stand-in east end,0,,
-R05,WK,R05-0-1752,P50,Stand-in east end,0,,
-R06,WK,R06-0-1753,P60,Stand-in east end,0,,
-R07,WK,R07-1-1753,P71,Stand-in west end,1,,
-R08,WK,R08-1-1753,P81,Stand-in west end,1,,
-R04,WK,R04-0-1756,P40,Stand-in east end,0,,
-R07,WK,R07-0-1756,P70,Stand-in east end,0,,
-R06,WK,R06-1-1758,P61,Stand-in west end,1,,
-R01,WK,R01-1-1801,P11,Stand-in west end,1,,
-R01,WK,R01-0-1804,P10,Stand-in east end,0,,
-R02,WK,R02-0-1804,P20,Stand-in east end,0,,
-R03,WK,R03-0-1807,P30,Stand-in east end,0,,
-R03,WK,R03-1-1807,P31,Stand-in west end,1,,
-R04,WK,R04-1-1807,P41,Stand-in west end,1,,
-R02,WK,R02-1-1808,P21,Stand-in west end,1,,
-R05,WK,R05-1-1808,P51,Stand-in west end,1,,
-R08,WK,R08-0-1808,P80,Stand-in east end,0,,
-R05,WK,R05-0-1812,P50,Stand-in east end,0,,
-R06,WK,R06-0-1813,P60,Stand-in east end,0,,
-R07,WK,R07-1-1813,P71,Stand-in west end,1,,
-R08,WK,R08-1-1813,P81,Stand-in west end,1,,
-R04,WK,R04-0-1816,P40,Stand-in east end,0,,
-R07,WK,R07-0-1816,P70,Stand-in east end,0,,
-R06,WK,R06-1-1818,P61,Stand-in west end,1,,
-R01,WK,R01-1-1821,P11,Stand-in west end,1,,
-R01,WK,R01-0-1824,P10,Stand-in east end,0,,
-R02,WK,R02-0-1824,P20,Stand-in east end,0,,
-R03,WK,R03-0-1827,P30,Stand-in east end,0,,
-R03,WK,R03-1-1827,P31,Stand-in west end,1,,
-R04,WK,R04-1-1827,P41,Stand-in west end,1,,
-R02,WK,R02-1-1828,P21,Stand-in west end,1,,
-R05,WK,R05-1-1828,P51,Stand-in west end,1,,
-R08,WK,R08-0-1828,P80,Stand-in east end,0,,
-R05,WK,R05-0-1832,P50,Stand-in east end,0,,
-R06,WK,R06-0-1834,P60,Stand-in east end,0,,
-R07,WK,R07-1-1834,P71,Stand-in west end,1,,
-R08,WK,R08-1-1834,P81,Stand-in west end,1,,
-R04,WK,R04-0-1837,P40,Stand-in east end,0,,
-R07,WK,R07-0-1837,P70,Stand-in east end,0,,
-R06,WK,R06-1-1839,P61,Stand-in west end,1,,
-R01,WK,R01-1-1842,P11,Stand-in west end,1,,
-R01,WK,R01-0-1845,P10,Stand-in east end,0,,
-R02,WK,R02-0-1845,P20,Stand-in east end,0,,
-R03,WK,R03-0-1849,P30,Stand-in east end,0,,
-R03,WK,R03-1-1849,P31,Stand-in west end,1,,
-R04,WK,R04-1-1849,P41,Stand-in west end,1,,
-R02,WK,R02-1-1850,P21,Stand-in west end,1,,
-R05,WK,R05-1-1850,P51,Stand-in west end,1,,
-R08,WK,R08-0-1850,P80,Stand-in east end,0,,
-R05,WK,R05-0-1854,P50,Stand-in east end,0,,
-R06,WK,R06-0-1857,P60,Stand-in east end,0,,
-R07,WK,R07-1-1857,P71,Stand-in west end,1,,
-R08,WK,R08-1-1857,P81,Stand-in west end,1,,
-R04,WK,R04-0-1900,P40,Stand-in east end,0,,
-R07,WK,R07-0-1900,P70,Stand-in east end,0,,
-R06,WK,R06-1-1902,P61,Stand-in west end,1,,
-R01,WK,R01-1-1906,P11,Stand-in west end,1,,
-R01,WK,R01-0-1909,P10,Stand-in east end,0,,
-R02,WK,R02-0-1909,P20,Stand-in east end,0,,
-R03,WK,R03-0-1913,P30,Stand-in east end,0,,
-R03,WK,R03-1-1913,P31,Stand-in west end,1,,
-R04,WK,R04-1-1913,P41,Stand-in west end,1,,
-R02,WK,R02-1-1915,P21,Stand-in west end,1,,
-R05,WK,R05-1-1915,P51,Stand-in west end,1,,
-R08,WK,R08-0-1915,P80,Stand-in east end,0,,
-R05,WK,R05-0-1919,P50,Stand-in east end,0,,
-R06,WK,R06-0-1923,P60,Stand-in east end,0,,
-R07,WK,R07-1-1923,P71,Stand-in west end,1,,
-R08,WK,R08-1-1923,P81,Stand-in west end,1,,
-R04,WK,R04-0-1926,P40,Stand-in east end,0,,
-R07,WK,R07-0-1926,P70,Stand-in east end,0,,
-R06,WK,R06-1-1928,P61,Stand-in west end,1,,
-R01,WK,R01-1-1933,P11,Stand-in west end,1,,
-R01,WK,R01-0-1936,P10,Stand-in east end,0,,
-R02,WK,R02-0-1936,P20,Stand-in east end,0,,
-R03,WK,R03-0-1941,P30,Stand-in east end,0,,
-R03,WK,R03-1-1941,P31,Stand-in west end,1,,
-R04,WK,R04-1-1941,P41,Stand-in west end,1,,
-R02,WK,R02-1-1943,P21,Stand-in west end,1,,
-R05,WK,R05-1-1943,P51,Stand-in west end,1,,
-R08,WK,R08-0-1943,P80,Stand-in east end,0,,
-R05,WK,R05-0-1948,P50,Stand-in east end,0,,
-R06,WK,R06-0-1953,P60,Stand-in east end,0,,
-R07,WK,R07-1-1953,P71,Stand-in west end,1,,
-R08,WK,R08-1-1953,P81,Stand-in west end,1,,
-R04,WK,R04-0-1956,P40,Stand-in east end,0,,
-R07,WK,R07-0-1956,P70,Stand-in east end,0,,
-R06,WK,R06-1-1958,P61,Stand-in west end,1,,
-R01,WK,R01-1-2004,P11,Stand-in west end,1,,
-R01,WK,R01-0-2008,P10,Stand-in east end,0,,
-R02,WK,R02-0-2008,P20,Stand-in east end,0,,
-R03,WK,R03-0-2013,P30,Stand-in east end,0,,
-R03,WK,R03-1-2013,P31,Stand-in west end,1,,
-R04,WK,R04-1-2013,P41,Stand-in west end,1,,
-R02,WK,R02-1-2016,P21,Stand-in west end,1,,
-R05,WK,R05-1-2016,P51,Stand-in west end,1,,
-R08,WK,R08-0-2016,P80,Stand-in east end,0,,
-R05,WK,R05-0-2021,P50,Stand-in east end,0,,
-R06,WK,R06-0-2027,P60,Stand-in east end,0,,
-R07,WK,R07-1-2027,P71,Stand-in west end,1,,
-R08,WK,R08-1-2027,P81,Stand-in west end,1,,
-R04,WK,R04-0-2031,P40,Stand-in east end,0,,
-R07,WK,R07-0-2031,P70,Stand-in east end,0,,
-R06,WK,R06-1-2033,P61,Stand-in west end,1,,
-R01,WK,R01-1-2040,P11,Stand-in west end,1,,
-R01,WK,R01-0-2044,P10,Stand-in east end,0,,
-R02,WK,R02-0-2044,P20,Stand-in east end,0,,
-R03,WK,R03-0-2050,P30,Stand-in east end,0,,
-R03,WK,R03-1-2050,P31,Stand-in west end,1,,
-R04,WK,R04-1-2050,P41,Stand-in west end,1,,
-R02,WK,R02-1-2053,P21,Stand-in west end,1,,
-R05,WK,R05-1-2053,P51,Stand-in west end,1,,
-R08,WK,R08-0-2053,P80,Stand-in east end,0,,
-R05,WK,R05-0-2059,P50,Stand-in east end,0,,
-R06,WK,R06-0-2105,P60,Stand-in east end,0,,
-R07,WK,R07-1-2105,P71,Stand-in west end,1,,
-R08,WK,R08-1-2105,P81,Stand-in west end,1,,
-R04,WK,R04-0-2110,P40,Stand-in east end,0,,
-R07,WK,R07-0-2110,P70,Stand-in east end,0,,
-R06,WK,R06-1-2112,P61,Stand-in west end,1,,
-R01,WK,R01-1-2120,P11,Stand-in west end,1,,
-R01,WK,R01-0-2124,P10,Stand-in east end,0,,
-R02,WK,R02-0-2124,P20,Stand-in east end,0,,
-R03,WK,R03-0-2131,P30,Stand-in east end,0,,
-R03,WK,R03-1-2131,P31,Stand-in west end,1,,
-R04,WK,R04-1-2131,P41,Stand-in west end,1,,
-R02,WK,R02-1-2134,P21,Stand-in west end,1,,
-R05,WK,R05-1-2134,P51,Stand-in west end,1,,
-R08,WK,R08-0-2134,P80,Stand-in east end,0,,
-R05,WK,R05-0-2140,P50,Stand-in east end,0,,
-R06,WK,R06-0-2147,P60,Stand-in east end,0,,
-R07,WK,R07-1-2147,P71,Stand-in west end,1,,
-R08,WK,R08-1-2147,P81,Stand-in west end,1,,
-R04,WK,R04-0-2152,P40,Stand-in east end,0,,
-R07,WK,R07-0-2152,P70,Stand-in east end,0,,
-R06,WK,R06-1-2154,P61,Stand-in west end,1,,
-R01,WK,R01-1-2202,P11,Stand-in west end,1,,
-R01,WK,R01-0-2207,P10,Stand-in east end,0,,
-R02,WK,R02-0-2207,P20,Stand-in east end,0,,
-R03,WK,R03-0-2214,P30,Stand-in east end,0,,
-R03,WK,R03-1-2214,P31,Stand-in west end,1,,
-R04,WK,R04-1-2214,P41,Stand-in west end,1,,
-R02,WK,R02-1-2217,P21,Stand-in west end,1,,
-R05,WK,R05-1-2217,P51,Stand-in west end,1,,
-R08,WK,R08-0-2217,P80,Stand-in east end,0,,
-R05,WK,R05-0-2223,P50,Stand-in east end,0,,
-R06,WK,R06-0-2230,P60,Stand-in east end,0,,
-R07,WK,R07-1-2230,P71,Stand-in west end,1,,
-R08,WK,R08-1-2230,P81,Stand-in west end,1,,
-R04,WK,R04-0-2236,P40,Stand-in east end,0,,
-R07,WK,R07-0-2236,P70,Stand-in east end,0,,
-R06,WK,R06-1-2238,P61,Stand-in west end,1,,
-R01,WK,R01-1-2246,P11,Stand-in west end,1,,
-R01,WK,R01-0-2251,P10,Stand-in east end,0,,
-R02,WK,R02-0-2251,P20,Stand-in east end,0,,
-R03,WK,R03-0-2258,P30,Stand-in east end,0,,
-R03,WK,R03-1-2258,P31,Stand-in west end,1,,
-R04,WK,R04-1-2258,P41,Stand-in west end,1,,
-R02,WK,R02-1-2301,P21,Stand-in west end,1,,
-R05,WK,R05-1-2301,P51,Stand-in west end,1,,
-R08,WK,R08-0-2301,P80,Stand-in east end,0,,
-R05,WK,R05-0-2307,P50,Stand-in east end,0,,
-R06,WK,R06-0-2314,P60,Stand-in east end,0,,
-R07,WK,R07-1-2314,P71,Stand-in west end,1,,
-R08,WK,R08-1-2314,P81,Stand-in west end,1,,
-R04,WK,R04-0-2320,P40,Stand-in east end,0,,
-R07,WK,R07-0-2320,P70,Stand-in east end,0,,
-R06,WK,R06-1-2322,P61,Stand-in west end,1,,
-R01,WK,R01-1-2330,P11,Stand-in west end,1,,
-R01,WK,R01-0-2335,P10,Stand-in east end,0,,
-R02,WK,R02-0-2335,P20,Stand-in east end,0,,
-R03,WK,R03-0-2342,P30,Stand-in east end,0,,
-R03,WK,R03-1-2342,P31,Stand-in west end,1,,
-R04,WK,R04-1-2342,P41,Stand-in west end,1,,
-R02,WK,R02-1-2345,P21,Stand-in west end,1,,
-R05,WK,R05-1-2345,P51,Stand-in west end,1,,
-R08,WK,R08-0-2345,P80,Stand-in east end,0,,
-R05,WK,R05-0-2351,P50,Stand-in east end,0,,
-R06,WK,R06-0-2358,P60,Stand-in east end,0,,
-R07,WK,R07-1-2358,P71,Stand-in west end,1,,
-R08,WK,R08-1-2358,P81,Stand-in west end,1,,
-R04,WK,R04-0-2404,P40,Stand-in east end,0,,
-R07,WK,R07-0-2404,P70,Stand-in east end,0,,
-R06,WK,R06-1-2406,P61,Stand-in west end,1,,
-R01,WK,R01-1-2414,P11,Stand-in west end,1,,
-R01,WK,R01-0-2419,P10,Stand-in east end,0,,
-R02,WK,R02-0-2419,P20,Stand-in east end,0,,
+1002,1,1002:17:21480:169:1,1002:17,Jebel Ali  Bus Stn,0,169,8106
+1002,1,1002:15:26940:169:1,1002:15,Gold Souq Bus Stn,1,169,8107
+1002,1,1002:17:32520:169:1,1002:17,Jebel Ali  Bus Stn,0,169,8108
+1002,1,1002:15:48960:169:1,1002:15,Gold Souq Bus Stn,1,169,8111
+1002,1,1002:17:54720:169:1,1002:17,Jebel Ali  Bus Stn,0,169,8112
+1002,1,1002:15:72360:169:1,1002:15,Gold Souq Bus Stn,1,169,8115
+1002,1,1002:17:23280:151:1,1002:17,Jebel Ali  Bus Stn,0,151,8126
+1002,1,1002:15:29040:151:1,1002:15,Gold Souq Bus Stn,1,151,8127
+1002,1,1002:17:34620:151:1,1002:17,Jebel Ali  Bus Stn,0,151,8128
+1002,1,1002:15:40020:151:1,1002:15,Gold Souq Bus Stn,1,151,8129
+1002,1,1002:17:45720:151:1,1002:17,Jebel Ali  Bus Stn,0,151,8130
+1002,1,1002:15:63240:151:1,1002:15,Gold Souq Bus Stn,1,151,8133
+1002,1,1002:17:69360:151:1,1002:17,Jebel Ali  Bus Stn,0,151,8134
+1002,1,1002:17:25080:150:1,1002:17,Jebel Ali  Bus Stn,0,150,8146
+1002,1,1002:15:52560:150:1,1002:15,Gold Souq Bus Stn,1,150,8151
+1002,1,1002:17:58320:150:1,1002:17,Jebel Ali  Bus Stn,0,150,8152
+1002,1,1002:15:76320:150:1,1002:15,Gold Souq Bus Stn,1,150,8155
+1002,1,1002:17:19800:190:1,1002:17,Jebel Ali  Bus Stn,0,190,8166
+1002,1,1002:15:45480:190:1,1002:15,Gold Souq Bus Stn,1,190,8171
+1002,1,1002:17:51120:190:1,1002:17,Jebel Ali  Bus Stn,0,190,8172
+1002,1,1002:15:68700:190:1,1002:15,Gold Souq Bus Stn,1,190,8175
+17,1,17:2:20100:163:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,163,8604
+17,1,17:5:27300:163:1,17:5,Al Sabkha Bus Stn,1,163,8605
+17,1,17:2:33810:163:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,163,8606
+17,1,17:5:39840:163:1,17:5,Al Sabkha Bus Stn,1,163,8607
+17,1,17:2:46050:163:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,163,8608
+17,1,17:5:52620:163:1,17:5,Al Sabkha Bus Stn,1,163,8609
+17,1,17:2:58920:163:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,163,8610
+17,1,17:5:66900:163:1,17:5,Al Sabkha Bus Stn,1,163,8611
+17,1,17:2:73080:163:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,163,8612
+17,1,17:5:79500:163:1,17:5,Al Sabkha Bus Stn,1,163,8613
+17,1,17:2:21960:162:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,162,8624
+17,1,17:5:29100:162:1,17:5,Al Sabkha Bus Stn,1,162,8625
+17,1,17:2:35070:162:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,162,8626
+17,1,17:5:41700:162:1,17:5,Al Sabkha Bus Stn,1,162,8627
+17,1,17:2:47940:162:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,162,8628
+17,1,17:5:54480:162:1,17:5,Al Sabkha Bus Stn,1,162,8629
+17,1,17:2:60570:162:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,162,8630
+17,1,17:5:68700:162:1,17:5,Al Sabkha Bus Stn,1,162,8631
+17,1,17:2:74700:162:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,162,8632
+17,1,17:5:81960:162:1,17:5,Al Sabkha Bus Stn,1,162,8633
+17,1,17:5:18300:228:1,17:5,Al Sabkha Bus Stn,1,228,11228
+17,1,17:2:23790:228:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,228,11229
+17,1,17:5:30900:228:1,17:5,Al Sabkha Bus Stn,1,228,11230
+17,1,17:2:36720:228:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,228,11231
+17,1,17:5:43500:228:1,17:5,Al Sabkha Bus Stn,1,228,11232
+17,1,17:2:49650:228:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,228,11233
+17,1,17:5:56100:228:1,17:5,Al Sabkha Bus Stn,1,228,11234
+17,1,17:2:62400:228:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,228,11235
+17,1,17:5:70500:228:1,17:5,Al Sabkha Bus Stn,1,228,11236
+17,1,17:2:76440:228:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,228,11237
+17,1,17:5:20100:229:1,17:5,Al Sabkha Bus Stn,1,229,11248
+17,1,17:2:25590:229:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,229,11249
+17,1,17:5:32700:229:1,17:5,Al Sabkha Bus Stn,1,229,11250
+17,1,17:2:38730:229:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,229,11251
+17,1,17:5:45300:229:1,17:5,Al Sabkha Bus Stn,1,229,11252
+17,1,17:2:51210:229:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,229,11253
+17,1,17:5:57900:229:1,17:5,Al Sabkha Bus Stn,1,229,11254
+17,1,17:2:64380:229:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,229,11255
+17,1,17:5:72300:229:1,17:5,Al Sabkha Bus Stn,1,229,11256
+17,1,17:2:77940:229:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,229,11257
+17,1,17:5:21900:230:1,17:5,Al Sabkha Bus Stn,1,230,11268
+17,1,17:2:27600:230:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,230,11269
+17,1,17:5:34500:230:1,17:5,Al Sabkha Bus Stn,1,230,11270
+17,1,17:2:40110:230:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,230,11271
+17,1,17:5:47100:230:1,17:5,Al Sabkha Bus Stn,1,230,11272
+17,1,17:2:52800:230:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,230,11273
+17,1,17:5:59700:230:1,17:5,Al Sabkha Bus Stn,1,230,11274
+17,1,17:2:66570:230:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,230,11275
+17,1,17:5:74100:230:1,17:5,Al Sabkha Bus Stn,1,230,11276
+17,1,17:2:79440:230:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,230,11277
+17,1,17:5:23580:231:1,17:5,Al Sabkha Bus Stn,1,231,11287
+17,1,17:2:30060:231:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,231,11288
+17,1,17:5:36480:231:1,17:5,Al Sabkha Bus Stn,1,231,11289
+17,1,17:2:42180:231:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,231,11290
+17,1,17:5:48900:231:1,17:5,Al Sabkha Bus Stn,1,231,11291
+17,1,17:2:54960:231:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,231,11292
+17,1,17:5:61500:231:1,17:5,Al Sabkha Bus Stn,1,231,11293
+17,1,17:2:68400:231:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,231,11294
+17,1,17:5:75900:231:1,17:5,Al Sabkha Bus Stn,1,231,11295
+17,1,17:5:25380:232:1,17:5,Al Sabkha Bus Stn,1,232,11304
+17,1,17:2:31980:232:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,232,11305
+17,1,17:5:38280:232:1,17:5,Al Sabkha Bus Stn,1,232,11306
+17,1,17:2:44310:232:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,232,11307
+17,1,17:5:50820:232:1,17:5,Al Sabkha Bus Stn,1,232,11308
+17,1,17:2:57180:232:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,232,11309
+17,1,17:5:65100:232:1,17:5,Al Sabkha Bus Stn,1,232,11310
+17,1,17:2:71670:232:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,232,11311
+17,1,17:5:63480:234:1,17:5,Al Sabkha Bus Stn,1,234,11315
+17,1,17:2:70230:234:1,17:2,"Muhaisnah 4, Wasl Oasis II",0,234,11316
+17,1,17:5:77700:234:1,17:5,Al Sabkha Bus Stn,1,234,11317
+8,1,8:2:15900:203:1,8:2,Ibn Battuta MS,0,203,11586
+8,1,8:1:20820:203:1,8:1,Al Baraha Bus Stn,1,203,11587
+8,1,8:2:26700:203:1,8:2,Ibn Battuta MS,0,203,11588
+8,1,8:1:32880:203:1,8:1,Al Baraha Bus Stn,1,203,11589
+8,1,8:2:39900:203:1,8:2,Ibn Battuta MS,0,203,11590
+8,1,8:1:46050:203:1,8:1,Al Baraha Bus Stn,1,203,11591
+8,1,8:2:52620:203:1,8:2,Ibn Battuta MS,0,203,11592
+8,1,8:1:58440:203:1,8:1,Al Baraha Bus Stn,1,203,11593
+8,1,8:2:66300:203:1,8:2,Ibn Battuta MS,0,203,11594
+8,1,8:1:72930:203:1,8:1,Al Baraha Bus Stn,1,203,11595
+8,1,8:2:19500:219:1,8:2,Ibn Battuta MS,0,219,11599
+8,1,8:1:24900:219:1,8:1,Al Baraha Bus Stn,1,219,11600
+8,1,8:2:31500:219:1,8:2,Ibn Battuta MS,0,219,11601
+8,1,8:2:67500:227:1,8:2,Ibn Battuta MS,0,227,11604
+8,1,8:1:74190:227:1,8:1,Al Baraha Bus Stn,1,227,11605
+8,1,8:2:21900:225:1,8:2,Ibn Battuta MS,0,225,11614
+8,1,8:1:27540:225:1,8:1,Al Baraha Bus Stn,1,225,11615
+8,1,8:2:33900:225:1,8:2,Ibn Battuta MS,0,225,11616
+8,1,8:1:40710:225:1,8:1,Al Baraha Bus Stn,1,225,11617
+8,1,8:2:47100:225:1,8:2,Ibn Battuta MS,0,225,11618
+8,1,8:1:53100:225:1,8:1,Al Baraha Bus Stn,1,225,11619
+8,1,8:2:60240:225:1,8:2,Ibn Battuta MS,0,225,11620
+8,1,8:1:66870:225:1,8:1,Al Baraha Bus Stn,1,225,11621
+8,1,8:2:65100:226:1,8:2,Ibn Battuta MS,0,226,11624
+8,1,8:1:71700:226:1,8:1,Al Baraha Bus Stn,1,226,11625
+8,1,8:1:59640:223:1,8:1,Al Baraha Bus Stn,1,223,11629
+8,1,8:2:68700:223:1,8:2,Ibn Battuta MS,0,223,11630
+8,1,8:1:75900:223:1,8:1,Al Baraha Bus Stn,1,223,11631
+8,1,8:2:18300:208:1,8:2,Ibn Battuta MS,0,208,11640
+8,1,8:1:23460:208:1,8:1,Al Baraha Bus Stn,1,208,11641
+8,1,8:2:30300:208:1,8:2,Ibn Battuta MS,0,208,11642
+8,1,8:1:36840:208:1,8:1,Al Baraha Bus Stn,1,208,11643
+8,1,8:2:43500:208:1,8:2,Ibn Battuta MS,0,208,11644
+8,1,8:1:49680:208:1,8:1,Al Baraha Bus Stn,1,208,11645
+8,1,8:2:57840:208:1,8:2,Ibn Battuta MS,0,208,11646
+8,1,8:1:64440:208:1,8:1,Al Baraha Bus Stn,1,208,11647
+320,1,320:13:15960:96:1,320:13,Al Rashidiya Bus Stn,1,96,13493
+320,1,320:18:19800:96:1,320:18,Academic City,0,96,13494
+320,1,320:16:24300:96:1,320:16,Al Rashidiya Bus Stn,1,96,13495
+320,1,320:18:30000:96:1,320:18,Academic City,0,96,13496
+320,1,320:16:34560:96:1,320:16,Al Rashidiya Bus Stn,1,96,13497
+320,1,320:18:39600:96:1,320:18,Academic City,0,96,13498
+320,1,320:16:43860:96:1,320:16,Al Rashidiya Bus Stn,1,96,13499
+320,1,320:18:49200:96:1,320:18,Academic City,0,96,13500
+320,1,320:17:53460:96:1,320:17,Al Rashidiya Bus Stn,1,96,13501
+320,1,320:18:58800:96:1,320:18,Academic City,0,96,13502
+320,1,320:17:63120:96:1,320:17,Al Rashidiya Bus Stn,1,96,13503
+320,1,320:18:68400:96:1,320:18,Academic City,0,96,13504
+320,1,320:17:73050:96:1,320:17,Al Rashidiya Bus Stn,1,96,13505
+320,1,320:18:77400:96:1,320:18,Academic City,0,96,13506
+320,1,320:17:81060:96:1,320:17,Al Rashidiya Bus Stn,1,96,13507
+320,1,320:18:27600:72:1,320:18,Academic City,0,72,13521
+320,1,320:16:32100:72:1,320:16,Al Rashidiya Bus Stn,1,72,13522
+320,1,320:18:37200:72:1,320:18,Academic City,0,72,13523
+320,1,320:16:41460:72:1,320:16,Al Rashidiya Bus Stn,1,72,13524
+320,1,320:18:46800:72:1,320:18,Academic City,0,72,13525
+320,1,320:17:51060:72:1,320:17,Al Rashidiya Bus Stn,1,72,13526
+320,1,320:18:56400:72:1,320:18,Academic City,0,72,13527
+320,1,320:17:60540:72:1,320:17,Al Rashidiya Bus Stn,1,72,13528
+320,1,320:18:66000:72:1,320:18,Academic City,0,72,13529
+320,1,320:17:70320:72:1,320:17,Al Rashidiya Bus Stn,1,72,13530
+320,1,320:18:75600:72:1,320:18,Academic City,0,72,13531
+320,1,320:17:79260:72:1,320:17,Al Rashidiya Bus Stn,1,72,13532
+320,1,320:18:84600:72:1,320:18,Academic City,0,72,13533
+320,1,320:13:17460:12:1,320:13,Al Rashidiya Bus Stn,1,12,13546
+320,1,320:18:21600:12:1,320:18,Academic City,0,12,13547
+320,1,320:16:25920:12:1,320:16,Al Rashidiya Bus Stn,1,12,13548
+320,1,320:18:31200:12:1,320:18,Academic City,0,12,13549
+320,1,320:16:35640:12:1,320:16,Al Rashidiya Bus Stn,1,12,13550
+320,1,320:18:40800:12:1,320:18,Academic City,0,12,13551
+320,1,320:16:45060:12:1,320:16,Al Rashidiya Bus Stn,1,12,13552
+320,1,320:18:50400:12:1,320:18,Academic City,0,12,13553
+320,1,320:17:54660:12:1,320:17,Al Rashidiya Bus Stn,1,12,13554
+320,1,320:18:60000:12:1,320:18,Academic City,0,12,13555
+320,1,320:17:64320:12:1,320:17,Al Rashidiya Bus Stn,1,12,13556
+320,1,320:18:69600:12:1,320:18,Academic City,0,12,13557
+320,1,320:18:18000:15:1,320:18,Academic City,0,15,13570
+320,1,320:16:21900:15:1,320:16,Al Rashidiya Bus Stn,1,15,13571
+320,1,320:18:26400:15:1,320:18,Academic City,0,15,13572
+320,1,320:16:30840:15:1,320:16,Al Rashidiya Bus Stn,1,15,13573
+320,1,320:18:36000:15:1,320:18,Academic City,0,15,13574
+320,1,320:16:40260:15:1,320:16,Al Rashidiya Bus Stn,1,15,13575
+320,1,320:18:45600:15:1,320:18,Academic City,0,15,13576
+320,1,320:16:49860:15:1,320:16,Al Rashidiya Bus Stn,1,15,13577
+320,1,320:18:55200:15:1,320:18,Academic City,0,15,13578
+320,1,320:17:59460:15:1,320:17,Al Rashidiya Bus Stn,1,15,13579
+320,1,320:18:64800:15:1,320:18,Academic City,0,15,13580
+320,1,320:17:69120:15:1,320:17,Al Rashidiya Bus Stn,1,15,13581
+320,1,320:16:18300:23:1,320:16,Al Rashidiya Bus Stn,1,23,13598
+320,1,320:18:22800:23:1,320:18,Academic City,0,23,13599
+320,1,320:16:27300:23:1,320:16,Al Rashidiya Bus Stn,1,23,13600
+320,1,320:18:32400:23:1,320:18,Academic City,0,23,13601
+320,1,320:16:36780:23:1,320:16,Al Rashidiya Bus Stn,1,23,13602
+320,1,320:18:42000:23:1,320:18,Academic City,0,23,13603
+320,1,320:16:46260:23:1,320:16,Al Rashidiya Bus Stn,1,23,13604
+320,1,320:18:51600:23:1,320:18,Academic City,0,23,13605
+320,1,320:17:55860:23:1,320:17,Al Rashidiya Bus Stn,1,23,13606
+320,1,320:18:61200:23:1,320:18,Academic City,0,23,13607
+320,1,320:17:65520:23:1,320:17,Al Rashidiya Bus Stn,1,23,13608
+320,1,320:18:70680:23:1,320:18,Academic City,0,23,13609
+320,1,320:17:74400:23:1,320:17,Al Rashidiya Bus Stn,1,23,13610
+320,1,320:18:79200:23:1,320:18,Academic City,0,23,13611
+320,1,320:17:82920:23:1,320:17,Al Rashidiya Bus Stn,1,23,13612
+320,1,320:18:87420:23:1,320:18,Academic City,0,23,13613
+320,1,320:16:20100:24:1,320:16,Al Rashidiya Bus Stn,1,24,13628
+320,1,320:18:25200:24:1,320:18,Academic City,0,24,13629
+320,1,320:16:29580:24:1,320:16,Al Rashidiya Bus Stn,1,24,13630
+320,1,320:18:34800:24:1,320:18,Academic City,0,24,13631
+320,1,320:16:39120:24:1,320:16,Al Rashidiya Bus Stn,1,24,13632
+320,1,320:18:44400:24:1,320:18,Academic City,0,24,13633
+320,1,320:16:48660:24:1,320:16,Al Rashidiya Bus Stn,1,24,13634
+320,1,320:18:54000:24:1,320:18,Academic City,0,24,13635
+320,1,320:17:58260:24:1,320:17,Al Rashidiya Bus Stn,1,24,13636
+320,1,320:18:63600:24:1,320:18,Academic City,0,24,13637
+320,1,320:17:67920:24:1,320:17,Al Rashidiya Bus Stn,1,24,13638
+320,1,320:18:73800:24:1,320:18,Academic City,0,24,13639
+320,1,320:17:77460:24:1,320:17,Al Rashidiya Bus Stn,1,24,13640
+320,1,320:18:82800:24:1,320:18,Academic City,0,24,13641
+320,1,320:16:23100:38:1,320:16,Al Rashidiya Bus Stn,1,38,13653
+320,1,320:18:28800:38:1,320:18,Academic City,0,38,13654
+320,1,320:16:33300:38:1,320:16,Al Rashidiya Bus Stn,1,38,13655
+320,1,320:18:38400:38:1,320:18,Academic City,0,38,13656
+320,1,320:16:42660:38:1,320:16,Al Rashidiya Bus Stn,1,38,13657
+320,1,320:18:48000:38:1,320:18,Academic City,0,38,13658
+320,1,320:17:52260:38:1,320:17,Al Rashidiya Bus Stn,1,38,13659
+320,1,320:18:57600:38:1,320:18,Academic City,0,38,13660
+320,1,320:17:61890:38:1,320:17,Al Rashidiya Bus Stn,1,38,13661
+320,1,320:18:67200:38:1,320:18,Academic City,0,38,13662
+320,1,320:17:71640:38:1,320:17,Al Rashidiya Bus Stn,1,38,13663
+320,1,320:18:24000:40:1,320:18,Academic City,0,40,13677
+320,1,320:16:28440:40:1,320:16,Al Rashidiya Bus Stn,1,40,13678
+320,1,320:18:33600:40:1,320:18,Academic City,0,40,13679
+320,1,320:16:37980:40:1,320:16,Al Rashidiya Bus Stn,1,40,13680
+320,1,320:18:43200:40:1,320:18,Academic City,0,40,13681
+320,1,320:16:47460:40:1,320:16,Al Rashidiya Bus Stn,1,40,13682
+320,1,320:18:52800:40:1,320:18,Academic City,0,40,13683
+320,1,320:17:57060:40:1,320:17,Al Rashidiya Bus Stn,1,40,13684
+320,1,320:18:62400:40:1,320:18,Academic City,0,40,13685
+320,1,320:17:66720:40:1,320:17,Al Rashidiya Bus Stn,1,40,13686
+320,1,320:18:72000:40:1,320:18,Academic City,0,40,13687
+320,1,320:17:75660:40:1,320:17,Al Rashidiya Bus Stn,1,40,13688
+320,1,320:18:81000:40:1,320:18,Academic City,0,40,13689
+1002,1,1002:15:43800:4018:1,1002:15,Gold Souq Bus Stn,1,4018,34254
+1002,1,1002:17:49320:4018:1,1002:17,Jebel Ali  Bus Stn,0,4018,34255
+1002,1,1002:15:66840:4018:1,1002:15,Gold Souq Bus Stn,1,4018,34258
+1002,1,1002:17:73200:4018:1,1002:17,Jebel Ali  Bus Stn,0,4018,34259
+1002,1,1002:17:18120:4020:1,1002:17,Jebel Ali  Bus Stn,0,4020,34271
+1002,1,1002:15:23280:4020:1,1002:15,Gold Souq Bus Stn,1,4020,34272
+1002,1,1002:17:28800:4020:1,1002:17,Jebel Ali  Bus Stn,0,4020,34273
+1002,1,1002:15:34680:4020:1,1002:15,Gold Souq Bus Stn,1,4020,34274
+1002,1,1002:17:40320:4020:1,1002:17,Jebel Ali  Bus Stn,0,4020,34275
+1002,1,1002:15:57840:4020:1,1002:15,Gold Souq Bus Stn,1,4020,34278
+1002,1,1002:17:63840:4020:1,1002:17,Jebel Ali  Bus Stn,0,4020,34279
+1002,1,1002:15:21720:4028:1,1002:15,Gold Souq Bus Stn,1,4028,34292
+1002,1,1002:17:26940:4028:1,1002:17,Jebel Ali  Bus Stn,0,4028,34293
+1002,1,1002:15:54360:4028:1,1002:15,Gold Souq Bus Stn,1,4028,34298
+1002,1,1002:17:60240:4028:1,1002:17,Jebel Ali  Bus Stn,0,4028,34299
+1002,1,1002:15:50760:4030:1,1002:15,Gold Souq Bus Stn,1,4030,34319
+1002,1,1002:17:56520:4030:1,1002:17,Jebel Ali  Bus Stn,0,4030,34320
+1002,1,1002:15:74460:4030:1,1002:15,Gold Souq Bus Stn,1,4030,34323
+1002,1,1002:15:31080:4024:1,1002:15,Gold Souq Bus Stn,1,4024,34336
+1002,1,1002:17:36660:4024:1,1002:17,Jebel Ali  Bus Stn,0,4024,34337
+1002,1,1002:15:41880:4024:1,1002:15,Gold Souq Bus Stn,1,4024,34338
+1002,1,1002:17:47520:4024:1,1002:17,Jebel Ali  Bus Stn,0,4024,34339
+1002,1,1002:15:65040:4024:1,1002:15,Gold Souq Bus Stn,1,4024,34342
+1002,1,1002:17:71400:4024:1,1002:17,Jebel Ali  Bus Stn,0,4024,34343
+1002,1,1002:15:38280:4016:1,1002:15,Gold Souq Bus Stn,1,4016,34358
+1002,1,1002:17:43920:4016:1,1002:17,Jebel Ali  Bus Stn,0,4016,34359
+1002,1,1002:15:61440:4016:1,1002:15,Gold Souq Bus Stn,1,4016,34362
+1002,1,1002:17:67560:4016:1,1002:17,Jebel Ali  Bus Stn,0,4016,34363
+1002,1,1002:15:32760:4022:1,1002:15,Gold Souq Bus Stn,1,4022,34379
+1002,1,1002:17:38520:4022:1,1002:17,Jebel Ali  Bus Stn,0,4022,34380
+1002,1,1002:15:56160:4022:1,1002:15,Gold Souq Bus Stn,1,4022,34383
+1002,1,1002:17:62040:4022:1,1002:17,Jebel Ali  Bus Stn,0,4022,34384
+1002,1,1002:15:78420:4022:1,1002:15,Gold Souq Bus Stn,1,4022,34387
+1002,1,1002:15:36720:4025:1,1002:15,Gold Souq Bus Stn,1,4025,34402
+1002,1,1002:17:42120:4025:1,1002:17,Jebel Ali  Bus Stn,0,4025,34403
+1002,1,1002:15:59640:4025:1,1002:15,Gold Souq Bus Stn,1,4025,34406
+1002,1,1002:17:65640:4025:1,1002:17,Jebel Ali  Bus Stn,0,4025,34407
+1002,1,1002:15:25320:4032:1,1002:15,Gold Souq Bus Stn,1,4032,34422
+1002,1,1002:17:30600:4032:1,1002:17,Jebel Ali  Bus Stn,0,4032,34423
+1002,1,1002:15:47280:4032:1,1002:15,Gold Souq Bus Stn,1,4032,34426
+1002,1,1002:17:52920:4032:1,1002:17,Jebel Ali  Bus Stn,0,4032,34427
+1002,1,1002:15:70500:4032:1,1002:15,Gold Souq Bus Stn,1,4032,34430
+1002,1,1002:17:76020:4032:1,1002:17,Jebel Ali  Bus Stn,0,4032,34431
+6045,1,6045:24:17160:4111:1,6045:24,Danube MS,0,4111,36040
+6045,1,6045:25:22800:4111:1,6045:25,Dubai Investment Park 2,0,4111,36041
+6045,1,6045:25:31200:4111:1,6045:25,Dubai Investment Park 2,0,4111,36042
+6045,1,6045:25:39600:4111:1,6045:25,Dubai Investment Park 2,0,4111,36043
+6045,1,6045:25:48600:4111:1,6045:25,Dubai Investment Park 2,0,4111,36044
+6045,1,6045:25:56400:4111:1,6045:25,Dubai Investment Park 2,0,4111,36045
+6045,1,6045:25:64800:4111:1,6045:25,Dubai Investment Park 2,0,4111,36046
+6045,1,6045:25:73200:4111:1,6045:25,Dubai Investment Park 2,0,4111,36047
+6045,1,6045:24:19020:4112:1,6045:24,Danube MS,0,4112,36051
+6045,1,6045:25:24000:4112:1,6045:25,Dubai Investment Park 2,0,4112,36052
+6045,1,6045:25:32400:4112:1,6045:25,Dubai Investment Park 2,0,4112,36053
+6045,1,6045:25:57600:4113:1,6045:25,Dubai Investment Park 2,0,4113,36058
+6045,1,6045:25:66000:4113:1,6045:25,Dubai Investment Park 2,0,4113,36059
+6045,1,6045:25:74400:4113:1,6045:25,Dubai Investment Park 2,0,4113,36060
+6045,1,6045:26:82800:4113:1,6045:26,Dubai Investment Park 2,0,4113,36061
+6045,1,6045:24:20220:4114:1,6045:24,Danube MS,0,4114,36070
+6045,1,6045:25:25200:4114:1,6045:25,Dubai Investment Park 2,0,4114,36071
+6045,1,6045:25:33600:4114:1,6045:25,Dubai Investment Park 2,0,4114,36072
+6045,1,6045:25:41400:4114:1,6045:25,Dubai Investment Park 2,0,4114,36073
+6045,1,6045:25:50400:4114:1,6045:25,Dubai Investment Park 2,0,4114,36074
+6045,1,6045:25:58800:4114:1,6045:25,Dubai Investment Park 2,0,4114,36075
+6045,1,6045:25:67200:4114:1,6045:25,Dubai Investment Park 2,0,4114,36076
+6045,1,6045:25:75600:4114:1,6045:25,Dubai Investment Park 2,0,4114,36077
+6045,1,6045:24:21420:4115:1,6045:24,Danube MS,0,4115,36087
+6045,1,6045:25:26400:4115:1,6045:25,Dubai Investment Park 2,0,4115,36088
+6045,1,6045:25:34800:4115:1,6045:25,Dubai Investment Park 2,0,4115,36089
+6045,1,6045:25:43200:4115:1,6045:25,Dubai Investment Park 2,0,4115,36090
+6045,1,6045:25:52200:4115:1,6045:25,Dubai Investment Park 2,0,4115,36091
+6045,1,6045:25:60000:4115:1,6045:25,Dubai Investment Park 2,0,4115,36092
+6045,1,6045:25:68400:4115:1,6045:25,Dubai Investment Park 2,0,4115,36093
+6045,1,6045:25:76800:4115:1,6045:25,Dubai Investment Park 2,0,4115,36094
+6045,1,6045:26:84600:4115:1,6045:26,Dubai Investment Park 2,0,4115,36095
+6045,1,6045:25:21600:4116:1,6045:25,Dubai Investment Park 2,0,4116,36104
+6045,1,6045:25:30000:4116:1,6045:25,Dubai Investment Park 2,0,4116,36105
+6045,1,6045:25:38400:4116:1,6045:25,Dubai Investment Park 2,0,4116,36106
+6045,1,6045:25:46800:4116:1,6045:25,Dubai Investment Park 2,0,4116,36107
+6045,1,6045:25:55200:4116:1,6045:25,Dubai Investment Park 2,0,4116,36108
+6045,1,6045:25:63600:4116:1,6045:25,Dubai Investment Park 2,0,4116,36109
+6045,1,6045:25:72000:4116:1,6045:25,Dubai Investment Park 2,0,4116,36110
+6045,1,6045:25:81000:4116:1,6045:25,Dubai Investment Park 2,0,4116,36111
+6045,1,6045:24:22620:4117:1,6045:24,Danube MS,0,4117,36115
+6045,1,6045:25:27600:4117:1,6045:25,Dubai Investment Park 2,0,4117,36116
+6045,1,6045:25:36000:4117:1,6045:25,Dubai Investment Park 2,0,4117,36117
+6045,1,6045:25:61200:4118:1,6045:25,Dubai Investment Park 2,0,4118,36122
+6045,1,6045:25:69600:4118:1,6045:25,Dubai Investment Park 2,0,4118,36123
+6045,1,6045:25:78000:4118:1,6045:25,Dubai Investment Park 2,0,4118,36124
+6045,1,6045:26:86940:4118:1,6045:26,Dubai Investment Park 2,0,4118,36125
+6045,1,6045:24:23820:4127:1,6045:24,Danube MS,0,4127,36134
+6045,1,6045:25:28800:4127:1,6045:25,Dubai Investment Park 2,0,4127,36135
+6045,1,6045:25:37200:4127:1,6045:25,Dubai Investment Park 2,0,4127,36136
+6045,1,6045:25:45000:4127:1,6045:25,Dubai Investment Park 2,0,4127,36137
+6045,1,6045:25:54000:4127:1,6045:25,Dubai Investment Park 2,0,4127,36138
+6045,1,6045:25:62400:4127:1,6045:25,Dubai Investment Park 2,0,4127,36139
+6045,1,6045:25:70800:4127:1,6045:25,Dubai Investment Park 2,0,4127,36140
+6045,1,6045:25:79200:4127:1,6045:25,Dubai Investment Park 2,0,4127,36141
+1018,1,1018:5:23400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36944
+1018,1,1018:5:29400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36945
+1018,1,1018:5:35400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36946
+1018,1,1018:5:41400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36947
+1018,1,1018:5:47400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36948
+1018,1,1018:5:53400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36949
+1018,1,1018:5:59400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36950
+1018,1,1018:5:65400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36951
+1018,1,1018:5:71400:4092:1,1018:5,Jumeirah Village Circle,0,4092,36952
+1018,1,1018:5:77700:4092:1,1018:5,Jumeirah Village Circle,0,4092,36953
+1018,1,1018:5:24600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36964
+1018,1,1018:5:30600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36965
+1018,1,1018:5:36600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36966
+1018,1,1018:5:42600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36967
+1018,1,1018:5:48600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36968
+1018,1,1018:5:54600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36969
+1018,1,1018:5:60600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36970
+1018,1,1018:5:66600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36971
+1018,1,1018:5:72600:4088:1,1018:5,Jumeirah Village Circle,0,4088,36972
+1018,1,1018:5:79200:4088:1,1018:5,Jumeirah Village Circle,0,4088,36973
+1018,1,1018:5:25800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36983
+1018,1,1018:5:31800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36984
+1018,1,1018:5:37800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36985
+1018,1,1018:5:43800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36986
+1018,1,1018:5:49800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36987
+1018,1,1018:5:55800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36988
+1018,1,1018:5:61800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36989
+1018,1,1018:5:67800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36990
+1018,1,1018:5:73800:4089:1,1018:5,Jumeirah Village Circle,0,4089,36991
+1018,1,1018:5:27000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37002
+1018,1,1018:5:33000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37003
+1018,1,1018:5:39000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37004
+1018,1,1018:5:45000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37005
+1018,1,1018:5:51000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37006
+1018,1,1018:5:57000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37007
+1018,1,1018:5:63000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37008
+1018,1,1018:5:69000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37009
+1018,1,1018:5:75000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37010
+1018,1,1018:5:81000:4091:1,1018:5,Jumeirah Village Circle,0,4091,37011
+1018,1,1018:5:28200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37021
+1018,1,1018:5:34200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37022
+1018,1,1018:5:40200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37023
+1018,1,1018:5:46200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37024
+1018,1,1018:5:52200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37025
+1018,1,1018:5:58200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37026
+1018,1,1018:5:64200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37027
+1018,1,1018:5:70200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37028
+1018,1,1018:5:76200:4068:1,1018:5,Jumeirah Village Circle,0,4068,37029
+8,1,8:2:56100:4070:1,8:2,Ibn Battuta MS,0,4070,37033
+8,1,8:1:62070:4070:1,8:1,Al Baraha Bus Stn,1,4070,37034
+8,1,8:2:71100:4070:1,8:2,Ibn Battuta MS,0,4070,37035
+8,1,8:1:63240:4079:1,8:1,Al Baraha Bus Stn,1,4079,37038
+8,1,8:2:72480:4079:1,8:2,Ibn Battuta MS,0,4079,37039
+8,1,8:2:17100:4008:1,8:2,Ibn Battuta MS,0,4008,37044
+8,1,8:1:22020:4008:1,8:1,Al Baraha Bus Stn,1,4008,37045
+8,1,8:2:27900:4008:1,8:2,Ibn Battuta MS,0,4008,37046
+8,1,8:1:34080:4008:1,8:1,Al Baraha Bus Stn,1,4008,37047
+8,1,8:1:17220:4007:1,8:1,Al Baraha Bus Stn,1,4007,37057
+8,1,8:2:23100:4007:1,8:2,Ibn Battuta MS,0,4007,37058
+8,1,8:1:28860:4007:1,8:1,Al Baraha Bus Stn,1,4007,37059
+8,1,8:2:35220:4007:1,8:2,Ibn Battuta MS,0,4007,37060
+8,1,8:1:42420:4007:1,8:1,Al Baraha Bus Stn,1,4007,37061
+8,1,8:2:48900:4007:1,8:2,Ibn Battuta MS,0,4007,37062
+8,1,8:1:54720:4007:1,8:1,Al Baraha Bus Stn,1,4007,37063
+8,1,8:2:62700:4007:1,8:2,Ibn Battuta MS,0,4007,37064
+8,1,8:1:69330:4007:1,8:1,Al Baraha Bus Stn,1,4007,37065
+8,1,8:2:20700:4074:1,8:2,Ibn Battuta MS,0,4074,37075
+8,1,8:1:26280:4074:1,8:1,Al Baraha Bus Stn,1,4074,37076
+8,1,8:2:32700:4074:1,8:2,Ibn Battuta MS,0,4074,37077
+8,1,8:1:38760:4074:1,8:1,Al Baraha Bus Stn,1,4074,37078
+8,1,8:2:45300:4074:1,8:2,Ibn Battuta MS,0,4074,37079
+8,1,8:1:51390:4074:1,8:1,Al Baraha Bus Stn,1,4074,37080
+8,1,8:2:59040:4074:1,8:2,Ibn Battuta MS,0,4074,37081
+8,1,8:1:65670:4074:1,8:1,Al Baraha Bus Stn,1,4074,37082
+8,1,8:2:74100:4074:1,8:2,Ibn Battuta MS,0,4074,37083
+8,1,8:1:19620:4073:1,8:1,Al Baraha Bus Stn,1,4073,37094
+8,1,8:2:25500:4073:1,8:2,Ibn Battuta MS,0,4073,37095
+8,1,8:1:31620:4073:1,8:1,Al Baraha Bus Stn,1,4073,37096
+8,1,8:2:38160:4073:1,8:2,Ibn Battuta MS,0,4073,37097
+8,1,8:1:44310:4073:1,8:1,Al Baraha Bus Stn,1,4073,37098
+8,1,8:2:50820:4073:1,8:2,Ibn Battuta MS,0,4073,37099
+8,1,8:1:56640:4073:1,8:1,Al Baraha Bus Stn,1,4073,37100
+8,1,8:2:63900:4073:1,8:2,Ibn Battuta MS,0,4073,37101
+8,1,8:1:70500:4073:1,8:1,Al Baraha Bus Stn,1,4073,37102
+8,1,8:2:77700:4073:1,8:2,Ibn Battuta MS,0,4073,37103
+8,1,8:2:29100:4006:1,8:2,Ibn Battuta MS,0,4006,37111
+8,1,8:1:35370:4006:1,8:1,Al Baraha Bus Stn,1,4006,37112
+8,1,8:2:41700:4006:1,8:2,Ibn Battuta MS,0,4006,37113
+8,1,8:1:47850:4006:1,8:1,Al Baraha Bus Stn,1,4006,37114
+8,1,8:2:54480:4006:1,8:2,Ibn Battuta MS,0,4006,37115
+8,1,8:1:60870:4006:1,8:1,Al Baraha Bus Stn,1,4006,37116
+8,1,8:2:69900:4006:1,8:2,Ibn Battuta MS,0,4006,37117
+8,1,8:2:61440:4096:1,8:2,Ibn Battuta MS,0,4096,37121
+8,1,8:1:68160:4096:1,8:1,Al Baraha Bus Stn,1,4096,37122
+8,1,8:2:75900:4096:1,8:2,Ibn Battuta MS,0,4096,37123
+8,1,8:2:24300:4069:1,8:2,Ibn Battuta MS,0,4069,37127
+8,1,8:1:30270:4069:1,8:1,Al Baraha Bus Stn,1,4069,37128
+8,1,8:2:36900:4069:1,8:2,Ibn Battuta MS,0,4069,37129
+27,1,27:24:19800:9074:1,27:24,Dubai Mall,0,9074,50367
+27,1,27:23:22800:9074:1,27:23,Gold Souq Bus Stn,1,9074,50368
+27,1,27:24:27000:9074:1,27:24,Dubai Mall,0,9074,50369
+27,1,27:23:31200:9074:1,27:23,Gold Souq Bus Stn,1,9074,50370
+27,1,27:24:37200:9074:1,27:24,Dubai Mall,0,9074,50371
+27,1,27:23:41100:9074:1,27:23,Gold Souq Bus Stn,1,9074,50372
+27,1,27:24:46200:9074:1,27:24,Dubai Mall,0,9074,50373
+27,1,27:23:50700:9074:1,27:23,Gold Souq Bus Stn,1,9074,50374
+27,1,27:24:55800:9074:1,27:24,Dubai Mall,0,9074,50375
+27,1,27:23:59880:9074:1,27:23,Gold Souq Bus Stn,1,9074,50376
+27,1,27:24:66000:9074:1,27:24,Dubai Mall,0,9074,50377
+27,1,27:23:70860:9074:1,27:23,Gold Souq Bus Stn,1,9074,50378
+27,1,27:24:21000:9069:1,27:24,Dubai Mall,0,9069,50383
+27,1,27:23:24090:9069:1,27:23,Gold Souq Bus Stn,1,9069,50384
+27,1,27:24:29400:9069:1,27:24,Dubai Mall,0,9069,50385
+27,1,27:23:33510:9069:1,27:23,Gold Souq Bus Stn,1,9069,50386
+27,1,27:24:49800:9042:1,27:24,Dubai Mall,0,9042,50392
+27,1,27:23:53970:9042:1,27:23,Gold Souq Bus Stn,1,9042,50393
+27,1,27:24:59400:9042:1,27:24,Dubai Mall,0,9042,50394
+27,1,27:23:63720:9042:1,27:23,Gold Souq Bus Stn,1,9042,50395
+27,1,27:24:71400:9042:1,27:24,Dubai Mall,0,9042,50396
+27,1,27:24:22200:9050:1,27:24,Dubai Mall,0,9050,50401
+27,1,27:23:25290:9050:1,27:23,Gold Souq Bus Stn,1,9050,50402
+27,1,27:24:30600:9050:1,27:24,Dubai Mall,0,9050,50403
+27,1,27:23:34710:9050:1,27:23,Gold Souq Bus Stn,1,9050,50404
+27,1,27:24:57000:9066:1,27:24,Dubai Mall,0,9066,50412
+27,1,27:23:61080:9066:1,27:23,Gold Souq Bus Stn,1,9066,50413
+27,1,27:24:68700:9066:1,27:24,Dubai Mall,0,9066,50414
+27,1,27:23:73320:9066:1,27:23,Gold Souq Bus Stn,1,9066,50415
+27,1,27:24:78600:9066:1,27:24,Dubai Mall,0,9066,50416
+27,1,27:23:82380:9066:1,27:23,Gold Souq Bus Stn,1,9066,50417
+27,1,27:24:86220:9066:1,27:24,Dubai Mall,0,9066,50418
+27,1,27:24:23400:9065:1,27:24,Dubai Mall,0,9065,50433
+27,1,27:23:26580:9065:1,27:23,Gold Souq Bus Stn,1,9065,50434
+27,1,27:24:31800:9065:1,27:24,Dubai Mall,0,9065,50435
+27,1,27:23:35910:9065:1,27:23,Gold Souq Bus Stn,1,9065,50436
+27,1,27:24:40800:9065:1,27:24,Dubai Mall,0,9065,50437
+27,1,27:23:44970:9065:1,27:23,Gold Souq Bus Stn,1,9065,50438
+27,1,27:24:51600:9065:1,27:24,Dubai Mall,0,9065,50439
+27,1,27:23:55680:9065:1,27:23,Gold Souq Bus Stn,1,9065,50440
+27,1,27:24:60600:9065:1,27:24,Dubai Mall,0,9065,50441
+27,1,27:23:64950:9065:1,27:23,Gold Souq Bus Stn,1,9065,50442
+27,1,27:24:72600:9065:1,27:24,Dubai Mall,0,9065,50443
+27,1,27:23:76740:9065:1,27:23,Gold Souq Bus Stn,1,9065,50444
+27,1,27:24:82200:9065:1,27:24,Dubai Mall,0,9065,50445
+27,1,27:23:85620:9065:1,27:23,Gold Souq Bus Stn,1,9065,50446
+27,1,27:24:24600:9038:1,27:24,Dubai Mall,0,9038,50457
+27,1,27:23:28170:9038:1,27:23,Gold Souq Bus Stn,1,9038,50458
+27,1,27:24:33600:9038:1,27:24,Dubai Mall,0,9038,50459
+27,1,27:23:37710:9038:1,27:23,Gold Souq Bus Stn,1,9038,50460
+27,1,27:24:42600:9038:1,27:24,Dubai Mall,0,9038,50461
+27,1,27:23:47040:9038:1,27:23,Gold Souq Bus Stn,1,9038,50462
+27,1,27:24:53400:9038:1,27:24,Dubai Mall,0,9038,50463
+27,1,27:23:57480:9038:1,27:23,Gold Souq Bus Stn,1,9038,50464
+27,1,27:24:63000:9038:1,27:24,Dubai Mall,0,9038,50465
+27,1,27:23:67830:9038:1,27:23,Gold Souq Bus Stn,1,9038,50466
+27,1,27:24:25800:9046:1,27:24,Dubai Mall,0,9046,50481
+27,1,27:23:29490:9046:1,27:23,Gold Souq Bus Stn,1,9046,50482
+27,1,27:24:35400:9046:1,27:24,Dubai Mall,0,9046,50483
+27,1,27:23:39510:9046:1,27:23,Gold Souq Bus Stn,1,9046,50484
+27,1,27:24:44400:9046:1,27:24,Dubai Mall,0,9046,50485
+27,1,27:23:48900:9046:1,27:23,Gold Souq Bus Stn,1,9046,50486
+27,1,27:24:54600:9046:1,27:24,Dubai Mall,0,9046,50487
+27,1,27:23:58680:9046:1,27:23,Gold Souq Bus Stn,1,9046,50488
+27,1,27:24:64500:9046:1,27:24,Dubai Mall,0,9046,50489
+27,1,27:23:69330:9046:1,27:23,Gold Souq Bus Stn,1,9046,50490
+27,1,27:24:75300:9046:1,27:24,Dubai Mall,0,9046,50491
+27,1,27:23:79080:9046:1,27:23,Gold Souq Bus Stn,1,9046,50492
+27,1,27:24:84120:9046:1,27:24,Dubai Mall,0,9046,50493
+27,1,27:23:87450:9046:1,27:23,Gold Souq Bus Stn,1,9046,50494
+27,1,27:24:28200:9057:1,27:24,Dubai Mall,0,9057,50507
+27,1,27:23:32340:9057:1,27:23,Gold Souq Bus Stn,1,9057,50508
+27,1,27:24:39000:9057:1,27:24,Dubai Mall,0,9057,50509
+27,1,27:23:42990:9057:1,27:23,Gold Souq Bus Stn,1,9057,50510
+27,1,27:24:48000:9057:1,27:24,Dubai Mall,0,9057,50511
+27,1,27:23:52560:9057:1,27:23,Gold Souq Bus Stn,1,9057,50512
+27,1,27:24:58200:9057:1,27:24,Dubai Mall,0,9057,50513
+27,1,27:23:62490:9057:1,27:23,Gold Souq Bus Stn,1,9057,50514
+27,1,27:24:70200:9057:1,27:24,Dubai Mall,0,9057,50515
+27,1,27:23:74910:9057:1,27:23,Gold Souq Bus Stn,1,9057,50516
+27,1,27:24:80400:9057:1,27:24,Dubai Mall,0,9057,50517
+27,1,27:23:83940:9057:1,27:23,Gold Souq Bus Stn,1,9057,50518
+27,1,27:24:61800:9125:1,27:24,Dubai Mall,0,9125,50522
+27,1,27:23:66420:9125:1,27:23,Gold Souq Bus Stn,1,9125,50523
+27,1,27:24:73800:9125:1,27:24,Dubai Mall,0,9125,50524
+27,1,27:24:67500:9128:1,27:24,Dubai Mall,0,9128,50529
+27,1,27:23:72150:9128:1,27:23,Gold Souq Bus Stn,1,9128,50530
+27,1,27:24:77100:9128:1,27:24,Dubai Mall,0,9128,50531
+27,1,27:23:80880:9128:1,27:23,Gold Souq Bus Stn,1,9128,50532
+84,1,84:19:21600:9118:1,84:19,"Al Quoz, Al Khail Gate",1,9118,51834
+84,1,84:22:26400:9118:1,84:22,JBR Marina,0,9118,51835
+84,1,84:19:31020:9118:1,84:19,"Al Quoz, Al Khail Gate",1,9118,51836
+84,1,84:22:36180:9118:1,84:22,JBR Marina,0,9118,51837
+84,1,84:19:41220:9118:1,84:19,"Al Quoz, Al Khail Gate",1,9118,51838
+84,1,84:22:46800:9118:1,84:22,JBR Marina,0,9118,51839
+84,1,84:19:52080:9118:1,84:19,"Al Quoz, Al Khail Gate",1,9118,51840
+84,1,84:22:57300:9118:1,84:22,JBR Marina,0,9118,51841
+84,1,84:19:63030:9118:1,84:19,"Al Quoz, Al Khail Gate",1,9118,51842
+84,1,84:22:69000:9118:1,84:22,JBR Marina,0,9118,51843
+84,1,84:19:74100:9118:1,84:19,"Al Quoz, Al Khail Gate",1,9118,51844
+84,1,84:22:21600:9132:1,84:22,JBR Marina,0,9132,51855
+84,1,84:19:26220:9132:1,84:19,"Al Quoz, Al Khail Gate",1,9132,51856
+84,1,84:22:31200:9132:1,84:22,JBR Marina,0,9132,51857
+84,1,84:19:35820:9132:1,84:19,"Al Quoz, Al Khail Gate",1,9132,51858
+84,1,84:22:41400:9132:1,84:22,JBR Marina,0,9132,51859
+84,1,84:19:46470:9132:1,84:19,"Al Quoz, Al Khail Gate",1,9132,51860
+84,1,84:22:52200:9132:1,84:22,JBR Marina,0,9132,51861
+84,1,84:19:58020:9132:1,84:19,"Al Quoz, Al Khail Gate",1,9132,51862
+84,1,84:22:63600:9132:1,84:22,JBR Marina,0,9132,51863
+84,1,84:19:68880:9132:1,84:19,"Al Quoz, Al Khail Gate",1,9132,51864
+84,1,84:19:22800:9133:1,84:19,"Al Quoz, Al Khail Gate",1,9133,51876
+84,1,84:22:27600:9133:1,84:22,JBR Marina,0,9133,51877
+84,1,84:19:32220:9133:1,84:19,"Al Quoz, Al Khail Gate",1,9133,51878
+84,1,84:22:37800:9133:1,84:22,JBR Marina,0,9133,51879
+84,1,84:19:42840:9133:1,84:19,"Al Quoz, Al Khail Gate",1,9133,51880
+84,1,84:22:48600:9133:1,84:22,JBR Marina,0,9133,51881
+84,1,84:19:54060:9133:1,84:19,"Al Quoz, Al Khail Gate",1,9133,51882
+84,1,84:22:60000:9133:1,84:22,JBR Marina,0,9133,51883
+84,1,84:19:65580:9133:1,84:19,"Al Quoz, Al Khail Gate",1,9133,51884
+84,1,84:22:71820:9133:1,84:22,JBR Marina,0,9133,51885
+84,1,84:19:76830:9133:1,84:19,"Al Quoz, Al Khail Gate",1,9133,51886
+84,1,84:22:22800:9136:1,84:22,JBR Marina,0,9136,51891
+84,1,84:19:27420:9136:1,84:19,"Al Quoz, Al Khail Gate",1,9136,51892
+84,1,84:22:32400:9136:1,84:22,JBR Marina,0,9136,51893
+84,1,84:19:36930:9136:1,84:19,"Al Quoz, Al Khail Gate",1,9136,51894
+84,1,84:22:62400:9154:1,84:22,JBR Marina,0,9154,51899
+84,1,84:19:67770:9154:1,84:19,"Al Quoz, Al Khail Gate",1,9154,51900
+84,1,84:22:74520:9154:1,84:22,JBR Marina,0,9154,51901
+84,1,84:19:79320:9154:1,84:19,"Al Quoz, Al Khail Gate",1,9154,51902
+84,1,84:19:24000:9155:1,84:19,"Al Quoz, Al Khail Gate",1,9155,51906
+84,1,84:22:28800:9155:1,84:22,JBR Marina,0,9155,51907
+84,1,84:19:33420:9155:1,84:19,"Al Quoz, Al Khail Gate",1,9155,51908
+84,1,84:22:58800:9156:1,84:22,JBR Marina,0,9156,51914
+84,1,84:19:64530:9156:1,84:19,"Al Quoz, Al Khail Gate",1,9156,51915
+84,1,84:22:70500:9156:1,84:22,JBR Marina,0,9156,51916
+84,1,84:19:75570:9156:1,84:19,"Al Quoz, Al Khail Gate",1,9156,51917
+84,1,84:22:81000:9156:1,84:22,JBR Marina,0,9156,51918
+84,1,84:22:24000:9159:1,84:22,JBR Marina,0,9159,51931
+84,1,84:19:28620:9159:1,84:19,"Al Quoz, Al Khail Gate",1,9159,51932
+84,1,84:22:33600:9159:1,84:22,JBR Marina,0,9159,51933
+84,1,84:19:38070:9159:1,84:19,"Al Quoz, Al Khail Gate",1,9159,51934
+84,1,84:22:43200:9159:1,84:22,JBR Marina,0,9159,51935
+84,1,84:19:48420:9159:1,84:19,"Al Quoz, Al Khail Gate",1,9159,51936
+84,1,84:22:54000:9159:1,84:22,JBR Marina,0,9159,51937
+84,1,84:19:59730:9159:1,84:19,"Al Quoz, Al Khail Gate",1,9159,51938
+84,1,84:22:66000:9159:1,84:22,JBR Marina,0,9159,51939
+84,1,84:19:71160:9159:1,84:19,"Al Quoz, Al Khail Gate",1,9159,51940
+84,1,84:22:77400:9159:1,84:22,JBR Marina,0,9159,51941
+84,1,84:19:81750:9159:1,84:19,"Al Quoz, Al Khail Gate",1,9159,51942
+84,1,84:19:25200:9161:1,84:19,"Al Quoz, Al Khail Gate",1,9161,51955
+84,1,84:22:30000:9161:1,84:22,JBR Marina,0,9161,51956
+84,1,84:19:34620:9161:1,84:19,"Al Quoz, Al Khail Gate",1,9161,51957
+84,1,84:22:39600:9161:1,84:22,JBR Marina,0,9161,51958
+84,1,84:19:44670:9161:1,84:19,"Al Quoz, Al Khail Gate",1,9161,51959
+84,1,84:22:50400:9161:1,84:22,JBR Marina,0,9161,51960
+84,1,84:19:56010:9161:1,84:19,"Al Quoz, Al Khail Gate",1,9161,51961
+84,1,84:22:61200:9161:1,84:22,JBR Marina,0,9161,51962
+84,1,84:19:66570:9161:1,84:19,"Al Quoz, Al Khail Gate",1,9161,51963
+84,1,84:22:73080:9161:1,84:22,JBR Marina,0,9161,51964
+84,1,84:19:78030:9161:1,84:19,"Al Quoz, Al Khail Gate",1,9161,51965
+84,1,84:22:82800:9161:1,84:22,JBR Marina,0,9161,51966
+84,1,84:22:25200:9163:1,84:22,JBR Marina,0,9163,51979
+84,1,84:19:29820:9163:1,84:19,"Al Quoz, Al Khail Gate",1,9163,51980
+84,1,84:22:34980:9163:1,84:22,JBR Marina,0,9163,51981
+84,1,84:19:39510:9163:1,84:19,"Al Quoz, Al Khail Gate",1,9163,51982
+84,1,84:22:45000:9163:1,84:22,JBR Marina,0,9163,51983
+84,1,84:19:50340:9163:1,84:19,"Al Quoz, Al Khail Gate",1,9163,51984
+84,1,84:22:55800:9163:1,84:22,JBR Marina,0,9163,51985
+84,1,84:19:61530:9163:1,84:19,"Al Quoz, Al Khail Gate",1,9163,51986
+84,1,84:22:67500:9163:1,84:22,JBR Marina,0,9163,51987
+84,1,84:19:72660:9163:1,84:19,"Al Quoz, Al Khail Gate",1,9163,51988
+84,1,84:22:79200:9163:1,84:22,JBR Marina,0,9163,51989
+84,1,84:19:83730:9163:1,84:19,"Al Quoz, Al Khail Gate",1,9163,51990
+84,1,84:22:64800:9188:1,84:22,JBR Marina,0,9188,51995
+84,1,84:19:69960:9188:1,84:19,"Al Quoz, Al Khail Gate",1,9188,51996
+84,1,84:22:75900:9188:1,84:22,JBR Marina,0,9188,51997
+84,1,84:19:80550:9188:1,84:19,"Al Quoz, Al Khail Gate",1,9188,51998
+2000,1,2000:14:18000:3168:1,2000:14,Satwa Bus stn,0,3168,65452
+2000,1,2000:13:22020:3168:1,2000:13,Airport 3,1,3168,65453
+2000,1,2000:14:26760:3168:1,2000:14,Satwa Bus stn,0,3168,65454
+2000,1,2000:13:31980:3168:1,2000:13,Airport 3,1,3168,65455
+2000,1,2000:14:37020:3168:1,2000:14,Satwa Bus stn,0,3168,65456
+2000,1,2000:13:42180:3168:1,2000:13,Airport 3,1,3168,65457
+2000,1,2000:14:47100:3168:1,2000:14,Satwa Bus stn,0,3168,65458
+2000,1,2000:13:52200:3168:1,2000:13,Airport 3,1,3168,65459
+2000,1,2000:14:57240:3168:1,2000:14,Satwa Bus stn,0,3168,65460
+2000,1,2000:13:62580:3168:1,2000:13,Airport 3,1,3168,65461
+2000,1,2000:14:68640:3168:1,2000:14,Satwa Bus stn,0,3168,65462
+2000,1,2000:13:75000:3168:1,2000:13,Airport 3,1,3168,65463
+2000,1,2000:14:80100:3168:1,2000:14,Satwa Bus stn,0,3168,65464
+2000,1,2000:13:85740:3168:1,2000:13,Airport 3,1,3168,65465
+2000,1,2000:14:90780:3168:1,2000:14,Satwa Bus stn,0,3168,65466
+2000,1,2000:13:17760:3167:1,2000:13,Airport 3,1,3167,65482
+2000,1,2000:14:21780:3167:1,2000:14,Satwa Bus stn,0,3167,65483
+2000,1,2000:13:26580:3167:1,2000:13,Airport 3,1,3167,65484
+2000,1,2000:14:31620:3167:1,2000:14,Satwa Bus stn,0,3167,65485
+2000,1,2000:13:36360:3167:1,2000:13,Airport 3,1,3167,65486
+2000,1,2000:14:41460:3167:1,2000:14,Satwa Bus stn,0,3167,65487
+2000,1,2000:13:46500:3167:1,2000:13,Airport 3,1,3167,65488
+2000,1,2000:14:51480:3167:1,2000:14,Satwa Bus stn,0,3167,65489
+2000,1,2000:13:56640:3167:1,2000:13,Airport 3,1,3167,65490
+2000,1,2000:14:61680:3167:1,2000:14,Satwa Bus stn,0,3167,65491
+2000,1,2000:13:67920:3167:1,2000:13,Airport 3,1,3167,65492
+2000,1,2000:14:73830:3167:1,2000:14,Satwa Bus stn,0,3167,65493
+2000,1,2000:13:79680:3167:1,2000:13,Airport 3,1,3167,65494
+2000,1,2000:14:84600:3167:1,2000:14,Satwa Bus stn,0,3167,65495
+2000,1,2000:13:89340:3167:1,2000:13,Airport 3,1,3167,65496
+2000,1,2000:14:18900:3172:1,2000:14,Satwa Bus stn,0,3172,65510
+2000,1,2000:13:23040:3172:1,2000:13,Airport 3,1,3172,65511
+2000,1,2000:14:27840:3172:1,2000:14,Satwa Bus stn,0,3172,65512
+2000,1,2000:13:32880:3172:1,2000:13,Airport 3,1,3172,65513
+2000,1,2000:14:37920:3172:1,2000:14,Satwa Bus stn,0,3172,65514
+2000,1,2000:13:42900:3172:1,2000:13,Airport 3,1,3172,65515
+2000,1,2000:14:47820:3172:1,2000:14,Satwa Bus stn,0,3172,65516
+2000,1,2000:13:52920:3172:1,2000:13,Airport 3,1,3172,65517
+2000,1,2000:14:57960:3172:1,2000:14,Satwa Bus stn,0,3172,65518
+2000,1,2000:13:63480:3172:1,2000:13,Airport 3,1,3172,65519
+2000,1,2000:14:69540:3172:1,2000:14,Satwa Bus stn,0,3172,65520
+2000,1,2000:13:75900:3172:1,2000:13,Airport 3,1,3172,65521
+2000,1,2000:14:81000:3172:1,2000:14,Satwa Bus stn,0,3172,65522
+2000,1,2000:13:18720:3173:1,2000:13,Airport 3,1,3173,65533
+2000,1,2000:14:22650:3173:1,2000:14,Satwa Bus stn,0,3173,65534
+2000,1,2000:13:27480:3173:1,2000:13,Airport 3,1,3173,65535
+2000,1,2000:14:32520:3173:1,2000:14,Satwa Bus stn,0,3173,65536
+2000,1,2000:13:37080:3173:1,2000:13,Airport 3,1,3173,65537
+2000,1,2000:14:42180:3173:1,2000:14,Satwa Bus stn,0,3173,65538
+2000,1,2000:13:47160:3173:1,2000:13,Airport 3,1,3173,65539
+2000,1,2000:14:52140:3173:1,2000:14,Satwa Bus stn,0,3173,65540
+2000,1,2000:13:57300:3173:1,2000:13,Airport 3,1,3173,65541
+2000,1,2000:14:62550:3173:1,2000:14,Satwa Bus stn,0,3173,65542
+2000,1,2000:14:19620:3164:1,2000:14,Satwa Bus stn,0,3164,65557
+2000,1,2000:13:23880:3164:1,2000:13,Airport 3,1,3164,65558
+2000,1,2000:14:28740:3164:1,2000:14,Satwa Bus stn,0,3164,65559
+2000,1,2000:13:33660:3164:1,2000:13,Airport 3,1,3164,65560
+2000,1,2000:14:38700:3164:1,2000:14,Satwa Bus stn,0,3164,65561
+2000,1,2000:13:43620:3164:1,2000:13,Airport 3,1,3164,65562
+2000,1,2000:14:48540:3164:1,2000:14,Satwa Bus stn,0,3164,65563
+2000,1,2000:13:53640:3164:1,2000:13,Airport 3,1,3164,65564
+2000,1,2000:14:58680:3164:1,2000:14,Satwa Bus stn,0,3164,65565
+2000,1,2000:13:64380:3164:1,2000:13,Airport 3,1,3164,65566
+2000,1,2000:14:70320:3164:1,2000:14,Satwa Bus stn,0,3164,65567
+2000,1,2000:13:76620:3164:1,2000:13,Airport 3,1,3164,65568
+2000,1,2000:14:81720:3164:1,2000:14,Satwa Bus stn,0,3164,65569
+2000,1,2000:13:86640:3164:1,2000:13,Airport 3,1,3164,65570
+2000,1,2000:13:19440:3177:1,2000:13,Airport 3,1,3177,65585
+2000,1,2000:14:23640:3177:1,2000:14,Satwa Bus stn,0,3177,65586
+2000,1,2000:13:28440:3177:1,2000:13,Airport 3,1,3177,65587
+2000,1,2000:14:33420:3177:1,2000:14,Satwa Bus stn,0,3177,65588
+2000,1,2000:13:37920:3177:1,2000:13,Airport 3,1,3177,65589
+2000,1,2000:14:42900:3177:1,2000:14,Satwa Bus stn,0,3177,65590
+2000,1,2000:13:47880:3177:1,2000:13,Airport 3,1,3177,65591
+2000,1,2000:14:52920:3177:1,2000:14,Satwa Bus stn,0,3177,65592
+2000,1,2000:13:58140:3177:1,2000:13,Airport 3,1,3177,65593
+2000,1,2000:14:63420:3177:1,2000:14,Satwa Bus stn,0,3177,65594
+2000,1,2000:13:69780:3177:1,2000:13,Airport 3,1,3177,65595
+2000,1,2000:14:75420:3177:1,2000:14,Satwa Bus stn,0,3177,65596
+2000,1,2000:13:81120:3177:1,2000:13,Airport 3,1,3177,65597
+2000,1,2000:14:85980:3177:1,2000:14,Satwa Bus stn,0,3177,65598
+2000,1,2000:14:20340:3178:1,2000:14,Satwa Bus stn,0,3178,65608
+2000,1,2000:13:24780:3178:1,2000:13,Airport 3,1,3178,65609
+2000,1,2000:14:29670:3178:1,2000:14,Satwa Bus stn,0,3178,65610
+2000,1,2000:13:34680:3178:1,2000:13,Airport 3,1,3178,65611
+2000,1,2000:14:39720:3178:1,2000:14,Satwa Bus stn,0,3178,65612
+2000,1,2000:13:45060:3178:1,2000:13,Airport 3,1,3178,65613
+2000,1,2000:14:49920:3178:1,2000:14,Satwa Bus stn,0,3178,65614
+2000,1,2000:13:55080:3178:1,2000:13,Airport 3,1,3178,65615
+2000,1,2000:14:60120:3178:1,2000:14,Satwa Bus stn,0,3178,65616
+2000,1,2000:13:20220:3156:1,2000:13,Airport 3,1,3156,65631
+2000,1,2000:14:24600:3156:1,2000:14,Satwa Bus stn,0,3156,65632
+2000,1,2000:13:29280:3156:1,2000:13,Airport 3,1,3156,65633
+2000,1,2000:14:34320:3156:1,2000:14,Satwa Bus stn,0,3156,65634
+2000,1,2000:13:39300:3156:1,2000:13,Airport 3,1,3156,65635
+2000,1,2000:14:44250:3156:1,2000:14,Satwa Bus stn,0,3156,65636
+2000,1,2000:13:49320:3156:1,2000:13,Airport 3,1,3156,65637
+2000,1,2000:14:54360:3156:1,2000:14,Satwa Bus stn,0,3156,65638
+2000,1,2000:13:59880:3156:1,2000:13,Airport 3,1,3156,65639
+2000,1,2000:14:65460:3156:1,2000:14,Satwa Bus stn,0,3156,65640
+2000,1,2000:13:71520:3156:1,2000:13,Airport 3,1,3156,65641
+2000,1,2000:14:76920:3156:1,2000:14,Satwa Bus stn,0,3156,65642
+2000,1,2000:13:82560:3156:1,2000:13,Airport 3,1,3156,65643
+2000,1,2000:14:87780:3156:1,2000:14,Satwa Bus stn,0,3156,65644
+2000,1,2000:14:21060:3170:1,2000:14,Satwa Bus stn,0,3170,65658
+2000,1,2000:13:25680:3170:1,2000:13,Airport 3,1,3170,65659
+2000,1,2000:14:30720:3170:1,2000:14,Satwa Bus stn,0,3170,65660
+2000,1,2000:13:35580:3170:1,2000:13,Airport 3,1,3170,65661
+2000,1,2000:14:40590:3170:1,2000:14,Satwa Bus stn,0,3170,65662
+2000,1,2000:13:45780:3170:1,2000:13,Airport 3,1,3170,65663
+2000,1,2000:14:50670:3170:1,2000:14,Satwa Bus stn,0,3170,65664
+2000,1,2000:13:55860:3170:1,2000:13,Airport 3,1,3170,65665
+2000,1,2000:14:60900:3170:1,2000:14,Satwa Bus stn,0,3170,65666
+2000,1,2000:13:67020:3170:1,2000:13,Airport 3,1,3170,65667
+2000,1,2000:14:73020:3170:1,2000:14,Satwa Bus stn,0,3170,65668
+2000,1,2000:13:78780:3170:1,2000:13,Airport 3,1,3170,65669
+2000,1,2000:14:83820:3170:1,2000:14,Satwa Bus stn,0,3170,65670
+2000,1,2000:13:21060:3239:1,2000:13,Airport 3,1,3239,65687
+2000,1,2000:14:25590:3239:1,2000:14,Satwa Bus stn,0,3239,65688
+2000,1,2000:13:30180:3239:1,2000:13,Airport 3,1,3239,65689
+2000,1,2000:14:35220:3239:1,2000:14,Satwa Bus stn,0,3239,65690
+2000,1,2000:13:40020:3239:1,2000:13,Airport 3,1,3239,65691
+2000,1,2000:14:44940:3239:1,2000:14,Satwa Bus stn,0,3239,65692
+2000,1,2000:13:50040:3239:1,2000:13,Airport 3,1,3239,65693
+2000,1,2000:14:55080:3239:1,2000:14,Satwa Bus stn,0,3239,65694
+2000,1,2000:13:60660:3239:1,2000:13,Airport 3,1,3239,65695
+2000,1,2000:14:66600:3239:1,2000:14,Satwa Bus stn,0,3239,65696
+2000,1,2000:13:72420:3239:1,2000:13,Airport 3,1,3239,65697
+2000,1,2000:14:77820:3239:1,2000:14,Satwa Bus stn,0,3239,65698
+2000,1,2000:13:83280:3239:1,2000:13,Airport 3,1,3239,65699
+2000,1,2000:14:88680:3239:1,2000:14,Satwa Bus stn,0,3239,65700
+2000,1,2000:13:93600:3239:1,2000:13,Airport 3,1,3239,65701
+2000,1,2000:14:99000:3239:1,2000:14,Satwa Bus stn,0,3239,65702
+2000,1,2000:13:31080:3171:1,2000:13,Airport 3,1,3171,67331
+2000,1,2000:14:36120:3171:1,2000:14,Satwa Bus stn,0,3171,67332
+2000,1,2000:13:40740:3171:1,2000:13,Airport 3,1,3171,67333
+2000,1,2000:14:45660:3171:1,2000:14,Satwa Bus stn,0,3171,67334
+2000,1,2000:13:50760:3171:1,2000:13,Airport 3,1,3171,67335
+2000,1,2000:14:55800:3171:1,2000:14,Satwa Bus stn,0,3171,67336
+2000,1,2000:13:61680:3171:1,2000:13,Airport 3,1,3171,67337
+2000,1,2000:14:67620:3171:1,2000:14,Satwa Bus stn,0,3171,67338
+2000,1,2000:13:73260:3171:1,2000:13,Airport 3,1,3171,67339
+2000,1,2000:14:78630:3171:1,2000:14,Satwa Bus stn,0,3171,67340
+2000,1,2000:13:84060:3171:1,2000:13,Airport 3,1,3171,67341
+2000,1,2000:14:89580:3171:1,2000:14,Satwa Bus stn,0,3171,67342
+2000,1,2000:13:95400:3171:1,2000:13,Airport 3,1,3171,67343
+2000,1,2000:14:100800:3171:1,2000:14,Satwa Bus stn,0,3171,67344
+2000,1,2000:13:38580:3240:1,2000:13,Airport 3,1,3240,67358
+2000,1,2000:14:43560:3240:1,2000:14,Satwa Bus stn,0,3240,67359
+2000,1,2000:13:48600:3240:1,2000:13,Airport 3,1,3240,67360
+2000,1,2000:14:53640:3240:1,2000:14,Satwa Bus stn,0,3240,67361
+2000,1,2000:13:59160:3240:1,2000:13,Airport 3,1,3240,67362
+2000,1,2000:14:64440:3240:1,2000:14,Satwa Bus stn,0,3240,67363
+2000,1,2000:13:70620:3240:1,2000:13,Airport 3,1,3240,67364
+2000,1,2000:14:76110:3240:1,2000:14,Satwa Bus stn,0,3240,67365
+2000,1,2000:13:81840:3240:1,2000:13,Airport 3,1,3240,67366
+2000,1,2000:14:86880:3240:1,2000:14,Satwa Bus stn,0,3240,67367
+2000,1,2000:13:92040:3240:1,2000:13,Airport 3,1,3240,67368
+2000,1,2000:14:97200:3240:1,2000:14,Satwa Bus stn,0,3240,67369
+2000,1,2000:13:102600:3240:1,2000:13,Airport 3,1,3240,67370
+2000,1,2000:13:41460:3241:1,2000:13,Airport 3,1,3241,67375
+2000,1,2000:14:46380:3241:1,2000:14,Satwa Bus stn,0,3241,67376
+2000,1,2000:13:51480:3241:1,2000:13,Airport 3,1,3241,67377
+2000,1,2000:14:56520:3241:1,2000:14,Satwa Bus stn,0,3241,67378
+2000,1,2000:13:44340:3166:1,2000:13,Airport 3,1,3166,67391
+2000,1,2000:14:49260:3166:1,2000:14,Satwa Bus stn,0,3166,67392
+2000,1,2000:13:54360:3166:1,2000:13,Airport 3,1,3166,67393
+2000,1,2000:14:59400:3166:1,2000:14,Satwa Bus stn,0,3166,67394
+2000,1,2000:13:65280:3166:1,2000:13,Airport 3,1,3166,67395
+2000,1,2000:14:71220:3166:1,2000:14,Satwa Bus stn,0,3166,67396
+2000,1,2000:13:77340:3166:1,2000:13,Airport 3,1,3166,67397
+2000,1,2000:14:82440:3166:1,2000:14,Satwa Bus stn,0,3166,67398
+2000,1,2000:13:87540:3166:1,2000:13,Airport 3,1,3166,67399
+2000,1,2000:14:92340:3166:1,2000:14,Satwa Bus stn,0,3166,67400
+2000,1,2000:13:97200:3166:1,2000:13,Airport 3,1,3166,67401
+2000,1,2000:14:102600:3166:1,2000:14,Satwa Bus stn,0,3166,67402
+2000,1,2000:13:74040:3163:1,2000:13,Airport 3,1,3163,67406
+2000,1,2000:14:79380:3163:1,2000:14,Satwa Bus stn,0,3163,67407
+2000,1,2000:13:84900:3163:1,2000:13,Airport 3,1,3163,67408
+2000,1,2000:13:66180:3162:1,2000:13,Airport 3,1,3162,67416
+2000,1,2000:14:72120:3162:1,2000:14,Satwa Bus stn,0,3162,67417
+2000,1,2000:13:78060:3162:1,2000:13,Airport 3,1,3162,67418
+2000,1,2000:14:83160:3162:1,2000:14,Satwa Bus stn,0,3162,67419
+2000,1,2000:13:88440:3162:1,2000:13,Airport 3,1,3162,67420
+2000,1,2000:14:93600:3162:1,2000:14,Satwa Bus stn,0,3162,67421
+2000,1,2000:13:99000:3162:1,2000:13,Airport 3,1,3162,67422
+2000,1,2000:13:68880:3165:1,2000:13,Airport 3,1,3165,67430
+2000,1,2000:14:74700:3165:1,2000:14,Satwa Bus stn,0,3165,67431
+2000,1,2000:13:80400:3165:1,2000:13,Airport 3,1,3165,67432
+2000,1,2000:14:85260:3165:1,2000:14,Satwa Bus stn,0,3165,67433
+2000,1,2000:13:90300:3165:1,2000:13,Airport 3,1,3165,67434
+2000,1,2000:14:95400:3165:1,2000:14,Satwa Bus stn,0,3165,67435
+2000,1,2000:13:100800:3165:1,2000:13,Airport 3,1,3165,67436

@@ -1,241 +1,479 @@
 table_name,field_name,language,record_id,record_sub_id,field_value
-stops,stop_name,ar,101011,,موقف تجريبي 1011
-stops,stop_name,ar,101012,,موقف تجريبي 1012
-stops,stop_name,ar,101021,,موقف تجريبي 1021
-stops,stop_name,ar,101022,,موقف تجريبي 1022
-stops,stop_name,ar,101031,,موقف تجريبي 1031
-stops,stop_name,ar,101032,,موقف تجريبي 1032
-stops,stop_name,ar,101041,,موقف تجريبي 1041
-stops,stop_name,ar,101042,,موقف تجريبي 1042
-stops,stop_name,ar,101051,,موقف تجريبي 1051
-stops,stop_name,ar,101052,,موقف تجريبي 1052
-stops,stop_name,ar,101061,,موقف تجريبي 1061
-stops,stop_name,ar,101062,,موقف تجريبي 1062
-stops,stop_name,ar,101071,,موقف تجريبي 1071
-stops,stop_name,ar,101072,,موقف تجريبي 1072
-stops,stop_name,ar,101081,,موقف تجريبي 1081
-stops,stop_name,ar,101082,,موقف تجريبي 1082
-stops,stop_name,ar,101091,,موقف تجريبي 1091
-stops,stop_name,ar,101092,,موقف تجريبي 1092
-stops,stop_name,ar,101101,,موقف تجريبي 1101
-stops,stop_name,ar,101102,,موقف تجريبي 1102
-stops,stop_name,ar,101111,,موقف تجريبي 1111
-stops,stop_name,ar,101112,,موقف تجريبي 1112
-stops,stop_name,ar,101121,,موقف تجريبي 1121
-stops,stop_name,ar,101122,,موقف تجريبي 1122
-stops,stop_name,ar,101131,,موقف تجريبي 1131
-stops,stop_name,ar,101132,,موقف تجريبي 1132
-stops,stop_name,ar,101141,,موقف تجريبي 1141
-stops,stop_name,ar,101142,,موقف تجريبي 1142
-stops,stop_name,ar,101151,,موقف تجريبي 1151
-stops,stop_name,ar,101152,,موقف تجريبي 1152
-stops,stop_name,ar,102011,,موقف تجريبي 2011
-stops,stop_name,ar,102012,,موقف تجريبي 2012
-stops,stop_name,ar,102021,,موقف تجريبي 2021
-stops,stop_name,ar,102022,,موقف تجريبي 2022
-stops,stop_name,ar,102031,,موقف تجريبي 2031
-stops,stop_name,ar,102032,,موقف تجريبي 2032
-stops,stop_name,ar,102041,,موقف تجريبي 2041
-stops,stop_name,ar,102042,,موقف تجريبي 2042
-stops,stop_name,ar,102051,,موقف تجريبي 2051
-stops,stop_name,ar,102052,,موقف تجريبي 2052
-stops,stop_name,ar,102061,,موقف تجريبي 2061
-stops,stop_name,ar,102062,,موقف تجريبي 2062
-stops,stop_name,ar,102071,,موقف تجريبي 2071
-stops,stop_name,ar,102072,,موقف تجريبي 2072
-stops,stop_name,ar,102081,,موقف تجريبي 2081
-stops,stop_name,ar,102082,,موقف تجريبي 2082
-stops,stop_name,ar,102091,,موقف تجريبي 2091
-stops,stop_name,ar,102092,,موقف تجريبي 2092
-stops,stop_name,ar,102101,,موقف تجريبي 2101
-stops,stop_name,ar,102102,,موقف تجريبي 2102
-stops,stop_name,ar,102111,,موقف تجريبي 2111
-stops,stop_name,ar,102112,,موقف تجريبي 2112
-stops,stop_name,ar,102121,,موقف تجريبي 2121
-stops,stop_name,ar,102122,,موقف تجريبي 2122
-stops,stop_name,ar,102131,,موقف تجريبي 2131
-stops,stop_name,ar,102132,,موقف تجريبي 2132
-stops,stop_name,ar,102141,,موقف تجريبي 2141
-stops,stop_name,ar,102142,,موقف تجريبي 2142
-stops,stop_name,ar,102151,,موقف تجريبي 2151
-stops,stop_name,ar,102152,,موقف تجريبي 2152
-stops,stop_name,ar,103011,,موقف تجريبي 3011
-stops,stop_name,ar,103012,,موقف تجريبي 3012
-stops,stop_name,ar,103021,,موقف تجريبي 3021
-stops,stop_name,ar,103022,,موقف تجريبي 3022
-stops,stop_name,ar,103031,,موقف تجريبي 3031
-stops,stop_name,ar,103032,,موقف تجريبي 3032
-stops,stop_name,ar,103041,,موقف تجريبي 3041
-stops,stop_name,ar,103042,,موقف تجريبي 3042
-stops,stop_name,ar,103051,,موقف تجريبي 3051
-stops,stop_name,ar,103052,,موقف تجريبي 3052
-stops,stop_name,ar,103061,,موقف تجريبي 3061
-stops,stop_name,ar,103062,,موقف تجريبي 3062
-stops,stop_name,ar,103071,,موقف تجريبي 3071
-stops,stop_name,ar,103072,,موقف تجريبي 3072
-stops,stop_name,ar,103081,,موقف تجريبي 3081
-stops,stop_name,ar,103082,,موقف تجريبي 3082
-stops,stop_name,ar,103091,,موقف تجريبي 3091
-stops,stop_name,ar,103092,,موقف تجريبي 3092
-stops,stop_name,ar,103101,,موقف تجريبي 3101
-stops,stop_name,ar,103102,,موقف تجريبي 3102
-stops,stop_name,ar,103111,,موقف تجريبي 3111
-stops,stop_name,ar,103112,,موقف تجريبي 3112
-stops,stop_name,ar,103121,,موقف تجريبي 3121
-stops,stop_name,ar,103122,,موقف تجريبي 3122
-stops,stop_name,ar,103131,,موقف تجريبي 3131
-stops,stop_name,ar,103132,,موقف تجريبي 3132
-stops,stop_name,ar,103141,,موقف تجريبي 3141
-stops,stop_name,ar,103142,,موقف تجريبي 3142
-stops,stop_name,ar,103151,,موقف تجريبي 3151
-stops,stop_name,ar,103152,,موقف تجريبي 3152
-stops,stop_name,ar,104011,,موقف تجريبي 4011
-stops,stop_name,ar,104012,,موقف تجريبي 4012
-stops,stop_name,ar,104021,,موقف تجريبي 4021
-stops,stop_name,ar,104022,,موقف تجريبي 4022
-stops,stop_name,ar,104031,,موقف تجريبي 4031
-stops,stop_name,ar,104032,,موقف تجريبي 4032
-stops,stop_name,ar,104041,,موقف تجريبي 4041
-stops,stop_name,ar,104042,,موقف تجريبي 4042
-stops,stop_name,ar,104051,,موقف تجريبي 4051
-stops,stop_name,ar,104052,,موقف تجريبي 4052
-stops,stop_name,ar,104061,,موقف تجريبي 4061
-stops,stop_name,ar,104062,,موقف تجريبي 4062
-stops,stop_name,ar,104071,,موقف تجريبي 4071
-stops,stop_name,ar,104072,,موقف تجريبي 4072
-stops,stop_name,ar,104081,,موقف تجريبي 4081
-stops,stop_name,ar,104082,,موقف تجريبي 4082
-stops,stop_name,ar,104091,,موقف تجريبي 4091
-stops,stop_name,ar,104092,,موقف تجريبي 4092
-stops,stop_name,ar,104101,,موقف تجريبي 4101
-stops,stop_name,ar,104102,,موقف تجريبي 4102
-stops,stop_name,ar,104111,,موقف تجريبي 4111
-stops,stop_name,ar,104112,,موقف تجريبي 4112
-stops,stop_name,ar,104121,,موقف تجريبي 4121
-stops,stop_name,ar,104122,,موقف تجريبي 4122
-stops,stop_name,ar,104131,,موقف تجريبي 4131
-stops,stop_name,ar,104132,,موقف تجريبي 4132
-stops,stop_name,ar,104141,,موقف تجريبي 4141
-stops,stop_name,ar,104142,,موقف تجريبي 4142
-stops,stop_name,ar,104151,,موقف تجريبي 4151
-stops,stop_name,ar,104152,,موقف تجريبي 4152
-stops,stop_name,ar,105011,,موقف تجريبي 5011
-stops,stop_name,ar,105012,,موقف تجريبي 5012
-stops,stop_name,ar,105021,,موقف تجريبي 5021
-stops,stop_name,ar,105022,,موقف تجريبي 5022
-stops,stop_name,ar,105031,,موقف تجريبي 5031
-stops,stop_name,ar,105032,,موقف تجريبي 5032
-stops,stop_name,ar,105041,,موقف تجريبي 5041
-stops,stop_name,ar,105042,,موقف تجريبي 5042
-stops,stop_name,ar,105051,,موقف تجريبي 5051
-stops,stop_name,ar,105052,,موقف تجريبي 5052
-stops,stop_name,ar,105061,,موقف تجريبي 5061
-stops,stop_name,ar,105062,,موقف تجريبي 5062
-stops,stop_name,ar,105071,,موقف تجريبي 5071
-stops,stop_name,ar,105072,,موقف تجريبي 5072
-stops,stop_name,ar,105081,,موقف تجريبي 5081
-stops,stop_name,ar,105082,,موقف تجريبي 5082
-stops,stop_name,ar,105091,,موقف تجريبي 5091
-stops,stop_name,ar,105092,,موقف تجريبي 5092
-stops,stop_name,ar,105101,,موقف تجريبي 5101
-stops,stop_name,ar,105102,,موقف تجريبي 5102
-stops,stop_name,ar,105111,,موقف تجريبي 5111
-stops,stop_name,ar,105112,,موقف تجريبي 5112
-stops,stop_name,ar,105121,,موقف تجريبي 5121
-stops,stop_name,ar,105122,,موقف تجريبي 5122
-stops,stop_name,ar,105131,,موقف تجريبي 5131
-stops,stop_name,ar,105132,,موقف تجريبي 5132
-stops,stop_name,ar,105141,,موقف تجريبي 5141
-stops,stop_name,ar,105142,,موقف تجريبي 5142
-stops,stop_name,ar,105151,,موقف تجريبي 5151
-stops,stop_name,ar,105152,,موقف تجريبي 5152
-stops,stop_name,ar,106011,,موقف تجريبي 6011
-stops,stop_name,ar,106012,,موقف تجريبي 6012
-stops,stop_name,ar,106021,,موقف تجريبي 6021
-stops,stop_name,ar,106022,,موقف تجريبي 6022
-stops,stop_name,ar,106031,,موقف تجريبي 6031
-stops,stop_name,ar,106032,,موقف تجريبي 6032
-stops,stop_name,ar,106041,,موقف تجريبي 6041
-stops,stop_name,ar,106042,,موقف تجريبي 6042
-stops,stop_name,ar,106051,,موقف تجريبي 6051
-stops,stop_name,ar,106052,,موقف تجريبي 6052
-stops,stop_name,ar,106061,,موقف تجريبي 6061
-stops,stop_name,ar,106062,,موقف تجريبي 6062
-stops,stop_name,ar,106071,,موقف تجريبي 6071
-stops,stop_name,ar,106072,,موقف تجريبي 6072
-stops,stop_name,ar,106081,,موقف تجريبي 6081
-stops,stop_name,ar,106082,,موقف تجريبي 6082
-stops,stop_name,ar,106091,,موقف تجريبي 6091
-stops,stop_name,ar,106092,,موقف تجريبي 6092
-stops,stop_name,ar,106101,,موقف تجريبي 6101
-stops,stop_name,ar,106102,,موقف تجريبي 6102
-stops,stop_name,ar,106111,,موقف تجريبي 6111
-stops,stop_name,ar,106112,,موقف تجريبي 6112
-stops,stop_name,ar,106121,,موقف تجريبي 6121
-stops,stop_name,ar,106122,,موقف تجريبي 6122
-stops,stop_name,ar,106131,,موقف تجريبي 6131
-stops,stop_name,ar,106132,,موقف تجريبي 6132
-stops,stop_name,ar,106141,,موقف تجريبي 6141
-stops,stop_name,ar,106142,,موقف تجريبي 6142
-stops,stop_name,ar,106151,,موقف تجريبي 6151
-stops,stop_name,ar,106152,,موقف تجريبي 6152
-stops,stop_name,ar,107011,,موقف تجريبي 7011
-stops,stop_name,ar,107012,,موقف تجريبي 7012
-stops,stop_name,ar,107021,,موقف تجريبي 7021
-stops,stop_name,ar,107022,,موقف تجريبي 7022
-stops,stop_name,ar,107031,,موقف تجريبي 7031
-stops,stop_name,ar,107032,,موقف تجريبي 7032
-stops,stop_name,ar,107041,,موقف تجريبي 7041
-stops,stop_name,ar,107042,,موقف تجريبي 7042
-stops,stop_name,ar,107051,,موقف تجريبي 7051
-stops,stop_name,ar,107052,,موقف تجريبي 7052
-stops,stop_name,ar,107061,,موقف تجريبي 7061
-stops,stop_name,ar,107062,,موقف تجريبي 7062
-stops,stop_name,ar,107071,,موقف تجريبي 7071
-stops,stop_name,ar,107072,,موقف تجريبي 7072
-stops,stop_name,ar,107081,,موقف تجريبي 7081
-stops,stop_name,ar,107082,,موقف تجريبي 7082
-stops,stop_name,ar,107091,,موقف تجريبي 7091
-stops,stop_name,ar,107092,,موقف تجريبي 7092
-stops,stop_name,ar,107101,,موقف تجريبي 7101
-stops,stop_name,ar,107102,,موقف تجريبي 7102
-stops,stop_name,ar,107111,,موقف تجريبي 7111
-stops,stop_name,ar,107112,,موقف تجريبي 7112
-stops,stop_name,ar,107121,,موقف تجريبي 7121
-stops,stop_name,ar,107122,,موقف تجريبي 7122
-stops,stop_name,ar,107131,,موقف تجريبي 7131
-stops,stop_name,ar,107132,,موقف تجريبي 7132
-stops,stop_name,ar,107141,,موقف تجريبي 7141
-stops,stop_name,ar,107142,,موقف تجريبي 7142
-stops,stop_name,ar,107151,,موقف تجريبي 7151
-stops,stop_name,ar,107152,,موقف تجريبي 7152
-stops,stop_name,ar,108011,,موقف تجريبي 8011
-stops,stop_name,ar,108012,,موقف تجريبي 8012
-stops,stop_name,ar,108021,,موقف تجريبي 8021
-stops,stop_name,ar,108022,,موقف تجريبي 8022
-stops,stop_name,ar,108031,,موقف تجريبي 8031
-stops,stop_name,ar,108032,,موقف تجريبي 8032
-stops,stop_name,ar,108041,,موقف تجريبي 8041
-stops,stop_name,ar,108042,,موقف تجريبي 8042
-stops,stop_name,ar,108051,,موقف تجريبي 8051
-stops,stop_name,ar,108052,,موقف تجريبي 8052
-stops,stop_name,ar,108061,,موقف تجريبي 8061
-stops,stop_name,ar,108062,,موقف تجريبي 8062
-stops,stop_name,ar,108071,,موقف تجريبي 8071
-stops,stop_name,ar,108072,,موقف تجريبي 8072
-stops,stop_name,ar,108081,,موقف تجريبي 8081
-stops,stop_name,ar,108082,,موقف تجريبي 8082
-stops,stop_name,ar,108091,,موقف تجريبي 8091
-stops,stop_name,ar,108092,,موقف تجريبي 8092
-stops,stop_name,ar,108101,,موقف تجريبي 8101
-stops,stop_name,ar,108102,,موقف تجريبي 8102
-stops,stop_name,ar,108111,,موقف تجريبي 8111
-stops,stop_name,ar,108112,,موقف تجريبي 8112
-stops,stop_name,ar,108121,,موقف تجريبي 8121
-stops,stop_name,ar,108122,,موقف تجريبي 8122
-stops,stop_name,ar,108131,,موقف تجريبي 8131
-stops,stop_name,ar,108132,,موقف تجريبي 8132
-stops,stop_name,ar,108141,,موقف تجريبي 8141
-stops,stop_name,ar,108142,,موقف تجريبي 8142
-stops,stop_name,ar,108151,,موقف تجريبي 8151
-stops,stop_name,ar,108152,,موقف تجريبي 8152
+stops,stop_name,ar,100003,,محطة حافلات سوق الذهب 3
+stops,stop_name,ar,112001,,تقاطع نايف 1
+stops,stop_name,ar,137002,,النخل 1-2
+stops,stop_name,ar,376502,,محطة حافلات مترو الإتحاد 1-2
+stops,stop_name,ar,143001,,شارع المكتوم 1
+stops,stop_name,ar,429001,,شارع ام هرير - 1-1
+stops,stop_name,ar,256104,,محطة حافلات الجافلية 4
+stops,stop_name,ar,999101,,شارع الشيخ زايد 1-1 بدون توقف
+stops,stop_name,ar,649101,,شركة دبي للغاز الطبيعي المحدودة
+stops,stop_name,ar,755001,,البوابة الرئيسية جبل علي المنطقة الحرة 1
+stops,stop_name,ar,756001,,1 هيئة موانئ دبي مكتب المنطقة الحرة
+stops,stop_name,ar,758001,,جبل علي المنطقة الحرة دوار 5-1
+stops,stop_name,ar,757001,,سوني جبل علي المنطقة الحرة 1
+stops,stop_name,ar,760001,,جبل علي المنطقة الحرة دوار 6-1
+stops,stop_name,ar,746001,,مكاتب الايجار جبل علي المنطقة الحرة 5-1
+stops,stop_name,ar,762001,,نافكو جبل علي المنطقة الحرة 1
+stops,stop_name,ar,761001,,مصنع العبوات الزجاجية 1
+stops,stop_name,ar,765001,,مجموعة زاهر 1
+stops,stop_name,ar,763001,,كليفلاند لهندسة الجسور 1-1
+stops,stop_name,ar,764001,,كليفلاند لهندسة الجسور 2-1
+stops,stop_name,ar,766001,,جبل علي المنطقة الحرة دوار 8-1
+stops,stop_name,ar,731001,,مجموعة كانو – جبل علي المنطقة الحرة 1
+stops,stop_name,ar,733001,,جبل علي المنطقة الحرة دوار 12أ
+stops,stop_name,ar,733002,,جبل علي المنطقة الحرة دوار 12ب
+stops,stop_name,ar,731002,,مجموعة كانو – جبل علي المنطقة الحرة 2
+stops,stop_name,ar,767001,,سكن موظفي المنطقة الحرة 1
+stops,stop_name,ar,768001,,جلف دينم المحدودة 1
+stops,stop_name,ar,773003,,محطة حافلات جبل علي 3
+stops,stop_name,ar,768002,,جلف دينم المحدودة 2
+stops,stop_name,ar,767002,,سكن موظفي المنطقة الحرة 2
+stops,stop_name,ar,766002,,جبل علي المنطقة الحرة دوار 8-2
+stops,stop_name,ar,764002,,كليفلاند لهندسة الجسور 2-2
+stops,stop_name,ar,763002,,كليفلاند لهندسة الجسور 2-1
+stops,stop_name,ar,765002,,مجموعة زاهر 2
+stops,stop_name,ar,761002,,مصنع العبوات الزجاجية 2
+stops,stop_name,ar,762002,,نافكو جبل علي المنطقة الحرة 2
+stops,stop_name,ar,746002,,مكاتب الايجار جبل علي المنطقة الحرة 5-2
+stops,stop_name,ar,760002,,جبل علي المنطقة الحرة دوار 6-2
+stops,stop_name,ar,759002,,إيوا الخليج - المنطقة الحرة 2
+stops,stop_name,ar,757002,,سوني جبل علي المنطقة الحرة 2
+stops,stop_name,ar,756002,,هيئة موانئ دبي مكتب المنطقة الحرة 2
+stops,stop_name,ar,755002,,البوابة الرئيسية جبل علي المنطقة الحرة 2
+stops,stop_name,ar,999102,,شارع الشيخ زايد 1-2 بدون توقف
+stops,stop_name,ar,131101,,محطة حافلات مترو ماكس جهة الجنوب
+stops,stop_name,ar,429002,,شارع ام هرير - 1-2
+stops,stop_name,ar,143002,,شارع المكتوم 2
+stops,stop_name,ar,376501,,محطة حافلات مترو الإتحاد 1-1
+stops,stop_name,ar,136001,,النخل
+stops,stop_name,ar,112002,,تقاطع نايف 2
+stops,stop_name,ar,202102,,محطة حافلات مترو شرف دي جي 1-2
+stops,stop_name,ar,407001,,شارع النهضة
+stops,stop_name,ar,234102,,الرفاعة 2
+stops,stop_name,ar,392001,,الرفاعة 1
+stops,stop_name,ar,406001,,الرولة
+stops,stop_name,ar,202101,,محطة حافلات مترو شرف دي جي 1-1
+stops,stop_name,ar,961508,,محطة حافلات الراشدية ، القادمون
+stops,stop_name,ar,921101,,مواقف محطة حافلات الراشدية 1
+stops,stop_name,ar,116002,,سوق مكتوم التراثي 2
+stops,stop_name,ar,108001,,شارع الخليج
+stops,stop_name,ar,110001,,فندق حياة ريجنسي
+stops,stop_name,ar,109001,,المرر الجديد 1
+stops,stop_name,ar,488002,,مسجد حصة بنت المر 2
+stops,stop_name,ar,487002,,مركز تسوق مركاتو 2
+stops,stop_name,ar,486002,,شارع جميرا بنك دبي الإسلامي 2
+stops,stop_name,ar,485002,,مركز الشاطئ 2
+stops,stop_name,ar,484001,,سنشري بلازا 2
+stops,stop_name,ar,482002,,مركز بالم ستريب
+stops,stop_name,ar,452002,,متحف الاتحاد 2
+stops,stop_name,ar,455002,,مركز الهناء 2
+stops,stop_name,ar,453002,,منعطف الحضيبة 2
+stops,stop_name,ar,454001,,محطة بترول ايبكو - الحوت
+stops,stop_name,ar,228102,,محطة حافلات مترو سيتي سنتر 2-1
+stops,stop_name,ar,201001,,دوار ابوهيل 1
+stops,stop_name,ar,205001,,ميناء الحمرية 1
+stops,stop_name,ar,205002,,ميناء الحمرية 2
+stops,stop_name,ar,201002,,دوار ابوهيل 2
+stops,stop_name,ar,199001,,محطة حافلات مترو سيتي سنتر 1-1
+stops,stop_name,ar,453001,,منعطف الحضيبة 1
+stops,stop_name,ar,455001,,مركز الهناء 1
+stops,stop_name,ar,452001,,متحف الاتحاد 1
+stops,stop_name,ar,481001,,مسجد جميرا الكبير
+stops,stop_name,ar,483001,,مركز الجميرا
+stops,stop_name,ar,484002,,سنشري بلازا 1
+stops,stop_name,ar,485001,,مركز الشاطئ1
+stops,stop_name,ar,486001,,شارع جميرا بنك دبي الإسلامي 1
+stops,stop_name,ar,487001,,مركز تسوق مركاتو 1
+stops,stop_name,ar,488001,,مسجد حصة بنت المر1
+stops,stop_name,ar,106002,,محطة حافلات السبخة 2
+stops,stop_name,ar,111001,,مدرسة الخنساء 1
+stops,stop_name,ar,130001,,مستشفى الكويت 1
+stops,stop_name,ar,128001,,مطعم بن عيد الشعبي - ابوهيل 1
+stops,stop_name,ar,204001,,الحمرية 1
+stops,stop_name,ar,206001,,مدرسة الوحيدة 1
+stops,stop_name,ar,207001,,عيادة الحمرية 1
+stops,stop_name,ar,208001,,"نادي شباب الأهلي, الممزر"
+stops,stop_name,ar,209001,,جمعية دبي للفنون الشعبية 1
+stops,stop_name,ar,216001,,شارع الوحيدة 1
+stops,stop_name,ar,288001,,"نادي شباب الأهلي 1, النهدة"
+stops,stop_name,ar,197101,,محطة حافلات مترو الاستاد 1
+stops,stop_name,ar,290001,,وزارة الإعلام 1
+stops,stop_name,ar,198101,,محطة حافلات مترو النهدة 1
+stops,stop_name,ar,292001,,الطوار جمعية الإتحاد التعاونية
+stops,stop_name,ar,199101,,محطة حافلات مترو المنطقة الحرة مطار دبي 1
+stops,stop_name,ar,285001,,الطوار 1 محطة بترول الإمارات - المورد 1
+stops,stop_name,ar,925001,,المنطقة الحرة
+stops,stop_name,ar,285002,,الطوار 1 محطة بترول الإمارات - المورد 2
+stops,stop_name,ar,294001,,مدرسة الخلفاء الراشدين للبنين 1
+stops,stop_name,ar,304001,,فندق دبي جراند 1
+stops,stop_name,ar,305002,,شارع دمشق - 1-2
+stops,stop_name,ar,322002,,شارع دمشق - 2-2
+stops,stop_name,ar,323002,,شارع دمشق - 3-2
+stops,stop_name,ar,329001,,مقصب دبي 1
+stops,stop_name,ar,327001,,محيصنة 4 الهيئة الاتحادية للكهرباء والماء 1
+stops,stop_name,ar,286101,,المحيصنة 4 بناية جمال 1
+stops,stop_name,ar,648501,,المحيصنة 4 بناية لوتاه 1
+stops,stop_name,ar,331001,,مدرسة اوكسفورد 1
+stops,stop_name,ar,150101,,بوابة مدرسة أكسفورد 4
+stops,stop_name,ar,149101,,محيصنة 4 مساكن الأوقاف
+stops,stop_name,ar,359502,,المدرسة الروسية الدولية 2
+stops,stop_name,ar,163502,,قرية اللولو 2
+stops,stop_name,ar,337001,,مدرسة الوحدة الدولية الخاصة 1
+stops,stop_name,ar,510502,,المدرسة الخاصة اللبنانية 1 2
+stops,stop_name,ar,339001,,محيصنة 4 شعبية الشرطة 1
+stops,stop_name,ar,339002,,محيصنة 4 شعبية الشرطة 2
+stops,stop_name,ar,333001,,مؤسسة تاكسي دبي محطة الأيواء 1
+stops,stop_name,ar,211001,,المحيصنة 4  واحة وصل 2
+stops,stop_name,ar,333002,,مؤسسة تاكسي دبي محطة الأيواء 2
+stops,stop_name,ar,510501,,المدرسة الخاصة اللبنانية 1 1
+stops,stop_name,ar,337002,,مدرسة الوحدة الدولية الخاصة 2
+stops,stop_name,ar,163501,,قرية اللولو 1
+stops,stop_name,ar,359501,,المدرسة الروسية الدولية 1
+stops,stop_name,ar,332002,,مساكن طيران الامارات 2
+stops,stop_name,ar,254501,,مدرسة فلادلفيا الخاصة
+stops,stop_name,ar,330002,,سوق المواشي 2
+stops,stop_name,ar,329002,,مقصب دبي 2
+stops,stop_name,ar,323001,,شارع دمشق - 3-1
+stops,stop_name,ar,322001,,شارع دمشق - 2-1
+stops,stop_name,ar,305001,,شارع دمشق - 1-1
+stops,stop_name,ar,304002,,فندق دبي جراند 2
+stops,stop_name,ar,199102,,محطة حافلات مترو المنطقة الحرة مطار دبي 2
+stops,stop_name,ar,198102,,محطة حافلات مترو النهدة 2
+stops,stop_name,ar,290002,,وزارة الإعلام 2
+stops,stop_name,ar,197102,,محطة حافلات مترو الاستاد 2
+stops,stop_name,ar,288002,,"نادي شباب الأهلي 2, النهدة"
+stops,stop_name,ar,216002,,شارع الوحيدة 2
+stops,stop_name,ar,230102,,جمعية دبي للفنون الشعبية 2
+stops,stop_name,ar,207002,,عيادة الحمرية 2
+stops,stop_name,ar,206002,,مدرسة الوحيدة 2
+stops,stop_name,ar,204002,,الحمرية 2
+stops,stop_name,ar,246102,,مطعم بن عيد الشعبي - ابوهيل 2
+stops,stop_name,ar,222102,,مستشفى دبي 2
+stops,stop_name,ar,119001,,مسجد الفطيم
+stops,stop_name,ar,544501,,مبنى المطار - 3
+stops,stop_name,ar,241102,,مبنى المطار 1 القادمون
+stops,stop_name,ar,233001,,قرية الشحن
+stops,stop_name,ar,189002,,تقاطع الشعلة 2
+stops,stop_name,ar,189001,,تقاطع الشعلة 1
+stops,stop_name,ar,232001,,تقاطع القرهود 1
+stops,stop_name,ar,966501,,"الراشدية, شارع 38"
+stops,stop_name,ar,556501,,الموقف الخارجي، مبنى المطار 1
+stops,stop_name,ar,411101,,شارع إي311-1 - بدون توقف
+stops,stop_name,ar,411102,,شارع إي311-2 - بدون توقف
+stops,stop_name,ar,186002,,دناتا 2
+stops,stop_name,ar,188002,,دوار برج الساعة 2
+stops,stop_name,ar,144002,,مبنى اتصالات الرئيسي 2
+stops,stop_name,ar,114002,,تقاطع برج نهار 2
+stops,stop_name,ar,114001,,تقاطع برج نهار 1
+stops,stop_name,ar,144001,,مبنى اتصالات الرئيسي 1
+stops,stop_name,ar,188001,,دوار برج الساعة 1
+stops,stop_name,ar,186001,,دناتا 1
+stops,stop_name,ar,200301,,محطة حافلات البراحة 1
+stops,stop_name,ar,195101,,محطة حافلات سوق الذهب الخارجية
+stops,stop_name,ar,385007,,محطة حافلات الغبيبة 7
+stops,stop_name,ar,391001,,دائرة الموانئ والجمارك 1
+stops,stop_name,ar,447001,,شارع الميناء 1
+stops,stop_name,ar,752501,,فندق كابيتول 1
+stops,stop_name,ar,448001,,الحضيبة 1
+stops,stop_name,ar,489001,,مسجد سهيل بن جمعة
+stops,stop_name,ar,490001,,مسجد راشد الحديث 1
+stops,stop_name,ar,535001,,مسجد راشد بن بخيت 1
+stops,stop_name,ar,564001,,مجلس الغريفة 1
+stops,stop_name,ar,566001,,مسجد سعيد ماجد باليوحة 1
+stops,stop_name,ar,567001,,مسجد جميرا 3- 1
+stops,stop_name,ar,590001,,نادي دبي للقوارب الشراعية 1
+stops,stop_name,ar,591001,,محطة بترول ايبكو - المنارة1
+stops,stop_name,ar,592001,,مسجد ابو منارة
+stops,stop_name,ar,608001,,ام سقيم - 1-1
+stops,stop_name,ar,593001,,مركز بلدية ام سقيم 1
+stops,stop_name,ar,607001,,مسجد سعيد بن حزيم 1
+stops,stop_name,ar,609001,,مكتبة ام سقيم 1
+stops,stop_name,ar,610001,,حديقة ام سقيم 1
+stops,stop_name,ar,647001,,مسجد المحاربة 1
+stops,stop_name,ar,252501,,وايلد وادي 1
+stops,stop_name,ar,648001,,فندق برج العرب 1
+stops,stop_name,ar,678001,,مدينة جميرا - 1
+stops,stop_name,ar,679001,,شارع الملك سلمان بن عبدالعزيز آل سعود 1-1
+stops,stop_name,ar,680001,,شارع الملك سلمان بن عبدالعزيز آل سعود - 2-1
+stops,stop_name,ar,681001,,شارع الملك سلمان بن عبدالعزيز آل سعود - 3-1
+stops,stop_name,ar,682001,,كلية دبي 1
+stops,stop_name,ar,688002,,فندق رويال ميراج 1-2
+stops,stop_name,ar,258501,,محطة ترام مدينة الاعلام 1
+stops,stop_name,ar,641001,,فندق لي مريديان الميناء السياحي 1
+stops,stop_name,ar,642001,,فندق رويال ميريديان جميرا 1
+stops,stop_name,ar,722001,,محطة جميرا للشقق المفروشة 1 جهة البحر
+stops,stop_name,ar,723001,,محطة جميرا للشقق المفروشة 2 جهة البحر
+stops,stop_name,ar,903501,,محطة حافلات ابن بطوطه 1
+stops,stop_name,ar,734001,,"مركز إبن بطوطة, ركن المطاعم 3"
+stops,stop_name,ar,705002,,منعطف الحدائق جبل علي 2
+stops,stop_name,ar,723002,,محطة جميرا للشقق المفروشة 2 جهة المساكن
+stops,stop_name,ar,722002,,محطة جميرا للشقق المفروشة 1 جهة المساكن
+stops,stop_name,ar,642002,,فندق رويال ميريديان جميرا 2
+stops,stop_name,ar,641002,,فندق لي مريديان الميناء السياحي 2
+stops,stop_name,ar,258502,,محطة ترام مدينة الاعلام 2
+stops,stop_name,ar,689002,,فندق رويال ميراج -2-2
+stops,stop_name,ar,690001,,قرية المعرفة
+stops,stop_name,ar,691001,,مجمع فيلات تيكوم
+stops,stop_name,ar,682002,,كلية دبي 2
+stops,stop_name,ar,681002,,شارع الملك سلمان بن عبدالعزيز آل سعود 3-2
+stops,stop_name,ar,680002,,شارع الملك سلمان بن عبدالعزيز آل سعود 2-2
+stops,stop_name,ar,679002,,شارع الملك سلمان بن عبدالعزيز آل سعود 1-2
+stops,stop_name,ar,678002,,مدينة جميرا - 2
+stops,stop_name,ar,648002,,فندق برج العرب 2
+stops,stop_name,ar,252502,,وايلد وادي 2
+stops,stop_name,ar,647002,,مسجد المحاربة 2
+stops,stop_name,ar,610002,,حديقة ام سقيم 2
+stops,stop_name,ar,609002,,مكتبة ام سقيم 2
+stops,stop_name,ar,607002,,مسجد سعيد بن حزيم 2
+stops,stop_name,ar,593002,,مركز بلدية ام سقيم 2
+stops,stop_name,ar,608002,,ام سقيم - 1-2
+stops,stop_name,ar,594001,,مسجد عبد الله مليحه
+stops,stop_name,ar,591002,,محطة بترول ايبكو - المنارة2
+stops,stop_name,ar,590002,,نادي دبي للقوارب الشراعية 2
+stops,stop_name,ar,567002,,مسجد جميرا 3 - 2
+stops,stop_name,ar,566002,,مسجد سعيد ماجد باليوحة 2
+stops,stop_name,ar,564002,,مجلس الغريفة 2
+stops,stop_name,ar,533002,,نادي شاطئ هليتون 2
+stops,stop_name,ar,535002,,مسجد راشد بن بخيت 2
+stops,stop_name,ar,490002,,مسجد راشد الحديث 2
+stops,stop_name,ar,448002,,الحضيبة 2
+stops,stop_name,ar,752502,,فندق كابيتول 2
+stops,stop_name,ar,447002,,شارع الميناء 2
+stops,stop_name,ar,391002,,دائرة الموانئ والجمارك 2
+stops,stop_name,ar,201101,,محطة حافلات مترو الغبيبة
+stops,stop_name,ar,238102,,مسجد السطوة 2
+stops,stop_name,ar,460001,,مكتب بريد السطوة
+stops,stop_name,ar,459001,,مسجد السطوة 1
+stops,stop_name,ar,501001,,عيادة السطوة
+stops,stop_name,ar,467002,,فندق المركز التجاري العالمي 2
+stops,stop_name,ar,467001,,فندق المركز التجاري العالمي 1
+stops,stop_name,ar,430001,,شارع ام هرير - 2
+stops,stop_name,ar,300002,,"مدينة دبي للتعهيد, بنك أسكتلندا الملكي 2"
+stops,stop_name,ar,299502,,"مدينة دبي للتعهيد , شركة العرب 2"
+stops,stop_name,ar,299501,,"مدينة دبي للتعهيد , شركة العرب 1"
+stops,stop_name,ar,321101,,مدينة دبي للتعهيد مجمع الشبا
+stops,stop_name,ar,333501,,مدينة دبي الأكاديمية 2-1
+stops,stop_name,ar,253101,,واحة السيليكون نورث بارك 1
+stops,stop_name,ar,254101,,واحة السيليكون برج اس أي تي 1
+stops,stop_name,ar,341501,,واحة السيليكون برج القصر 1
+stops,stop_name,ar,342501,,واحة السيليكون اس بي واحة 1
+stops,stop_name,ar,659501,,واحة السيليكون - مبنى القوس 1
+stops,stop_name,ar,735501,,واحة السيليكون مسجد الواحة 1
+stops,stop_name,ar,687001,,واحة السيليكون أفنيو مول 1
+stops,stop_name,ar,290501,,واحة السيلكون بنك رأس الخيمة المركز الرئيسي
+stops,stop_name,ar,389001,,واحة السيليكون لاجون
+stops,stop_name,ar,393001,,واحة السيليكون هاي - بي
+stops,stop_name,ar,511501,,المبنى الرئيسي واحة السيليكون 1
+stops,stop_name,ar,266501,,المبنى الرئيسي واحة السيليكون 2
+stops,stop_name,ar,687002,,واحة السيليكون أفنيو مول 2
+stops,stop_name,ar,735502,,واحة السيليكون مسجد الواحة 2
+stops,stop_name,ar,659502,,واحة السيليكون - مبنى القوس 2
+stops,stop_name,ar,342502,,واحة السيليكون اس بي واحة 2
+stops,stop_name,ar,341502,,واحة السيليكون برج القصر 2
+stops,stop_name,ar,333502,,مدينة دبي الأكاديمية 2-2
+stops,stop_name,ar,584001,,مدينة دبي للتعهيد ، دياك هومز 1
+stops,stop_name,ar,330501,,مدينة دبي للتعهيد ـ 4-1
+stops,stop_name,ar,255101,,جامعة مانيبال 1
+stops,stop_name,ar,331502,,بتس بلاني 2
+stops,stop_name,ar,266102,,حرم جامعة هيريوت وات دبي 2
+stops,stop_name,ar,332502,,مدينة دبي الأكاديمية 1-2
+stops,stop_name,ar,335501,,جامعة الإمارات للطيران 1
+stops,stop_name,ar,336501,,جامعة الغرير 2-1
+stops,stop_name,ar,337501,,جامعة الغرير 3-1
+stops,stop_name,ar,338501,,كلية دبي للرجال 1-1
+stops,stop_name,ar,339501,,كلية دبي للرجال 2-1
+stops,stop_name,ar,340501,,بحيرة واحة السيليكون 1
+stops,stop_name,ar,267501,,واحة السيليكون حديقة السيليكون 1
+stops,stop_name,ar,961505,,محطة حافلات الراشدية ، بوابة 5
+stops,stop_name,ar,267502,,واحة السيليكون حديقة السيليكون 2
+stops,stop_name,ar,340502,,بحيرة واحة السيليكون 2
+stops,stop_name,ar,339502,,كلية دبي للرجال 2-2
+stops,stop_name,ar,338502,,كلية دبي للرجال 1-2
+stops,stop_name,ar,337502,,جامعة الغرير 3-2
+stops,stop_name,ar,336502,,جامعة الغرير 2-2
+stops,stop_name,ar,335502,,جامعة الإمارات للطيران 2
+stops,stop_name,ar,285501,,شارع جامعة الغرير
+stops,stop_name,ar,332501,,مدينة دبي الأكاديمية 1-1
+stops,stop_name,ar,266101,,حرم جامعة هيريوت وات دبي 1
+stops,stop_name,ar,331501,,بتس بلاني 1
+stops,stop_name,ar,255102,,جامعة مانيبال 2
+stops,stop_name,ar,779001,,هايبرماركت جراند بي 1
+stops,stop_name,ar,784001,,هايبرماركت باركو
+stops,stop_name,ar,785001,,مركز قصر القبائل 1
+stops,stop_name,ar,788001,,جبل علي الصناعية 11
+stops,stop_name,ar,983001,,مجمع دبي للاستثمار 1
+stops,stop_name,ar,554502,,مصنع طابوق إنسيوليت 2
+stops,stop_name,ar,555502,,سكن عمال دبي للمقاولات 2
+stops,stop_name,ar,500502,,مصانع البحار السبع للصلب 2
+stops,stop_name,ar,552502,,2 سكن عمال ديبا للمقاولات
+stops,stop_name,ar,551502,,سكن عمال شوبا للمقاولات 2
+stops,stop_name,ar,524101,,جبل علي الصناعية يني مكس 1
+stops,stop_name,ar,523101,,جبل علي الصناعية أيسوفوم 1
+stops,stop_name,ar,783002,,مساكن عمال نزل 2
+stops,stop_name,ar,782002,,سوبرماركت خليج المدينة 2
+stops,stop_name,ar,600501,,منطقة جبل علي الصناعية - بي إتش سي
+stops,stop_name,ar,781001,,مجموعة لاندمارك 1
+stops,stop_name,ar,782001,,سوبرماركت خليج المدينة 1
+stops,stop_name,ar,783001,,مساكن عمال نزل 1
+stops,stop_name,ar,203101,,محطة حافلات مترو شرف دي جي 2-1
+stops,stop_name,ar,240501,,مدينة دبي للأنترنت ـ شلم برغ 1
+stops,stop_name,ar,233501,,مدينة دبي للأنترنت ــ مبنى المعلومات التقنية 1
+stops,stop_name,ar,693002,,مدينة دبي الاعلامية 2
+stops,stop_name,ar,233502,,مدينة دبي للأنترنت ــ مبنى المعلومات التقنية 2
+stops,stop_name,ar,240502,,مدينة دبي للأنترنت ـ شلم برغ 2
+stops,stop_name,ar,657001,,الكرستال الكلاسيكي 1
+stops,stop_name,ar,666002,,اطلس للخدمات البحرية2
+stops,stop_name,ar,665002,,سكن عمال شركة الاسمنت الوطنية2
+stops,stop_name,ar,664002,,سكن موظفي شركة سفن آب 2
+stops,stop_name,ar,969502,,"البرشاء هايتس, بناية مشعل 2"
+stops,stop_name,ar,971502,,"البرشاء هايتس, فندق ريم 2"
+stops,stop_name,ar,972502,,"البرشاء هايتس, بناية صالح بن لاحج 2"
+stops,stop_name,ar,135101,,"البرشاء هايتس, مازون للشقق الفندقية 1"
+stops,stop_name,ar,969501,,"البرشاء هايتس, بناية مشعل 1"
+stops,stop_name,ar,972501,,"البرشاء هايتس, بناية صالح بن لاحج 1"
+stops,stop_name,ar,971501,,"البرشاء هايتس, فندق ريم 1"
+stops,stop_name,ar,191502,,البرشاء أ 2
+stops,stop_name,ar,190502,,البرشاء - سوبرماركت اللولو 2
+stops,stop_name,ar,684002,,أكاديمية دبي الأمريكية 2
+stops,stop_name,ar,684001,,أكاديمية دبي الأمريكية 1
+stops,stop_name,ar,191501,,البرشاء أ 1
+stops,stop_name,ar,188502,,مول الأمارات 1-2
+stops,stop_name,ar,189502,,مول الأمارات 2-2
+stops,stop_name,ar,934502,,"مول الإمارات, بناية صالح بن لاحج 2"
+stops,stop_name,ar,192502,,البرشاء - مركز راشد لذوي الإحتياجات الخاصة 2
+stops,stop_name,ar,217501,,البرشاء - مدرسة دبي الوطنية 1
+stops,stop_name,ar,222501,,البرشاء د1
+stops,stop_name,ar,223501,,البرشاء إي1
+stops,stop_name,ar,223502,,البرشاء إي 2
+stops,stop_name,ar,222502,,البرشاء د2
+stops,stop_name,ar,217502,,البرشاء - مدرسة دبي الوطنية 2
+stops,stop_name,ar,657002,,الكرستال الكلاسيكي 2
+stops,stop_name,ar,603501,,محطة حافلات مترو دانوب جهة الجنوب
+stops,stop_name,ar,472101,,شركة بستان للمعكرونة والنودلز 1
+stops,stop_name,ar,474101,,الشركة الملكية لهندسة التصنيع 1
+stops,stop_name,ar,471101,,شركة الصناعات المعدنية إي إم أي 1
+stops,stop_name,ar,539101,,"منطقة جبل علي الصناعية, كواليتي مكس"
+stops,stop_name,ar,530101,,مساكن الاتحاد 1
+stops,stop_name,ar,546502,,محطة حافلات مترو مجمع دبي للأستثمار 2
+stops,stop_name,ar,502501,,المجمعات الخضراء - بوابة الدخول الغربية 1
+stops,stop_name,ar,503501,,المجمعات الخضراء - بوابة الدخول الشرقية 1
+stops,stop_name,ar,504501,,المجمعات الخضراء بوابة الدخول الرئيسية 1
+stops,stop_name,ar,505501,,المجمعات الخضراء - سوبرماركت شويترام 1
+stops,stop_name,ar,528101,,المجمعات الخضراء - مبنى أ - أ - 1
+stops,stop_name,ar,506501,,بحيرة دبي- مدرسة نبراس العالمية 1
+stops,stop_name,ar,507501,,بحيرة دبي- مجمع إيوان السكني 1
+stops,stop_name,ar,278101,,بحيرات دبي 1
+stops,stop_name,ar,172101,,باسي لتجارة المواد الغذائية 1
+stops,stop_name,ar,319101,,سكن عمال - الإمارات للمقاولات
+stops,stop_name,ar,318101,,سكن - بترون الامارات
+stops,stop_name,ar,173101,,قرية دونز 1
+stops,stop_name,ar,174101,,فستنر الدولية العالمية 1
+stops,stop_name,ar,175101,,لؤلؤة دبي لصناعات الجبس 1
+stops,stop_name,ar,516101,,مجمع دبي للاستثمار مبنى أي إم بي 1
+stops,stop_name,ar,276101,,محطة مجمع دبي للأستثمار سوبر ماركت المدينة
+stops,stop_name,ar,608101,,مجمع دبي للأستثمار 2 مسجد السلام
+stops,stop_name,ar,609501,,مجمع دبي للأستثمار 2 الدفاع المدني
+stops,stop_name,ar,169101,,كان باك للشرق الأوسط 1
+stops,stop_name,ar,611001,,مجمع دبي للأستثمار 1 تامكوم
+stops,stop_name,ar,612501,,مجمع دبي للاستثمار 1 مجمع سوشن للأعمال 1
+stops,stop_name,ar,616001,,مدرسة الشويفات الدولية 1
+stops,stop_name,ar,617501,,مجمع دبي للأستثمار 1 مصنع إيميكول 1
+stops,stop_name,ar,618501,,مجمع دبي للأستثمار منطقة جرين الغربية
+stops,stop_name,ar,502502,,المجمعات الخضراء - بوابة الدخول الغربية 2
+stops,stop_name,ar,546501,,محطة حافلات مترو مجمع دبي للأستثمار 1
+stops,stop_name,ar,530102,,مساكن الاتحاد 2
+stops,stop_name,ar,526102,,ريج للصناعات المعدنية 2
+stops,stop_name,ar,527102,,صن رايز لطلاء المعادن 2
+stops,stop_name,ar,193101,,منطقة جبل علي الصناعية ، كلينول الشرق الأوسط 1
+stops,stop_name,ar,279101,,جبل علي الصناعية برج الأتصالات 1
+stops,stop_name,ar,192101,,جبل علي الصناعية بوليسترين الوطنية 1
+stops,stop_name,ar,191101,,الخدمات المتخصصة 1
+stops,stop_name,ar,190101,,منطقة جبل علي الصناعية ، ستار سوبر للأسمنت 1
+stops,stop_name,ar,220501,,منطقة جبل علي الصناعية سينتكنيك 1
+stops,stop_name,ar,471102,,شركة الصناعات المعدنية إي إم أي 2
+stops,stop_name,ar,474102,,الشركة الملكية لهندسة التصنيع 2
+stops,stop_name,ar,472102,,شركة بستان للمعكرونة والنودلز 2
+stops,stop_name,ar,873001,,قناة أم بي سي
+stops,stop_name,ar,251502,,جامعة ولونغونغ مدينة دبي للانترنت 2
+stops,stop_name,ar,567505,,محطة حافلات مول الإمارات 5
+stops,stop_name,ar,352101,,البرشا مجمع الوسير للفلل
+stops,stop_name,ar,667101,,حديقة دبي للعلوم مدرسة فورمارك 1
+stops,stop_name,ar,413102,,دبي مدرسة ديوايت 2
+stops,stop_name,ar,321001,,جي في سي حديقة سامر
+stops,stop_name,ar,626101,,جي في سي  مجمع ساندوفال لين 1
+stops,stop_name,ar,627101,,جي في سي مجمع شوبا النرجس 1
+stops,stop_name,ar,613101,,جي في سي برج الوزان 1
+stops,stop_name,ar,628101,,جي في سي مجمع ويستار فيستا 1
+stops,stop_name,ar,624101,,جي في سي برج برايم للأعمال 1
+stops,stop_name,ar,616101,,جي في سي  مجمع الإمارات حديقة 2 الورود  1
+stops,stop_name,ar,623101,,جي في سي فلل نخيل 12 ت 1
+stops,stop_name,ar,625101,,جي في سي قماش أ 1
+stops,stop_name,ar,617101,,جي في سي قصر جودي للشقق الفندقية 1
+stops,stop_name,ar,104501,,قرية الجميرا رؤية الماس 3
+stops,stop_name,ar,106501,,قرية الجميرا فلل ميرابيلا 6
+stops,stop_name,ar,107501,,قرية الجميرا فلل ميرابيلا 2
+stops,stop_name,ar,619101,,جي في سي مجمع غراند شاتو بناية أ 1
+stops,stop_name,ar,109501,,قرية الجميرا مجمع سكن ويستار لي
+stops,stop_name,ar,111501,,قرية الجميرا الدائرية ميدان هانوفر
+stops,stop_name,ar,113501,,قرية الجميرا الدائرية برج مانهاتن
+stops,stop_name,ar,615102,,قرية الجميرا اتلانتيس اس 4
+stops,stop_name,ar,615101,,قرية الجميرا اتلانتيس اس 1
+stops,stop_name,ar,116501,,قرية الجميرا مجمع توسكان
+stops,stop_name,ar,117101,,مجمع سكن نور
+stops,stop_name,ar,117501,,قرية الجميرا مجمع موسم الخريف
+stops,stop_name,ar,118101,,قرية الجميرا مجمع موسم الصيف
+stops,stop_name,ar,413101,,دبي مدرسة ديوايت 1
+stops,stop_name,ar,667102,,حديقة دبي للعلوم مدرسة فورمارك 2
+stops,stop_name,ar,668002,,الكترو للصناعات 2
+stops,stop_name,ar,667002,,مستودعات شركة جمبو للالكترونيات 2
+stops,stop_name,ar,626001,,سكن عمال القميش للمقاولات 1
+stops,stop_name,ar,625002,,سكن عمال شركة الاحمدية للمقاولات 2
+stops,stop_name,ar,646001,,محطة القوز الصناعية - 3
+stops,stop_name,ar,664001,,سكن موظفي شركة سفن آب 1
+stops,stop_name,ar,665001,,سكن عمال شركة الاسمنت الوطنية1
+stops,stop_name,ar,666001,,اطلس للخدمات البحرية1
+stops,stop_name,ar,667001,,مستودعات شركة جمبو للالكترونيات 1
+stops,stop_name,ar,668001,,الكترو للصناعات 1
+stops,stop_name,ar,836501,,البرشاء شارع 23 ديونز للشقق الفندقية 1
+stops,stop_name,ar,765501,,البرشا شارع 23 مركز نور للتدريب 1
+stops,stop_name,ar,895001,,فندق نوفيتل
+stops,stop_name,ar,742501,,مركز دبي المالي العالمي، بوابة القرية
+stops,stop_name,ar,897001,,برج داماك بارك 1
+stops,stop_name,ar,898001,,زعبيل
+stops,stop_name,ar,344101,,دبي مول
+stops,stop_name,ar,905001,,ابراج الامارات - 1
+stops,stop_name,ar,906001,,ابراج الامارات - 2
+stops,stop_name,ar,417002,,دائرة الصحة 2
+stops,stop_name,ar,256103,,محطة حافلات الجافلية 3
+stops,stop_name,ar,314501,,شارع المصلى - مسجد عيال ناصر
+stops,stop_name,ar,100012,,محطة حافلات سوق الذهب 12
+stops,stop_name,ar,320501,,برج خليفة فندق ذا بالاس
+stops,stop_name,ar,900001,,"اتصالات, الوصل"
+stops,stop_name,ar,895501,,محطة حافلات مترو أبراج الإمارات جهة الجنوب
+stops,stop_name,ar,540101,,القوز مدخل بوابة الخيل 1
+stops,stop_name,ar,135102,,"البرشاء هايتس, مازون للشقق الفندقية 2"
+stops,stop_name,ar,284502,,"البرشاء, مدرسة المواكب 2"
+stops,stop_name,ar,765502,,البرشا شارع 23 مركز نور للتدريب 2
+stops,stop_name,ar,836502,,البرشاء شارع 23 ديونز للشقق الفندقية 2
+stops,stop_name,ar,189501,,مول الأمارات 2-1
+stops,stop_name,ar,101502,,"القوز, شركة آ س تي 2"
+stops,stop_name,ar,624002,,قرية الواحة 2
+stops,stop_name,ar,165101,,القوز بوابة الخيل 1
+stops,stop_name,ar,166101,,القوز بوابة الخيل 2
+stops,stop_name,ar,466101,,"القوز , بوابة الخيل 3"
+stops,stop_name,ar,978001,,القوز سكن طيران الامارات بوابة الخيل 2
+stops,stop_name,ar,525101,,القوز سكن موظفي قرقاش للمقاولات 2
+stops,stop_name,ar,719001,,سكن فندق لي مريديان 1
+stops,stop_name,ar,720001,,مصنع دوكاست 1
+stops,stop_name,ar,635301,,مصنع البحر للبلاستيك 2
+stops,stop_name,ar,634001,,دانوي الامارات 1
+stops,stop_name,ar,284501,,"البرشاء, مدرسة المواكب 1"
+stops,stop_name,ar,251501,,1 جامعة ولونغونغ مدينة دبي للأنترنت
+stops,stop_name,ar,408001,,بنك ستاندرد تشارترد - المنخول 1
+stops,stop_name,ar,409001,,تقاطع شارع الشيخ راشد 1
+stops,stop_name,ar,409002,,تقاطع شارع الشيخ راشد 2
+stops,stop_name,ar,410001,,دائرة عقارات حكومة دبي
+stops,stop_name,ar,408002,,بنك ستاندرد تشارترد - المنخول 2
+stops,stop_name,ar,411001,,مركز الريس
+stops,stop_name,ar,503009,,محطة حافلات السطوة 9

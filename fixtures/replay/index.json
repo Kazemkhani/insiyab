@@ -2,44 +2,49 @@
  "fixture": true,
  "routes": [
   {
-   "file": "replay/route-901.json",
-   "route_id": "901",
-   "trips": 71
-  },
-  {
-   "file": "replay/route-902A.json",
-   "route_id": "902A",
-   "trips": 69
-  },
-  {
-   "file": "replay/route-903.json",
-   "route_id": "903",
+   "file": "replay/route-17.json",
+   "route_id": "17",
    "trips": 70
   },
   {
-   "file": "replay/route-904.json",
-   "route_id": "904",
-   "trips": 68
+   "file": "replay/route-27.json",
+   "route_id": "27",
+   "trips": 89
   },
   {
-   "file": "replay/route-K10.json",
-   "route_id": "K10",
-   "trips": 69
+   "file": "replay/route-320.json",
+   "route_id": "320",
+   "trips": 106
   },
   {
-   "file": "replay/route-K900.json",
-   "route_id": "K900",
-   "trips": 67
+   "file": "replay/route-8.json",
+   "route_id": "8",
+   "trips": 84
   },
   {
-   "file": "replay/route-Q13.json",
-   "route_id": "Q13",
-   "trips": 70
+   "file": "replay/route-84.json",
+   "route_id": "84",
+   "trips": 88
   },
   {
-   "file": "replay/route-Q28.json",
-   "route_id": "Q28",
-   "trips": 67
+   "file": "replay/route-91A.json",
+   "route_id": "91A",
+   "trips": 63
+  },
+  {
+   "file": "replay/route-C01.json",
+   "route_id": "C01",
+   "trips": 193
+  },
+  {
+   "file": "replay/route-F47.json",
+   "route_id": "F47",
+   "trips": 55
+  },
+  {
+   "file": "replay/route-J01.json",
+   "route_id": "J01",
+   "trips": 48
   }
  ]
 }

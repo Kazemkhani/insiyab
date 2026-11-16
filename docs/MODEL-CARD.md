@@ -13,18 +13,18 @@ This file is written by the engine (`python3 -m model.card`) from `metrics.json`
 
 ## The data, and its one day
 
-One service day, 2025-12-15: 8 routes, 240 stops, 551 trips, 8,265 stop visits and 6,409 boardings. Tested on one day only: Monday 15 December 2025, in the school holidays. Later hours of that day, and routes and communities the model had not seen, are what was tested. Nothing was tested on another day, and a school day may look different.
+One service day, 2025-12-15: 9 routes, 478 stops, 796 trips, 26,915 stop visits and 11,637 boardings. Tested on one day only: Monday 15 December 2025, in the school holidays. Later hours of that day, and routes and communities the model had not seen, are what was tested. Nothing was tested on another day, and a school day may look different.
 
 How the tables were made ready, stage by stage, with the count each stage kept:
 
-- **Runtime report.** One row is one bus at one stop; rows with no scheduled time or no stop sequence are left out; a missing actual time takes the scheduled one; a time that ran backwards is moved up to the time before it. Counted: actual times filled from schedule 0, door not opened 2,057, route numbers rewritten 0, rows in 8,265, rows out 8,265, rows whose clock ran backwards 0, rows without a scheduled time 0, trips 551.
-- **Fleet.** A vehicle that is not in the fleet table is given the fleet's middle number of seats and the type UNKNOWN; seats only, standing capacity is not verified. Counted: seats given to those 38, vehicles in the fleet table 50, vehicles in the runtime report 46, vehicles run but not in the fleet table 2.
-- **Taps.** One row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out. Counted: cards counted 4,901, check ins 6,409, check outs 5,450, repeated rows 64, rows in 11,923, rows neither or both or no time 0, rows out 11,859, taps before day start dated the service day 0.
-- **Taps to trips.** A tap is given to the stop visit of its vehicle with the latest actual arrival at or before the tap; a tap whose vehicle is not in the runtime report, or that comes before its first arrival, cannot be placed and is left out of loads and counts. Counted: share not placed 0, taps in 11,859, taps not placed 0, taps whose own stop differs from the stop placed 235.
-- **Loads.** Check-ins with no check-out are alightings we do not know: they are spread over the trip's stops in proportion to its known alightings, and whoever is left alights at the last stop; nobody alights who is not on board. Counted: alightings not recorded and spread 959, passengers boarding at a last stop 0, share of boardings with no recorded alighting 0.1496, trips 551, trips over their seats 7, trips whose recorded load did not end at zero 355, trips whose recorded load went below zero 0.
-- **Stops to places.** Each stop is put in the community whose boundary it lies inside. Counted: communities in 9, communities whose shape could be read 9, stops 240, stops outside every community 2.
-- **Timetable.** Scheduled departures on the service day, by route, direction and stop. Counted: routes 8, scheduled departures 8,310, scheduled trips 554, stops served 240.
-- **Bins.** Boardings are counted by stop, route, direction and quarter of an hour, at the time of the tap; between a stop's first and last scheduled departure a bin with no boarding is a true zero, and outside that span the stop is absent, not zero. Counted: bins 81, bins present 17,606, bins present with no boarding 14,194, boardings at a stop or time outside the timetable 0, boardings counted 6,409, boardings placed on a trip 6,409, series 240.
+- **Runtime report.** One row is one bus at one stop; rows with no scheduled time or no stop sequence are left out; a missing actual time takes the scheduled one; a time that ran backwards is moved up to the time before it. Counted: actual times filled from schedule 0, door not opened 9,124, latest scheduled hour 29, route numbers rewritten 0, rows in 26,915, rows out 26,915, rows placed after midnight 915, rows whose clock ran backwards 0, rows without a scheduled time 0, trips 796.
+- **Fleet.** A vehicle that is not in the fleet table is given the fleet's middle number of seats and the type UNKNOWN; seats only, standing capacity is not verified. Counted: seats given to those 32, vehicles in the fleet table 93, vehicles in the runtime report 89, vehicles run but not in the fleet table 2.
+- **Taps.** One row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out. Counted: cards counted 8,918, check ins 11,637, check outs 9,934, repeated rows 104, rows in 21,675, rows neither or both or no time 0, rows out 21,571, taps before day start dated the service day 0.
+- **Taps to trips.** A tap is given to the stop visit of its vehicle with the latest actual arrival at or before the tap; a tap whose vehicle is not in the runtime report, or that comes before its first arrival, cannot be placed and is left out of loads and counts. Counted: share not placed 0, taps in 21,571, taps not placed 0, taps whose own stop differs from the stop placed 384.
+- **Loads.** Check-ins with no check-out are alightings we do not know: they are spread over the trip's stops in proportion to its known alightings, and whoever is left alights at the last stop; nobody alights who is not on board. Counted: alightings not recorded and spread 1,703, passengers boarding at a last stop 0, share of boardings with no recorded alighting 0.1463, trips 796, trips over their seats 20, trips whose recorded load did not end at zero 552, trips whose recorded load went below zero 0.
+- **Stops to places.** Each stop is put in the community whose boundary it lies inside. Counted: communities in 9, communities whose shape could be read 9, stops 478, stops outside every community 44.
+- **Timetable.** Scheduled departures on the service day, by route, direction and stop. Counted: routes 9, scheduled departures 27,034, scheduled trips 799, stops served 478.
+- **Bins.** Boardings are counted by stop, route, direction and quarter of an hour, at the time of the tap; between a stop's first and last scheduled departure a bin with no boarding is a true zero, and outside that span the stop is absent, not zero. Counted: bins 103, bins present 40,699, bins present with no boarding 33,046, boardings at a stop or time outside the timetable 1, boardings counted 11,636, boardings placed on a trip 11,637, series 555.
 
 ## How the test is kept honest
 
@@ -42,11 +42,11 @@ Unit: passengers boarding per route per 15 minutes. MAPE is taken only over quar
 
 | Forecast | n | MAE | RMSE | WAPE | MAPE | Gain |
 |---|---|---|---|---|---|---|
-| Same as the last quarter of an hour seen | 384 | 9.01 | 13.16 | 0.63 | 0.67 over 240 |  |
-| The average so far today | 384 | 11.90 | 14.93 | 0.83 | 0.62 over 240 |  |
-| In proportion to the timetable (best naive) | 384 | 8.59 | 11.31 | 0.60 | 0.49 over 240 |  |
-| A plain count model (Poisson regression with a penalty) | 384 | 10.90 | 14.44 | 0.76 | 0.60 over 240 | -27 in 100 (-45 to -10) against in proportion to the timetable |
-| Boosted trees with a loss made for counts, one model for every stop and every horizon (chosen) | 384 | 6.84 | 10.05 | 0.48 | 0.50 over 240 | +20 in 100 (-12 to +47) against in proportion to the timetable |
+| Same as the last quarter of an hour seen (best naive) | 430 | 10.10 | 15.15 | 0.47 | 0.63 over 346 |  |
+| The average so far today | 430 | 14.32 | 18.52 | 0.67 | 0.80 over 346 |  |
+| In proportion to the timetable | 430 | 14.04 | 18.53 | 0.66 | 0.85 over 346 |  |
+| A plain count model (Poisson regression with a penalty) | 430 | 13.95 | 18.77 | 0.65 | 0.76 over 346 | -38 in 100 (-85 to -5) against same as the last quarter of an hour seen |
+| Boosted trees with a loss made for counts, one model for every stop and every horizon (chosen) | 430 | 9.30 | 13.95 | 0.44 | 0.58 over 346 | +8 in 100 (-1 to +14) against same as the last quarter of an hour seen |
 
 **The range of the gain includes zero.** On these rows the model is not shown to beat the best naive forecast, and no screen should say it does.
 
@@ -56,39 +56,39 @@ Unit: passengers boarding per route per 15 minutes. MAPE is taken only over quar
 
 | Ahead | n | Best naive forecast there | Its MAE | Model MAE | Gain |
 |---|---|---|---|---|---|
-| 15 minutes | 96 | Same as the last quarter of an hour seen | 5.41 | 4.21 | +22 in 100 |
-| 30 minutes | 96 | Same as the last quarter of an hour seen | 6.57 | 5.26 | +20 in 100 |
-| 60 minutes | 96 | In proportion to the timetable | 9.08 | 7.83 | +14 in 100 |
-| 120 minutes | 96 | In proportion to the timetable | 8.48 | 10.07 | -19 in 100 |
+| 15 minutes | 108 | Same as the last quarter of an hour seen | 5.20 | 4.95 | +5 in 100 |
+| 30 minutes | 108 | Same as the last quarter of an hour seen | 7.58 | 6.89 | +9 in 100 |
+| 60 minutes | 108 | Same as the last quarter of an hour seen | 11.43 | 10.07 | +12 in 100 |
+| 120 minutes | 106 | In proportion to the timetable | 13.87 | 15.42 | -11 in 100 |
 
 **By subset, untouched part, every horizon's rows averaged by their count.**
 
 | Subset | n | Best naive MAE | Model MAE | Gain |
 |---|---|---|---|---|
-| Every held-out bin | 384 | 7.39 | 6.84 | +7 in 100 |
-| Evening peak, 16:00 to 20:00 | 224 | 8.39 | 8.67 | -3 in 100 |
-| After 20:00 | 160 | 5.18 | 4.29 | +17 in 100 |
-| Routes run mostly by buses of type COACH | 48 | 3.00 | 3.19 | -6 in 100 |
-| Routes run mostly by buses of type DOUBLE | 96 | 5.86 | 5.23 | +11 in 100 |
-| Routes run mostly by buses of type MIDI | 96 | 11.18 | 10.00 | +11 in 100 |
-| Routes run mostly by buses of type STANDARD | 144 | 7.29 | 7.03 | +4 in 100 |
-| Route group 0 | 96 | 6.97 | 5.83 | +16 in 100 |
-| Route group 1 | 96 | 6.56 | 6.32 | +4 in 100 |
-| Route group 2 | 96 | 8.99 | 8.70 | +3 in 100 |
-| Route group 3 | 48 | 7.71 | 7.15 | +7 in 100 |
-| Route group 4 | 48 | 6.31 | 5.89 | +7 in 100 |
+| Every held-out bin | 430 | 9.50 | 9.30 | +2 in 100 |
+| Evening peak, 16:00 to 20:00 | 252 | 11.06 | 11.54 | -4 in 100 |
+| After 20:00 | 178 | 7.29 | 6.13 | +16 in 100 |
+| Routes run mostly by buses of type COACH | 47 | 5.28 | 4.74 | +10 in 100 |
+| Routes run mostly by buses of type DOUBLE | 48 | 7.19 | 7.68 | -7 in 100 |
+| Routes run mostly by buses of type MIDI | 143 | 10.07 | 10.47 | -4 in 100 |
+| Routes run mostly by buses of type STANDARD | 192 | 10.67 | 9.96 | +7 in 100 |
+| Route group 0 | 95 | 7.49 | 7.52 | -0 in 100 |
+| Route group 1 | 96 | 15.04 | 14.29 | +5 in 100 |
+| Route group 2 | 96 | 7.34 | 7.84 | -7 in 100 |
+| Route group 3 | 95 | 7.95 | 8.23 | -4 in 100 |
+| Route group 4 | 48 | 9.01 | 7.92 | +12 in 100 |
 
-**The range.** Promised to hold 90 in 100 times; it held 95 in 100. When nobody boarded it held 100 in 100 times (38 quarter-hours); when somebody did, 94 in 100 (346). How it is set: set at each origin from the misses of forecasts that had already come true that day (conformal prediction, rolling), widened to whole passengers.
+**The range.** Promised to hold 90 in 100 times; it held 97 in 100. When nobody boarded it held 100 in 100 times (15 quarter-hours); when somebody did, 97 in 100 (415). How it is set: set at each origin from the misses of forecasts that had already come true that day (conformal prediction, rolling), widened to whole passengers.
 
 **Development.** Forecasts made from 08:00 to 15:30 for quarters of an hour that had ended by 16:00. Every choice was made here, so these numbers flatter the model: read the main table first.
 
 | Forecast | n | MAE | RMSE | Gain |
 |---|---|---|---|---|
-| Same as the last quarter of an hour seen | 480 | 5.55 | 10.05 |  |
-| The average so far today | 480 | 13.44 | 15.56 |  |
-| In proportion to the timetable | 480 | 8.18 | 10.16 |  |
-| A plain count model (Poisson regression with a penalty) | 480 | 8.80 | 13.98 | -59 in 100 (-101 to -32) |
-| Boosted trees with a loss made for counts, one model for every stop and every horizon | 480 | 4.35 | 7.96 | +22 in 100 (+17 to +28) |
+| Same as the last quarter of an hour seen | 540 | 7.01 | 11.94 |  |
+| The average so far today | 540 | 16.83 | 19.68 |  |
+| In proportion to the timetable | 540 | 15.16 | 18.26 |  |
+| A plain count model (Poisson regression with a penalty) | 540 | 13.77 | 19.31 | -96 in 100 (-137 to -71) |
+| Boosted trees with a loss made for counts, one model for every stop and every horizon | 540 | 7.89 | 14.11 | -12 in 100 (-20 to +0) |
 
 ## Boardings by stop
 
@@ -98,102 +98,102 @@ Unit: passengers boarding per stop per 15 minutes. MAPE is taken only over quart
 
 | Forecast | n | MAE | RMSE | WAPE | MAPE | Gain |
 |---|---|---|---|---|---|---|
-| Same as the last quarter of an hour seen | 11,520 | 0.73 | 1.37 | 1.51 | 0.76 over 154 |  |
-| The average so far today | 11,520 | 0.65 | 1.04 | 1.36 | 0.89 over 154 |  |
-| In proportion to the timetable (best naive) | 11,520 | 0.55 | 1.01 | 1.14 | 0.82 over 154 |  |
-| A plain count model (Poisson regression with a penalty) | 11,520 | 0.62 | 1.02 | 1.29 | 0.89 over 154 | -13 in 100 (-18 to -9) against in proportion to the timetable |
-| Boosted trees with a loss made for counts, one model for every stop and every horizon (chosen) | 11,520 | 0.52 | 0.92 | 1.09 | 0.74 over 154 | +5 in 100 (-6 to +18) against in proportion to the timetable |
+| Same as the last quarter of an hour seen | 26,120 | 0.53 | 1.01 | 1.52 | 0.69 over 100 |  |
+| The average so far today | 26,120 | 0.48 | 0.76 | 1.37 | 0.87 over 100 |  |
+| In proportion to the timetable (best naive) | 26,120 | 0.47 | 0.78 | 1.33 | 0.86 over 100 |  |
+| A plain count model (Poisson regression with a penalty) | 26,120 | 0.49 | 0.76 | 1.41 | 0.89 over 100 | -6 in 100 (-8 to -2) against in proportion to the timetable |
+| Boosted trees with a loss made for counts, one model for every stop and every horizon (chosen) | 26,120 | 0.45 | 0.70 | 1.27 | 0.73 over 100 | +4 in 100 (-5 to +16) against in proportion to the timetable |
 
 **The range of the gain includes zero.** On these rows the model is not shown to beat the best naive forecast, and no screen should say it does.
 
 **Caution.** At 120 minutes ahead the model misses by more than the naive forecast (in proportion to the timetable). Use the naive forecast that far ahead.
 
-**Caution.** When somebody boarded, the range held 87 times in 100, short of the 90 promised.
-
 **By horizon, untouched part, every row.** A row where the model loses stays in: it tells a planner where not to rely on it.
 
 | Ahead | n | Best naive forecast there | Its MAE | Model MAE | Gain |
 |---|---|---|---|---|---|
-| 15 minutes | 2,880 | In proportion to the timetable | 0.58 | 0.49 | +15 in 100 |
-| 30 minutes | 2,880 | In proportion to the timetable | 0.57 | 0.53 | +7 in 100 |
-| 60 minutes | 2,880 | In proportion to the timetable | 0.56 | 0.55 | +2 in 100 |
-| 120 minutes | 2,880 | In proportion to the timetable | 0.48 | 0.52 | -9 in 100 |
+| 15 minutes | 6,654 | In proportion to the timetable | 0.48 | 0.42 | +12 in 100 |
+| 30 minutes | 6,645 | In proportion to the timetable | 0.48 | 0.45 | +8 in 100 |
+| 60 minutes | 6,583 | In proportion to the timetable | 0.48 | 0.46 | +4 in 100 |
+| 120 minutes | 6,238 | In proportion to the timetable | 0.43 | 0.46 | -8 in 100 |
 
 **By subset, untouched part, every horizon's rows averaged by their count.**
 
 | Subset | n | Best naive MAE | Model MAE | Gain |
 |---|---|---|---|---|
-| Every held-out bin | 11,520 | 0.55 | 0.52 | +5 in 100 |
-| Evening peak, 16:00 to 20:00 | 6,720 | 0.72 | 0.74 | -2 in 100 |
-| After 20:00 | 4,800 | 0.26 | 0.22 | +15 in 100 |
-| Direction 0 | 5,760 | 0.45 | 0.43 | +4 in 100 |
-| Direction 1 | 5,760 | 0.65 | 0.61 | +5 in 100 |
-| Routes run mostly by buses of type COACH | 1,440 | 0.28 | 0.27 | +5 in 100 |
-| Routes run mostly by buses of type DOUBLE | 2,880 | 0.45 | 0.43 | +5 in 100 |
-| Routes run mostly by buses of type MIDI | 2,880 | 0.76 | 0.72 | +6 in 100 |
-| Routes run mostly by buses of type STANDARD | 4,320 | 0.56 | 0.54 | +4 in 100 |
-| Route group 0 | 2,880 | 0.54 | 0.49 | +9 in 100 |
-| Route group 1 | 2,880 | 0.51 | 0.48 | +5 in 100 |
-| Route group 2 | 2,880 | 0.60 | 0.59 | +1 in 100 |
-| Route group 3 | 1,440 | 0.56 | 0.54 | +4 in 100 |
-| Route group 4 | 1,440 | 0.54 | 0.52 | +4 in 100 |
-| Community group 0 | 2,304 | 0.60 | 0.59 | +2 in 100 |
-| Community group 1 | 2,304 | 0.53 | 0.46 | +13 in 100 |
-| Community group 2 | 2,400 | 0.52 | 0.50 | +4 in 100 |
-| Community group 3 | 2,544 | 0.57 | 0.57 | -1 in 100 |
-| Community group 4 | 1,872 | 0.53 | 0.49 | +7 in 100 |
+| Every held-out bin | 26,120 | 0.47 | 0.45 | +4 in 100 |
+| Evening peak, 16:00 to 20:00 | 15,540 | 0.56 | 0.58 | -4 in 100 |
+| After 20:00 | 10,580 | 0.27 | 0.25 | +7 in 100 |
+| Direction 0 | 15,254 | 0.41 | 0.40 | +3 in 100 |
+| Direction 1 | 10,866 | 0.55 | 0.52 | +6 in 100 |
+| Routes run mostly by buses of type COACH | 2,470 | 0.27 | 0.30 | -9 in 100 |
+| Routes run mostly by buses of type DOUBLE | 2,832 | 0.39 | 0.39 | -2 in 100 |
+| Routes run mostly by buses of type MIDI | 11,177 | 0.45 | 0.43 | +4 in 100 |
+| Routes run mostly by buses of type STANDARD | 9,641 | 0.56 | 0.51 | +8 in 100 |
+| Route group 0 | 6,486 | 0.35 | 0.36 | -3 in 100 |
+| Route group 1 | 4,320 | 0.82 | 0.72 | +11 in 100 |
+| Route group 2 | 5,856 | 0.41 | 0.40 | +4 in 100 |
+| Route group 3 | 5,858 | 0.44 | 0.43 | +2 in 100 |
+| Route group 4 | 3,600 | 0.39 | 0.38 | +2 in 100 |
+| Community group 0 | 7,262 | 0.55 | 0.51 | +7 in 100 |
+| Community group 1 | 8,293 | 0.47 | 0.45 | +4 in 100 |
+| Community group 2 | 1,622 | 0.46 | 0.45 | +2 in 100 |
+| Community group 3 | 4,649 | 0.43 | 0.41 | +4 in 100 |
+| Community group 4 | 1,824 | 0.43 | 0.43 | -0 in 100 |
 
-**The range.** Promised to hold 90 in 100 times; it held 97 in 100. When nobody boarded it held 100 in 100 times (8,627 quarter-hours); when somebody did, 87 in 100 (2,893). How it is set: set at each origin from the misses of forecasts that had already come true that day (conformal prediction, rolling), widened to whole passengers.
+**The range.** Promised to hold 90 in 100 times; it held 98 in 100. When nobody boarded it held 100 in 100 times (20,179 quarter-hours); when somebody did, 91 in 100 (5,941). How it is set: set at each origin from the misses of forecasts that had already come true that day (conformal prediction, rolling), widened to whole passengers.
 
 **Development.** Forecasts made from 08:00 to 15:30 for quarters of an hour that had ended by 16:00. Every choice was made here, so these numbers flatter the model: read the main table first.
 
 | Forecast | n | MAE | RMSE | Gain |
 |---|---|---|---|---|
-| Same as the last quarter of an hour seen | 14,400 | 0.38 | 0.93 |  |
-| The average so far today | 14,400 | 0.60 | 0.81 |  |
-| In proportion to the timetable | 14,400 | 0.40 | 0.81 |  |
-| A plain count model (Poisson regression with a penalty) | 14,400 | 0.45 | 0.70 | -20 in 100 (-48 to -7) |
-| Boosted trees with a loss made for counts, one model for every stop and every horizon | 14,400 | 0.29 | 0.60 | +24 in 100 (+21 to +25) |
+| Same as the last quarter of an hour seen | 33,247 | 0.31 | 0.74 |  |
+| The average so far today | 33,247 | 0.44 | 0.61 |  |
+| In proportion to the timetable | 33,247 | 0.40 | 0.65 |  |
+| A plain count model (Poisson regression with a penalty) | 33,247 | 0.39 | 0.56 | -25 in 100 (-44 to -13) |
+| Boosted trees with a loss made for counts, one model for every stop and every horizon | 33,247 | 0.28 | 0.53 | +10 in 100 (+7 to +12) |
 
 **Other routes.** Routes in five groups: learn from four, forecast the fifth. No route is on both sides. Does it carry over to a route it has never seen?
 
 | Forecast | n | MAE | RMSE | Gain |
 |---|---|---|---|---|
-| Same as the last quarter of an hour seen | 5,760 | 0.76 | 1.39 |  |
-| The average so far today | 5,760 | 0.66 | 1.07 |  |
-| In proportion to the timetable | 5,760 | 0.56 | 1.03 |  |
-| A plain count model (Poisson regression with a penalty) | 5,760 | 0.64 | 1.05 | -14 in 100 (-21 to -10) |
-| Boosted trees with a loss made for counts, one model for every stop and every horizon | 5,760 | 0.57 | 0.99 | -2 in 100 (-14 to +15) |
+| Same as the last quarter of an hour seen | 13,149 | 0.54 | 1.02 |  |
+| The average so far today | 13,149 | 0.49 | 0.78 |  |
+| In proportion to the timetable | 13,149 | 0.48 | 0.79 |  |
+| A plain count model (Poisson regression with a penalty) | 13,149 | 0.50 | 0.79 | -6 in 100 (-10 to -1) |
+| Boosted trees with a loss made for counts, one model for every stop and every horizon | 13,149 | 0.47 | 0.74 | +2 in 100 (-9 to +17) |
 
 **Other communities.** Communities in five groups: learn from four, forecast the fifth. Does it carry over to a part of the city it has never seen?
 
 | Forecast | n | MAE | RMSE | Gain |
 |---|---|---|---|---|
-| Same as the last quarter of an hour seen | 5,712 | 0.76 | 1.40 |  |
-| The average so far today | 5,712 | 0.67 | 1.07 |  |
-| In proportion to the timetable | 5,712 | 0.56 | 1.03 |  |
-| A plain count model (Poisson regression with a penalty) | 5,712 | 0.64 | 1.05 | -14 in 100 (-21 to -9) |
-| Boosted trees with a loss made for counts, one model for every stop and every horizon | 5,712 | 0.57 | 0.98 | -1 in 100 (-11 to +15) |
+| Same as the last quarter of an hour seen | 11,903 | 0.56 | 1.04 |  |
+| The average so far today | 11,903 | 0.50 | 0.79 |  |
+| In proportion to the timetable | 11,903 | 0.49 | 0.81 |  |
+| A plain count model (Poisson regression with a penalty) | 11,903 | 0.51 | 0.79 | -4 in 100 (-7 to -1) |
+| Boosted trees with a loss made for counts, one model for every stop and every horizon | 11,903 | 0.48 | 0.75 | +3 in 100 (-8 to +17) |
 
 **What the model leans on**, as each feature's share of the boosted trees' gain, learned from the hours before 16:00:
 
 | Feature | Share |
 |---|---|
-| The time of day | 53 in 100 |
-| The timetable's share | 22 in 100 |
-| Where the stop is along the route | 9 in 100 |
-| The route's boardings for each bus so far | 3 in 100 |
+| The time of day | 47 in 100 |
+| Where the stop is along the route | 11 in 100 |
+| The timetable's share | 10 in 100 |
+| Buses scheduled here over the day | 7 in 100 |
+| This stop's average so far today | 4 in 100 |
+| How late those buses are running | 3 in 100 |
+| Buses scheduled in that quarter of an hour | 3 in 100 |
+| The route's boardings for each bus so far | 2 in 100 |
+| How far ahead the forecast looks | 2 in 100 |
 | Buses scheduled just after | 2 in 100 |
-| How late those buses are running | 1 in 100 |
-| Buses scheduled in that quarter of an hour | 1 in 100 |
-| Buses scheduled here over the day | 1 in 100 |
-| Passengers who have got off near here today | 1 in 100 |
-| Buses scheduled just before | 1 in 100 |
+| Boardings on the whole route in the last hour | 2 in 100 |
+| Boardings here so far today | 1 in 100 |
+| Buses already on the road that should reach the stop then | 1 in 100 |
 | How many have boarded those buses so far | 1 in 100 |
-| How long the stop has been in service today | 1 in 100 |
-| How far ahead the forecast looks | 1 in 100 |
-| Boardings for each bus here so far | 1 in 100 |
 | Passengers who got off near here today and have not travelled since | 1 in 100 |
+| Buses scheduled just before | 1 in 100 |
+| How long the stop has been in service today | 1 in 100 |
 
 ## Lateness at a stop ahead
 
@@ -203,9 +203,9 @@ Unit: seconds late at a stop ahead (early is below zero). MAPE and WAPE are not 
 
 | Forecast | n | MAE | RMSE | Gain |
 |---|---|---|---|---|
-| The timetable: the bus will be on time | 7,670 | 208.58 | 267.75 |  |
-| The bus stays as late as it is now (best naive) | 7,670 | 77.25 | 123.10 |  |
-| Boosted trees on the bus's run so far, the timetable ahead and the bus in front (chosen) | 7,670 | 41.37 | 62.51 | +46 in 100 (+27 to +56) against the bus stays as late as it is now |
+| The timetable: the bus will be on time | 35,003 | 312.93 | 386.47 |  |
+| The bus stays as late as it is now (best naive) | 35,003 | 75.58 | 123.77 |  |
+| Boosted trees on the bus's run so far, the timetable ahead and the bus in front (chosen) | 35,003 | 43.92 | 72.54 | +42 in 100 (+23 to +57) against the bus stays as late as it is now |
 
 The range of the gain lies above zero: on these rows the model beat the best naive forecast.
 
@@ -213,35 +213,36 @@ The range of the gain lies above zero: on these rows the model beat the best nai
 
 | Ahead | n | Best naive forecast there | Its MAE | Model MAE | Gain |
 |---|---|---|---|---|---|
-| 1 stops | 3,728 | The bus stays as late as it is now | 20.85 | 18.07 | +13 in 100 |
-| 5 stops | 2,639 | The bus stays as late as it is now | 99.31 | 46.27 | +53 in 100 |
-| 10 stops | 1,303 | The bus stays as late as it is now | 193.92 | 98.11 | +49 in 100 |
+| 1 stops | 11,741 | The bus stays as late as it is now | 8.72 | 8.57 | +2 in 100 |
+| 5 stops | 10,202 | The bus stays as late as it is now | 54.26 | 29.55 | +46 in 100 |
+| 10 stops | 8,326 | The bus stays as late as it is now | 112.14 | 64.00 | +43 in 100 |
+| 20 stops | 4,734 | The bus stays as late as it is now | 223.03 | 127.27 | +43 in 100 |
 
 **By subset, untouched part, every horizon's rows averaged by their count.**
 
 | Subset | n | Best naive MAE | Model MAE | Gain |
 |---|---|---|---|---|
-| Every held-out bin | 7,670 | 77.25 | 41.37 | +46 in 100 |
-| Evening peak, 16:00 to 20:00 | 4,585 | 110.10 | 48.53 | +56 in 100 |
-| After 20:00 | 3,085 | 28.41 | 30.74 | -8 in 100 |
-| Direction 0 | 3,851 | 74.05 | 39.85 | +46 in 100 |
-| Direction 1 | 3,819 | 80.47 | 42.91 | +47 in 100 |
-| Buses of type ARTICULATED | 1,040 | 85.10 | 44.85 | +47 in 100 |
-| Buses of type COACH | 998 | 69.99 | 44.78 | +36 in 100 |
-| Buses of type DOUBLE | 1,319 | 75.90 | 39.63 | +48 in 100 |
-| Buses of type MIDI | 1,186 | 82.04 | 42.76 | +48 in 100 |
-| Buses of type STANDARD | 2,550 | 79.07 | 39.93 | +49 in 100 |
-| Buses of type UNKNOWN | 577 | 60.84 | 36.71 | +40 in 100 |
+| Every held-out bin | 35,003 | 75.58 | 43.92 | +42 in 100 |
+| Evening peak, 16:00 to 20:00 | 18,073 | 114.59 | 51.17 | +55 in 100 |
+| After 20:00 | 16,930 | 33.93 | 36.18 | -7 in 100 |
+| Direction 0 | 21,124 | 72.03 | 42.06 | +42 in 100 |
+| Direction 1 | 13,879 | 80.98 | 46.75 | +42 in 100 |
+| Buses of type ARTICULATED | 4,864 | 78.08 | 46.19 | +41 in 100 |
+| Buses of type COACH | 3,083 | 79.64 | 45.50 | +43 in 100 |
+| Buses of type DOUBLE | 3,465 | 81.90 | 48.87 | +40 in 100 |
+| Buses of type MIDI | 8,107 | 78.63 | 43.31 | +45 in 100 |
+| Buses of type STANDARD | 14,440 | 71.02 | 42.49 | +40 in 100 |
+| Buses of type UNKNOWN | 1,044 | 70.22 | 36.80 | +48 in 100 |
 
-**The range.** Promised to hold 90 in 100 times; it held 93 in 100. 
+**The range.** Promised to hold 90 in 100 times; it held 91 in 100. 
 
 **Development.** Forecasts made from 08:00 for arrivals up to 16:00. Read the main table first.
 
 | Forecast | n | MAE | RMSE | Gain |
 |---|---|---|---|---|
-| The timetable: the bus will be on time | 6,235 | 148.91 | 213.73 |  |
-| The bus stays as late as it is now | 6,235 | 50.93 | 88.38 |  |
-| Boosted trees on the bus's run so far, the timetable ahead and the bus in front | 6,235 | 36.83 | 55.97 | +28 in 100 (-25 to +54) |
+| The timetable: the bus will be on time | 33,063 | 241.88 | 326.88 |  |
+| The bus stays as late as it is now | 33,063 | 51.10 | 85.63 |  |
+| Boosted trees on the bus's run so far, the timetable ahead and the bus in front | 33,063 | 37.40 | 66.24 | +27 in 100 (+1 to +47) |
 
 ## Why these models
 

@@ -1,0 +1,10 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
+8,1,8,Al Baraha Bus Stn  - Ibn Battuta MS,3,FFC000,000000
+2000,1,C01,Airport Terminal 3 - Al Satwa Bus Stn,3,FFC000,000000
+27,1,27,Gold Souq Bus Stn - The Dubai Mall,3,FFC000,000000
+6045,1,F47,Danube MS - DIP 2,3,FFC000,000000
+320,1,320,Al Rashidiya Bus Stn - Academic City,3,FFC000,000000
+84,1,84,Al Khail Gate - Jumeirah Beach Residence Station,3,FFC000,000000
+1002,1,91A,Gold Souq Bus Stn - Jebel Ali Bus Stn,3,FFC000,000000
+17,1,17,"Al Sabkha Bus Stn - Muhaisnah 4, Wasl Oasis II",3,FFC000,000000
+1018,1,J01,MOE MS - Jumeirah Village Circle,3,FFC000,000000

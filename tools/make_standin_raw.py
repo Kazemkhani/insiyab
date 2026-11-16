@@ -1,31 +1,34 @@
 #!/usr/bin/env python3
-"""Writes invented raw tables to fixtures/raw/: the same file kinds and exactly the column names RTA provided
-(docs/DATA.md, section 1), and not one real row. Every stage of the engine is built and tested on these.
+"""Writes the stand-in raw tables to fixtures/raw/: the same file kinds and exactly the column names RTA provided
+(docs/DATA.md, section 1). Every stage of the engine is built and tested on these.
 
   python3 tools/make_standin_raw.py                     write fixtures/raw/
   python3 tools/make_standin_raw.py --check             rebuild in memory, compare byte for byte with what is on disk
   python3 tools/make_standin_raw.py --out DIR --nol-shape journey     write a variant somewhere else (tests use this)
 
-Everything comes from one fixed seed, so two runs give the same bytes. The gates run --check: that is what proves the
-tables in fixtures/raw/ are invented, and it is the only reason the guard lets these column names into git.
-A real table must never be put in fixtures/raw/.
+What is real and what is invented. The NETWORK is real and public: nine routes of RTA's public timetable feed as published in
+late 2021, with their stops, paths and one Monday's trips (opendata/public/rta-gtfs/, with its PROVENANCE.md). It is not part of
+the data RTA gave the hackathon. Everything about the DAY is invented here, from one fixed seed: every passenger, tap, card,
+device, vehicle, driver, the lateness of every bus, and the nine square "areas" that stand in for communities.
+So a map of this day shows real Dubai stops and routes carrying invented passengers, and every screen says STAND-IN DATA.
+
+The gates run --check: that proves the tables in fixtures/raw/ equal a fresh build, which is the only reason the guard lets
+these column names into git. A real table from the hackathon must never be put in fixtures/raw/.
 
 Choices made here, because the real answers are not known until the census has run on the real data:
 - One nol row is one TAP (the default, --nol-shape tap): a check-in row has CKI=1, CKO=0 and Amount 0.00; a check-out row
   has CKI=0, CKO=1 and the fare. With --nol-shape journey one row is one journey: CKI and CKO hold the two clock times.
 - The runtime report keeps the service date in Date and writes clock times as HH:MM:SS that wrap at midnight
-  (a bus at 24:12 is written 00:12:00). Nothing runs between 02:00 and 05:00, so a time before 04:00 is the next day.
-  The nol table writes the calendar date, so a tap after midnight is dated 2025-12-16.
-- GTFS times run above 24:00:00, as the standard says.
-- Every identifier is invented and begins STANDIN-.
-- Each file stays under the guard's limit for an invented table (3,000,000 bytes), which is why the day is thinner than a real one:
-  PEAK_HEADWAY, OFF_HEADWAY and RIDERS below are the three numbers to change if that limit is ever raised.
+  (a bus at 24:12 is written 00:12:00). The nol table writes the calendar date, so a tap after midnight is dated 2025-12-16.
+- GTFS times run above 24:00:00, as the standard says. The feed's calendar dates are moved to December 2025, so the public
+  Monday timetable is the plan for the stand-in Monday. Nothing else in the feed's rows is changed.
+- Every invented identifier begins STANDIN-.
 
 Mess planted on purpose, for the census to count (the test recounts each from the files, nothing is typed twice):
 two vehicles that run but are missing from the fleet table; taps whose route number is written in another format;
 taps that carry the stop before the right one; duplicated taps; empty stop names and amounts; journeys with no
-check-out; stop visits where the door did not open; three scheduled trips that did not run; two stops outside every
-community; two buses with no model year and one with no total.
+check-out; stop visits where the door did not open; three scheduled trips that did not run; stops outside every
+area; two buses with no model year and one with no total.
 """
 import csv, io, math, os, random, sys
 
@@ -34,32 +37,8 @@ DATE, NEXT_DATE = "2025-12-15", "2025-12-16"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "fixtures", "raw")
 PEAK_HEADWAY, OFF_HEADWAY = 20 * 60, 45 * 60      # seconds between buses in one direction
-RIDERS = 1.35                                      # multiplies every boarding rate
-N_STOPS = 15
-LON0, LAT0, CELL = 55.20, 25.10, 0.06              # nine invented communities in a 3 by 3 grid
+RIDERS = 1.8                                       # multiplies every boarding rate
 TYPES = {"STANDARD": 32, "ARTICULATED": 48, "DOUBLE": 64, "MIDI": 20, "COACH": 44}
-# short name (invented: none is meant to be a route that exists), long name, from (lon, lat), to (lon, lat), how busy, the bus types its vehicles take in turn
-ROUTES = [
-    ("901",  "Stand-in South Cross",  (55.21, 25.13), (55.37, 25.13), 1.6, ["MIDI", "STANDARD", "ARTICULATED"]),
-    ("902A", "Stand-in Middle Cross", (55.21, 25.19), (55.37, 25.19), 1.2, ["STANDARD", "ARTICULATED"]),
-    ("903",  "Stand-in North Cross",  (55.21, 25.25), (55.37, 25.25), 0.8, ["STANDARD", "MIDI"]),
-    ("904",  "Stand-in West Line",    (55.23, 25.11), (55.23, 25.27), 1.0, ["STANDARD", "DOUBLE"]),
-    ("Q13",  "Stand-in Centre Line",  (55.29, 25.11), (55.29, 25.27), 0.5, ["DOUBLE", "ARTICULATED"]),
-    ("Q28",  "Stand-in East Line",    (55.35, 25.11), (55.35, 25.27), 1.4, ["MIDI", "STANDARD"]),
-    ("K10",  "Stand-in Rising Line",  (55.21, 25.11), (55.37, 25.27), 0.9, ["STANDARD", "COACH"]),
-    ("K900", "Stand-in Falling Line", (55.21, 25.27), (55.39, 25.09), 0.35, ["COACH", "DOUBLE"]),
-]
-# Where each route bends on its way, so the invented network reads as roads and not as a grid. One list of (lon, lat) a route, in the order of ROUTES.
-VIA = [
-    [(55.26, 25.125), (55.30, 25.145), (55.33, 25.14)],
-    [(55.25, 25.20), (55.29, 25.185), (55.33, 25.20)],
-    [(55.26, 25.262), (55.31, 25.24)],
-    [(55.222, 25.16), (55.24, 25.21)],
-    [(55.30, 25.15), (55.285, 25.20), (55.295, 25.24)],
-    [(55.36, 25.16), (55.345, 25.22)],
-    [(55.25, 25.16), (55.30, 25.19), (55.33, 25.24)],
-    [(55.24, 25.23), (55.29, 25.20), (55.33, 25.15)],
-]
 MISSING_FROM_FLEET = (5, 11)          # the vehicles, by the order they first run, that the fleet table leaves out
 ODD_ROUTE_VEHICLES = ((3, 1), (4, 0))  # (route, which of its vehicles): taps on these write the route number another way
 NOT_RUN = (40, 97, 133)               # scheduled trips, by order, that did not run
@@ -122,54 +101,41 @@ def table(cols, rows):
     return buf.getvalue()
 
 
+NET = os.path.join(ROOT, "opendata", "public", "rta-gtfs")       # a part of RTA's public network feed: see its PROVENANCE.md
+# How busy each route is made, and the kinds of bus its vehicles take in turn. The routes are real; these two things are invented.
+INVENTED = {"8": (1.6, ["MIDI", "STANDARD", "ARTICULATED"]), "C01": (1.3, ["STANDARD", "ARTICULATED"]), "27": (1.0, ["STANDARD", "DOUBLE"]), "F47": (1.5, ["MIDI", "STANDARD"]),
+            "320": (0.7, ["DOUBLE", "ARTICULATED"]), "84": (0.9, ["STANDARD", "COACH"]), "91A": (0.6, ["COACH", "DOUBLE"]), "17": (1.4, ["MIDI", "STANDARD"]), "J01": (0.5, ["STANDARD", "MIDI"])}
+
+
+def seconds(text):
+    h, m, s = text.split(":"); return int(h) * 3600 + int(m) * 60 + int(s)
+
+
+def public_network():
+    """The plan, read from the part of RTA's public feed kept in opendata/public/rta-gtfs: real routes, stops, paths and a Monday's trips."""
+    rd = lambda n: list(csv.DictReader(open(os.path.join(NET, n + ".txt"), encoding="utf-8", newline="")))
+    raw = {n: rd(n) for n in ("agency", "routes", "trips", "stop_times", "stops", "calendar", "shapes", "transfers", "translations", "feed_info")}
+    stops = {x["stop_id"]: {"name": x["stop_name"], "lon": float(x["stop_lon"]), "lat": float(x["stop_lat"]), "code": x["stop_code"]} for x in raw["stops"]}
+    routes = [{"rid": x["route_id"], "short": x["route_short_name"], "long": x["route_long_name"], "weight": INVENTED[x["route_short_name"]][0], "pool": INVENTED[x["route_short_name"]][1]} for x in raw["routes"]]
+    index = {r["rid"]: i for i, r in enumerate(routes)}
+    calls = {}
+    for x in raw["stop_times"]:
+        calls.setdefault(x["trip_id"], []).append((int(x["stop_sequence"]), x["stop_id"], seconds(x["arrival_time"]), seconds(x["departure_time"])))
+    sched = []
+    for x in raw["trips"]:
+        c = sorted(calls[x["trip_id"]])
+        if len(c) < 3:
+            continue
+        sched.append({"ri": index[x["route_id"]], "dir": int(x["direction_id"] or 0), "dep": c[0][3], "gtfs_id": x["trip_id"], "shape_id": x["shape_id"], "stops": [k[1] for k in c], "arr": [k[2] for k in c], "sdep": [k[3] for k in c]})
+    sched.sort(key=lambda t: (t["dep"], t["ri"], t["dir"], t["gtfs_id"]))
+    for n, tr in enumerate(sched):
+        tr["n"] = n
+    return raw, stops, routes, sched
+
+
 def build(nol_shape="tap"):
     rng = random.Random(SEED)
-    # ---- the network: eight routes, two directions, a stop on each side of the road ----
-    stops, shapes, routes = {}, [], []
-    for ri, (short, long_name, a, b, weight, pool) in enumerate(ROUTES):
-        rid = "R%02d" % (ri + 1)
-        seg = 110 + 12 * (ri % 5)                                    # scheduled seconds between stops
-        path = [a] + VIA[ri] + [b]; legs = [math.hypot(q[0] - p[0], q[1] - p[1]) for p, q in zip(path, path[1:])]; line = []
-        for i in range(N_STOPS):                                    # stops at equal steps along the bent path
-            want = sum(legs) * i / (N_STOPS - 1); k = 0
-            while k < len(legs) - 1 and want > legs[k]:
-                want -= legs[k]; k += 1
-            f = min(1.0, want / legs[k]); line.append((path[k][0] + (path[k + 1][0] - path[k][0]) * f, path[k][1] + (path[k + 1][1] - path[k][1]) * f))
-        dirs = []
-        for d in (0, 1):
-            pts = line if d == 0 else line[::-1]
-            off = 0.0003 if d == 0 else -0.0003                     # the other side of the road
-            ids = []
-            for i, (lon, lat) in enumerate(pts):
-                n = i if d == 0 else N_STOPS - 1 - i
-                sid = str(100000 + (ri + 1) * 1000 + (n + 1) * 10 + d + 1)
-                stops[sid] = {"name": "Stand-in %s Stop %d %s" % (short, n + 1, "A" if d == 0 else "B"), "lon": round(lon + off, 6), "lat": round(lat + off, 6), "code": "SC%d%02d%d" % (ri + 1, n + 1, d + 1)}
-                ids.append(sid)
-            shape_id = "P%d%d" % (ri + 1, d)
-            dist, acc = [0.0], 0.0
-            for p, q in zip(ids, ids[1:]):
-                acc += metres((stops[p]["lon"], stops[p]["lat"]), (stops[q]["lon"], stops[q]["lat"]))
-                dist.append(round(acc, 1))
-            for i, sid in enumerate(ids):
-                shapes.append([shape_id, "%.6f" % stops[sid]["lat"], "%.6f" % stops[sid]["lon"], i + 1, dist[i]])
-            dirs.append({"stops": ids, "shape_id": shape_id, "dist": dist})
-        routes.append({"rid": rid, "short": short, "long": long_name, "weight": weight, "pool": pool, "seg": seg, "dirs": dirs})
-
-    # ---- the timetable ----
-    sched = []
-    for ri, r in enumerate(routes):
-        for d in (0, 1):
-            t = 5 * 3600 + ((ri * 41 + d * 71) % 150) * 60        # staggered, so the routes do not all leave together
-            while t <= 24 * 3600 + 20 * 60:
-                sched.append({"ri": ri, "dir": d, "dep": t})
-                t += int((OFF_HEADWAY - (OFF_HEADWAY - PEAK_HEADWAY) * min(1.0, bump(t, 7.75, 1.4) + bump(t, 17.75, 1.6))) / 60) * 60   # buses come closer together towards each peak
-    sched.sort(key=lambda x: (x["dep"], x["ri"], x["dir"]))
-    for n, tr in enumerate(sched):
-        r = routes[tr["ri"]]
-        tr["n"] = n
-        tr["gtfs_id"] = "%s-%d-%s" % (r["rid"], tr["dir"], clock(tr["dep"], wrap=False).replace(":", "")[:4])
-        tr["arr"] = [tr["dep"] + i * r["seg"] for i in range(N_STOPS)]
-        tr["sdep"] = [a + (30 if i in (4, 9) else 0) for i, a in enumerate(tr["arr"])]      # two timing points where the bus waits
+    raw, stops, routes, sched = public_network()
 
     # ---- the day as it ran: vehicles, lateness, passengers ----
     vehicles, per_route = [], {}          # a vehicle: its number in order of first use, type, when it is free
@@ -186,26 +152,26 @@ def build(nol_shape="tap"):
             vehicles.append(v); mine.append(v)
         body = "STANDIN-B%02d" % v["n"]
         driver = "STANDIN-R%02d%s" % (v["n"], "a" if tr["dep"] < 14 * 3600 else "b")
-        ids = r["dirs"][tr["dir"]]["stops"]
+        ids = tr["stops"]; N = len(ids)
         aboard, late, prev_dep = [], rng.randint(-60, 120), None
         for i, sid in enumerate(ids):
             sa, sd = tr["arr"][i], tr["sdep"][i]
             peak = bump(sa, 8.0, 1.0) + bump(sa, 18.0, 1.3)
             if i:
-                late += rng.gauss(26 * peak - 5, 18) + 90 * peak / N_STOPS       # lateness grows along the route, most in the peaks
+                late = max(-90, late + (rng.gauss(26 * peak - 5, 18) + 90 * peak / 15) * 15 / N)   # lateness grows along the route, most in the peaks, whatever the number of stops
             act_arr = int(round(sa + late))
             if prev_dep is not None:
                 act_arr = max(act_arr, prev_dep + 40)
             off = [j for j in aboard if j["to"] == i]
             aboard = [j for j in aboard if j["to"] != i]
             on = 0
-            if i < N_STOPS - 1:
+            if i < N - 1:
                 tide = 1.35 if tr["dir"] == 0 else 0.65                           # direction 0 runs towards work in the morning
                 shape = 0.18 + 1.5 * tide * bump(sa, 7.75, 1.0) + 1.35 * (2 - tide) * bump(sa, 17.75, 1.2)
                 if sa >= 22 * 3600:
                     shape *= 0.6
-                place = (1 - i / (N_STOPS - 1)) ** 0.7 + 0.15
-                on = poisson(rng, RIDERS * 1.15 * r["weight"] * shape * place)
+                place = (1 - i / (N - 1)) ** 0.7 + 0.15
+                on = poisson(rng, RIDERS * 1.15 * r["weight"] * shape * place * 15 / N)        # about the same boardings a trip, however many stops it has
             door = "Open" if (on or off) else ("Closed" if rng.random() < 0.6 else "Open")
             dwell = 0 if door == "Closed" else int(10 + 2.5 * on + 1.5 * len(off))
             act_dep = act_arr + dwell if door == "Closed" else max(act_arr + dwell, min(sd, act_arr + dwell + 45))
@@ -216,14 +182,14 @@ def build(nol_shape="tap"):
                     card = card_free.pop(0)[1]
                 else:
                     card = used_cards; used_cards += 1
-                j = {"card": card, "v": v["n"], "ri": tr["ri"], "dir": tr["dir"], "from": i, "to": min(N_STOPS - 1, i + 1 + int(rng.expovariate(1 / 7.0))),
+                j = {"card": card, "v": v["n"], "ri": tr["ri"], "dir": tr["dir"], "from": i, "to": min(N - 1, i + 1 + int(rng.expovariate(1 / (N * 0.45)))), "stops": ids,
                      "t_in": act_arr + 2 + int(rng.random() * max(1, dwell - 4)), "odd": v["odd"], "t_out": None, "no_out": rng.random() < NO_CHECK_OUT, "door": 1 + (rng.random() < 0.4)}
                 aboard.append(j); journeys.append(j)
                 card_free.append((act_arr + 2400, card))
             tid += 1
             diff = act_arr - sa
             avl.append([DATE, "Weekday", body, 70000 + tr["n"], r["short"], driver, tr["dir"], i + 1, sid, stops[sid]["name"], clock(sa), clock(act_arr), clock(sd), clock(act_dep),
-                        "%.1f" % (diff / 60), door, "B%02d" % v["n"], r["dirs"][tr["dir"]]["shape_id"], clock(tr["arr"][-1]), diff, (sa % 86400) // 3600, tid])
+                        "%.1f" % (diff / 60), door, "B%02d" % v["n"], tr["shape_id"], clock(tr["arr"][-1]), diff, (sa % 86400) // 3600, tid])
             prev_dep = act_dep
             if door == "Open":
                 late = max(late, act_dep - sd)                       # a long stop makes the bus later
@@ -235,7 +201,7 @@ def build(nol_shape="tap"):
 
     def tap_row(j, t, stop_i, cki, cko, amount):
         r = routes[j["ri"]]
-        ids = r["dirs"][j["dir"]]["stops"]
+        ids = j["stops"]
         if rng.random() < WRONG_STOP and stop_i > 0:
             stop_i -= 1                                             # the reader had not yet moved on from the stop before
         sid = ids[stop_i]
@@ -272,40 +238,35 @@ def build(nol_shape="tap"):
         fleet.append(["STANDIN-B%02d" % v["n"], "Stand-in Motors " + "ABC"[v["n"] % 3], v["type"], "" if v["n"] in (9, 14) else 2009 + (v["n"] * 7) % 16,
                       "STAND-IN OPERATOR %d" % (1 + v["n"] % 2), seats, standing, "" if v["n"] == 12 else seats + standing])
 
-    # ---- the communities ----
+    # ---- the communities: nine invented squares over the routes, drawn a little inside their edge so that a few stops fall outside ----
+    lons, lats = [x["lon"] for x in stops.values()], [x["lat"] for x in stops.values()]
+    lon0, lat0 = min(lons) + 0.012, min(lats) + 0.012; cw, ch = (max(lons) - 0.012 - lon0) / 3, (max(lats) - 0.012 - lat0) / 3
     comm = []
     for k in range(9):
-        x, y = LON0 + CELL * (k % 3), LAT0 + CELL * (k // 3)
-        ring = [(x, y), (x + CELL, y), (x + CELL, y + CELL), (x, y + CELL), (x, y)]
+        x, y = lon0 + cw * (k % 3), lat0 + ch * (k // 3)
+        ring = [(x, y), (x + cw, y), (x + cw, y + ch), (x, y + ch), (x, y)]
         wkt = "POLYGON ((" + ", ".join("%.4f %.4f" % p for p in ring) + "))"
-        en, ar = "STAND-IN COMMUNITY %d" % (k + 1), "منطقة تجريبية %d" % (k + 1)
-        comm.append(["ت%d" % (k + 1), "SI%d" % (k + 1), ar, en, 900 + k + 1, ar, en, 5000 + k, ar, en, 7000 + k, k + 1, wkt, "%.6f" % (CELL * CELL), "%.4f" % (4 * CELL)])
+        en, ar = "STAND-IN AREA %d" % (k + 1), "منطقة تجريبية %d" % (k + 1)
+        comm.append(["ت%d" % (k + 1), "SI%d" % (k + 1), ar, en, 900 + k + 1, ar, en, 5000 + k, ar, en, 7000 + k, k + 1, wkt, "%.6f" % (cw * ch), "%.4f" % (2 * cw + 2 * ch)])
 
-    # ---- the twelve network files ----
+    # ---- the twelve network files: RTA's public rows, written under the column names the hackathon's feed uses ----
+    # One thing is changed and one only: the calendar's dates are moved to December 2025, so that the public Monday timetable is the plan for the stand-in Monday.
     g = {}
-    g["agency"] = [["SI", "Stand-in Transit (invented)", "https://example.invalid", "Asia/Dubai", "en", ""]]
-    g["routes"] = [[r["rid"], "SI", r["short"], r["long"], 3, "0E5A5A", "FFFFFF"] for r in routes]
-    g["trips"] = [[routes[t["ri"]]["rid"], "WK", t["gtfs_id"], routes[t["ri"]]["dirs"][t["dir"]]["shape_id"], "Stand-in %s end" % ("east" if t["dir"] == 0 else "west"), t["dir"], "", ""] for t in sched]
-    g["stop_times"] = [[t["gtfs_id"], clock(t["arr"][i], wrap=False), clock(t["sdep"][i], wrap=False), sid, i + 1, "", 0, 0, routes[t["ri"]]["dirs"][t["dir"]]["dist"][i]]
-                       for t in sched for i, sid in enumerate(routes[t["ri"]]["dirs"][t["dir"]]["stops"])]
-    g["stops"] = [[sid, s["name"], "%.6f" % s["lat"], "%.6f" % s["lon"], "", 0, s["code"], "", ""] for sid, s in sorted(stops.items())]
-    g["calendar"] = [["WK", 1, 1, 1, 1, 1, 0, 0, "20251201", "20251231"], ["WE", 0, 0, 0, 0, 0, 1, 1, "20251201", "20251231"]]
-    g["calendar_dates"] = [["WK", "20251202", 2], ["WE", "20251202", 1]]
-    g["frequencies"] = []
-    g["shapes"] = shapes
-    near = []
-    ordered = sorted(stops.items())
-    for a_id, a in ordered:
-        for b_id, b in ordered:
-            if a_id[:3] != b_id[:3] and metres((a["lon"], a["lat"]), (b["lon"], b["lat"])) < 450:
-                near.append([a_id, b_id, 2, 300])
-    g["transfers"] = near
-    g["translations"] = [["stops", "stop_name", "ar", sid, "", "موقف تجريبي %s" % sid[-4:]] for sid, _ in ordered]
-    g["feed_info"] = [["STAND-IN, invented by tools/make_standin_raw.py", "https://example.invalid", "20251201", "20251231"]]
+    pick = lambda rows, cols: [[x.get(c, "") for c in cols] for x in rows]
+    g["agency"] = pick(raw["agency"], GTFS_COLS["agency"]); g["routes"] = pick(raw["routes"], GTFS_COLS["routes"])
+    g["trips"] = pick(raw["trips"], GTFS_COLS["trips"]); g["stop_times"] = pick(raw["stop_times"], GTFS_COLS["stop_times"])
+    g["stops"] = pick(raw["stops"], GTFS_COLS["stops"]); g["shapes"] = pick(raw["shapes"], GTFS_COLS["shapes"]); g["transfers"] = pick(raw["transfers"], GTFS_COLS["transfers"])
+    g["calendar"] = [[x["service_id"], x["monday"], x["tuesday"], x["wednesday"], x["thursday"], x["friday"], x["saturday"], x["sunday"], "20251201", "20251231"] for x in raw["calendar"]]
+    g["calendar_dates"] = []; g["frequencies"] = []
+    g["translations"] = [[x["table_name"], x["field_name"], x["language"], x["record_id"], "", x["translation"]] for x in raw["translations"]]
+    g["feed_info"] = [[x["feed_publisher_name"], x["feed_publisher_url"], "20251201", "20251231"] for x in raw["feed_info"]]
 
     files = {"nol_transactions.csv": table(NOL_COLS, nol), "bus_runtime_avl.csv": table(AVL_COLS, avl), "bus_fleet.csv": table(FLEET_COLS, fleet),
              "community_boundaries.csv": table(COMM_COLS, comm),
-             "README.txt": "STAND-IN DATA, NOT A RESULT. Every row here is invented by tools/make_standin_raw.py from a fixed seed.\nA real table must never be put in this folder. scripts/gates.sh proves these files equal a fresh build.\n"}
+             "README.txt": "STAND-IN DATA, NOT A RESULT. Written by tools/make_standin_raw.py from a fixed seed.\n"
+                           "The network in gtfs/ is real and public: nine routes of RTA's public timetable feed as published in late 2021 (opendata/public/rta-gtfs/PROVENANCE.md), with its calendar's dates moved to December 2025.\n"
+                           "Everything else is invented: every passenger, tap, card, device, vehicle, driver, lateness and community here. None of it is RTA's data, and no number made from it is a result.\n"
+                           "A real table from the hackathon must never be put in this folder. scripts/gates.sh proves these files equal a fresh build.\n"}
     for name, cols in GTFS_COLS.items():
         files["gtfs/%s.txt" % name] = table(cols, g[name])
     return files
@@ -318,7 +279,7 @@ def main():
     if shape not in ("tap", "journey"):
         print("--nol-shape is tap or journey"); return 2
     files = build(shape)
-    big = [n for n, t in files.items() if len(t.encode("utf-8")) > 3_000_000]
+    big = [n for n, t in files.items() if len(t.encode("utf-8")) > 8_000_000]
     if "--check" in args:
         def same(n):
             p = os.path.join(out, n)

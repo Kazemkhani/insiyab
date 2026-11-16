@@ -243,7 +243,18 @@ def census_facts(tables):
             a["door"] = a["door"].str.upper()
             for k, name in {"sa": "Sched_Arr", "aa": "Act_Arr", "sd": "Sched_Dep", "ad": "Act_Dep"}.items():
                 c = need(avl, "avl", name)
-                a[k] = _secs(avl[c]) if c else np.nan
+                a[k] = _secs(avl[c], service_day=False) if c else np.nan
+            # A clock time is placed on the service day by following each vehicle's rows in the order the report gives them: when its clock falls
+            # back by more than six hours it has passed midnight. A fixed hour will not do: a night bus is still out after 04:00.
+            base = a["sa"].fillna(a["sd"]); prev = base.groupby(a["veh"], sort=False).shift(1)
+            wrapped = (base < prev - 6 * 3600).astype(int).groupby(a["veh"], sort=False).cumsum()
+            first = base.groupby(a["veh"], sort=False).transform("first")
+            day = (wrapped + (first < DAY_STARTS).astype(int)).clip(upper=1) * 86400; anchor = base + day
+            for k in ("sa", "aa", "sd", "ad"):
+                t = a[k] + day
+                a[k] = t + np.where(t < anchor - 12 * 3600, 86400, 0) - np.where(t > anchor + 12 * 3600, 86400, 0)
+            W["avl_after_midnight"] = int((a["sa"] >= 86400).sum()); W["avl_latest_hour"] = None if a["sa"].isna().all() else int(a["sa"].max() // 3600)
+            W["avl_out_of_order"] = int((a["sa"] < a["sa"].groupby(a["veh"], sort=False).shift(1) - 600).sum())
             c = need(avl, "avl", "Stop_Seq")
             a["seq"] = pd.to_numeric(_text(avl[c]), errors="coerce") if c else np.nan
             c = need(avl, "avl", "Diff_in_seconds")
@@ -269,6 +280,9 @@ def census_facts(tables):
                 o.fact("nol.distinct_%s" % label, int(n[k][n[k] != ""].nunique()))
         if a is not None:
             o.fact("avl.first_actual_arrival", _clock(a["aa"].min())); o.fact("avl.last_actual_departure", _clock(a["ad"].max()))
+            o.fact("avl.rows_placed_after_midnight", W.get("avl_after_midnight"), "by following each vehicle's rows in the order given")
+            o.fact("avl.latest_scheduled_hour_of_the_service_day", W.get("avl_latest_hour"), "above 24 means buses still running after midnight; above 28, after 04:00")
+            o.fact("avl.rows_more_than_ten_minutes_before_the_row_above_for_the_same_vehicle", W.get("avl_out_of_order"), "if this is large the report is not in time order for each vehicle, and clock times cannot be placed this way")
             for k, label in [("route", "routes"), ("stop", "stops"), ("veh", "vehicles"), ("trip", "trips"), ("driver", "drivers")]:
                 o.fact("avl.distinct_%s" % label, int(a[k][a[k] != ""].nunique()))
         if f is not None:

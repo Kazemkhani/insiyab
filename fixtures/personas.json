@@ -3,7 +3,7 @@
  "personas": [
   {
    "anchor": {
-    "route_id": "901",
+    "route_id": "C01",
     "stop_id": null,
     "time": 21600
    },
@@ -13,12 +13,12 @@
     {
      "after": null,
      "before": {
-      "trips_over_seats": 7,
-      "trips_under_a_third_full": 444
+      "trips_over_seats": 20,
+      "trips_under_a_third_full": 606
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, 7 trips ran with more passengers than seats, and 444 ran less than a third full.",
+     "say": "On the day, 20 trips ran with more passengers than seats, and 606 ran less than a third full.",
      "scene": "control_room",
      "t": 21600
     },
@@ -27,7 +27,7 @@
       "passenger_minutes_over_seats": 0
      },
      "before": {
-      "passenger_minutes_over_seats": 194
+      "passenger_minutes_over_seats": 2996
      },
      "decision_id": "d001",
      "kind": "simulated",
@@ -40,9 +40,9 @@
   },
   {
    "anchor": {
-    "route_id": "901",
-    "stop_id": "101042",
-    "time": 62862
+    "route_id": "F47",
+    "stop_id": "609501",
+    "time": 30277
    },
    "id": "site_worker",
    "label": "Fictional. Built from the day's totals, not from any one person.",
@@ -50,38 +50,38 @@
     {
      "after": null,
      "before": {
-      "load": 27,
+      "load": 41,
       "seats": 20
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, the 17:19 bus left this stop with 27 people on board and 20 seats.",
+     "say": "On the day, the 08:12 bus left this stop with 41 people on board and 20 seats.",
      "scene": "stop",
-     "t": 62862
+     "t": 30277
     },
     {
      "after": {
-      "load": 27,
+      "load": 41,
       "seats": 64
      },
      "before": {
-      "load": 27,
+      "load": 41,
       "seats": 20
      },
      "decision_id": "d001",
      "kind": "simulated",
-     "say": "With the 64-seat bus on this trip, the same 27 passengers all have a seat.",
+     "say": "With the 64-seat bus on this trip, the same 41 passengers all have a seat.",
      "scene": "bus",
-     "t": 62862
+     "t": 30277
     }
    ],
    "title": "The site worker"
   },
   {
    "anchor": {
-    "route_id": "901",
-    "stop_id": "101052",
-    "time": 62240
+    "route_id": "C01",
+    "stop_id": "376501",
+    "time": 26790
    },
    "id": "office_worker",
    "label": "Fictional. Built from the day's totals, not from any one person.",
@@ -89,37 +89,37 @@
     {
      "after": null,
      "before": {
-      "load": 25,
-      "seats": 20
+      "load": 33,
+      "seats": 32
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, her usual bus left this stop with 25 people on board and 20 seats.",
+     "say": "On the day, her usual bus left this stop with 33 people on board and 32 seats.",
      "scene": "stop",
-     "t": 62240
+     "t": 26790
     },
     {
      "after": {
-      "load": 19,
-      "points": 20,
-      "seats": 48
+      "load": 4,
+      "points": 10,
+      "seats": 64
      },
      "before": {
-      "load": 25,
-      "seats": 20
+      "load": 33,
+      "seats": 32
      },
      "decision_id": "d003",
      "kind": "simulated",
      "say": "Her phone shows a bus with room close by, and taking it earns Khutwa points.",
      "scene": "phone",
-     "t": 61340
+     "t": 25890
     }
    ],
    "title": "The office worker"
   },
   {
    "anchor": {
-    "route_id": "K900",
+    "route_id": "F47",
     "stop_id": null,
     "time": 72900
    },
@@ -129,12 +129,12 @@
     {
      "after": null,
      "before": {
-      "doors_not_opened": 2057,
-      "stop_visits": 8265
+      "doors_not_opened": 9124,
+      "stop_visits": 26915
      },
      "decision_id": null,
      "kind": "measured",
-     "say": "On the day, buses called at stops 2,057 times without the door opening.",
+     "say": "On the day, buses called at stops 9,124 times without the door opening.",
      "scene": "bus",
      "t": 72900
     },
@@ -143,7 +143,7 @@
       "calls_at_a_stop_with_nobody_there": 0
      },
      "before": {
-      "calls_at_a_stop_with_nobody_there": 89
+      "calls_at_a_stop_with_nobody_there": 522
      },
      "decision_id": "d002",
      "kind": "simulated",

@@ -1,0 +1,479 @@
+table_name,field_name,language,translation,record_id
+stops,stop_name,ar,محطة حافلات سوق الذهب 3,100003
+stops,stop_name,ar,تقاطع نايف 1,112001
+stops,stop_name,ar,النخل 1-2,137002
+stops,stop_name,ar,محطة حافلات مترو الإتحاد 1-2,376502
+stops,stop_name,ar,شارع المكتوم 1,143001
+stops,stop_name,ar,شارع ام هرير - 1-1,429001
+stops,stop_name,ar,محطة حافلات الجافلية 4,256104
+stops,stop_name,ar,شارع الشيخ زايد 1-1 بدون توقف,999101
+stops,stop_name,ar,شركة دبي للغاز الطبيعي المحدودة,649101
+stops,stop_name,ar,البوابة الرئيسية جبل علي المنطقة الحرة 1,755001
+stops,stop_name,ar,1 هيئة موانئ دبي مكتب المنطقة الحرة,756001
+stops,stop_name,ar,جبل علي المنطقة الحرة دوار 5-1,758001
+stops,stop_name,ar,سوني جبل علي المنطقة الحرة 1,757001
+stops,stop_name,ar,جبل علي المنطقة الحرة دوار 6-1,760001
+stops,stop_name,ar,مكاتب الايجار جبل علي المنطقة الحرة 5-1,746001
+stops,stop_name,ar,نافكو جبل علي المنطقة الحرة 1,762001
+stops,stop_name,ar,مصنع العبوات الزجاجية 1,761001
+stops,stop_name,ar,مجموعة زاهر 1,765001
+stops,stop_name,ar,كليفلاند لهندسة الجسور 1-1,763001
+stops,stop_name,ar,كليفلاند لهندسة الجسور 2-1,764001
+stops,stop_name,ar,جبل علي المنطقة الحرة دوار 8-1,766001
+stops,stop_name,ar,مجموعة كانو – جبل علي المنطقة الحرة 1,731001
+stops,stop_name,ar,جبل علي المنطقة الحرة دوار 12أ,733001
+stops,stop_name,ar,جبل علي المنطقة الحرة دوار 12ب,733002
+stops,stop_name,ar,مجموعة كانو – جبل علي المنطقة الحرة 2,731002
+stops,stop_name,ar,سكن موظفي المنطقة الحرة 1,767001
+stops,stop_name,ar,جلف دينم المحدودة 1,768001
+stops,stop_name,ar,محطة حافلات جبل علي 3,773003
+stops,stop_name,ar,جلف دينم المحدودة 2,768002
+stops,stop_name,ar,سكن موظفي المنطقة الحرة 2,767002
+stops,stop_name,ar,جبل علي المنطقة الحرة دوار 8-2,766002
+stops,stop_name,ar,كليفلاند لهندسة الجسور 2-2,764002
+stops,stop_name,ar,كليفلاند لهندسة الجسور 2-1,763002
+stops,stop_name,ar,مجموعة زاهر 2,765002
+stops,stop_name,ar,مصنع العبوات الزجاجية 2,761002
+stops,stop_name,ar,نافكو جبل علي المنطقة الحرة 2,762002
+stops,stop_name,ar,مكاتب الايجار جبل علي المنطقة الحرة 5-2,746002
+stops,stop_name,ar,جبل علي المنطقة الحرة دوار 6-2,760002
+stops,stop_name,ar,إيوا الخليج - المنطقة الحرة 2,759002
+stops,stop_name,ar,سوني جبل علي المنطقة الحرة 2,757002
+stops,stop_name,ar,هيئة موانئ دبي مكتب المنطقة الحرة 2,756002
+stops,stop_name,ar,البوابة الرئيسية جبل علي المنطقة الحرة 2,755002
+stops,stop_name,ar,شارع الشيخ زايد 1-2 بدون توقف,999102
+stops,stop_name,ar,محطة حافلات مترو ماكس جهة الجنوب,131101
+stops,stop_name,ar,شارع ام هرير - 1-2,429002
+stops,stop_name,ar,شارع المكتوم 2,143002
+stops,stop_name,ar,محطة حافلات مترو الإتحاد 1-1,376501
+stops,stop_name,ar,النخل,136001
+stops,stop_name,ar,تقاطع نايف 2,112002
+stops,stop_name,ar,محطة حافلات مترو شرف دي جي 1-2,202102
+stops,stop_name,ar,شارع النهضة,407001
+stops,stop_name,ar,الرفاعة 2,234102
+stops,stop_name,ar,الرفاعة 1,392001
+stops,stop_name,ar,الرولة,406001
+stops,stop_name,ar,محطة حافلات مترو شرف دي جي 1-1,202101
+stops,stop_name,ar,محطة حافلات الراشدية ، القادمون,961508
+stops,stop_name,ar,مواقف محطة حافلات الراشدية 1,921101
+stops,stop_name,ar,سوق مكتوم التراثي 2,116002
+stops,stop_name,ar,شارع الخليج,108001
+stops,stop_name,ar,فندق حياة ريجنسي,110001
+stops,stop_name,ar,المرر الجديد 1,109001
+stops,stop_name,ar,مسجد حصة بنت المر 2,488002
+stops,stop_name,ar,مركز تسوق مركاتو 2,487002
+stops,stop_name,ar,شارع جميرا بنك دبي الإسلامي 2,486002
+stops,stop_name,ar,مركز الشاطئ 2,485002
+stops,stop_name,ar,سنشري بلازا 2,484001
+stops,stop_name,ar,مركز بالم ستريب,482002
+stops,stop_name,ar,متحف الاتحاد 2,452002
+stops,stop_name,ar,مركز الهناء 2,455002
+stops,stop_name,ar,منعطف الحضيبة 2,453002
+stops,stop_name,ar,محطة بترول ايبكو - الحوت,454001
+stops,stop_name,ar,محطة حافلات مترو سيتي سنتر 2-1,228102
+stops,stop_name,ar,دوار ابوهيل 1,201001
+stops,stop_name,ar,ميناء الحمرية 1,205001
+stops,stop_name,ar,ميناء الحمرية 2,205002
+stops,stop_name,ar,دوار ابوهيل 2,201002
+stops,stop_name,ar,محطة حافلات مترو سيتي سنتر 1-1,199001
+stops,stop_name,ar,منعطف الحضيبة 1,453001
+stops,stop_name,ar,مركز الهناء 1,455001
+stops,stop_name,ar,متحف الاتحاد 1,452001
+stops,stop_name,ar,مسجد جميرا الكبير,481001
+stops,stop_name,ar,مركز الجميرا,483001
+stops,stop_name,ar,سنشري بلازا 1,484002
+stops,stop_name,ar,مركز الشاطئ1,485001
+stops,stop_name,ar,شارع جميرا بنك دبي الإسلامي 1,486001
+stops,stop_name,ar,مركز تسوق مركاتو 1,487001
+stops,stop_name,ar,مسجد حصة بنت المر1,488001
+stops,stop_name,ar,محطة حافلات السبخة 2,106002
+stops,stop_name,ar,مدرسة الخنساء 1,111001
+stops,stop_name,ar,مستشفى الكويت 1,130001
+stops,stop_name,ar,مطعم بن عيد الشعبي - ابوهيل 1,128001
+stops,stop_name,ar,الحمرية 1,204001
+stops,stop_name,ar,مدرسة الوحيدة 1,206001
+stops,stop_name,ar,عيادة الحمرية 1,207001
+stops,stop_name,ar,"نادي شباب الأهلي, الممزر",208001
+stops,stop_name,ar,جمعية دبي للفنون الشعبية 1,209001
+stops,stop_name,ar,شارع الوحيدة 1,216001
+stops,stop_name,ar,"نادي شباب الأهلي 1, النهدة",288001
+stops,stop_name,ar,محطة حافلات مترو الاستاد 1,197101
+stops,stop_name,ar,وزارة الإعلام 1,290001
+stops,stop_name,ar,محطة حافلات مترو النهدة 1,198101
+stops,stop_name,ar,الطوار جمعية الإتحاد التعاونية,292001
+stops,stop_name,ar,محطة حافلات مترو المنطقة الحرة مطار دبي 1,199101
+stops,stop_name,ar,الطوار 1 محطة بترول الإمارات - المورد 1,285001
+stops,stop_name,ar,المنطقة الحرة,925001
+stops,stop_name,ar,الطوار 1 محطة بترول الإمارات - المورد 2,285002
+stops,stop_name,ar,مدرسة الخلفاء الراشدين للبنين 1,294001
+stops,stop_name,ar,فندق دبي جراند 1,304001
+stops,stop_name,ar,شارع دمشق - 1-2,305002
+stops,stop_name,ar,شارع دمشق - 2-2,322002
+stops,stop_name,ar,شارع دمشق - 3-2,323002
+stops,stop_name,ar,مقصب دبي 1,329001
+stops,stop_name,ar,محيصنة 4 الهيئة الاتحادية للكهرباء والماء 1,327001
+stops,stop_name,ar,المحيصنة 4 بناية جمال 1,286101
+stops,stop_name,ar,المحيصنة 4 بناية لوتاه 1,648501
+stops,stop_name,ar,مدرسة اوكسفورد 1,331001
+stops,stop_name,ar,بوابة مدرسة أكسفورد 4,150101
+stops,stop_name,ar,محيصنة 4 مساكن الأوقاف,149101
+stops,stop_name,ar,المدرسة الروسية الدولية 2,359502
+stops,stop_name,ar,قرية اللولو 2,163502
+stops,stop_name,ar,مدرسة الوحدة الدولية الخاصة 1,337001
+stops,stop_name,ar,المدرسة الخاصة اللبنانية 1 2,510502
+stops,stop_name,ar,محيصنة 4 شعبية الشرطة 1,339001
+stops,stop_name,ar,محيصنة 4 شعبية الشرطة 2,339002
+stops,stop_name,ar,مؤسسة تاكسي دبي محطة الأيواء 1,333001
+stops,stop_name,ar,المحيصنة 4  واحة وصل 2,211001
+stops,stop_name,ar,مؤسسة تاكسي دبي محطة الأيواء 2,333002
+stops,stop_name,ar,المدرسة الخاصة اللبنانية 1 1,510501
+stops,stop_name,ar,مدرسة الوحدة الدولية الخاصة 2,337002
+stops,stop_name,ar,قرية اللولو 1,163501
+stops,stop_name,ar,المدرسة الروسية الدولية 1,359501
+stops,stop_name,ar,مساكن طيران الامارات 2,332002
+stops,stop_name,ar,مدرسة فلادلفيا الخاصة,254501
+stops,stop_name,ar,سوق المواشي 2,330002
+stops,stop_name,ar,مقصب دبي 2,329002
+stops,stop_name,ar,شارع دمشق - 3-1,323001
+stops,stop_name,ar,شارع دمشق - 2-1,322001
+stops,stop_name,ar,شارع دمشق - 1-1,305001
+stops,stop_name,ar,فندق دبي جراند 2,304002
+stops,stop_name,ar,محطة حافلات مترو المنطقة الحرة مطار دبي 2,199102
+stops,stop_name,ar,محطة حافلات مترو النهدة 2,198102
+stops,stop_name,ar,وزارة الإعلام 2,290002
+stops,stop_name,ar,محطة حافلات مترو الاستاد 2,197102
+stops,stop_name,ar,"نادي شباب الأهلي 2, النهدة",288002
+stops,stop_name,ar,شارع الوحيدة 2,216002
+stops,stop_name,ar,جمعية دبي للفنون الشعبية 2,230102
+stops,stop_name,ar,عيادة الحمرية 2,207002
+stops,stop_name,ar,مدرسة الوحيدة 2,206002
+stops,stop_name,ar,الحمرية 2,204002
+stops,stop_name,ar,مطعم بن عيد الشعبي - ابوهيل 2,246102
+stops,stop_name,ar,مستشفى دبي 2,222102
+stops,stop_name,ar,مسجد الفطيم,119001
+stops,stop_name,ar,مبنى المطار - 3,544501
+stops,stop_name,ar,مبنى المطار 1 القادمون,241102
+stops,stop_name,ar,قرية الشحن,233001
+stops,stop_name,ar,تقاطع الشعلة 2,189002
+stops,stop_name,ar,تقاطع الشعلة 1,189001
+stops,stop_name,ar,تقاطع القرهود 1,232001
+stops,stop_name,ar,"الراشدية, شارع 38",966501
+stops,stop_name,ar,الموقف الخارجي، مبنى المطار 1,556501
+stops,stop_name,ar,شارع إي311-1 - بدون توقف,411101
+stops,stop_name,ar,شارع إي311-2 - بدون توقف,411102
+stops,stop_name,ar,دناتا 2,186002
+stops,stop_name,ar,دوار برج الساعة 2,188002
+stops,stop_name,ar,مبنى اتصالات الرئيسي 2,144002
+stops,stop_name,ar,تقاطع برج نهار 2,114002
+stops,stop_name,ar,تقاطع برج نهار 1,114001
+stops,stop_name,ar,مبنى اتصالات الرئيسي 1,144001
+stops,stop_name,ar,دوار برج الساعة 1,188001
+stops,stop_name,ar,دناتا 1,186001
+stops,stop_name,ar,محطة حافلات البراحة 1,200301
+stops,stop_name,ar,محطة حافلات سوق الذهب الخارجية,195101
+stops,stop_name,ar,محطة حافلات الغبيبة 7,385007
+stops,stop_name,ar,دائرة الموانئ والجمارك 1,391001
+stops,stop_name,ar,شارع الميناء 1,447001
+stops,stop_name,ar,فندق كابيتول 1,752501
+stops,stop_name,ar,الحضيبة 1,448001
+stops,stop_name,ar,مسجد سهيل بن جمعة,489001
+stops,stop_name,ar,مسجد راشد الحديث 1,490001
+stops,stop_name,ar,مسجد راشد بن بخيت 1,535001
+stops,stop_name,ar,مجلس الغريفة 1,564001
+stops,stop_name,ar,مسجد سعيد ماجد باليوحة 1,566001
+stops,stop_name,ar,مسجد جميرا 3- 1,567001
+stops,stop_name,ar,نادي دبي للقوارب الشراعية 1,590001
+stops,stop_name,ar,محطة بترول ايبكو - المنارة1,591001
+stops,stop_name,ar,مسجد ابو منارة,592001
+stops,stop_name,ar,ام سقيم - 1-1,608001
+stops,stop_name,ar,مركز بلدية ام سقيم 1,593001
+stops,stop_name,ar,مسجد سعيد بن حزيم 1,607001
+stops,stop_name,ar,مكتبة ام سقيم 1,609001
+stops,stop_name,ar,حديقة ام سقيم 1,610001
+stops,stop_name,ar,مسجد المحاربة 1,647001
+stops,stop_name,ar,وايلد وادي 1,252501
+stops,stop_name,ar,فندق برج العرب 1,648001
+stops,stop_name,ar,مدينة جميرا - 1,678001
+stops,stop_name,ar,شارع الملك سلمان بن عبدالعزيز آل سعود 1-1,679001
+stops,stop_name,ar,شارع الملك سلمان بن عبدالعزيز آل سعود - 2-1,680001
+stops,stop_name,ar,شارع الملك سلمان بن عبدالعزيز آل سعود - 3-1,681001
+stops,stop_name,ar,كلية دبي 1,682001
+stops,stop_name,ar,فندق رويال ميراج 1-2,688002
+stops,stop_name,ar,محطة ترام مدينة الاعلام 1,258501
+stops,stop_name,ar,فندق لي مريديان الميناء السياحي 1,641001
+stops,stop_name,ar,فندق رويال ميريديان جميرا 1,642001
+stops,stop_name,ar,محطة جميرا للشقق المفروشة 1 جهة البحر,722001
+stops,stop_name,ar,محطة جميرا للشقق المفروشة 2 جهة البحر,723001
+stops,stop_name,ar,محطة حافلات ابن بطوطه 1,903501
+stops,stop_name,ar,"مركز إبن بطوطة, ركن المطاعم 3",734001
+stops,stop_name,ar,منعطف الحدائق جبل علي 2,705002
+stops,stop_name,ar,محطة جميرا للشقق المفروشة 2 جهة المساكن,723002
+stops,stop_name,ar,محطة جميرا للشقق المفروشة 1 جهة المساكن,722002
+stops,stop_name,ar,فندق رويال ميريديان جميرا 2,642002
+stops,stop_name,ar,فندق لي مريديان الميناء السياحي 2,641002
+stops,stop_name,ar,محطة ترام مدينة الاعلام 2,258502
+stops,stop_name,ar,فندق رويال ميراج -2-2,689002
+stops,stop_name,ar,قرية المعرفة,690001
+stops,stop_name,ar,مجمع فيلات تيكوم,691001
+stops,stop_name,ar,كلية دبي 2,682002
+stops,stop_name,ar,شارع الملك سلمان بن عبدالعزيز آل سعود 3-2,681002
+stops,stop_name,ar,شارع الملك سلمان بن عبدالعزيز آل سعود 2-2,680002
+stops,stop_name,ar,شارع الملك سلمان بن عبدالعزيز آل سعود 1-2,679002
+stops,stop_name,ar,مدينة جميرا - 2,678002
+stops,stop_name,ar,فندق برج العرب 2,648002
+stops,stop_name,ar,وايلد وادي 2,252502
+stops,stop_name,ar,مسجد المحاربة 2,647002
+stops,stop_name,ar,حديقة ام سقيم 2,610002
+stops,stop_name,ar,مكتبة ام سقيم 2,609002
+stops,stop_name,ar,مسجد سعيد بن حزيم 2,607002
+stops,stop_name,ar,مركز بلدية ام سقيم 2,593002
+stops,stop_name,ar,ام سقيم - 1-2,608002
+stops,stop_name,ar,مسجد عبد الله مليحه,594001
+stops,stop_name,ar,محطة بترول ايبكو - المنارة2,591002
+stops,stop_name,ar,نادي دبي للقوارب الشراعية 2,590002
+stops,stop_name,ar,مسجد جميرا 3 - 2,567002
+stops,stop_name,ar,مسجد سعيد ماجد باليوحة 2,566002
+stops,stop_name,ar,مجلس الغريفة 2,564002
+stops,stop_name,ar,نادي شاطئ هليتون 2,533002
+stops,stop_name,ar,مسجد راشد بن بخيت 2,535002
+stops,stop_name,ar,مسجد راشد الحديث 2,490002
+stops,stop_name,ar,الحضيبة 2,448002
+stops,stop_name,ar,فندق كابيتول 2,752502
+stops,stop_name,ar,شارع الميناء 2,447002
+stops,stop_name,ar,دائرة الموانئ والجمارك 2,391002
+stops,stop_name,ar,محطة حافلات مترو الغبيبة,201101
+stops,stop_name,ar,مسجد السطوة 2,238102
+stops,stop_name,ar,مكتب بريد السطوة,460001
+stops,stop_name,ar,مسجد السطوة 1,459001
+stops,stop_name,ar,عيادة السطوة,501001
+stops,stop_name,ar,فندق المركز التجاري العالمي 2,467002
+stops,stop_name,ar,فندق المركز التجاري العالمي 1,467001
+stops,stop_name,ar,شارع ام هرير - 2,430001
+stops,stop_name,ar,"مدينة دبي للتعهيد, بنك أسكتلندا الملكي 2",300002
+stops,stop_name,ar,"مدينة دبي للتعهيد , شركة العرب 2",299502
+stops,stop_name,ar,"مدينة دبي للتعهيد , شركة العرب 1",299501
+stops,stop_name,ar,مدينة دبي للتعهيد مجمع الشبا,321101
+stops,stop_name,ar,مدينة دبي الأكاديمية 2-1,333501
+stops,stop_name,ar,واحة السيليكون نورث بارك 1,253101
+stops,stop_name,ar,واحة السيليكون برج اس أي تي 1,254101
+stops,stop_name,ar,واحة السيليكون برج القصر 1,341501
+stops,stop_name,ar,واحة السيليكون اس بي واحة 1,342501
+stops,stop_name,ar,واحة السيليكون - مبنى القوس 1,659501
+stops,stop_name,ar,واحة السيليكون مسجد الواحة 1,735501
+stops,stop_name,ar,واحة السيليكون أفنيو مول 1,687001
+stops,stop_name,ar,واحة السيلكون بنك رأس الخيمة المركز الرئيسي,290501
+stops,stop_name,ar,واحة السيليكون لاجون,389001
+stops,stop_name,ar,واحة السيليكون هاي - بي,393001
+stops,stop_name,ar,المبنى الرئيسي واحة السيليكون 1,511501
+stops,stop_name,ar,المبنى الرئيسي واحة السيليكون 2,266501
+stops,stop_name,ar,واحة السيليكون أفنيو مول 2,687002
+stops,stop_name,ar,واحة السيليكون مسجد الواحة 2,735502
+stops,stop_name,ar,واحة السيليكون - مبنى القوس 2,659502
+stops,stop_name,ar,واحة السيليكون اس بي واحة 2,342502
+stops,stop_name,ar,واحة السيليكون برج القصر 2,341502
+stops,stop_name,ar,مدينة دبي الأكاديمية 2-2,333502
+stops,stop_name,ar,مدينة دبي للتعهيد ، دياك هومز 1,584001
+stops,stop_name,ar,مدينة دبي للتعهيد ـ 4-1,330501
+stops,stop_name,ar,جامعة مانيبال 1,255101
+stops,stop_name,ar,بتس بلاني 2,331502
+stops,stop_name,ar,حرم جامعة هيريوت وات دبي 2,266102
+stops,stop_name,ar,مدينة دبي الأكاديمية 1-2,332502
+stops,stop_name,ar,جامعة الإمارات للطيران 1,335501
+stops,stop_name,ar,جامعة الغرير 2-1,336501
+stops,stop_name,ar,جامعة الغرير 3-1,337501
+stops,stop_name,ar,كلية دبي للرجال 1-1,338501
+stops,stop_name,ar,كلية دبي للرجال 2-1,339501
+stops,stop_name,ar,بحيرة واحة السيليكون 1,340501
+stops,stop_name,ar,واحة السيليكون حديقة السيليكون 1,267501
+stops,stop_name,ar,محطة حافلات الراشدية ، بوابة 5,961505
+stops,stop_name,ar,واحة السيليكون حديقة السيليكون 2,267502
+stops,stop_name,ar,بحيرة واحة السيليكون 2,340502
+stops,stop_name,ar,كلية دبي للرجال 2-2,339502
+stops,stop_name,ar,كلية دبي للرجال 1-2,338502
+stops,stop_name,ar,جامعة الغرير 3-2,337502
+stops,stop_name,ar,جامعة الغرير 2-2,336502
+stops,stop_name,ar,جامعة الإمارات للطيران 2,335502
+stops,stop_name,ar,شارع جامعة الغرير,285501
+stops,stop_name,ar,مدينة دبي الأكاديمية 1-1,332501
+stops,stop_name,ar,حرم جامعة هيريوت وات دبي 1,266101
+stops,stop_name,ar,بتس بلاني 1,331501
+stops,stop_name,ar,جامعة مانيبال 2,255102
+stops,stop_name,ar,هايبرماركت جراند بي 1,779001
+stops,stop_name,ar,هايبرماركت باركو,784001
+stops,stop_name,ar,مركز قصر القبائل 1,785001
+stops,stop_name,ar,جبل علي الصناعية 11,788001
+stops,stop_name,ar,مجمع دبي للاستثمار 1,983001
+stops,stop_name,ar,مصنع طابوق إنسيوليت 2,554502
+stops,stop_name,ar,سكن عمال دبي للمقاولات 2,555502
+stops,stop_name,ar,مصانع البحار السبع للصلب 2,500502
+stops,stop_name,ar,2 سكن عمال ديبا للمقاولات,552502
+stops,stop_name,ar,سكن عمال شوبا للمقاولات 2,551502
+stops,stop_name,ar,جبل علي الصناعية يني مكس 1,524101
+stops,stop_name,ar,جبل علي الصناعية أيسوفوم 1,523101
+stops,stop_name,ar,مساكن عمال نزل 2,783002
+stops,stop_name,ar,سوبرماركت خليج المدينة 2,782002
+stops,stop_name,ar,منطقة جبل علي الصناعية - بي إتش سي,600501
+stops,stop_name,ar,مجموعة لاندمارك 1,781001
+stops,stop_name,ar,سوبرماركت خليج المدينة 1,782001
+stops,stop_name,ar,مساكن عمال نزل 1,783001
+stops,stop_name,ar,محطة حافلات مترو شرف دي جي 2-1,203101
+stops,stop_name,ar,مدينة دبي للأنترنت ـ شلم برغ 1,240501
+stops,stop_name,ar,مدينة دبي للأنترنت ــ مبنى المعلومات التقنية 1,233501
+stops,stop_name,ar,مدينة دبي الاعلامية 2,693002
+stops,stop_name,ar,مدينة دبي للأنترنت ــ مبنى المعلومات التقنية 2,233502
+stops,stop_name,ar,مدينة دبي للأنترنت ـ شلم برغ 2,240502
+stops,stop_name,ar,الكرستال الكلاسيكي 1,657001
+stops,stop_name,ar,اطلس للخدمات البحرية2,666002
+stops,stop_name,ar,سكن عمال شركة الاسمنت الوطنية2,665002
+stops,stop_name,ar,سكن موظفي شركة سفن آب 2,664002
+stops,stop_name,ar,"البرشاء هايتس, بناية مشعل 2",969502
+stops,stop_name,ar,"البرشاء هايتس, فندق ريم 2",971502
+stops,stop_name,ar,"البرشاء هايتس, بناية صالح بن لاحج 2",972502
+stops,stop_name,ar,"البرشاء هايتس, مازون للشقق الفندقية 1",135101
+stops,stop_name,ar,"البرشاء هايتس, بناية مشعل 1",969501
+stops,stop_name,ar,"البرشاء هايتس, بناية صالح بن لاحج 1",972501
+stops,stop_name,ar,"البرشاء هايتس, فندق ريم 1",971501
+stops,stop_name,ar,البرشاء أ 2,191502
+stops,stop_name,ar,البرشاء - سوبرماركت اللولو 2,190502
+stops,stop_name,ar,أكاديمية دبي الأمريكية 2,684002
+stops,stop_name,ar,أكاديمية دبي الأمريكية 1,684001
+stops,stop_name,ar,البرشاء أ 1,191501
+stops,stop_name,ar,مول الأمارات 1-2,188502
+stops,stop_name,ar,مول الأمارات 2-2,189502
+stops,stop_name,ar,"مول الإمارات, بناية صالح بن لاحج 2",934502
+stops,stop_name,ar,البرشاء - مركز راشد لذوي الإحتياجات الخاصة 2,192502
+stops,stop_name,ar,البرشاء - مدرسة دبي الوطنية 1,217501
+stops,stop_name,ar,البرشاء د1,222501
+stops,stop_name,ar,البرشاء إي1,223501
+stops,stop_name,ar,البرشاء إي 2,223502
+stops,stop_name,ar,البرشاء د2,222502
+stops,stop_name,ar,البرشاء - مدرسة دبي الوطنية 2,217502
+stops,stop_name,ar,الكرستال الكلاسيكي 2,657002
+stops,stop_name,ar,محطة حافلات مترو دانوب جهة الجنوب,603501
+stops,stop_name,ar,شركة بستان للمعكرونة والنودلز 1,472101
+stops,stop_name,ar,الشركة الملكية لهندسة التصنيع 1,474101
+stops,stop_name,ar,شركة الصناعات المعدنية إي إم أي 1,471101
+stops,stop_name,ar,"منطقة جبل علي الصناعية, كواليتي مكس",539101
+stops,stop_name,ar,مساكن الاتحاد 1,530101
+stops,stop_name,ar,محطة حافلات مترو مجمع دبي للأستثمار 2,546502
+stops,stop_name,ar,المجمعات الخضراء - بوابة الدخول الغربية 1,502501
+stops,stop_name,ar,المجمعات الخضراء - بوابة الدخول الشرقية 1,503501
+stops,stop_name,ar,المجمعات الخضراء بوابة الدخول الرئيسية 1,504501
+stops,stop_name,ar,المجمعات الخضراء - سوبرماركت شويترام 1,505501
+stops,stop_name,ar,المجمعات الخضراء - مبنى أ - أ - 1,528101
+stops,stop_name,ar,بحيرة دبي- مدرسة نبراس العالمية 1,506501
+stops,stop_name,ar,بحيرة دبي- مجمع إيوان السكني 1,507501
+stops,stop_name,ar,بحيرات دبي 1,278101
+stops,stop_name,ar,باسي لتجارة المواد الغذائية 1,172101
+stops,stop_name,ar,سكن عمال - الإمارات للمقاولات,319101
+stops,stop_name,ar,سكن - بترون الامارات,318101
+stops,stop_name,ar,قرية دونز 1,173101
+stops,stop_name,ar,فستنر الدولية العالمية 1,174101
+stops,stop_name,ar,لؤلؤة دبي لصناعات الجبس 1,175101
+stops,stop_name,ar,مجمع دبي للاستثمار مبنى أي إم بي 1,516101
+stops,stop_name,ar,محطة مجمع دبي للأستثمار سوبر ماركت المدينة,276101
+stops,stop_name,ar,مجمع دبي للأستثمار 2 مسجد السلام,608101
+stops,stop_name,ar,مجمع دبي للأستثمار 2 الدفاع المدني,609501
+stops,stop_name,ar,كان باك للشرق الأوسط 1,169101
+stops,stop_name,ar,مجمع دبي للأستثمار 1 تامكوم,611001
+stops,stop_name,ar,مجمع دبي للاستثمار 1 مجمع سوشن للأعمال 1,612501
+stops,stop_name,ar,مدرسة الشويفات الدولية 1,616001
+stops,stop_name,ar,مجمع دبي للأستثمار 1 مصنع إيميكول 1,617501
+stops,stop_name,ar,مجمع دبي للأستثمار منطقة جرين الغربية,618501
+stops,stop_name,ar,المجمعات الخضراء - بوابة الدخول الغربية 2,502502
+stops,stop_name,ar,محطة حافلات مترو مجمع دبي للأستثمار 1,546501
+stops,stop_name,ar,مساكن الاتحاد 2,530102
+stops,stop_name,ar,ريج للصناعات المعدنية 2,526102
+stops,stop_name,ar,صن رايز لطلاء المعادن 2,527102
+stops,stop_name,ar,منطقة جبل علي الصناعية ، كلينول الشرق الأوسط 1,193101
+stops,stop_name,ar,جبل علي الصناعية برج الأتصالات 1,279101
+stops,stop_name,ar,جبل علي الصناعية بوليسترين الوطنية 1,192101
+stops,stop_name,ar,الخدمات المتخصصة 1,191101
+stops,stop_name,ar,منطقة جبل علي الصناعية ، ستار سوبر للأسمنت 1,190101
+stops,stop_name,ar,منطقة جبل علي الصناعية سينتكنيك 1,220501
+stops,stop_name,ar,شركة الصناعات المعدنية إي إم أي 2,471102
+stops,stop_name,ar,الشركة الملكية لهندسة التصنيع 2,474102
+stops,stop_name,ar,شركة بستان للمعكرونة والنودلز 2,472102
+stops,stop_name,ar,قناة أم بي سي,873001
+stops,stop_name,ar,جامعة ولونغونغ مدينة دبي للانترنت 2,251502
+stops,stop_name,ar,محطة حافلات مول الإمارات 5,567505
+stops,stop_name,ar,البرشا مجمع الوسير للفلل,352101
+stops,stop_name,ar,حديقة دبي للعلوم مدرسة فورمارك 1,667101
+stops,stop_name,ar,دبي مدرسة ديوايت 2,413102
+stops,stop_name,ar,جي في سي حديقة سامر,321001
+stops,stop_name,ar,جي في سي  مجمع ساندوفال لين 1,626101
+stops,stop_name,ar,جي في سي مجمع شوبا النرجس 1,627101
+stops,stop_name,ar,جي في سي برج الوزان 1,613101
+stops,stop_name,ar,جي في سي مجمع ويستار فيستا 1,628101
+stops,stop_name,ar,جي في سي برج برايم للأعمال 1,624101
+stops,stop_name,ar,جي في سي  مجمع الإمارات حديقة 2 الورود  1,616101
+stops,stop_name,ar,جي في سي فلل نخيل 12 ت 1,623101
+stops,stop_name,ar,جي في سي قماش أ 1,625101
+stops,stop_name,ar,جي في سي قصر جودي للشقق الفندقية 1,617101
+stops,stop_name,ar,قرية الجميرا رؤية الماس 3,104501
+stops,stop_name,ar,قرية الجميرا فلل ميرابيلا 6,106501
+stops,stop_name,ar,قرية الجميرا فلل ميرابيلا 2,107501
+stops,stop_name,ar,جي في سي مجمع غراند شاتو بناية أ 1,619101
+stops,stop_name,ar,قرية الجميرا مجمع سكن ويستار لي,109501
+stops,stop_name,ar,قرية الجميرا الدائرية ميدان هانوفر,111501
+stops,stop_name,ar,قرية الجميرا الدائرية برج مانهاتن,113501
+stops,stop_name,ar,قرية الجميرا اتلانتيس اس 4,615102
+stops,stop_name,ar,قرية الجميرا اتلانتيس اس 1,615101
+stops,stop_name,ar,قرية الجميرا مجمع توسكان,116501
+stops,stop_name,ar,مجمع سكن نور,117101
+stops,stop_name,ar,قرية الجميرا مجمع موسم الخريف,117501
+stops,stop_name,ar,قرية الجميرا مجمع موسم الصيف,118101
+stops,stop_name,ar,دبي مدرسة ديوايت 1,413101
+stops,stop_name,ar,حديقة دبي للعلوم مدرسة فورمارك 2,667102
+stops,stop_name,ar,الكترو للصناعات 2,668002
+stops,stop_name,ar,مستودعات شركة جمبو للالكترونيات 2,667002
+stops,stop_name,ar,سكن عمال القميش للمقاولات 1,626001
+stops,stop_name,ar,سكن عمال شركة الاحمدية للمقاولات 2,625002
+stops,stop_name,ar,محطة القوز الصناعية - 3,646001
+stops,stop_name,ar,سكن موظفي شركة سفن آب 1,664001
+stops,stop_name,ar,سكن عمال شركة الاسمنت الوطنية1,665001
+stops,stop_name,ar,اطلس للخدمات البحرية1,666001
+stops,stop_name,ar,مستودعات شركة جمبو للالكترونيات 1,667001
+stops,stop_name,ar,الكترو للصناعات 1,668001
+stops,stop_name,ar,البرشاء شارع 23 ديونز للشقق الفندقية 1,836501
+stops,stop_name,ar,البرشا شارع 23 مركز نور للتدريب 1,765501
+stops,stop_name,ar,فندق نوفيتل,895001
+stops,stop_name,ar,مركز دبي المالي العالمي، بوابة القرية,742501
+stops,stop_name,ar,برج داماك بارك 1,897001
+stops,stop_name,ar,زعبيل,898001
+stops,stop_name,ar,دبي مول,344101
+stops,stop_name,ar,ابراج الامارات - 1,905001
+stops,stop_name,ar,ابراج الامارات - 2,906001
+stops,stop_name,ar,دائرة الصحة 2,417002
+stops,stop_name,ar,محطة حافلات الجافلية 3,256103
+stops,stop_name,ar,شارع المصلى - مسجد عيال ناصر,314501
+stops,stop_name,ar,محطة حافلات سوق الذهب 12,100012
+stops,stop_name,ar,برج خليفة فندق ذا بالاس,320501
+stops,stop_name,ar,"اتصالات, الوصل",900001
+stops,stop_name,ar,محطة حافلات مترو أبراج الإمارات جهة الجنوب,895501
+stops,stop_name,ar,القوز مدخل بوابة الخيل 1,540101
+stops,stop_name,ar,"البرشاء هايتس, مازون للشقق الفندقية 2",135102
+stops,stop_name,ar,"البرشاء, مدرسة المواكب 2",284502
+stops,stop_name,ar,البرشا شارع 23 مركز نور للتدريب 2,765502
+stops,stop_name,ar,البرشاء شارع 23 ديونز للشقق الفندقية 2,836502
+stops,stop_name,ar,مول الأمارات 2-1,189501
+stops,stop_name,ar,"القوز, شركة آ س تي 2",101502
+stops,stop_name,ar,قرية الواحة 2,624002
+stops,stop_name,ar,القوز بوابة الخيل 1,165101
+stops,stop_name,ar,القوز بوابة الخيل 2,166101
+stops,stop_name,ar,"القوز , بوابة الخيل 3",466101
+stops,stop_name,ar,القوز سكن طيران الامارات بوابة الخيل 2,978001
+stops,stop_name,ar,القوز سكن موظفي قرقاش للمقاولات 2,525101
+stops,stop_name,ar,سكن فندق لي مريديان 1,719001
+stops,stop_name,ar,مصنع دوكاست 1,720001
+stops,stop_name,ar,مصنع البحر للبلاستيك 2,635301
+stops,stop_name,ar,دانوي الامارات 1,634001
+stops,stop_name,ar,"البرشاء, مدرسة المواكب 1",284501
+stops,stop_name,ar,1 جامعة ولونغونغ مدينة دبي للأنترنت,251501
+stops,stop_name,ar,بنك ستاندرد تشارترد - المنخول 1,408001
+stops,stop_name,ar,تقاطع شارع الشيخ راشد 1,409001
+stops,stop_name,ar,تقاطع شارع الشيخ راشد 2,409002
+stops,stop_name,ar,دائرة عقارات حكومة دبي,410001
+stops,stop_name,ar,بنك ستاندرد تشارترد - المنخول 2,408002
+stops,stop_name,ar,مركز الريس,411001
+stops,stop_name,ar,محطة حافلات السطوة 9,503009

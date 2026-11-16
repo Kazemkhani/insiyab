@@ -3,11 +3,11 @@
  "commit": null,
  "contract_version": 1,
  "counts": {
-  "boardings": 6409,
-  "routes": 8,
-  "stop_visits": 8265,
-  "stops": 240,
-  "trips": 551
+  "boardings": 11637,
+  "routes": 9,
+  "stop_visits": 26915,
+  "stops": 478,
+  "trips": 796
  },
  "engine": {
   "boosted_trees": "lightgbm 4.7.0",
@@ -64,32 +64,34 @@
  "stages": [
   {
    "actual_times_filled_from_schedule": 0,
-   "door_not_opened": 2057,
+   "door_not_opened": 9124,
+   "latest_scheduled_hour": 29,
    "route_numbers_rewritten": 0,
-   "rows_in": 8265,
-   "rows_out": 8265,
+   "rows_in": 26915,
+   "rows_out": 26915,
+   "rows_placed_after_midnight": 915,
    "rows_whose_clock_ran_backwards": 0,
    "rows_without_a_scheduled_time": 0,
    "stage": "runtime report",
    "text": "one row is one bus at one stop; rows with no scheduled time or no stop sequence are left out; a missing actual time takes the scheduled one; a time that ran backwards is moved up to the time before it",
-   "trips": 551
+   "trips": 796
   },
   {
-   "seats_given_to_those": 38,
+   "seats_given_to_those": 32,
    "stage": "fleet",
    "text": "a vehicle that is not in the fleet table is given the fleet's middle number of seats and the type UNKNOWN; seats only, standing capacity is not verified",
-   "vehicles_in_the_fleet_table": 50,
-   "vehicles_in_the_runtime_report": 46,
+   "vehicles_in_the_fleet_table": 93,
+   "vehicles_in_the_runtime_report": 89,
    "vehicles_run_but_not_in_the_fleet_table": 2
   },
   {
-   "cards_counted": 4901,
-   "check_ins": 6409,
-   "check_outs": 5450,
-   "repeated_rows": 64,
-   "rows_in": 11923,
+   "cards_counted": 8918,
+   "check_ins": 11637,
+   "check_outs": 9934,
+   "repeated_rows": 104,
+   "rows_in": 21675,
    "rows_neither_or_both_or_no_time": 0,
-   "rows_out": 11859,
+   "rows_out": 21571,
    "stage": "taps",
    "taps_before_day_start_dated_the_service_day": 0,
    "text": "one row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out"
@@ -97,47 +99,47 @@
   {
    "share_not_placed": 0,
    "stage": "taps to trips",
-   "taps_in": 11859,
+   "taps_in": 21571,
    "taps_not_placed": 0,
-   "taps_whose_own_stop_differs_from_the_stop_placed": 235,
+   "taps_whose_own_stop_differs_from_the_stop_placed": 384,
    "text": "a tap is given to the stop visit of its vehicle with the latest actual arrival at or before the tap; a tap whose vehicle is not in the runtime report, or that comes before its first arrival, cannot be placed and is left out of loads and counts"
   },
   {
-   "alightings_not_recorded_and_spread": 959,
+   "alightings_not_recorded_and_spread": 1703,
    "passengers_boarding_at_a_last_stop": 0,
-   "share_of_boardings_with_no_recorded_alighting": 0.1496,
+   "share_of_boardings_with_no_recorded_alighting": 0.1463,
    "stage": "loads",
    "text": "check-ins with no check-out are alightings we do not know: they are spread over the trip's stops in proportion to its known alightings, and whoever is left alights at the last stop; nobody alights who is not on board",
-   "trips": 551,
-   "trips_over_their_seats": 7,
-   "trips_whose_recorded_load_did_not_end_at_zero": 355,
+   "trips": 796,
+   "trips_over_their_seats": 20,
+   "trips_whose_recorded_load_did_not_end_at_zero": 552,
    "trips_whose_recorded_load_went_below_zero": 0
   },
   {
    "communities_in": 9,
    "communities_whose_shape_could_be_read": 9,
    "stage": "stops to places",
-   "stops": 240,
-   "stops_outside_every_community": 2,
+   "stops": 478,
+   "stops_outside_every_community": 44,
    "text": "each stop is put in the community whose boundary it lies inside"
   },
   {
-   "routes": 8,
-   "scheduled_departures": 8310,
-   "scheduled_trips": 554,
+   "routes": 9,
+   "scheduled_departures": 27034,
+   "scheduled_trips": 799,
    "service_date_as_number": 20251215,
    "stage": "timetable",
-   "stops_served": 240,
+   "stops_served": 478,
    "text": "scheduled departures on the service day, by route, direction and stop"
   },
   {
-   "bins": 81,
-   "bins_present": 17606,
-   "bins_present_with_no_boarding": 14194,
-   "boardings_at_a_stop_or_time_outside_the_timetable": 0,
-   "boardings_counted": 6409,
-   "boardings_placed_on_a_trip": 6409,
-   "series": 240,
+   "bins": 103,
+   "bins_present": 40699,
+   "bins_present_with_no_boarding": 33046,
+   "boardings_at_a_stop_or_time_outside_the_timetable": 1,
+   "boardings_counted": 11636,
+   "boardings_placed_on_a_trip": 11637,
+   "series": 555,
    "stage": "bins",
    "text": "boardings are counted by stop, route, direction and quarter of an hour, at the time of the tap; between a stop's first and last scheduled departure a bin with no boarding is a true zero, and outside that span the stop is absent, not zero"
   }
