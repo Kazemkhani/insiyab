@@ -51,6 +51,8 @@ The checker requires: a bus leaves after it arrives and reaches the next stop la
 | `baseline` | what the naive forecast said for the same bin. Always present: the error counter on screen needs it. |
 | `actual` | what happened (null if not yet known) |
 
+`forecast/boardings-stop.json` is what a screen draws for one stop, so it holds one look-ahead (`horizons_kept`, one hour) for the busiest series only (`series_kept` of `series_in_all`), and says so in `kept_note`. A stop with no series here has no forecast to show, and a screen says that; it never makes one up. Every stop and every look-ahead is still scored in `metrics.json`.
+
 Each forecast file also names `model` (the model whose forecast it holds) and `baseline_model` (the naive forecast in `baseline`: the best one on the same rows). A stop series also has `direction` (0 or 1): one stop can be served in both directions of a route, as two series.
 
 The delay forecast, when it exists, is `forecast/delay-route.json` with `target` "arrival_delay_seconds" and `horizon_unit` "stops": its rows carry `stops_ahead` (1, 5, 10, 20) in place of `horizon` and `bin_start`, `origin` is the second the bus left a stop, `trip_id` and `stop_id` name the trip and the stop ahead, and the rest is the same. Its entry in `metrics.json` has `target` "arrival_delay_seconds", `horizon_unit` "stops", and no MAPE or WAPE: a bus can be exactly on time or early.

@@ -14,6 +14,8 @@ from .measures import MAPE_RULE
 from .prepare import BIN, load, prepare
 
 PROMISED = 0.9
+STOP_FILE_HORIZON = 3600       # the stop file is what a screen draws for one stop: one look-ahead is enough for that, and the table of error keeps them all
+STOP_FILE_SERIES = 400         # and the busiest series only. A city's every stop at every origin is a file of hundreds of megabytes, which no page can load
 
 
 def _labels(day, rows):
@@ -168,6 +170,9 @@ def build(day, fixture=True, generated_at=None, commit=None):
 
     # At an origin with too little of the day behind it, a model can only repeat the timetable. Those forecasts are learned from but not shown as the model's.
     shown_stop, shown_route = stop[~stop["origin"].isin(thin)], route[~route["origin"].isin(thin)]
+    # What a screen is given for stops: the one-hour look-ahead, for the busiest series. The file says how many it kept of how many.
+    busy = stop.groupby("series")["y"].sum().sort_values(ascending=False, kind="stable"); kept = set(busy.index[:STOP_FILE_SERIES])
+    stop_file = shown_stop[(shown_stop["horizon"] == STOP_FILE_HORIZON) & shown_stop["series"].isin(kept)]
     gap, decisions, v, trips = B.gap_and_decisions(day)
     replay, left_out = B.replay(day)
     net = B.network(day)
@@ -192,7 +197,9 @@ def build(day, fixture=True, generated_at=None, commit=None):
              "summary.json": {"headline": summary}, "gap.json": gap,
              "forecast/boardings-route.json": {"target": "boardings", "level": "route", "bin_seconds": BIN, "model": chosen, "baseline_model": base, "series": [{"id": s.pop("route_id"), **s} for s in _series_json(shown_route, ["route_id"], chosen, base, first_bin)]},
              "forecast/boardings-stop.json": {"target": "boardings", "level": "stop", "bin_seconds": BIN, "model": chosen, "baseline_model": base,
-                                              "series": [{"id": s.pop("stop_id"), **s} for s in _series_json(shown_stop, ["stop_id", "route_id", "direction"], chosen, base, first_bin)]},
+                                              "horizons_kept": [STOP_FILE_HORIZON], "series_kept": int(min(len(busy), STOP_FILE_SERIES)), "series_in_all": int(len(busy)),
+                                              "kept_note": "This file holds the one-hour look-ahead for the busiest stops on each route. Every stop and every look-ahead is in the table of error in metrics.json.",
+                                              "series": [{"id": s.pop("stop_id"), **s} for s in _series_json(stop_file, ["stop_id", "route_id", "direction"], chosen, base, first_bin)]},
              "replay/index.json": {"routes": [{"route_id": rid, "file": f"replay/route-{rid}.json", "trips": len(r["trips"])} for rid, r in replay.items()]}}
     for rid, r in replay.items():
         files[f"replay/route-{rid}.json"] = r
