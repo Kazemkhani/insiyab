@@ -1604,3 +1604,31 @@ h2,.decision h2,.cautions h2{font-size:20px;line-height:1.25}
 #story-values{flex-wrap:wrap;gap:16px 32px}#story-values p{min-width:0}   /* a real day has counts in the thousands: two large numbers must be able to wrap */
 .map-credit{position:absolute;left:8px;bottom:6px;margin:0;z-index:5;font:400 11px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink);background:var(--paper);padding:1px 6px;pointer-events:none}
 .maplibregl-ctrl-attrib{display:none}
+
+/* The briefing: the day in plain words, before any chart. One headline, three counts, three moves. */
+.gap-view #briefing,.forecast-view #briefing{display:none}
+.briefing{padding:8px 0 40px;border-bottom:2px solid var(--ink);margin-bottom:32px}
+.briefing h1{font:600 52px/1.05 Overpass,sans-serif;letter-spacing:-.02em;margin:8px 0 32px;max-width:18ch;text-wrap:balance}
+.briefing h2{margin:40px 0 8px}
+.briefing-facts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 40px;border-top:1px solid var(--line);padding-top:24px}
+.briefing-facts li{display:flex;flex-direction:column;gap:8px}
+.briefing-facts strong{font:600 52px/1 Overpass,sans-serif;letter-spacing:-.02em}
+.briefing-facts span{font-size:16px;max-width:24ch}
+.briefing-facts .tone-over strong{color:var(--over)}
+.briefing-facts .tone-spare strong{color:var(--spare)}
+.briefing-kind{font-size:13px;color:var(--muted);margin:16px 0 0}
+.briefing-moves{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.briefing-moves li{border-bottom:1px solid var(--line)}
+.briefing-moves a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 32px;align-items:baseline;padding:16px 0;color:var(--ink);text-decoration:none;min-height:44px}
+.briefing-moves a:hover .move-verb,.briefing-moves a:focus-visible .move-verb{text-decoration:underline;text-underline-offset:4px}
+.move-verb{font:600 20px/1.25 Overpass,sans-serif}
+.move-effect{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--simulated);white-space:nowrap}
+.move-effect b{font:600 20px/1 Overpass,sans-serif}
+.move-effect i{font-style:normal;color:var(--muted)}
+.move-effect em{font-style:normal}
+.briefing-foresight{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-width:72ch}
+.briefing-foresight li.holds b{color:var(--flow)}
+.briefing-go{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.briefing-go button{min-height:48px}
+@media (max-width:800px){.briefing h1{font-size:32px;margin-bottom:24px}.briefing-facts{grid-template-columns:1fr;gap:20px}.briefing-moves a{grid-template-columns:1fr}.move-effect{white-space:normal;flex-wrap:wrap}}
+.briefing{padding-top:24px}

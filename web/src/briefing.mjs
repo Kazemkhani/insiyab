@@ -9,7 +9,7 @@ const day=iso=>new Date(iso+'T00:00:00Z').toLocaleDateString('en-GB',{weekday:'l
 const LEVERS={
   right_bus:{verb:'Put the bigger bus where the passengers are',unit:'minutes passengers spent without a seat'},
   right_stop:{verb:'Stop only where someone is waiting',unit:'calls at a stop with nobody there'},
-  rewarded_choice:{verb:'Reward the passenger who takes the emptier bus',unit:'passengers moved to a bus with room'},
+  rewarded_choice:{verb:'Reward the passenger who takes the emptier bus',unit:'passengers move to a bus with room'},
   right_time:{verb:'Set the timetable to the time buses really take',unit:''},on_demand:{verb:'Send a bus only when it is asked for',unit:''},
 };
 
@@ -17,8 +17,8 @@ export function briefingHTML(bundle){
   const head=new Map((bundle['summary.json']?.headline??[]).map(h=>[h.key,h])),meta=bundle['meta.json'],decisions=bundle['decisions.json']?.decisions??[];
   const v=k=>head.get(k)?.value,has=k=>Number.isFinite(v(k));
   const facts=[
-    has('trips_over_seats')&&{n:v('trips_over_seats'),say:`${v('trips_over_seats')===1?'bus left':'buses left'} a stop with more passengers than seats`,tone:'over'},
-    has('trips_under_a_third_full')&&{n:v('trips_under_a_third_full'),say:`${v('trips_under_a_third_full')===1?'bus':'buses'} never filled a third of ${v('trips_under_a_third_full')===1?'its':'their'} seats`,tone:'spare'},
+    has('trips_over_seats')&&{n:v('trips_over_seats'),say:`bus ${v('trips_over_seats')===1?'trip':'trips'} ran with more passengers than seats`,tone:'over'},
+    has('trips_under_a_third_full')&&{n:v('trips_under_a_third_full'),say:`bus ${v('trips_under_a_third_full')===1?'trip':'trips'} never filled a third of the seats`,tone:'spare'},
     has('visits_with_nobody')&&{n:v('visits_with_nobody'),say:'times a bus called at a stop and nobody got on or off',tone:'ink'},
   ].filter(Boolean);
   const scale=[has('routes')&&`${whole(v('routes'))} routes`,has('stops')&&`${whole(v('stops'))} stops`,has('trips')&&`${whole(v('trips'))} bus trips`,has('boardings')&&`${whole(v('boardings'))} passengers boarding`].filter(Boolean).join(', ');
@@ -36,7 +36,7 @@ export function briefingHTML(bundle){
 <p class="briefing-kind">Counted from the day's records. Seats are counted, not standing room.</p>
 ${decisions.length?`<h2>Three things a planner could do on Monday</h2>
 <ol class="briefing-moves">${decisions.slice(0,3).map(d=>{const e=d.effect?.[0],l=LEVERS[d.lever]??{verb:d.title,unit:''};const moved=e&&Number.isFinite(e.before)&&Number.isFinite(e.after);
-  return `<li><a href="#decision-${esc(d.id)}"><span class="move-verb">${esc(l.verb)}</span>${moved?`<span class="move-effect"><b>${whole(e.before)}</b><i aria-hidden="true">to</i><b>${e.after<1&&e.after>0?e.after:whole(e.after)}</b><em>${esc(l.unit)} · ${esc(e.kind)}</em></span>`:''}</a></li>`;}).join('')}</ol>`:''}
+  return `<li><a href="#decision-${esc(d.id)}"><span class="move-verb">${esc(l.verb)}</span>${moved?(e.before===0?`<span class="move-effect"><b>about ${whole(Math.max(1,Math.round(e.after)))}</b><em>${esc(l.unit)}, at one stop in one hour · ${esc(e.kind)}</em></span>`:`<span class="move-effect"><b>${whole(e.before)}</b><i aria-hidden="true">to</i><b>${whole(e.after)}</b><em>${esc(l.unit)} · ${esc(e.kind)}</em></span>`):''}</a></li>`;}).join('')}</ol>`:''}
 ${foresight.length?`<h2>Can it be seen coming?</h2><ul class="briefing-foresight">${foresight.map(f=>`<li class="${f.ok?'holds':'open'}"><b>${esc(f.title)}</b> ${esc(f.say)}</li>`).join('')}</ul><p class="briefing-kind">${esc(late?.tested_on??board?.tested_on??'')}</p>`:''}
 <div class="briefing-go"><button class="primary" data-go="replay">Watch the day on the map</button><button data-go="stories">Meet four people</button><button data-go="model">See the proof</button></div>
 </section>`;

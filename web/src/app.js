@@ -2,6 +2,7 @@ import {horizonChart,subsetChart,forecastChart,gapChart,gainChart} from './chart
 import {sceneSVG,seatDiagram} from './scene.mjs';
 import {Deck, OrthographicView, COORDINATE_SYSTEM} from '@deck.gl/core';
 import {initMap} from './map.mjs';
+import {briefingHTML} from './briefing.mjs';
 import {PathLayer,ScatterplotLayer,PolygonLayer,TextLayer} from '@deck.gl/layers';
 import {createModel, busesAt, boardingsAt, fitPaths, pointAlong, clock, number, rollingError, originRows} from './model.mjs';
 const B=window.INSIYAB_BUNDLE, M=createModel(B), $=id=>document.getElementById(id);
@@ -177,6 +178,10 @@ async function setView(next){
   fitMap();render();window.scrollTo(0,0);
 }
 document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.dataset.view));
+// The first thing read: the day in plain words, from the bundle. Its three buttons lead on; a decision's line opens that decision.
+$('briefing').innerHTML=briefingHTML(B);
+$('briefing').addEventListener('click',e=>{const go=e.target.closest('[data-go]')?.dataset.go;if(go==='replay'){document.querySelector('.network-panel')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}else if(go)setView(go);
+  const link=e.target.closest('a[href^="#decision-"]');if(link){e.preventDefault();closedGaps=true;setView('gap').then(()=>{renderDecisions?.();document.getElementById(link.getAttribute('href').slice(1))?.scrollIntoView();});}});
 function freezeForecast(){forecastOrigin=[...M.meta.origins].reverse().find(o=>o<=time)??M.meta.origins[0];$('frozen-at').textContent=`Made at ${clock(forecastOrigin)}. Quarter hour ending ${clock(forecastOrigin+3600)}. forecast/boardings-stop.json · ${M.meta.service_date}`;render();}
 $('freeze').onclick=freezeForecast;
 function forecastLayers(shared,u){

@@ -40,7 +40,11 @@ with sync_playwright() as p:
         check(all(e['height']>=44 for e in sizes),f'{width}: all controls at least 44px {sizes}')
         if width==390:check(page.locator('#time').bounding_box()['width']>=width-40,f'{width}: full-width time slider')
         if width in [1280,390] and not reduced:
-            rect=page.locator('#play').bounding_box();check(rect['y']+rect['height']<=height,f'{width}: clock control visible without scrolling')
+            # The first screen is now the day in plain words. One press of its first button brings the map and its clock into view.
+            check(page.locator('#briefing h1').is_visible() and page.locator('#briefing h1').bounding_box()['y']<height,f'{width}: the briefing is what a visitor reads first')
+            check(page.locator('#briefing .briefing-facts li').count()>=2 and page.locator('#briefing [data-go]').count()==3,f'{width}: the briefing gives its counts and three ways on')
+            page.locator('#briefing [data-go="replay"]').click();page.wait_for_timeout(700)
+            rect=page.locator('#play').bounding_box();check(0<=rect['y'] and rect['y']+rect['height']<=height,f'{width}: one press from the briefing puts the clock control in view')
             if shots:
                 page.evaluate("insiyab.setTime(INSIYAB_BUNDLE['metrics.json'].targets.find(t=>t.level==='route'&&t.target==='boardings').split.origins[0])");page.screenshot(path=str(shots/f'first-{width}x{height}.png'))
         page.locator('[data-route]').nth(1).click()
