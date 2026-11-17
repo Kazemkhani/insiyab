@@ -4,12 +4,17 @@ Written by lane 1 on 17 November after the Dataiku judge's two talks, RTA's sche
 
 **The one message, said three times (tell, show, tell):** Dubai's buses hold up in the morning and fall behind in the evening, because one timetable serves the whole day. We forecast how long each trip will really take, and show the planner where the timetable needs more time.
 
+**Who it is for, when, and what they decide** (say this in the first two minutes; an outside reviewer on 17 November asked exactly this and the team could not answer): it is for the timetable planner. Every night the day's taps and running times are added and the Flow rebuilds. At each timetable change, which RTA makes about every one to two months, the planner works down a ranked list of routes and hours that need more running time, and accepts or sets aside each one. Nothing applies itself. Nothing new has to be measured.
+
+**Not in this pitch**, each cut after someone outside the team took it apart: AI phone calls to drivers (nobody on the team knows how the control centre reaches a driver today); skipping stops (three people have now called it odd, and no table says a stop is empty); agents scanning the news for events (events are known a month ahead); routes that change by the day (a passenger cannot follow one). If asked, say: "we looked at those and cut them; this is the one we can stand behind."
+
 **Every number below is read off the screen on the day.** They are from RTA's real day, Monday 15 December 2025, computed inside Dataiku (project Insiyab). Check each against the web app before saying it.
 
 | Time | Part | On screen | Say (in your own words) |
 |---|---|---|---|
 | 0:00 | **Tell.** The film, as a teaser | `Insiyab-comic.mp4`, 60 seconds or less | Nothing. Let it play. |
 | 1:00 | The scene, in one breath | The web app, tab "The day" | "At seven in the morning about one departure in five leaves five minutes late. At seven in the evening it is about one in two. Same buses, same drivers, same timetable. Nobody is doing anything wrong: the timetable was written for a day that does not exist, one where six in the evening behaves like ten in the morning." |
+| 1:40 | The answer, before the evidence | Tab "Planner's worklist" | "This is what a planner gets: the routes and hours where the plan falls short, and the minutes each one needs. Accept, or set aside. Now let me show you where that list comes from." |
 | 2:00 | **Show.** Demand | Tab "Passenger demand" | "This is when people travel: two peaks. And this is where." One sentence, move on. |
 | 2:30 | Reliability | Tab "Service reliability" | "This is when buses run late, by route and hour. The evening band is red across most of the network. So it is not one bad route." |
 | 3:15 | Supply, in RTA's own arithmetic | Tab "Supply and capacity" | "Your own planning rule: boardings in the hour, divided by what a bus carries. At six in the evening most routes come out short. The room is at other hours. Buses are spread across the day more evenly than passengers are." Say "by your rule of thumb": it counts every boarding against a seat. |
