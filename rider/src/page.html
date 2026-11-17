@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Khutwa: a bus with room</title>
+<style>/*STYLE*/</style>
+</head>
+<body>
+<p class="band" id="band" hidden>STAND-IN DATA, NOT A RESULT</p>
+<header>
+  <p class="name">Khutwa <span lang="ar" dir="rtl">خطوة</span></p>
+  <a href="../">Insiyab</a>
+</header>
+
+<main id="main" aria-live="polite">
+  <!-- 1. Her usual bus at her stop -->
+  <section id="s-usual" hidden>
+    <p class="eyebrow" id="where"></p>
+    <h1 id="headline"></h1>
+    <div class="bus" id="usual-bus" role="img"></div>
+    <p class="count"><strong id="usual-load"></strong> <span id="usual-words"></span></p>
+    <ul class="facts" id="usual-facts"></ul>
+    <button class="primary" id="show" hidden>Show me the offer</button>
+    <p class="wait" id="waiting" hidden></p>
+    <p class="small" id="fictional">The passenger is fictional. Nobody's own journey is shown, and this page asks you for nothing.</p>
+    <p class="small"><a id="stop-link" href="?stop=">Every bus at this stop in the next hour</a></p>
+  </section>
+
+  <!-- 2. The choices -->
+  <section id="s-offer" hidden>
+    <p class="eyebrow">A bus with room</p>
+    <h1 id="offer-headline">Take one of these and earn Khutwa points.</h1>
+    <label class="walk"><input type="checkbox" id="no-walk"> <span>I cannot walk further</span></label>
+    <p class="small" id="walk-note" hidden>Understood. No choice will ask you to walk to another stop.</p>
+    <ol id="choices"></ol>
+    <p class="small" id="no-choices" hidden>There is no offer for you this morning. Your usual bus runs as always.</p>
+    <button class="quiet" id="decline">No thanks</button>
+    <p class="small">Your usual bus still runs and you can always take it. Nobody is ever charged more: an offer only adds points.</p>
+  </section>
+
+  <!-- 3. Taken, or not -->
+  <section id="s-done" hidden>
+    <p class="eyebrow" id="done-eyebrow"></p>
+    <h1 id="done-headline"></h1>
+    <p id="done-words"></p>
+    <div id="buys" hidden>
+      <h2>What the points buy</h2>
+      <ul class="buys" id="buys-list"></ul>
+      <p class="simulated">Simulated. The prices in points are this prototype's example, not a published rate. Khutwa is shown as a way of earning points in RTA's existing points programme.</p>
+    </div>
+    <p class="room" id="room-count" hidden></p>
+    <p class="simulated" id="simulated" hidden></p>
+    <button class="plain" id="again">See the choices again</button>
+  </section>
+
+  <!-- Nothing to offer in this bundle -->
+  <section id="s-none" hidden>
+    <p class="eyebrow">Nothing to offer</p>
+    <h1>No stop had a full bus with a roomier one close by.</h1>
+    <p>On this day the bundle holds no rewarded choice, so there is no offer to show. Your usual bus runs as always.</p>
+  </section>
+
+  <!-- One stop: its next buses (?stop=<stop_id>) -->
+  <section id="s-stop" hidden>
+    <p class="eyebrow" id="stop-eyebrow"></p>
+    <h1 id="stop-name"></h1>
+    <p id="stop-when"></p>
+    <ol class="board" id="board"></ol>
+    <p class="small" id="board-none" hidden>No bus is due at this stop in this hour of the day.</p>
+    <div id="stop-forecast" hidden>
+      <h2>Forecast boardings at this stop</h2>
+      <ul class="facts" id="stop-forecast-list"></ul>
+    </div>
+    <p class="small" id="stop-note"></p>
+    <p class="small"><a id="morning-link" href="./">One passenger's morning, and the offer</a></p>
+  </section>
+</main>
+
+<footer>
+  <p id="credit"></p>
+  <p>A prototype for the RTA Future Move Hackathon. Not an RTA service.</p>
+</footer>
+<script>window.KHUTWA_DATA = "__DATA__";</script>
+<script>/*LOGIC*/</script>
+<script>/*SCRIPT*/</script>
+</body>
+</html>
