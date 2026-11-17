@@ -13,7 +13,7 @@ with sync_playwright() as p:
    page.add_style_tag(content='body>*{display:none!important}body>#map{display:block!important;position:fixed;inset:0;width:100vw!important;height:100vh!important}.map-zoom,.map-note,#map-credit{display:none!important}')
    page.evaluate('document.body.append(document.querySelector("#map"));window.dispatchEvent(new Event("resize"))')
   else:
-   page.goto(out.as_uri()+'/stage.html');page.wait_for_function("typeof window.showFilmStage==='function'");page.evaluate('document.fonts.ready');page.evaluate('(name)=>showFilmStage(name)',name)
+   page.goto(out.as_uri()+'/stage.html');page.wait_for_function("typeof window.showFilmStage==='function'");page.evaluate("Promise.all([document.fonts.ready,document.fonts.load('500 42px Plex')])");page.evaluate('(name)=>showFilmStage(name)',name)
    page.wait_for_function('window.insiyabScene?.renderer.info.render.calls>0')
   page.wait_for_timeout(300)
   if name in ['full','changed']:page.locator('[data-replay]').evaluate('(e)=>e.click()')

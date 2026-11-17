@@ -313,18 +313,22 @@ function renderModel(){
   const result=(model,horizon,subset)=>t.results.find(r=>r.model===model&&r.horizon===horizon&&r.subset===subset);
   const selectedH=$('model-horizon').value;$('model-horizon').innerHTML=horizons.map(h=>`<option value="${h}">${hLabel(h)}</option>`).join('');$('model-horizon').value=horizons.includes(+selectedH)?selectedH:(horizons.includes(oneHour)?oneHour:horizons[0]);
   const h=+$('model-horizon').value,choices=t.models.filter(m=>!m.is_baseline),oldChoice=metricsTarget===$('model-target').value?$('model-choice').value:t.chosen;metricsTarget=$('model-target').value;
-  $('model-choice').innerHTML=choices.map(m=>`<option value="${escape(m.model)}">${escape(m.label)}</option>`).join('');if(choices.some(m=>m.model===oldChoice))$('model-choice').value=oldChoice;
+  $('model-choice').innerHTML=choices.map(m=>`<option value="${escape(m.model)}">${escape(({gbt:'Tree model',glm:'Count model'})[m.model]??m.label)}${m.model===t.chosen?' · chosen':''}</option>`).join('');if(choices.some(m=>m.model===oldChoice))$('model-choice').value=oldChoice;
   const chosen=t.models.find(m=>m.model===$('model-choice').value),best=result(chosen.model,h,all);
   const baselines=t.models.filter(m=>m.is_baseline).map(m=>({m,r:result(m.model,h,all)})).filter(x=>x.r).sort((a,b)=>a.r.mae-b.r.mae),comparison=baselines.find(x=>x.m.model===best?.skill_vs)??baselines[0],naive=comparison?.m,base=comparison?.r;
   $('model-sentence').textContent=`${hLabel(h)} ahead: ${number(best?.mae)} ${unit} average miss. Best naive forecast in this table: ${number(base?.mae)}.${best&&base?(best.mae<base.mae?' The model misses less.':best.mae>base.mae?' The naive forecast misses less.':' The two have the same average miss.'):''}`;
-  $('comparison-note').textContent=`Comparing ${chosen.label} with ${naive?.label??'no supplied naive result'}. The naive forecast is the one this result names, scored on the same quarter-hours. The line keeps that comparator across horizons. This table comparison does not select a model for deployment.`;
+  $('comparison-note').innerHTML=`<p>A naive forecast is a simple rule to compare against. Both forecasts are checked on the same records. Smaller misses are better.</p><details><summary>Model and comparison details</summary><p>${escape(chosen.label)}. Compared with: ${escape(naive?.label??'no supplied naive result')}. The line keeps that comparator across horizons. This comparison does not select a model for deployment.</p></details>`;
+  const inputsTarget=t.features?.length?t:B['metrics.json'].targets.find(t=>t.features?.length);
+  $('model-inputs').hidden=!inputsTarget;
+  $('model-inputs').textContent=inputsTarget===t?'See chosen model inputs':`See ${inputsTarget?.level??''} forecast inputs`;
+  $('model-inputs').dataset.target=String(B['metrics.json'].targets.indexOf(inputsTarget));
   $('model').querySelector('.forecast-limit').textContent='Tested on '+(t.tested_on??limit).replace(/^Tested on /,'');
   const pooled=t.pooled?.find(r=>r.model===chosen.model),range=t.range;
   if(pooled?.skill_lo<=0&&pooled?.skill_hi>=0)$('model-sentence').textContent+=' Across all horizons, the gain range includes zero; improvement is not established.';
   $('model-reliability').innerHTML=pooled?.skill!==null&&pooled?.skill!==undefined?`<h2>Is the forecast really better?</h2><p>Its misses are ${Math.round(Math.abs(pooled.skill)*100)} in 100 ${pooled.skill>=0?'smaller':'larger'} than the best naive forecast’s (${escape((t.models.find(m=>m.model===pooled.skill_vs)?.label??pooled.skill_vs).toLowerCase())}), every look-ahead together, over ${Number(pooled.n).toLocaleString('en-GB')} forecasts.</p>${gainChart(pooled)}<p>${pooled.skill_lo<=0&&pooled.skill_hi>=0?'The range includes zero. An improvement is not established.':pooled.skill_hi<0?'The whole range is below zero. The naive forecast did better.':'The whole range is above zero in the hours the model had not seen.'}</p><p class="small">The supplied range covers 95 in 100 resamples of whole forecast origins. It does not test another day.</p>`:'';
   if(range)$('model-reliability').innerHTML+=`<h2>Did the forecast’s own range hold?</h2><p>${number(range.promised*100)}% intended coverage; ${number(range.kept*100)}% observed coverage across the supplied rows.</p><div class="coverage">${[['Nobody boarded','kept_when_nobody_boarded'],['Somebody boarded','kept_when_somebody_boarded']].filter(([,key])=>range[key]!==null&&range[key]!==undefined).map(([label,key])=>`<p><strong>${number(range[key]*100)}%</strong>${label}</p>`).join('')}</div><p class="small">Coverage belongs to the bundle-selected forecast ranges. A range that covers empty bins can still miss when passengers board.</p>`;
   if(t.cautions?.length)$('model-reliability').innerHTML=`<div class="cautions"><h2>Where not to lean on it</h2>${t.cautions.map(c=>`<p>${escape(c.say)}</p>`).join('')}</div>`+$('model-reliability').innerHTML;
-  $('model-features').innerHTML=t.features?.length?`<h2>What the model uses</h2>${[...t.features].sort((a,b)=>b.share-a.share).map(f=>`<div class="feature-row"><span>${escape(f.label)}</span><span>${number(f.share*100)}%</span><i style="width:${f.share*100}%"></i></div>`).join('')}<p class="small">Share of the supplied model's split gain. This is global importance, not a reason for one forecast or evidence of cause.</p>`:'';
+  $('model-features').innerHTML=t.features?.length?`<h2>Inputs used by the chosen model</h2><p>${escape(t.models.find(m=>m.model===t.chosen)?.label??t.chosen)}</p>${[...t.features].sort((a,b)=>b.share-a.share).map(f=>`<div class="feature-row"><span>${escape(f.label)}</span><span>${number(f.share*100)}%</span><i style="width:${f.share*100}%"></i></div>`).join('')}<p class="small">Share of the supplied model's split gain. This is global importance, not a reason for one forecast or evidence of cause.</p>`:'';
   $('model-numbers').innerHTML=`<div><strong>${number(best?.mae)}</strong><span>Model · ${unit}</span></div><div><strong>${number(base?.mae)}</strong><span>Naive forecast · ${unit}</span></div>`;
   $('model-chart').innerHTML=horizonChart(horizons.map(h=>({horizon:delay?h:h/60,model:result(chosen.model,h,all)?.mae,naive:result(naive?.model,h,all)?.mae})),delay?h:h/60,delay?'stops ahead':'minutes ahead');
   $('model-unit').textContent=`Average absolute miss (MAE). ${t.unit}. Lower is better.`;
@@ -337,6 +341,7 @@ function renderModel(){
   $('subset-chart').innerHTML=subsetChart(subsets.slice(0,8));
   $('mape-rule').textContent=t.mape_rule;$('split-rule').textContent=`Learning: ${t.split.train}. Held-out: ${t.split.test}.`;
 }
+$('model-inputs').onclick=()=>{$('model-target').value=$('model-inputs').dataset.target;renderModel();$('model-features').scrollIntoView({block:'start',behavior:'auto'});$('model-features').focus({preventScroll:true});};
 $('model-target').onchange=renderModel;$('model-horizon').onchange=renderModel;$('model-choice').onchange=renderModel;
 
 function gapRows(){const hour=Math.floor(time/B['gap.json'].bin_seconds)*B['gap.json'].bin_seconds;return B['gap.json'].rows.filter(r=>r.hour_start===hour);}
@@ -351,9 +356,10 @@ const metricLabel=key=>({passenger_minutes_over_seats:'passenger-minutes without
 function renderGap(){
   const totals=B['gap.json'].totals,which=closedGaps?'after':'before',values=totals[which],kind=values.kind??totals.kind;
   const key=$('gap-metric').value;
-  $('gap-totals').innerHTML=`<div><span class="eyebrow">Before · ${escape(totals.before.kind??totals.kind)}</span><strong>${number(totals.before[key])}</strong></div><div><span class="eyebrow">${closedGaps?'With the decisions':'Current'} · ${escape(kind)}</span><strong data-total="${key}">${number(values[key])}</strong><span>${metricLabel(key)}</span></div>`;
+  $('gap-totals').classList.toggle('gap-start',!closedGaps);
+  $('gap-totals').innerHTML=closedGaps?`<div><span class="eyebrow">Before proposals · ${escape(totals.before.kind??totals.kind)}</span><strong>${number(totals.before[key])}</strong></div><div><span class="eyebrow">With the proposals · ${escape(kind)}</span><strong data-total="${key}">${number(values[key])}</strong><span>${metricLabel(key)}</span></div>`:`<div><span class="eyebrow">Starting point · ${escape(kind)}</span><strong data-total="${key}">${number(values[key])}</strong><span>${metricLabel(key)}</span><p>Compare the proposed changes with this starting point.</p></div>`;
   $('gap-assumption').textContent=`Simulated assumption: ${values.assumption??totals.assumption??'See each decision.'}`;
-  $('close-gaps').textContent=closedGaps?'Show before':'Close the gaps';$('close-gaps').setAttribute('aria-pressed',String(closedGaps));
+  $('close-gaps').textContent=closedGaps?'Reset comparison':'Compare proposed changes';$('close-gaps').setAttribute('aria-pressed',String(closedGaps));
   $('decisions').hidden=!closedGaps;
   const rows=gapRows();$('gap-hour').textContent=`Hour beginning ${clock(Math.floor(time/B['gap.json'].bin_seconds)*B['gap.json'].bin_seconds)}. The colours show route-hour totals, not the load of each stretch.${closedGaps?' Rings locate proposed decisions. Faded routes show the scenario, not recalculated route loads.':''}`;
   $('gap-routes').innerHTML=rows.length?gapChart(rows,id=>M.routes.get(id).short_name)+`<p class="small">${escape(B['gap.json'].index_note)} Source: gap.json · ${M.meta.service_date}. Above seats is a passenger count; spare is a seat count.</p>`:'<p>No gap forecast is supplied for this hour.</p>';
@@ -379,7 +385,7 @@ async function printOrder(id){
 window.addEventListener('afterprint',()=>{$('print-order').hidden=true;});
 $('gap-metric').onchange=renderGap;
 let presenterCode='',roomPolling=false;
-$('presenter-form').onsubmit=event=>{event.preventDefault();presenterCode=$('presenter-code').value;$('presenter-code').value='';$('presenter-status').textContent='Code held in this tab. Close the gaps to open the room offer.';$('end-offer').hidden=false;};
+$('presenter-form').onsubmit=event=>{event.preventDefault();presenterCode=$('presenter-code').value;$('presenter-code').value='';$('presenter-status').textContent='Code held in this tab. Compare proposed changes to open the room offer.';$('end-offer').hidden=false;};
 function validRoom(data){return ['waiting','offer','closed'].includes(data?.phase)&&['none','ringing','confirmed','declined'].includes(data.depot)&&['joined','accepted','declined'].every(k=>Number.isInteger(data[k])&&data[k]>=0)&&data.accepted+data.declined<=data.joined;}
 async function setRoomPhase(phase){
   if(!presenterCode||!roomState)return;

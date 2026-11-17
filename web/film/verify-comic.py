@@ -2,18 +2,20 @@
 import json,pathlib,subprocess,sys,tempfile,shutil,struct,array,math
 site,out,audio=map(lambda x:pathlib.Path(x).resolve(),sys.argv[1:4]);movie=out/'Insiyab-comic.mp4'
 def run(args):return subprocess.check_output(args,text=True)
-info=json.loads(run(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_name,width,height,sample_rate,duration,nb_frames','-of','json',str(movie)]))
+info=json.loads(run(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_name,width,height,sample_rate,channels,duration,nb_frames','-of','json',str(movie)]))
 video=next(s for s in info['streams'] if s['codec_name']=='h264');sound=next(s for s in info['streams'] if s['codec_name']=='aac')
 assert (video['width'],video['height'],int(video['nb_frames']))==(1920,1080,1800)
-assert float(video['duration'])==60 and abs(float(info['format']['duration'])-60)<1/30 and sound['sample_rate']=='48000'
+assert float(video['duration'])==60 and abs(float(info['format']['duration'])-60)<1/30 and sound['sample_rate']=='48000' and sound['channels']==2
 print('PASS film: 1800 frames, 1920x1080, 60-second H.264 video and 48kHz AAC audio')
-raw=subprocess.check_output(['ffmpeg','-loglevel','error','-i',str(movie),'-vn','-ac','1','-ar','48000','-f','f32le','-']);samples=array.array('f');samples.frombytes(raw)
-peak=max(map(abs,samples));cut=samples[int(29.35*48000):int(29.55*48000)];rms=math.sqrt(sum(x*x for x in cut)/len(cut))
+raw=subprocess.check_output(['ffmpeg','-loglevel','error','-i',str(movie),'-vn','-ac','2','-ar','48000','-f','f32le','-']);samples=array.array('f');samples.frombytes(raw)
+peak=max(map(abs,samples));cut=samples[int(29.35*48000*2):int(29.55*48000*2)];rms=math.sqrt(sum(x*x for x in cut)/len(cut))
 assert peak<1,(peak,'mix exceeds full scale');assert rms<.0001,(rms,'the release beat is not silent')
-print(f'PASS film: decoded audio peak {peak:.4f}; silent cut RMS {rms:.8f}; listening quality not assessed')
-manifest=json.loads((out/'media/comic.json').read_text());assert manifest['omitted']==[5,6,8,9]
-assert all(len(manifest['captions'][str(i)])>0 for i in manifest['omitted'])
-print('PASS film: unsupported spoken claims are excluded and have corrected captions')
+print(f'PASS film: decoded stereo sample peak {peak:.4f}; silent cut RMS {rms:.8f}; listening quality not assessed')
+manifest=json.loads((out/'media/comic.json').read_text())
+assert manifest['cues']==json.loads((audio/'cues.json').read_text())
+assert len(manifest['cues']['lines'])==13
+assert (out/'media/audio/soundtrack.wav').read_bytes()==(audio/'soundtrack.wav').read_bytes()
+print('PASS film: all thirteen corrected narration cues and the supplied soundtrack are retained')
 frames=out/'review';frames.mkdir(exist_ok=True)
 for i,t in enumerate([1,9,13.5,17,24,30,36,41,44,48,52,56,59]):
  frame=frames/f'{i:02d}.png';subprocess.run(['ffmpeg','-loglevel','error','-y','-ss',str(t),'-i',str(movie),'-frames:v','1',str(frame)],check=True)
@@ -29,5 +31,13 @@ with tempfile.TemporaryDirectory(prefix='insiyab-film-negative-') as tmp:
   result=subprocess.run(['node','web/film/prepare-comic.mjs',str(target),str(pathlib.Path(tmp)/'out'),str(audio)],capture_output=True,text=True)
   assert result.returncode!=0 and 'do not describe the same load' in result.stderr
   print(f'PASS film: mismatched story step {step+1} {field} is rejected')
+ # A stale recording manifest must not silently restore a waiting-queue claim.
+ p.write_text(json.dumps(original))
+ bad_audio=pathlib.Path(tmp)/'audio';bad_audio.mkdir()
+ stale=json.loads((audio/'cues.json').read_text());stale['lines'][8]['text']='It forecasts how many will be waiting.'
+ (bad_audio/'cues.json').write_text(json.dumps(stale))
+ result=subprocess.run(['node','web/film/prepare-comic.mjs',str(target),str(pathlib.Path(tmp)/'out'),str(bad_audio)],capture_output=True,text=True)
+ assert result.returncode!=0 and 'Superseded narration claim' in result.stderr
+ print('PASS film: superseded waiting-queue narration is rejected')
 (out/'probe.json').write_text(json.dumps(info,indent=2)+'\n')
 print('FILM PASS')

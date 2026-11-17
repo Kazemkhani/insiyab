@@ -21,6 +21,7 @@ with sync_playwright() as p:
   if h>=720:
    rect=pg.locator('#guide-next').bounding_box();check(rect['y']+rect['height']<=h,'first action is visible without scrolling')
   check(pg.locator('#guide-title').inner_text()=='The bus arrives. Not enough seats.','judge: the first heading states the problem')
+  check('forecasts how many people will board and how late buses will be' in pg.locator('.guide-lead').inner_text(),'judge: first screen explains both forecasts in plain words')
   pg.wait_for_timeout(1700);check(pg.evaluate('insiyabGuide.step')==0,'story waits for the visitor instead of advancing itself')
   check(pg.locator('#guide-scene canvas').evaluate("e=>getComputedStyle(e).touchAction.includes('pan-y')"),'phone swipes can scroll over the 3D scene')
   check(pg.evaluate('insiyabScene.reduced')==reduced,'reduced motion preference reaches the 3D renderer')

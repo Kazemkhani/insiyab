@@ -22,7 +22,7 @@ export function createGuide(bundle,model,explore){
     let title,lead,stats='',note='',action,person=worker,story=before;
     if(step===0){
       title='The bus arrives. Not enough seats.';
-      lead='Insiyab helps planners put buses where passengers need them. Start with one fictional passenger on the way to work.';
+      lead='Insiyab forecasts how many people will board and how late buses will be. Start with one fictional journey to work.';
       stats=stat(busy.largest_load,'passengers')+stat(busy.seats,'seats')+stat(above,'without a seat','over');
       note=`Route ${busy.route_id} · highest load on this trip. ${model.stops.get(worker.anchor.stop_id)?.name??''}.`;
       action='Find a bus with room';
