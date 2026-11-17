@@ -5,23 +5,28 @@
 
 <div id="app">
 
-  <!-- Tab navigation -->
+  <!-- Tab navigation — order: The day, Passenger demand, Service reliability,
+       Supply and capacity, Forecast, What if, How it is built -->
   <nav id="tab-bar" role="tablist" aria-label="Analysis tabs">
     <button class="tab-btn active" role="tab" aria-selected="true"
             aria-controls="panel-day" id="tbtn-day" data-tab="day">
       The day
     </button>
     <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-reliability" id="tbtn-reliability" data-tab="reliability">
-      Service reliability
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
             aria-controls="panel-demand" id="tbtn-demand" data-tab="demand">
       Passenger demand
     </button>
     <button class="tab-btn" role="tab" aria-selected="false"
+            aria-controls="panel-reliability" id="tbtn-reliability" data-tab="reliability">
+      Service reliability
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false"
             aria-controls="panel-supply" id="tbtn-supply" data-tab="supply">
       Supply and capacity
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false"
+            aria-controls="panel-forecast" id="tbtn-forecast" data-tab="forecast">
+      Forecast
     </button>
     <button class="tab-btn" role="tab" aria-selected="false"
             aria-controls="panel-whatif" id="tbtn-whatif" data-tab="whatif">
@@ -30,11 +35,6 @@
     <button class="tab-btn" role="tab" aria-selected="false"
             aria-controls="panel-build" id="tbtn-build" data-tab="build">
       How it is built
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-forecast" id="tbtn-forecast" data-tab="forecast"
-            hidden>
-      Forecast
     </button>
   </nav>
 
@@ -61,6 +61,7 @@
            id="panel-reliability" aria-labelledby="tbtn-reliability">
 
     <h2>Service reliability</h2>
+    <p class="flow-zone-label">Flow zone: Service reliability</p>
 
     <p class="caption">
       Route-hour cells coloured by share of departures 5+ minutes late.
@@ -96,6 +97,7 @@
            id="panel-demand" aria-labelledby="tbtn-demand">
 
     <h2>Passenger demand</h2>
+    <p class="flow-zone-label">Flow zone: Passenger demand</p>
 
     <p class="caption">
       "Boardings" are passengers recorded boarding a bus.
@@ -139,6 +141,7 @@
            id="panel-supply" aria-labelledby="tbtn-supply">
 
     <h2>Supply and capacity</h2>
+    <p class="flow-zone-label">Flow zone: Supply and capacity</p>
 
     <p class="headline" style="font-size:var(--sz16);margin-bottom:12px">
       RTA's planning rule: passengers boarding in the hour divided by
@@ -257,78 +260,86 @@
     <h2>How it is built</h2>
 
     <p>
-      The Dataiku Flow has three processing zones.  Each zone is a set
+      The Dataiku Flow has four processing zones.  Each zone is a set
       of recipes that read raw data, clean it, and produce the aggregated
       datasets this webapp reads.
     </p>
 
     <div class="flow-zone">
-      <h3>Zone: Service reliability</h3>
+      <h3>Zone: Passenger demand</h3>
       <p class="caption">
-        Reads RTA's automated vehicle location (AVL) feed for 15 December 2025.
-        Aligns each actual departure to its scheduled time, computes the
-        difference, and aggregates it three ways.
+        Reads RTA's nol card transaction records for 15 December 2025.
+        Each tap-on and tap-off becomes a boarding or alighting event,
+        placed at the nearest stop on the matching trip, then aggregated.
       </p>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
         <span>
-          <strong>prepare_avl</strong>: parses dates in the form 15DEC2025,
-          falls back to the nearest same weekday when a timetable feed covers
-          a different season, and exports the community map geometry to the
-          column format the engine reads.
+          <strong>count_taps</strong>: matches each nol tap to a trip using
+          vehicle number and time; handles door-open (boarding) and
+          drive-through (count) tap types; places taps at the stop that
+          best fits time and direction.
         </span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
         <span>
-          <strong>punctuality_by_hour</strong>: aggregates departure lateness
-          by service-day hour (3 to 30; hours 24–30 are after midnight).
-          Dataset read by Tab 1 and Tab 2.
+          <strong>demand_by_hour</strong>: total boardings and alightings by
+          service-day hour.  Read by The day tab and the Passenger demand tab.
         </span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
         <span>
-          <strong>punctuality_by_route_hour</strong>: same aggregation split
-          by route.  About 3,200 rows.  Dataset read by Tab 2.
-        </span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>punctuality_by_bus_type</strong>: aggregation split by
-          vehicle type (STANDARD, DOUBLE, ARTICULATED, MIDI, COACH).
-          Dataset read by Tab 2.
-        </span>
-      </div>
-    </div>
-
-    <div class="flow-zone">
-      <h3>Zone: Passenger demand</h3>
-      <p class="caption">
-        Reads RTA's nol card transaction records for the same day.
-        Each tap-on and tap-off becomes a boarding or alighting event,
-        aggregated by hour, by route and hour, and by stop.
-      </p>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>demand_by_hour</strong>: total boardings and alightings
-          by service-day hour.  Dataset read by Tab 1 and Tab 3.
-        </span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>demand_by_route_hour</strong>: same, split by route.
-          About 3,700 rows.  Dataset read by Tab 3.
+          <strong>demand_by_route_hour</strong>: split by route.
+          About 3,700 rows.  Read by the Passenger demand tab.
         </span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
         <span>
           <strong>demand_by_stop</strong>: boardings and alightings by stop.
-          About 2,600 rows.  Dataset read by Tab 3 (top 15 busiest).
+          About 2,600 rows.  Read by the Passenger demand tab (top 15).
+        </span>
+      </div>
+    </div>
+
+    <div class="flow-zone">
+      <h3>Zone: Service reliability</h3>
+      <p class="caption">
+        Reads RTA's automated vehicle location (AVL) feed.
+        Aligns each actual departure to its scheduled time, computes the
+        lateness, and aggregates it three ways.
+      </p>
+      <div class="flow-step">
+        <span class="flow-step-kind">Python</span>
+        <span>
+          <strong>clean_running_time</strong>: parses two-digit years, times
+          without seconds, and service-day hours past 24:00; rejects trips
+          with implausible running times; outputs one row per departure.
+        </span>
+      </div>
+      <div class="flow-step">
+        <span class="flow-step-kind visual">Group</span>
+        <span>
+          <strong>punctuality_by_hour</strong>: aggregates departure lateness
+          by service-day hour (3 to 30; hours 24-30 are after midnight).
+          Read by The day tab and the Service reliability tab.
+        </span>
+      </div>
+      <div class="flow-step">
+        <span class="flow-step-kind visual">Group</span>
+        <span>
+          <strong>punctuality_by_route_hour</strong>: same split by route.
+          About 3,200 rows.  Read by the Service reliability tab.
+        </span>
+      </div>
+      <div class="flow-step">
+        <span class="flow-step-kind visual">Group</span>
+        <span>
+          <strong>punctuality_by_bus_type</strong>: split by vehicle type
+          (STANDARD, DOUBLE, ARTICULATED, MIDI, COACH).  Read by the
+          Service reliability tab.
         </span>
       </div>
     </div>
@@ -336,17 +347,18 @@
     <div class="flow-zone">
       <h3>Zone: Supply and capacity</h3>
       <p class="caption">
-        Joins departure counts and demand figures.  Applies RTA's
-        planning rule: passengers boarding divided by seats per bus
-        gives buses needed. It classifies each route-hour by status.
+        Joins departure counts and demand figures.  Applies RTA's planning
+        rule: passengers boarding divided by seats per bus gives buses needed,
+        and classifies each route-hour by status.
       </p>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
         <span>
-          <strong>join_supply_demand</strong>: joins punctuality (trips run,
-          seats) with demand (boardings) on route and hour.
-          Routes not found in the running-time table receive status
-          "route not in the running-time table".
+          <strong>buses_needed_rule</strong>: joins punctuality (trips run,
+          seats per bus, standing places) with demand (boardings) on route
+          and hour.  Routes not in the running-time table are flagged.
+          Computes buses needed under both the seated rule and the standing
+          rule (places per bus from the fleet register, marked not verified).
         </span>
       </div>
       <div class="flow-step">
@@ -354,27 +366,61 @@
         <span>
           <strong>supply_vs_demand_by_route_hour</strong>: full route-hour
           table with buses needed, buses short, and status.
-          Dataset read by the Supply and capacity tab and the What-if tab.
+          Read by the Supply and capacity tab and the What-if tab.
         </span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
         <span>
           <strong>supply_status_by_hour</strong>: count of route-hours in
-          each status, by hour.  Dataset read by the Supply and capacity tab.
+          each status, by hour.  Read by the Supply and capacity tab.
         </span>
       </div>
     </div>
 
-    <h3>RTA facts that make this usable</h3>
+    <div class="flow-zone">
+      <h3>Zone: Forecast</h3>
+      <p class="caption">
+        Builds a gradient-boosted tree model that predicts how long a trip
+        will take.  Tested on the evening peak and compared against the
+        timetable and simple baselines.
+      </p>
+      <div class="flow-step">
+        <span class="flow-step-kind">Python</span>
+        <span>
+          <strong>build_trip_table</strong>: joins one row per trip from AVL,
+          demand, timetable, and fleet register; adds lag features (how late
+          the previous trip on this bus finished, what boardings were in the
+          last full hour on this route).
+        </span>
+      </div>
+      <div class="flow-step">
+        <span class="flow-step-kind">Python</span>
+        <span>
+          <strong>forecast_running_time</strong>: trains a gradient-boosted
+          tree on trips before 16:00, scores trips from 16:00 to end of
+          service.  Outputs trip-level forecasts plus feature importances.
+        </span>
+      </div>
+      <div class="flow-step">
+        <span class="flow-step-kind">Python</span>
+        <span>
+          <strong>running_time_bands</strong> (optional): groups each
+          route-hour into percentile bands (median, 85th percentile) to show
+          planners how much buffer is needed.  Built separately; the Forecast
+          tab shows a note if this dataset is absent.
+        </span>
+      </div>
+    </div>
+
+    <h3>RTA facts that inform this analysis</h3>
     <p>
       These were told to the team by RTA's scheduling engineer:
     </p>
     <ul style="font-size:var(--sz13);line-height:1.7">
       <li>
         Timetables change about every one to two months.
-        The route network changes four times a year, because changes must be
-        published to stops and journey planners.
+        The route network changes four times a year.
         The Flow is sized to re-run when a new timetable feed arrives.
       </li>
       <li>
@@ -386,17 +432,89 @@
         Most stops are not monitored with physical sensors.
         "Boardings" here means nol card tap-ons, not all passengers.
       </li>
+      <li>
+        Standing capacity in the fleet register is marked not verified.
+        RTA plans with about 35 standing places per standard bus.
+      </li>
     </ul>
 
   </section>
 
-  <!-- ── Forecast tab (shown only when datasets exist) ──────────── -->
+  <!-- ── Tab 5: Forecast ──────────────────────────────────────────── -->
   <section class="panel" role="tabpanel"
            id="panel-forecast" aria-labelledby="tbtn-forecast">
 
     <h2>Forecast</h2>
-    <div id="forecast-content">
-      <p class="loading">Loading forecast data…</p>
+    <p class="flow-zone-label">Flow zone: Forecast</p>
+
+    <!-- Section 1: one-sentence summary computed from data -->
+    <p id="fc-summary" class="headline" style="font-size:var(--sz20)">
+      <span class="skeleton-line" style="width:85%"></span>
+    </p>
+
+    <!-- Section 2: method comparison bar chart (evening band) -->
+    <h3>How each method does in the evening peak</h3>
+    <div id="fc-method-chart" class="chart-wrap" aria-label="Mean absolute error by method, evening band">
+      <div class="skel-chart"></div>
+    </div>
+    <p class="source-line">from running_time_metrics</p>
+
+    <!-- Section 3: table of all three bands -->
+    <h3>All bands</h3>
+    <div id="fc-bands-table" class="table-scroll">
+      <div class="skel-table"></div>
+    </div>
+    <p class="source-line">from running_time_metrics</p>
+
+    <!-- Section 4: miss by hour, timetable vs model -->
+    <h3>Where it helps: average miss by hour from 16:00</h3>
+    <div id="fc-hour-chart" class="chart-wrap" aria-label="Mean absolute error by hour">
+      <div class="skel-chart"></div>
+    </div>
+    <p class="source-line">from running_time_forecast (aggregated)</p>
+
+    <!-- Section 5: one route, trip by trip -->
+    <h3>One route, trip by trip</h3>
+    <div class="ctrl-row">
+      <div class="ctrl-group">
+        <label for="fc-route-sel">Route (evening)</label>
+        <select id="fc-route-sel" aria-label="Select route for trip-by-trip view">
+          <option value="">Loading…</option>
+        </select>
+      </div>
+    </div>
+    <div id="fc-trip-chart" class="chart-wrap" aria-label="Planned, actual and forecast minutes per trip">
+      <div class="skel-chart"></div>
+    </div>
+    <p class="source-line">from running_time_forecast</p>
+
+    <!-- Section 6: feature importance -->
+    <h3>What the model leans on</h3>
+    <div id="fc-drivers-chart" class="chart-wrap" aria-label="Feature importance">
+      <div class="skel-chart"></div>
+    </div>
+    <p class="source-line">from running_time_drivers</p>
+
+    <!-- Section 7: what this does not show -->
+    <div id="fc-caveats" class="caveats-box">
+      <div class="skel-line"></div>
+    </div>
+
+    <!-- Section 8: planner view (optional dataset) -->
+    <div id="fc-planner-wrap" hidden>
+      <h3>What a planner would change</h3>
+      <div class="ctrl-row">
+        <div class="ctrl-group">
+          <label for="fc-planner-route">Route</label>
+          <select id="fc-planner-route" aria-label="Select route for planner view">
+            <option value="">Loading…</option>
+          </select>
+        </div>
+      </div>
+      <div id="fc-planner-chart" class="chart-wrap" aria-label="Planned vs 85th percentile by hour">
+        <div class="skel-chart"></div>
+      </div>
+      <p class="source-line">from running_time_bands</p>
     </div>
 
   </section>

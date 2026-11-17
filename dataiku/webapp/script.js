@@ -3,13 +3,15 @@
  * No external dependencies.  All charts are inline SVG built here.
  * getWebAppBackendUrl(path) is provided by Dataiku's runtime.
  *
- * Data sources and their tabs:
- *   Tab 1 "The day"            punctuality_by_hour, demand_by_hour
- *   Tab 2 "Service reliability" punctuality_by_route_hour, punctuality_by_bus_type
- *   Tab 3 "Passenger demand"   demand_by_hour, demand_by_route_hour, demand_by_stop
- *   Tab 4 "Supply and capacity" supply_vs_demand_by_route_hour, supply_status_by_hour
- *   Tab 5 "What if"            supply_vs_demand_by_route_hour (browser computation)
- *   Forecast                   forecast_boardings, forecast_lateness, model_metrics, insights
+ * Tab order and data sources:
+ *   The day              punctuality_by_hour, demand_by_hour
+ *   Passenger demand     demand_by_hour, demand_by_route_hour, demand_by_stop
+ *   Service reliability  punctuality_by_route_hour, punctuality_by_bus_type
+ *   Supply and capacity  supply_vs_demand_by_route_hour, supply_status_by_hour
+ *   Forecast             running_time_metrics, running_time_forecast (aggregated),
+ *                        running_time_drivers, running_time_bands (optional)
+ *   What if              supply_vs_demand_by_route_hour (browser computation)
+ *   How it is built      static
  */
 
 // ── Colour tokens ───────────────────────────────────────────────────
@@ -23,8 +25,12 @@ const C = {
 const S = {
   pHour: null, pRouteHour: null, pBusType: null,
   dHour: null, dRouteHour: null, dStop: null,
-  supply: null, supplyStatus: null, forecast: null,
+  supply: null, supplyStatus: null,
   supplyHour: null, demandRoute: null,
+  // Forecast zone state
+  fcMetrics: null, fcSummary: null, fcDrivers: null, fcBands: null,
+  fcRoute: null,          // currently selected route in the trip chart
+  fcPlannerRoute: null,   // currently selected route in the planner chart
   wi: { addBuses: 0, useDouble: false, route: null, hour: null, donor: '' },
 };
 
@@ -1111,41 +1117,461 @@ async function renderWhatIf() {
 }
 
 // ── Forecast tab ──────────────────────────────────────────────────────
+// ── Forecast tab ──────────────────────────────────────────────────────
+
+function _fcNotBuilt(label) {
+  return '<p class="not-built">' + label + ' has not been built yet.</p>';
+}
+
+function _fcMetricTable(rows) {
+  // Table: method, trips, MAE, RMSE, MAPE, gain vs timetable (with range), gain vs best simple
+  const BANDS = ['16:00 to 18:59', '19:00 to end of service', 'all trips from 16:00'];
+  let html = '<div class="table-scroll"><table class="data-table"><thead><tr>';
+  html += '<th>Band</th><th>Method</th><th class="num">Trips</th><th class="num">MAE min</th>';
+  html += '<th class="num">RMSE min</th><th class="num">MAPE</th>';
+  html += '<th class="num">vs timetable</th><th class="num">vs best simple</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    const gain = r.gain_vs_timetable != null ? fmtPct(r.gain_vs_timetable, 0) : '';
+    const range = (r.gain_low != null && r.gain_high != null)
+      ? ' (' + fmtPct(r.gain_low, 0) + ' to ' + fmtPct(r.gain_high, 0) + ')'
+      : '';
+    const gainStr = r.gain_vs_timetable != null
+      ? '<span class="col-gain">' + gain + range + '</span>'
+      : '<span style="color:var(--g3)">baseline</span>';
+    const vs_simple = r.gain_vs_best_simple != null
+      ? '<span class="col-gain">' + fmtPct(r.gain_vs_best_simple, 0) + '</span>'
+      : '';
+    html += '<tr>';
+    html += '<td style="font-size:var(--sz11);color:var(--g4)">' + (r.tested_on || '') + '</td>';
+    html += '<td>' + (r.method || '') + '</td>';
+    html += '<td class="num">' + fmtNum(r.trips) + '</td>';
+    html += '<td class="num col-miss">' + (r.mae_minutes != null ? r.mae_minutes.toFixed(1) : '') + '</td>';
+    html += '<td class="num">' + (r.rmse_minutes != null ? r.rmse_minutes.toFixed(1) : '') + '</td>';
+    html += '<td class="num">' + (r.mape != null ? fmtPct(r.mape, 0) : '') + '</td>';
+    html += '<td class="num">' + gainStr + '</td>';
+    html += '<td class="num">' + vs_simple + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function _fcMethodBars(eveningRows) {
+  // Horizontal bars: MAE in minutes for each method in the evening band
+  if (!eveningRows || !eveningRows.length) return _fcNotBuilt('Method comparison');
+  const maxMae = Math.max.apply(null, eveningRows.map(function(r) { return r.mae_minutes || 0; }));
+  if (!maxMae) return '';
+
+  const METHOD_COLOUR = {
+    'RTA timetable (the plan)': C.ink,
+  };
+  function barColour(method) {
+    if (METHOD_COLOUR[method]) return METHOD_COLOUR[method];
+    if (method && method.toLowerCase().indexOf('model') >= 0) return C.flow;
+    return C.g3;
+  }
+
+  let html = '<div class="method-bar-wrap">';
+  eveningRows.forEach(function(r) {
+    const pct = maxMae > 0 ? Math.round((r.mae_minutes / maxMae) * 100) : 0;
+    const col = barColour(r.method);
+    html += '<div class="method-bar-row">';
+    html += '<span class="method-bar-label">' + (r.method || '') + '</span>';
+    html += '<div class="method-bar-track">';
+    html += '<div class="method-bar-fill" style="width:' + pct + '%;background:' + col + '">';
+    html += '<span class="method-bar-val">' + (r.mae_minutes != null ? r.mae_minutes.toFixed(1) + ' min' : '') + '</span>';
+    html += '</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function _fcHourChart(byHour) {
+  // Dual bar chart: timetable MAE vs model MAE by hour from 16:00
+  if (!byHour || !byHour.length) return _fcNotBuilt('Hour breakdown');
+  const evening = byHour.filter(function(r) { return (r.hour || 0) >= 16; });
+  if (!evening.length) return _fcNotBuilt('Hour breakdown');
+
+  const W = 560, H = 180, padL = 40, padR = 8, padT = 10, padB = 32;
+  const iW = W - padL - padR, iH = H - padT - padB;
+  const maxVal = Math.max.apply(null, evening.map(function(r) {
+    return Math.max(r.timetable_mae || 0, r.model_mae || 0);
+  }));
+  const yS = function(v) { return padT + iH - (v / (maxVal || 1)) * iH; };
+  const bGap = iW / evening.length;
+  const bW = Math.max(4, bGap - 4);
+
+  const svg = se('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
+  const g = se('g', { transform: 'translate(' + padL + ',0)' });
+  svg.appendChild(g);
+
+  // Y gridlines
+  [0.25, 0.5, 0.75, 1].forEach(function(f) {
+    const y = padT + iH * (1 - f);
+    g.appendChild(seLine(0, y, iW, y, { stroke: C.g1 }));
+    g.appendChild(seText(-4, y + 4, (maxVal * f).toFixed(1), { 'text-anchor': 'end', 'font-size': 10, fill: C.g4 }));
+  });
+
+  // Bars
+  evening.forEach(function(r, i) {
+    const x = i * bGap + bGap / 2;
+    if (r.timetable_mae != null) {
+      const h = (r.timetable_mae / (maxVal || 1)) * iH;
+      g.appendChild(seRect(x - bW / 2 - 2, padT + iH - h, bW / 2 - 1, h, { fill: C.ink }));
+    }
+    if (r.model_mae != null) {
+      const h = (r.model_mae / (maxVal || 1)) * iH;
+      g.appendChild(seRect(x + 1, padT + iH - h, bW / 2 - 1, h, { fill: C.flow }));
+    }
+    if (i % 2 === 0 || evening.length <= 6) {
+      g.appendChild(seText(x, padT + iH + 14, fmtHourShort(r.hour), { 'text-anchor': 'middle', 'font-size': 10, fill: C.g4 }));
+    }
+  });
+
+  // Axis label
+  g.appendChild(seText(-padL + 2, padT + iH / 2, 'min', { transform: 'rotate(-90,' + (-padL + 12) + ',' + (padT + iH / 2) + ')', 'font-size': 10, fill: C.g4 }));
+
+  // Legend
+  const lx = iW - 160;
+  g.appendChild(seRect(lx, padT, 12, 10, { fill: C.ink }));
+  g.appendChild(seText(lx + 16, padT + 9, 'Timetable', { 'font-size': 10, fill: C.ink }));
+  g.appendChild(seRect(lx + 80, padT, 12, 10, { fill: C.flow }));
+  g.appendChild(seText(lx + 96, padT + 9, 'Model', { 'font-size': 10, fill: C.flow }));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chart-wrap';
+  wrap.setAttribute('role', 'img');
+  wrap.setAttribute('aria-label', 'Mean absolute error by hour');
+  wrap.appendChild(svg);
+  return wrap.outerHTML;
+}
+
+function _fcTripChart(trips) {
+  // Simple chart: sched_run_min, actual_run_min, model_plan per evening trip in order
+  if (!trips || !trips.length) return _fcNotBuilt('Trip chart');
+  trips = trips.slice().sort(function(a, b) { return (a.hour || 0) - (b.hour || 0) || (a.trip_id || '') < (b.trip_id || '') ? -1 : 1; });
+
+  const W = 560, H = 180, padL = 40, padR = 8, padT = 10, padB = 32;
+  const iW = W - padL - padR, iH = H - padT - padB;
+  const maxVal = Math.max.apply(null, trips.map(function(r) {
+    return Math.max(r.sched_run_min || 0, r.actual_run_min || 0, r.model_plan || 0);
+  }));
+  if (!maxVal) return _fcNotBuilt('Trip chart (no run-time values)');
+
+  const xS = function(i) { return i * (iW / (trips.length - 1 || 1)); };
+  const yS = function(v) { return padT + iH - (v / maxVal) * iH; };
+
+  const svg = se('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
+  const g = se('g', { transform: 'translate(' + padL + ',0)' });
+  svg.appendChild(g);
+
+  // Gridlines
+  [0.25, 0.5, 0.75, 1].forEach(function(f) {
+    const y = padT + iH * (1 - f);
+    g.appendChild(seLine(0, y, iW, y, { stroke: C.g1 }));
+    g.appendChild(seText(-4, y + 4, (maxVal * f).toFixed(0), { 'text-anchor': 'end', 'font-size': 10, fill: C.g4 }));
+  });
+
+  // Lines: sched, actual, model
+  function polyLine(key, col) {
+    const pts = trips.map(function(r, i) { return r[key] != null ? xS(i) + ',' + yS(r[key]) : null; }).filter(Boolean);
+    if (pts.length < 2) return;
+    g.appendChild(se('polyline', { points: pts.join(' '), fill: 'none', stroke: col, 'stroke-width': '2' }));
+  }
+  polyLine('sched_run_min', C.g3);
+  polyLine('actual_run_min', C.ink);
+  polyLine('model_plan', C.flow);
+
+  // X axis: a few hour labels
+  const hoursSeen = {};
+  trips.forEach(function(r, i) {
+    const h = r.hour;
+    if (h != null && !hoursSeen[h]) {
+      hoursSeen[h] = 1;
+      g.appendChild(seText(xS(i), padT + iH + 14, fmtHourShort(h), { 'text-anchor': 'middle', 'font-size': 10, fill: C.g4 }));
+    }
+  });
+
+  // Axis label
+  g.appendChild(seText(-padL + 2, padT + iH / 2, 'min', { transform: 'rotate(-90,' + (-padL + 12) + ',' + (padT + iH / 2) + ')', 'font-size': 10, fill: C.g4 }));
+
+  // Legend
+  g.appendChild(seLine(iW - 150, padT + 5, iW - 138, padT + 5, { stroke: C.g3, 'stroke-width': 2 }));
+  g.appendChild(seText(iW - 134, padT + 9, 'Planned', { 'font-size': 10, fill: C.g3 }));
+  g.appendChild(seLine(iW - 100, padT + 5, iW - 88, padT + 5, { stroke: C.ink, 'stroke-width': 2 }));
+  g.appendChild(seText(iW - 84, padT + 9, 'Actual', { 'font-size': 10, fill: C.ink }));
+  g.appendChild(seLine(iW - 50, padT + 5, iW - 38, padT + 5, { stroke: C.flow, 'stroke-width': 2 }));
+  g.appendChild(seText(iW - 34, padT + 9, 'Forecast', { 'font-size': 10, fill: C.flow }));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chart-wrap';
+  wrap.appendChild(svg);
+  return wrap.outerHTML;
+}
+
+function _fcDriverBars(drivers) {
+  // Horizontal bars for feature importance (share 0..1)
+  if (!drivers || !drivers.length) return _fcNotBuilt('Feature importance');
+  const PLAIN_NAMES = {
+    'sched_run_min': 'Planned running time',
+    'n_stops': 'Number of stops',
+    'hour': 'Hour of day',
+    'sched_dep_min': 'Time of day (minutes since midnight)',
+    'route': 'Route',
+    'direction': 'Direction',
+    'bus_type': 'Bus type',
+    'seats': 'Seats',
+    'model_year': 'Age of the bus',
+    'layover_sched_min': 'Planned layover before the trip',
+    'prev_trip_end_late_min': 'How late this bus finished its previous trip',
+    'route_recent_ratio': 'How the route ran in the last two hours',
+    'route_boardings_prev_hour': 'Boardings on the route in the last full hour',
+  };
+  const top = drivers.slice(0, 12);
+  const maxShare = top[0] && top[0].share != null ? Number(top[0].share) : 1;
+  let html = '<div class="method-bar-wrap">';
+  top.forEach(function(d) {
+    const name = PLAIN_NAMES[d.feature] || d.feature;
+    const share = Number(d.share) || 0;
+    const pct = maxShare > 0 ? Math.round((share / maxShare) * 100) : 0;
+    html += '<div class="method-bar-row">';
+    html += '<span class="method-bar-label">' + name + '</span>';
+    html += '<div class="method-bar-track">';
+    html += '<div class="method-bar-fill" style="width:' + pct + '%;background:' + C.flow + '">';
+    html += '<span class="method-bar-val">' + Math.round(share * 100) + '%</span>';
+    html += '</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function _fcCaveats(metrics, summary) {
+  // Section 7: computed statements about what the forecast does not show
+  const evening = metrics ? metrics.filter(function(r) { return r.tested_on === '16:00 to 18:59'; }) : [];
+  const timetableRow = evening.find(function(r) { return r.method === 'RTA timetable (the plan)'; });
+  const modelPlanRow = evening.find(function(r) { return r.method === 'Model, timetable features only'; });
+  const modelLiveRow = evening.find(function(r) { return r.method === 'Model, with what is known 30 minutes ahead'; });
+  const bestSimpleRow = evening.find(function(r) { return r.method && r.method.toLowerCase().indexOf('simple') >= 0 && r.gain_vs_timetable != null; });
+
+  const items = [];
+  if (timetableRow && bestSimpleRow) {
+    const gainSimple = bestSimpleRow.gain_vs_timetable != null
+      ? Math.round(Number(bestSimpleRow.gain_vs_timetable) * 100) : null;
+    if (gainSimple != null) {
+      items.push('The gain over the best simple baseline (' + (bestSimpleRow.best_simple_was || 'route history') + ') is ' + gainSimple + '%: the model learns patterns the simple baseline does not capture, but the gap is small.');
+    }
+  }
+  if (modelPlanRow && modelLiveRow) {
+    const diffMae = (modelLiveRow.mae_minutes || 0) - (modelPlanRow.mae_minutes || 0);
+    if (Math.abs(diffMae) < 0.5) {
+      items.push('Adding the live signals (how the route ran in the last two hours, boardings in the last full hour) did not improve accuracy in the test: the two model rows have almost the same MAE. The model learns most from the planned running time, not from real-time updates.');
+    }
+  }
+  items.push('This is one day of data. Performance on other days may differ, particularly on days with incidents or unusual demand.');
+
+  let html = '<div class="caveats-box"><h4>What this does not show</h4><ul>';
+  items.forEach(function(s) { html += '<li>' + s + '</li>'; });
+  html += '</ul></div>';
+  return html;
+}
+
+function _fcPlannerChart(bands, route) {
+  // Section 8: planned vs p85 by hour for the chosen route
+  if (!bands || !bands.length) return '';
+  const routeBands = bands.filter(function(r) { return r.route === route; });
+  if (!routeBands.length) return '<p class="note">No bands data for route ' + route + '.</p>';
+  const hours = routeBands.map(function(r) { return r.hour; }).filter(function(h) { return h != null; });
+  hours.sort(function(a,b) { return a-b; });
+
+  const W = 560, H = 200, padL = 40, padR = 8, padT = 10, padB = 32;
+  const iW = W - padL - padR, iH = H - padT - padB;
+  const allVals = routeBands.flatMap(function(r) { return [r.sched_run_min, r.actual_p85_min]; }).filter(Boolean);
+  const maxVal = Math.max.apply(null, allVals) || 1;
+  const xS = function(i) { return i * (iW / (Math.max(hours.length - 1, 1))); };
+  const yS = function(v) { return padT + iH - (v / maxVal) * iH; };
+
+  const svg = se('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
+  const g = se('g', { transform: 'translate(' + padL + ',0)' });
+  svg.appendChild(g);
+
+  // Gridlines
+  [0.25, 0.5, 0.75, 1].forEach(function(f) {
+    const y = padT + iH * (1 - f);
+    g.appendChild(seLine(0, y, iW, y, { stroke: C.g1 }));
+    g.appendChild(seText(-4, y + 4, (maxVal * f).toFixed(0), { 'text-anchor': 'end', 'font-size': 10, fill: C.g4 }));
+  });
+
+  // Lines
+  function routeLine(key, col) {
+    const pts = hours.map(function(h, i) {
+      const row = routeBands.find(function(r) { return r.hour === h; });
+      return row && row[key] != null ? xS(i) + ',' + yS(row[key]) : null;
+    }).filter(Boolean);
+    if (pts.length >= 2) g.appendChild(se('polyline', { points: pts.join(' '), fill: 'none', stroke: col, 'stroke-width': 2 }));
+  }
+  routeLine('sched_run_min', C.g3);
+  routeLine('actual_p85_min', C.over);
+
+  // Extra min fill
+  hours.forEach(function(h, i) {
+    const row = routeBands.find(function(r) { return r.hour === h; });
+    if (row && row.extra_min_at_p85 != null && row.extra_min_at_p85 > 0) {
+      const x = xS(i);
+      const y1 = yS(row.sched_run_min || 0);
+      const y2 = yS(row.actual_p85_min || 0);
+      g.appendChild(seRect(x - 4, Math.min(y1, y2), 8, Math.abs(y1 - y2), { fill: C.over, opacity: '0.15' }));
+    }
+  });
+
+  // X axis labels
+  hours.forEach(function(h, i) {
+    if (i % 2 === 0 || hours.length <= 6) {
+      g.appendChild(seText(xS(i), padT + iH + 14, fmtHourShort(h), { 'text-anchor': 'middle', 'font-size': 10, fill: C.g4 }));
+    }
+  });
+
+  // Axis label
+  g.appendChild(seText(-padL + 2, padT + iH / 2, 'min', { transform: 'rotate(-90,' + (-padL + 12) + ',' + (padT + iH / 2) + ')', 'font-size': 10, fill: C.g4 }));
+
+  // Legend
+  g.appendChild(seLine(iW - 160, padT + 5, iW - 148, padT + 5, { stroke: C.g3, 'stroke-width': 2 }));
+  g.appendChild(seText(iW - 144, padT + 9, 'Planned', { 'font-size': 10, fill: C.g3 }));
+  g.appendChild(seLine(iW - 95, padT + 5, iW - 83, padT + 5, { stroke: C.over, 'stroke-width': 2 }));
+  g.appendChild(seText(iW - 79, padT + 9, '85th percentile', { 'font-size': 10, fill: C.over }));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chart-wrap';
+  wrap.appendChild(svg);
+  return wrap.outerHTML;
+}
+
 async function renderForecast() {
-  const el = document.getElementById('forecast-content');
-  setLoading(el);
   try {
-    if (!S.forecast) S.forecast = await apiFetch('/api/forecast');
-    const f = S.forecast;
-    let html = '';
+    // Load all four datasets in parallel (bands is optional)
+    const [metrics, summary, drivers, bandsResult] = await Promise.all([
+      S.fcMetrics  || apiFetch('/api/running-time-metrics').then(function(d)  { return (S.fcMetrics  = d); }),
+      S.fcSummary  || apiFetch('/api/running-time-forecast-summary').then(function(d) { return (S.fcSummary  = d); }),
+      S.fcDrivers  || apiFetch('/api/running-time-drivers').then(function(d)  { return (S.fcDrivers  = d); }),
+      S.fcBands !== undefined
+        ? Promise.resolve(S.fcBands)
+        : apiFetch('/api/running-time-bands').then(function(d) { S.fcBands = d.error ? null : d; return S.fcBands; }).catch(function() { S.fcBands = null; return null; }),
+    ]);
 
-    ['forecast_boardings', 'forecast_lateness', 'model_metrics', 'insights'].forEach(function(key) {
-      const val = f[key];
-      if (!val || val.error) {
-        html += '<p class="not-built">The ' + key.replace(/_/g,' ') + ' step has not been built yet.</p>';
-      } else {
-        html += '<h3>' + key.replace(/_/g,' ') + '</h3>';
-        html += '<p class="caption">Source: ' + key + ' (' + val.length + ' rows)</p>';
-        // Simple table
-        if (val.length) {
-          const cols = Object.keys(val[0]);
-          html += '<div style="overflow-x:auto"><table class="whatif-table"><thead><tr>';
-          cols.forEach(function(c) { html += '<th>' + c + '</th>'; });
-          html += '</tr></thead><tbody>';
-          val.slice(0, 10).forEach(function(row) {
-            html += '<tr>';
-            cols.forEach(function(c) { html += '<td>' + (row[c] != null ? row[c] : '') + '</td>'; });
-            html += '</tr>';
+    const eveningMetrics = metrics.filter(function(r) { return r.tested_on === '16:00 to 18:59'; });
+    const modelRow = eveningMetrics.find(function(r) { return r.method && r.method.indexOf('Model') >= 0 && r.method.indexOf('timetable features') >= 0; });
+    const ttRow    = eveningMetrics.find(function(r) { return r.method === 'RTA timetable (the plan)'; });
+
+    // 1. Summary sentence
+    const summaryEl = document.getElementById('fc-summary');
+    if (summaryEl && modelRow && ttRow) {
+      const gain = modelRow.gain_vs_timetable != null ? Math.round(Number(modelRow.gain_vs_timetable) * 100) : null;
+      const gainLow  = modelRow.gain_low  != null ? Math.round(Number(modelRow.gain_low)  * 100) : null;
+      const gainHigh = modelRow.gain_high != null ? Math.round(Number(modelRow.gain_high) * 100) : null;
+      const rangeStr = (gainLow != null && gainHigh != null) ? ' (' + gainLow + ' to ' + gainHigh + '%)' : '';
+      summaryEl.textContent =
+        'In the evening peak, the timetable misses actual running time by ' +
+        (ttRow.mae_minutes != null ? ttRow.mae_minutes.toFixed(1) : '?') + ' min on average. ' +
+        'The model brings that to ' + (modelRow.mae_minutes != null ? modelRow.mae_minutes.toFixed(1) : '?') + ' min' +
+        (gain != null ? ', a ' + gain + '% gain' + rangeStr : '') + '. ' +
+        (modelRow.learned_from ? 'It learned from ' + modelRow.learned_from + '.' : '') +
+        (modelRow.made ? ' Forecast is made ' + modelRow.made + '.' : '');
+    } else if (summaryEl) {
+      summaryEl.textContent = 'Running-time metrics could not be loaded.';
+    }
+
+    // 2. Method bar chart (evening band)
+    const methodChartEl = document.getElementById('fc-method-chart');
+    if (methodChartEl) methodChartEl.innerHTML = _fcMethodBars(eveningMetrics);
+
+    // 3. All-bands table
+    const bandsTableEl = document.getElementById('fc-bands-table');
+    if (bandsTableEl) bandsTableEl.innerHTML = _fcMetricTable(metrics);
+
+    // 4. Hour chart
+    const hourChartEl = document.getElementById('fc-hour-chart');
+    if (hourChartEl) hourChartEl.innerHTML = _fcHourChart(summary && summary.by_hour);
+
+    // 5. Trip chart: route selector
+    const byRoute = (summary && summary.by_route) || [];
+    const routeSel = document.getElementById('fc-route-sel');
+    if (routeSel && byRoute.length) {
+      routeSel.innerHTML = '';
+      byRoute.forEach(function(r) {
+        const opt = document.createElement('option');
+        opt.value = r.route;
+        opt.textContent = r.route + ' (' + r.trips + ' trips)';
+        routeSel.appendChild(opt);
+      });
+      if (!S.fcRoute && byRoute.length) S.fcRoute = byRoute[0].route;
+      if (S.fcRoute) routeSel.value = S.fcRoute;
+
+      routeSel.onchange = function() {
+        S.fcRoute = routeSel.value;
+        _loadTripChart();
+      };
+    }
+    _loadTripChart();
+
+    // 6. Drivers
+    const driversEl = document.getElementById('fc-drivers-chart');
+    if (driversEl) driversEl.innerHTML = _fcDriverBars(drivers);
+
+    // 7. Caveats
+    const caveatsEl = document.getElementById('fc-caveats');
+    if (caveatsEl) caveatsEl.innerHTML = _fcCaveats(metrics, summary);
+
+    // 8. Planner view (optional)
+    const plannerWrap = document.getElementById('fc-planner-wrap');
+    if (plannerWrap) {
+      if (S.fcBands && S.fcBands.length) {
+        plannerWrap.removeAttribute('hidden');
+        // Populate planner route selector from bands data
+        const plannerRoutes = Array.from(new Set(S.fcBands.map(function(r) { return r.route; }).filter(Boolean))).sort();
+        const plannerSel = document.getElementById('fc-planner-route');
+        if (plannerSel) {
+          plannerSel.innerHTML = '';
+          plannerRoutes.forEach(function(r) {
+            const opt = document.createElement('option');
+            opt.value = r;
+            opt.textContent = r;
+            plannerSel.appendChild(opt);
           });
-          if (val.length > 10) html += '<tr><td colspan="' + cols.length + '" style="color:var(--g3)">... ' + (val.length-10) + ' more rows</td></tr>';
-          html += '</tbody></table></div>';
+          if (!S.fcPlannerRoute && plannerRoutes.length) S.fcPlannerRoute = plannerRoutes[0];
+          if (S.fcPlannerRoute) plannerSel.value = S.fcPlannerRoute;
+          plannerSel.onchange = function() {
+            S.fcPlannerRoute = plannerSel.value;
+            const plannerChart = document.getElementById('fc-planner-chart');
+            if (plannerChart) plannerChart.innerHTML = _fcPlannerChart(S.fcBands, S.fcPlannerRoute);
+          };
         }
+        const plannerChart = document.getElementById('fc-planner-chart');
+        if (plannerChart) plannerChart.innerHTML = _fcPlannerChart(S.fcBands, S.fcPlannerRoute || plannerRoutes[0]);
+      } else {
+        // Show "not built yet" note within planner section
+        plannerWrap.removeAttribute('hidden');
+        const plannerChart = document.getElementById('fc-planner-chart');
+        if (plannerChart) plannerChart.innerHTML = _fcNotBuilt('running_time_bands');
       }
-    });
+    }
 
-    el.innerHTML = html;
   } catch (e) {
-    setError(el, e.message);
+    const el = document.getElementById('fc-summary');
+    if (el) setError(el, e.message);
+  }
+}
+
+async function _loadTripChart() {
+  const tripChartEl = document.getElementById('fc-trip-chart');
+  if (!tripChartEl || !S.fcRoute) return;
+  tripChartEl.innerHTML = '<div class="skel-chart"></div>';
+  try {
+    const url = '/api/running-time-forecast-route?route=' + encodeURIComponent(S.fcRoute);
+    const trips = await apiFetch(url);
+    tripChartEl.innerHTML = _fcTripChart(trips);
+  } catch (e) {
+    tripChartEl.innerHTML = '<p class="api-error">Could not load trips: ' + e.message + '</p>';
   }
 }
 
@@ -1274,21 +1700,7 @@ function wireKeyboard() {
   });
 }
 
-// ── Forecast tab: show only when data exists ──────────────────────────
-async function probeForecast() {
-  try {
-    const f = await apiFetch('/api/forecast');
-    S.forecast = f;
-    const hasAny = ['forecast_boardings','forecast_lateness','model_metrics','insights']
-      .some(function(k) { return f[k] && !f[k].error; });
-    if (hasAny) {
-      const btn = document.getElementById('tbtn-forecast');
-      if (btn) btn.removeAttribute('hidden');
-    }
-  } catch (e) {
-    // Forecast datasets absent — tab stays hidden
-  }
-}
+// Forecast tab is always shown; no probe needed.
 
 // ── Init ──────────────────────────────────────────────────────────────
 (function init() {
@@ -1306,6 +1718,5 @@ async function probeForecast() {
   LOADED['day'] = true;
   renderDay().catch(function(e) { console.error('Day tab error:', e); });
 
-  // Probe forecast in background
-  probeForecast();
+  // No background probe needed — forecast tab is always visible.
 })();

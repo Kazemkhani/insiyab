@@ -226,16 +226,123 @@ def _make_supply_status_by_hour():
     return pd.DataFrame(result)
 
 
+def _make_running_time_metrics():
+    """Three test-bands times five methods = 15 rows."""
+    bands = [
+        ("16:00 to 18:59",        "evening peak"),
+        ("19:00 to end of service", "late"),
+        ("all trips from 16:00",   "combined"),
+    ]
+    methods = [
+        ("RTA timetable (the plan)",                  None,  None, None, None, None),
+        ("Route history mean",                         0.14,  0.12, 0.17, 0.12, "route history"),
+        ("Route recent mean",                          0.18,  0.15, 0.22, 0.09, "route recent"),
+        ("Model, timetable features only",             0.26,  0.21, 0.31, 0.16, "route history"),
+        ("Model, with what is known 30 minutes ahead", 0.27,  0.22, 0.32, 0.12, "route history"),
+    ]
+    rows = []
+    for tested_on, _short in bands:
+        for idx, (method, gain, gain_low, gain_high, gain_vs_simple, best_simple) in enumerate(methods):
+            timetable_mae = 8.4 + idx * 0.3
+            rows.append({
+                "tested_on":          tested_on,
+                "method":             method,
+                "trips":              420 + idx * 15,
+                "mae_minutes":        round(timetable_mae * (1 - (gain or 0)), 2),
+                "rmse_minutes":       round(timetable_mae * (1 - (gain or 0)) * 1.3, 2),
+                "mape":               round(0.14 + idx * 0.01, 4),
+                "gain_vs_timetable":  gain,
+                "gain_low":           gain_low,
+                "gain_high":          gain_high,
+                "gain_vs_best_simple": gain_vs_simple,
+                "best_simple_was":    best_simple,
+                "learned_from":       "14,230 evening trips on 15 routes",
+                "made":               "2026-11-15",
+            })
+    return pd.DataFrame(rows)
+
+
+def _make_running_time_forecast():
+    """~400 rows: 20 routes x 20 evening trips each."""
+    rows = []
+    for route in _ROUTES[:20]:
+        ri = int(route[1:]) - 1
+        base_run = 25 + ri * 2
+        for trip_num in range(20):
+            h = 16 + (trip_num * 20) // 60
+            sched = base_run + (h - 16) * 0.4
+            actual = sched + random.uniform(-2.5, 4.5)
+            tt = sched
+            mp = sched + (actual - sched) * 0.6
+            rows.append({
+                "trip_id":        "TRIP{}{:04d}".format(route, trip_num),
+                "route":          route,
+                "direction":      "inbound" if trip_num % 2 == 0 else "outbound",
+                "hour":           h,
+                "band":           "evening_peak",
+                "bus_type":       _BUS_TYPES[ri % len(_BUS_TYPES)],
+                "sched_run_min":  round(sched, 2),
+                "actual_run_min": round(actual, 2),
+                "timetable":      round(tt, 2),
+                "route_history":  round(sched + 0.8, 2),
+                "route_recent":   round(sched + 0.5, 2),
+                "model_plan":     round(mp, 2),
+                "model_live":     round(mp - 0.2, 2),
+            })
+    return pd.DataFrame(rows)
+
+
+def _make_running_time_drivers():
+    features = [
+        ("sched_run_min",           0.42),
+        ("hour",                    0.18),
+        ("route",                   0.12),
+        ("n_stops",                 0.08),
+        ("prev_trip_end_late_min",  0.07),
+        ("route_recent_ratio",      0.06),
+        ("bus_type",                0.04),
+        ("direction",               0.03),
+    ]
+    rows = [{"feature": f, "share": s} for f, s in features]
+    return pd.DataFrame(rows)
+
+
+def _make_running_time_bands():
+    """Route-hour bands for the first 10 routes, hours 16..20."""
+    rows = []
+    for route in _ROUTES[:10]:
+        ri = int(route[1:]) - 1
+        for h in range(16, 21):
+            sched = 25 + ri * 2 + (h - 16) * 0.5
+            p50   = sched * 1.05
+            p85   = sched * 1.20 + (h - 16) * 0.8
+            rows.append({
+                "route":               route,
+                "direction":           "inbound",
+                "hour":                h,
+                "trips":               8 + ri % 5,
+                "sched_run_min":       round(sched, 2),
+                "actual_p50_min":      round(p50, 2),
+                "actual_p85_min":      round(p85, 2),
+                "extra_min_at_p85":    round(p85 - sched, 2),
+                "share_running_over_plan": round((p85 - sched) / sched, 4),
+            })
+    return pd.DataFrame(rows)
+
+
 _DATA = {
-    "punctuality_by_hour":          _make_punctuality_by_hour,
-    "punctuality_by_route_hour":     _make_punctuality_by_route_hour,
-    "punctuality_by_bus_type":       _make_punctuality_by_bus_type,
-    "demand_by_hour":                _make_demand_by_hour,
-    "demand_by_route_hour":          _make_demand_by_route_hour,
-    "demand_by_stop":                _make_demand_by_stop,
+    "punctuality_by_hour":           _make_punctuality_by_hour,
+    "punctuality_by_route_hour":      _make_punctuality_by_route_hour,
+    "punctuality_by_bus_type":        _make_punctuality_by_bus_type,
+    "demand_by_hour":                 _make_demand_by_hour,
+    "demand_by_route_hour":           _make_demand_by_route_hour,
+    "demand_by_stop":                 _make_demand_by_stop,
     "supply_vs_demand_by_route_hour": _make_supply_vs_demand,
-    "supply_status_by_hour":         _make_supply_status_by_hour,
-    # forecast datasets are ABSENT by default (triggers "not built yet" path)
+    "supply_status_by_hour":          _make_supply_status_by_hour,
+    "running_time_metrics":           _make_running_time_metrics,
+    "running_time_forecast":          _make_running_time_forecast,
+    "running_time_drivers":           _make_running_time_drivers,
+    "running_time_bands":             _make_running_time_bands,
 }
 
 
@@ -388,9 +495,10 @@ def run_all_tests():
 
     TABS = [
         ("day",         "tbtn-day"),
-        ("reliability", "tbtn-reliability"),
         ("demand",      "tbtn-demand"),
+        ("reliability", "tbtn-reliability"),
         ("supply",      "tbtn-supply"),
+        ("forecast",    "tbtn-forecast"),
         ("whatif",      "tbtn-whatif"),
         ("build",       "tbtn-build"),
     ]
@@ -491,21 +599,99 @@ def run_all_tests():
                 "text did not change after clicking +",
             )
 
-            # Absent forecast dataset shows "not built yet" sentence
-            page.click("#tbtn-forecast") if page.query_selector("#tbtn-forecast:not([hidden])") else None
-            # Probe forecast to try to unhide the tab (it may still be hidden if all missing)
-            # Directly navigate to forecast state
-            page.evaluate("switchTab && switchTab('forecast')")
-            page.wait_for_timeout(1200)
-            shot = os.path.join(SHOT_DIR, "{}-forecast.png".format(vname))
-            page.screenshot(path=shot)
-            forecast_text = page.evaluate("(document.getElementById('forecast-content') || {}).innerText || ''")
+            # ── Forecast tab (always visible) ─────────────────────────
+            page.click("#tbtn-forecast")
+            page.wait_for_timeout(2000)
+            shot = os.path.join(SHOT_DIR, "{}-forecast-data.png".format(vname))
+            page.screenshot(path=shot, full_page=False)
+
+            # Flow zone label is present
+            fc_zone = page.evaluate("""
+                (function() {
+                    var el = document.querySelector('#panel-forecast .flow-zone-label');
+                    return el ? el.innerText : '';
+                })()
+            """)
             check(
-                vname + "/forecast/shows-not-built",
-                "not been built yet" in (forecast_text or "").lower() or
-                "not built" in (forecast_text or "").lower(),
-                repr((forecast_text or "")[:100]),
+                vname + "/forecast/flow-zone-label",
+                "forecast" in fc_zone.lower(),
+                "flow-zone-label text: " + repr(fc_zone[:60]),
             )
+
+            # First screenful at 1280x720: fc-summary is visible without scrolling
+            if vp["width"] == 1280:
+                summary_in_view = page.evaluate("""
+                    (function() {
+                        var el = document.getElementById('fc-summary');
+                        if (!el) return false;
+                        var r = el.getBoundingClientRect();
+                        return r.top >= 0 && r.bottom <= window.innerHeight;
+                    })()
+                """)
+                check(
+                    vname + "/forecast/first-screenful-has-summary",
+                    summary_in_view,
+                    "fc-summary not in first screenful at 1280x720",
+                )
+
+            # Summary sentence has content (not skeleton)
+            summary_text = page.evaluate("(document.getElementById('fc-summary') || {}).innerText || ''")
+            check(
+                vname + "/forecast/summary-sentence-not-empty",
+                len(summary_text.strip()) > 20,
+                repr(summary_text[:80]),
+            )
+
+            # Method chart section present
+            method_el = page.evaluate("document.getElementById('fc-method-chart') !== null")
+            check(vname + "/forecast/has-method-chart", method_el, "fc-method-chart not found")
+
+            # Bands table present and non-empty
+            bands_tbl = page.evaluate("(document.getElementById('fc-bands-table') || {}).innerText || ''")
+            check(
+                vname + "/forecast/bands-table-has-content",
+                len(bands_tbl.strip()) > 10,
+                repr(bands_tbl[:60]),
+            )
+
+            # Drivers chart present
+            drivers_el = page.evaluate("document.getElementById('fc-drivers-chart') !== null")
+            check(vname + "/forecast/has-drivers-chart", drivers_el, "fc-drivers-chart not found")
+
+            # Planner section visible (running_time_bands is present in this test run)
+            planner_hidden = page.evaluate("""
+                (function() {
+                    var el = document.getElementById('fc-planner-wrap');
+                    return el ? el.hasAttribute('hidden') : true;
+                })()
+            """)
+            check(
+                vname + "/forecast/planner-section-visible",
+                not planner_hidden,
+                "fc-planner-wrap is hidden; running_time_bands should be present",
+            )
+
+            # ── Forecast tab with running_time_bands absent ───────────
+            page.goto(BASE + "/test-break/running_time_bands")
+            page.wait_for_timeout(200)
+            page.goto(BASE + "/")
+            page.wait_for_timeout(1000)
+            page.click("#tbtn-forecast")
+            page.wait_for_timeout(2000)
+            shot = os.path.join(SHOT_DIR, "{}-forecast-no-bands.png".format(vname))
+            page.screenshot(path=shot, full_page=False)
+            # Main sections still render; planner shows "not built yet"
+            summary_still = page.evaluate("(document.getElementById('fc-summary') || {}).innerText || ''")
+            check(
+                vname + "/forecast/summary-still-shows-without-bands",
+                len(summary_still.strip()) > 20,
+                repr(summary_still[:80]),
+            )
+            # Restore
+            page.goto(BASE + "/test-restore/running_time_bands")
+            page.wait_for_timeout(200)
+            page.goto(BASE + "/")
+            page.wait_for_timeout(1000)
 
             # ── Fix 1: headline and stat tile must use the same hour ──────
             page.click("#tbtn-day")
@@ -645,6 +831,26 @@ def run_all_tests():
             # Restore
             page.goto(BASE + "/test-restore/punctuality_by_hour")
             page.wait_for_timeout(200)
+            page.goto(BASE + "/")
+            page.wait_for_timeout(1000)
+
+            # ── How it is built: four zones ───────────────────────────
+            page.click("#tbtn-build")
+            page.wait_for_timeout(800)
+            build_text = page.evaluate("(document.getElementById('panel-build') || {}).innerText || document.body.innerText")
+            for zone_name in ["Passenger demand", "Service reliability", "Supply and capacity", "Forecast"]:
+                check(
+                    vname + "/build/has-zone-" + zone_name.lower().replace(" ", "-"),
+                    zone_name.lower() in build_text.lower(),
+                    repr(build_text[:200]),
+                )
+            # Real step names
+            for step_name in ["count_taps", "clean_running_time", "buses_needed_rule", "forecast_running_time"]:
+                check(
+                    vname + "/build/has-step-" + step_name,
+                    step_name in build_text,
+                    "step '{}' not found in build panel".format(step_name),
+                )
 
             page.close()
 
