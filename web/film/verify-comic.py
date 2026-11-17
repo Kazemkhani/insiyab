@@ -23,9 +23,11 @@ with tempfile.TemporaryDirectory(prefix='insiyab-film-negative-') as tmp:
  target=pathlib.Path(tmp)/'bad';(target/'data/forecast').mkdir(parents=True)
  for name in ['meta.json','network.json','personas.json','decisions.json','forecast/boardings-route.json','forecast/delay-route.json']:
   shutil.copyfile(site/'data'/name,target/'data'/name)
- p=target/'data/personas.json';data=json.loads(p.read_text());next(p for p in data['personas'] if p['id']=='site_worker')['steps'][0]['before']['load']+=1;p.write_text(json.dumps(data))
- result=subprocess.run(['node','web/film/prepare-comic.mjs',str(target),str(pathlib.Path(tmp)/'out'),str(audio)],capture_output=True,text=True)
- assert result.returncode!=0 and 'do not describe the same load' in result.stderr
-print('PASS film: a mismatched worker and vehicle-exchange story is rejected')
+ p=target/'data/personas.json';original=json.loads(p.read_text())
+ for step,field in [(0,'load'),(1,'load'),(1,'seats')]:
+  data=json.loads(json.dumps(original));person=next(p for p in data['personas'] if p['id']=='site_worker');person['steps'][step]['before' if step==0 else 'after'][field]+=1;p.write_text(json.dumps(data))
+  result=subprocess.run(['node','web/film/prepare-comic.mjs',str(target),str(pathlib.Path(tmp)/'out'),str(audio)],capture_output=True,text=True)
+  assert result.returncode!=0 and 'do not describe the same load' in result.stderr
+  print(f'PASS film: mismatched story step {step+1} {field} is rejected')
 (out/'probe.json').write_text(json.dumps(info,indent=2)+'\n')
 print('FILM PASS')

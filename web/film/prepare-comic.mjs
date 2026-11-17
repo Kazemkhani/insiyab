@@ -13,7 +13,7 @@ const swap=decisions.decisions.find(d=>d.lever==='right_bus')?.swaps?.[0];
 if(!swap)throw Error('This film requires a supplied vehicle exchange; it cannot invent one.');
 const person=id=>personas.personas.find(p=>p.id===id);
 const worker=person('site_worker'),office=person('office_worker');
-if(worker.steps[0].before.load!==swap.from.largest_load||worker.steps[0].before.seats!==swap.from.seats)throw Error('The worker story and first exchange do not describe the same load.');
+if(worker.steps[0].before.load!==swap.from.largest_load||worker.steps[0].before.seats!==swap.from.seats||worker.steps[1]?.after?.load!==swap.from.largest_load||worker.steps[1]?.after?.seats!==swap.to.seats)throw Error('The worker story and first exchange do not describe the same load.');
 const series=forecast.series.find(s=>s.id===swap.from.route_id)??forecast.series[0];
 const rows=series.rows.filter(r=>r.horizon===3600).sort((a,b)=>a.bin_start-b.bin_start).slice(0,12);
 const delaySeries=delay.series.find(s=>s.id===series.id)??delay.series[0];
