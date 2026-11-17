@@ -1,5 +1,6 @@
 import {horizonChart,subsetChart,forecastChart,gapChart,gainChart} from './charts.mjs';
-import {sceneSVG,seatDiagram} from './scene.mjs';
+import {seatDiagram} from './scene.mjs';
+import {showTwin} from './twin-scene.mjs';
 import {Deck, OrthographicView, COORDINATE_SYSTEM} from '@deck.gl/core';
 import {initMap} from './map.mjs';
 import {briefingHTML} from './briefing.mjs';
@@ -9,12 +10,12 @@ const B=window.INSIYAB_BUNDLE, M=createModel(B), $=id=>document.getElementById(i
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const css=getComputedStyle(document.documentElement);
 const colour=name=>css.getPropertyValue('--'+name).trim().match(/\w\w/g).map(v=>parseInt(v,16));
-const C=Object.fromEntries(['ink','paper','flow','over','spare','simulated','line','grey','muted'].map(n=>[n,colour(n)]));
+const C=Object.fromEntries(['ink','paper','flow','over','spare','simulated','line','grey','muted','pale'].map(n=>[n,colour(n)]));
 const routeTarget=B['metrics.json'].targets.find(t=>t.target==='boardings'&&t.level==='route');
 const openingTime=routeTarget?.split.origins[0]??M.meta.origins[0]+3600;
 let time=Math.min(M.max,Math.max(M.min,openingTime)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1,focusRoute='',closedGaps=false,roomState=null,playbackCount=null;
 // Map mode: geoMode=true uses MapLibre+MapboxOverlay; false uses OrthographicView fallback.
-let geoMode=false,decklike,mapGL;
+let geoMode=false,decklike,mapGL,publicStop='';
 // Inverse of model.mjs equirectangular projection, so bus positions can be rendered in lon/lat.
 const _rCoords=M.network.routes.flatMap(r=>r.directions.flatMap(d=>d.shape));
 const _cLon=_rCoords.reduce((a,p)=>a+p[0],0)/_rCoords.length,_cLat=_rCoords.reduce((a,p)=>a+p[1],0)/_rCoords.length,_cosLat=Math.cos(_cLat*Math.PI/180)*10000;
@@ -25,11 +26,43 @@ const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Has room
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 $('fixture').hidden=!M.meta.fixture;
 $('service-date').textContent=M.meta.service_date+' · Dubai time';
-$('provenance').textContent=`${M.meta.notes}. Source bundle generated ${M.meta.generated_at}. Service day ${M.meta.service_date}. ${M.meta.fixture?'Every transport value in this build is invented.':'Measured values are supplied aggregate records.'}`;
+$('provenance').textContent=`${M.meta.notes}. Source bundle generated ${M.meta.generated_at}. Service day ${M.meta.service_date}. ${M.meta.fixture?'Operational counts are invented. The bundled routes and stops use an archived RTA public network; see the map source note.':'Measured values are supplied aggregate records.'}`;
 const headline=B['summary.json'].headline[0];
 $('headline').innerHTML=`<span class="big-number" data-headline>${number(headline.value)}</span><span class="headline-label">${escape(headline.label)}</span><span class="source">${escape(headline.kind)} · ${escape(headline.unit)}<br>${escape(headline.source)} · ${M.meta.service_date}</span>`;
 $('time').min=M.min;$('time').max=M.max;
 $('play').textContent=playing?'Pause':'Play';
+$('map').append($('map-credit'));
+$('map-credit').innerHTML='<a href="https://www.dubaipulse.gov.ae/data/rta-public-transports/rta_gtfs-open" target="_blank" rel="noopener">RTA public network · 2021 archive</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>';
+function inspectPublicStop(id){
+  publicStop=id;const stop=M.stops.get(id);if(!stop)return;
+  const routes=M.paths.filter(r=>r.stops.includes(id));
+  $('public-selection').hidden=false;
+  $('public-selection').innerHTML=`<strong>${escape(stop.name)}</strong><span>${[...new Set(routes.map(r=>r.label))].map(escape).join(' · ')}</span><p>${M.meta.fixture?'Published stop location. Passenger counts in this example are invented, not RTA observations.':'Passenger counts come from the supplied service records.'}</p>`;
+  $('public-search-results').replaceChildren();pick('stop',id);
+}
+function syncMapMode(){
+  $('public-controls').hidden=view!=='replay';$('public-selection').hidden=view!=='replay'||!publicStop;
+  $('map-note-context').textContent='Seats only';
+}
+$('public-route').insertAdjacentHTML('beforeend',M.network.routes.map(r=>`<option value="${escape(r.route_id)}">${escape(r.short_name)} · ${escape(r.long_name??r.name??'')}</option>`).join(''));
+$('public-route').onchange=e=>{focusRoute=e.target.value;publicStop='';$('public-selection').hidden=true;document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.route===focusRoute)));fitMap();};
+$('public-search').oninput=e=>{const query=e.target.value.trim().toLowerCase();const results=query.length>=2?M.network.stops.filter(s=>s.name.toLowerCase().includes(query)).slice(0,6):[];$('public-search-results').innerHTML=results.map(s=>`<button data-public-stop="${escape(s.stop_id)}">${escape(s.name)}</button>`).join('');if(query.length>=2&&!results.length)$('public-search-results').textContent='No published stop matches.';document.querySelectorAll('[data-public-stop]').forEach(b=>b.onclick=()=>{inspectPublicStop(b.dataset.publicStop);$('public-search').focus({preventScroll:true});const stop=M.stops.get(b.dataset.publicStop);if(geoMode){mapGL.jumpTo({center:[stop.lon,stop.lat],zoom:14});}else{fit={target:[...stop.position,0],zoom:1,scale:2};deck?.setProps({viewState:{target:fit.target,zoom:fit.zoom}});}render();});};
+for(const [id,change] of [['zoom-in',.6],['zoom-out',-.6]])$(id).onclick=()=>{if(geoMode){mapGL.jumpTo({zoom:mapGL.getZoom()+change});return;}if(!fit||!deck)return;fit.zoom=Math.max(-6,Math.min(7,fit.zoom+change));fit.scale=2**fit.zoom;deck.setProps({viewState:{target:fit.target,zoom:fit.zoom}});render();};
+$('map-reset').onclick=fitMap;
+$('open-reliability').onclick=()=>setView('model');
+let compareSwap=false;
+function renderExecutive(){
+  const decision=B['decisions.json'].decisions.find(d=>d.lever==='right_bus'),swap=decision?.swaps?.[0];
+  if(!swap){$('executive').innerHTML='<h2>Compare the proposed changes</h2><p>No paired vehicle exchange is supplied in this bundle.</p><button id="executive-decisions">See the decisions</button>';$('executive-decisions').onclick=()=>setView('gap');return;}
+  const row=(side,other)=>{const s=swap[side],seats=compareSwap?swap[other].seats:s.seats,load=s.largest_load,excess=Math.max(0,load-seats);return `<div class="swap-trip"><div><span>${escape(M.routes.get(s.route_id)?.short_name??s.route_id)} · ${clock(s.start)}</span><strong>${load}<small> passengers</small></strong></div><div class="swap-capacity"><span>${seats} seats</span><div class="capacity-track"><i style="width:${Math.min(100,load/seats*100)}%;background:var(--${excess?'over':'flow'})"></i></div><b class="${excess?'over':'room'}">${excess?`${excess} above seats`:`${seats-load} seats free`}</b></div></div>`;};
+  $('executive').innerHTML=`<p class="eyebrow">${M.meta.fixture?'An invented service example':'A proposed vehicle exchange'}</p><h2>${compareSwap?'The same people. More seats where needed.':'One bus is too small. Another has room.'}</h2><p class="executive-state ${compareSwap?'simulated':''}">${compareSwap?'Proposed swap · simulated':'Before the change · '+(M.meta.fixture?'invented records':'measured records')}</p>${row('from','to')}${row('to','from')}<button id="compare-swap" class="primary" aria-pressed="${compareSwap}">${compareSwap?'Show the original buses':'Compare the vehicle swap'}</button><p class="small">${compareSwap?'The buses exchange trips. Passenger demand stays the same.':'Put the larger bus on the busier trip.'}</p><details><summary>What the planner must check</summary><p>${escape(decision.cost_note)}</p><p>${escape(decision.effect[0]?.assumption??'')}</p><p class="source">decisions.json · first proposed pair · ${M.meta.service_date}</p></details><button id="meet-worker" class="text-action">See it from the worker’s side →</button><button id="executive-decisions" class="text-action">Inspect every proposed change →</button><p class="source">${M.meta.fixture?'Real route and stop locations; invented passengers, vehicles and lateness.':'The proposal uses the supplied service records.'}</p>`;
+  const constraint=document.createElement('p');constraint.className='swap-constraint';constraint.textContent=`${Number.isFinite(swap.empty_km)?number(swap.empty_km)+' km of empty running estimated for this pair.':'Empty running for this pair is not supplied.'} Vehicle access and duties still need checking.`;$('compare-swap').insertAdjacentElement('afterend',constraint);
+  const fullScope=document.createElement('p');fullScope.className='small';fullScope.textContent=`The following cost note covers the full proposal: ${decision.swaps.length} pairs of trips. The distance above is for this pair only.`;$('executive').querySelector('details summary').insertAdjacentElement('afterend',fullScope);
+  $('compare-swap').onclick=()=>{compareSwap=!compareSwap;renderExecutive();$('compare-swap').focus({preventScroll:true});$('executive-status').textContent=compareSwap?`Simulated exchange. ${swap.from.largest_load} passengers now have ${swap.to.seats} seats; ${swap.to.largest_load} passengers have ${swap.from.seats} seats. This is a proposal. Nothing was dispatched.`:'Original buses restored. The service records are unchanged.';};
+  $('executive-decisions').onclick=()=>{closedGaps=true;setView('gap');};
+  $('meet-worker').onclick=()=>{personIndex=B['personas.json'].personas.findIndex(p=>p.id==='site_worker');if(personIndex<0)personIndex=0;stepIndex=compareSwap?Math.min(1,B['personas.json'].personas[personIndex].steps.length-1):0;setView('stories');};
+}
+syncMapMode();renderExecutive();
 function records() {
   const kind=$('entity-type').value;
   const items=kind==='stop'?M.network.stops.map(s=>[s.stop_id,s.name]):kind==='bus'?M.trips.map(t=>[t.trip_id,`${M.routes.get(t.route_id).short_name} · ${t.trip_id}`]):M.network.communities.map(c=>[c.community_id,c.name_en]);
@@ -72,6 +105,7 @@ function render() {
       new PathLayer({id:'routes',data:paths.filter(p=>p.direction===0),getPath:d=>d.shape,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
       new PathLayer({id:'boardings',data:shownStops,getPath:s=>[[s.lon,s.lat],[s.lon,s.lat+Math.sqrt(s.on)*3.5*u.lat]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
       new ScatterplotLayer({id:'stops',data:shownStops,getPosition:s=>[s.lon,s.lat],getRadius:focusRoute?4:2.5,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.muted,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
+      new TextLayer({id:'stop-labels',data:focusRoute?shownStops:[],getPosition:s=>[s.lon,s.lat],getText:s=>s.name,getPixelOffset:[7,0],getTextAnchor:'start',getSize:11,getColor:C.ink,fontFamily:'Plex',background:true,getBackgroundColor:[...C.paper,235],backgroundPadding:[2,1]}),
       new PathLayer({id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[unproject(pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*u.cart))),unproject(b.position)],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
       new ScatterplotLayer({id:'buses',data:buses,getPosition:b=>unproject(b.position),getRadius:b=>b.load>b.seats?7:5,radiusUnits:'pixels',getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
       new ScatterplotLayer({id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>unproject(b.position),getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
@@ -98,7 +132,7 @@ function render() {
     ]});
   }
   // The browser checks rendered layer data, not a separate animation model.
-  window.insiyab={model:M,time,buses,fit,deck,setTime:t=>{time=+t;playing=false;$('play').textContent='Play';render();},get selected(){return selected;},get view(){return view;},get forecastOrigin(){return forecastOrigin;}};
+  window.insiyab={model:M,time,buses,fit,deck,map:mapGL,geoMode,setTime:t=>{time=+t;playing=false;$('play').textContent='Play';render();},get selected(){return selected;},get view(){return view;},get forecastOrigin(){return forecastOrigin;}};
 }
 $('entity-type').value='bus';
 selected=(busesAt(M,time).find(b=>b.load>b.seats)??busesAt(M,time)[0])?.trip_id??M.trips[0].trip_id;
@@ -107,7 +141,7 @@ $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pause':'P
 $('time').oninput=e=>{time=+e.target.value;playing=false;$('play').textContent='Play';render();};
 $('speed').onchange=e=>{speed=+e.target.value;};
 records();render();
-function fitMap(){const summary=document.querySelector('.forecast-summary'),grid=document.querySelector('.replay-grid'),reading=document.querySelector('.reading');if(matchMedia('(max-width:800px)').matches){if(summary.parentElement!==grid)grid.insertBefore(summary,reading);}else if(summary!==reading.firstElementChild)reading.prepend(summary);if(!decklike)return;const rect=$('map').getBoundingClientRect();if(!rect.width||!rect.height)return;if(geoMode){if(!mapGL._insiyabFitted){const shapes=M.paths.filter(p=>!focusRoute||p.route_id===focusRoute).map(p=>p.shape).filter(Boolean);if(shapes.length){const lons=shapes.flatMap(s=>s.map(p=>p[0])),lats=shapes.flatMap(s=>s.map(p=>p[1]));mapGL.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]],{padding:30,animate:false});}mapGL._insiyabFitted=true;}fit=fitPaths(M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),rect.width,rect.height);}else{fit=fitPaths(M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),rect.width,rect.height);decklike.setProps({width:rect.width,height:rect.height,viewState:{target:fit.target,zoom:fit.zoom}});}render();}
+function fitMap(){if(!decklike)return;const rect=$('map').getBoundingClientRect();if(!rect.width||!rect.height)return;const paths=M.paths.filter(p=>!focusRoute||p.route_id===focusRoute);fit=fitPaths(paths,rect.width,rect.height);if(geoMode){mapGL.resize();const points=paths.flatMap(p=>p.shape),lons=points.map(p=>p[0]),lats=points.map(p=>p[1]);mapGL.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]],{padding:24,animate:false});}else{decklike.setProps({width:rect.width,height:rect.height,viewState:{target:fit.target,zoom:fit.zoom}});}render();}
 $('route-focus').innerHTML='<button data-route="" aria-pressed="true">All routes</button>'+M.network.routes.map(r=>`<button data-route="${escape(r.route_id)}" aria-pressed="false">${escape(r.short_name)}</button>`).join('');
 document.querySelectorAll('[data-route]').forEach(e=>e.onclick=()=>{focusRoute=e.dataset.route;document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',String(b===e)));if(focusRoute){const bus=busesAt(M,time).find(b=>b.route_id===focusRoute);if(bus)pick('bus',bus.trip_id);}fitMap();});
 async function start(){
@@ -118,7 +152,7 @@ async function start(){
     await new Promise((resolve,reject)=>{
       const timer=setTimeout(()=>reject(new Error('map timeout')),5000);
       try{
-        const {map:m,overlay:o}=initMap($('map'),(m,o)=>{
+        initMap($('map'),(m,o)=>{
           clearTimeout(timer);
           mapGL=m; const ov=o;
           deck=ov._deck; decklike=ov; geoMode=true;
@@ -132,7 +166,7 @@ async function start(){
           if(!tn){tn=document.createElement('div');tn.id='map-tile-note';
             tn.setAttribute('aria-hidden','true');$('map').appendChild(tn);}
           tn.textContent='Street map not loaded: the network is drawn alone.';
-        });
+        }).catch(reject);
       }catch(e){clearTimeout(timer);reject(e);}
     });
   }catch(e){
@@ -163,6 +197,8 @@ function renderError(){
 async function setView(next){
   const enteringGap=next==='gap'&&view!=='gap';
   view=next;playing=false;$('play').textContent='Play';
+  $('executive-intro').hidden=next!=='replay';$('map-modes').hidden=next!=='replay';$('executive').hidden=next!=='replay';
+  syncMapMode();
   document.querySelectorAll('nav button').forEach(e=>e.setAttribute('aria-current',e.dataset.view===next?'page':'false'));
   $('replay').hidden=['model','stories'].includes(next);$('model').hidden=next!=='model';$('stories').hidden=next!=='stories';
   // The gap screen opens on the hour with the most passengers above the seats: an hour with none shows a visitor nothing to close.
@@ -176,6 +212,7 @@ async function setView(next){
   if(next==='gap'){renderGap();pollRoom();}
   if(next==='stories')renderStory();
   fitMap();render();window.scrollTo(0,0);
+  document.querySelector(`nav button[data-view="${next}"]`)?.focus({preventScroll:true});
 }
 document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.dataset.view));
 // The first thing read: the day in plain words, from the bundle. Its three buttons lead on; a decision's line opens that decision.
@@ -264,7 +301,7 @@ function gapLayers(shared,u){
   const positions=decisions.flatMap(d=>d.where.stop_ids.map(id=>{const stop=M.stops.get(id);return{id:d.id,title:d.title,position:geoMode?[stop.lon,stop.lat]:stop.position};}));
   return [new PathLayer({...shared,id:'gaps',data:rows,getPath:r=>geoMode?r.path.shape.map(p=>[p[0]+(r.direction?4:-4)*u.lon,p[1]]):r.path.points.map(p=>[p[0]+(r.direction?4:-4)*u,p[1]]),getColor:r=>[...(r.over>0?C.over:C.spare),closedGaps?100:230],getWidth:7,widthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('gap-hour').textContent=`${M.routes.get(object.route_id).short_name}, direction ${object.direction}: ${object.over} passengers above seats; ${object.spare} spare seats. Supplied route-hour totals. gap.json · ${M.meta.service_date}`;}}}),new ScatterplotLayer({...shared,id:'decision-places',data:positions,getPosition:d=>d.position,getRadius:13,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.simulated,getLineWidth:3,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>object&&document.getElementById('decision-'+object.id)?.scrollIntoView({behavior:'instant',block:'start'})})];
 }
-const metricLabel=key=>({passenger_minutes_over_seats:'passenger-minutes without a seat',passengers_over_seats_minutes:'passenger-minutes without a seat',empty_seat_km:'seat-kilometres run empty',minutes_saved_per_trip:'minutes saved per trip',passengers_shifted:'passengers shifted',load:'passengers on board',seats:'seats',points:'Khutwa points',doors_not_opened:'stop visits with doors closed'}[key]??key.replaceAll('_',' '));
+const metricLabel=key=>({passenger_minutes_over_seats:'passenger-minutes without a seat',passengers_over_seats_minutes:'passenger-minutes without a seat',empty_seat_km:'seat-kilometres run empty',minutes_saved_per_trip:'minutes saved per trip',passengers_shifted:'passengers shifted',load:'passengers on board',seats:'seats',points:'Khutwa points',doors_not_opened:'stop visits with doors closed',calls_at_a_stop_with_nobody_there:'calls assumed unnecessary'}[key]??key.replaceAll('_',' '));
 function renderGap(){
   const totals=B['gap.json'].totals,which=closedGaps?'after':'before',values=totals[which],kind=values.kind??totals.kind;
   const key=$('gap-metric').value;
@@ -345,19 +382,20 @@ function renderStory(){
   $('fictional').textContent=person.label;
   $('story-place').textContent=person.anchor.stop_id?M.stops.get(person.anchor.stop_id).name:M.routes.get(person.anchor.route_id).long_name;
   $('story-time').textContent=`${clock(step.t)} · ${M.meta.service_date}`;
-  $('scene').innerHTML=sceneSVG(person,step,M,escape);
-  $('scene-caption').textContent='Illustration. It does not show a real passenger or a count of people waiting.';
+  const decision=B['decisions.json'].decisions.find(d=>d.id===step.decision_id);
+  showTwin($('scene'),person,step,M,decision??B['decisions.json'].decisions.find(d=>d.lever==='right_bus'));
+  $('scene-caption').textContent=person.id==='driver'?'Illustrative cab. Closed-door records do not establish that a stop was empty; request stops require an approved way to ask the bus to call.':person.id==='planner'?'Illustrative planning desk. The models show the first proposed trip pair, not the entire fleet. Drag to look around.':'Interactive illustration · drag to look around. Seat layout and movements are illustrative; counts come from this step. Standing capacity is unverified.';
   $('story-kind').textContent=simulated?'If RTA made this change · simulated':'What happened · measured';$('story-kind').classList.toggle('simulated',simulated);
   $('story-say').textContent=step.say;
-  $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).filter(([key])=>!(['load','seats'].includes(key)&&Number.isInteger((step.after??step.before)?.seats))).map(([key,value])=>`<p class="${simulated?'simulated':''}"><span class="which">${which==='before'?'On the day':'With the change'}</span><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
+  $('story-assumption').hidden=!(person.id==='driver'&&simulated);$('story-assumption').textContent='Scenario assumption: no stop request is made. Door records cannot tell us who was waiting.';
+  $('story-values').innerHTML=['before','after'].flatMap(which=>Object.entries(step[which]??{}).filter(([key])=>!(['load','seats'].includes(key)&&Number.isInteger((step.after??step.before)?.seats))).map(([key,value])=>`<p class="${simulated?'simulated':''}"><span class="which">${which==='before'?(simulated?'Before the proposal':'On the day'):'With the change'}</span><strong>${number(value)}</strong> ${escape(metricLabel(key))}<small>${which==='before'?'Before':'After'} · ${escape(step.kind)} · personas.json · ${M.meta.service_date}</small></p>`)).join('');
   $('story-seats').innerHTML=seatDiagram(step);
   $('story-source').textContent=`personas.json · ${M.meta.service_date} · Step ${stepIndex+1} of ${person.steps.length}`;
-  const decision=B['decisions.json'].decisions.find(d=>d.id===step.decision_id);
   $('story-decision').innerHTML=decision?`<details><summary>The decision behind this change</summary>${decisionHTML(decision,false,'story-decision-').replace(/<button data-print=.*?<\/button>/,'')}</details>`:'';
   if(step.scene==='phone')$('story-action').innerHTML='<a class="button-link primary" href="khutwa/">See the offer on her phone</a>';
   else if(stepIndex<person.steps.length-1)$('story-action').innerHTML='<button id="story-next" class="primary">See what changes</button>';
   else $('story-action').innerHTML=`<button id="story-next" class="primary">${personIndex<B['personas.json'].personas.length-1?'Meet '+escape(B['personas.json'].personas[personIndex+1].title.toLowerCase()):'Return to the day'}</button>`;
-  if($('story-next'))$('story-next').onclick=()=>{if(stepIndex<person.steps.length-1)stepIndex++;else if(personIndex<B['personas.json'].personas.length-1){personIndex++;stepIndex=0;}else{setView('replay');return;}renderStory();};
+  if($('story-next'))$('story-next').onclick=()=>{if(stepIndex<person.steps.length-1)stepIndex++;else if(personIndex<B['personas.json'].personas.length-1){personIndex++;stepIndex=0;}else{setView('replay');return;}renderStory();document.querySelector('#story-action button,#story-action a')?.focus({preventScroll:true});};
   const visits=M.visits.filter(v=>v.route_id===person.anchor.route_id&&(!person.anchor.stop_id||v.stop_id===person.anchor.stop_id));
   const closest=visits.reduce((a,b)=>Math.abs(a.act_dep-step.t)<Math.abs(b.act_dep-step.t)?a:b);
   const bin=Math.floor(step.t/M.meta.bin_seconds)*M.meta.bin_seconds;

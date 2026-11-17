@@ -1,0 +1,93 @@
+"""Adversarial geographic and 3D journeys; these are role-based checks, not user research."""
+import json, pathlib, sys, time
+from playwright.sync_api import sync_playwright
+site=pathlib.Path(sys.argv[1]).resolve()
+network=json.loads((site/'data/network.json').read_text())
+decisions=json.loads((site/'data/decisions.json').read_text())['decisions']
+proposal=next((d for d in decisions if d['lever']=='right_bus'),{})
+pair=(proposal.get('swaps') or [None])[0]
+def check(ok,label):
+    assert ok,label
+    print('PASS twin:',label,flush=True)
+ids={s['stop_id'] for s in network['stops']}
+check(len(ids)==len(network['stops']),'published stop IDs are unique')
+check(all(s in ids for r in network['routes'] for p in r['directions'] for s in p['stops']),'every public route stop resolves to a public coordinate')
+check(all(len(p['shape'])>=2 for r in network['routes'] for p in r['directions']),'every published route has a path')
+with sync_playwright() as p:
+    browser=p.chromium.launch(args=['--use-angle=metal'])
+    for width,height,reduced in [(1280,720,False),(390,844,False),(390,844,True)]:
+        context=browser.new_context(viewport={'width':width,'height':height},offline=True,reduced_motion='reduce' if reduced else 'no-preference')
+        page=context.new_page();errors=[];remote=[]
+        page.on('pageerror',lambda e:errors.append(str(e)))
+        page.on('request',lambda r:remote.append(r.url) if r.url.startswith(('http:','https:')) else None)
+        page.goto(site.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized && insiyab.map?.isSourceLoaded("basemap")')
+        check(page.locator('#map-credit').is_visible() and 'OpenStreetMap' in page.locator('#map-credit').inner_text(),'judge: public map has visible attribution')
+        check(page.evaluate("insiyab.geoMode && insiyab.map.isSourceLoaded('basemap')"),'judge: offline street tiles load from the bundled archive')
+        route=network['routes'][0]
+        page.locator('#public-route').select_option(route['route_id'])
+        check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='routes').props.data.every(r=>r.route_id==="+json.dumps(route['route_id'])+")"),'judge: route selector changes the rendered geography')
+        check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='stop-labels').props.data.length>0"),'judge: selected route shows published stop names')
+        check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='routes').props.getPath(insiyab.deck.props.layers.find(l=>l.id==='routes').props.data[0])")==route['directions'][0]['shape'],'geographer: actual rendered route coordinates match the bundle')
+        zoom=page.evaluate('insiyab.map.getZoom()');page.locator('#zoom-in').click()
+        check(page.evaluate('insiyab.map.getZoom()')>zoom,'judge: zoom control changes the camera')
+        page.locator('#map-reset').click()
+        stop=network['stops'][0]
+        page.locator('#public-search').fill(stop['name']);page.locator('[data-public-stop]').first.click()
+        check('invented, not RTA observations' in page.locator('#public-selection').inner_text(),'judge: a real stop does not turn invented counts into RTA observations')
+        check(page.locator('#public-selection').is_visible(),'judge: selected stop has a readable record')
+        page.locator('#public-search').fill('zzzz-no-such-stop');check('No published stop matches' in page.locator('#public-search-results').inner_text(),'judge: unknown stop has an explicit empty state')
+        page.locator('#public-search').fill('')
+        page.locator('#briefing-panel').evaluate('(e)=>e.open=true')
+        check(page.locator('#briefing .briefing-facts li').count()>=2 and page.locator('#briefing [data-go]').count()==3,'judge: plain-language briefing gives bundle counts and three ways on')
+        check('invented service records' in page.locator('#briefing').inner_text() and 'does not prove' in page.locator('#briefing').inner_text(),'judge: briefing distinguishes invented counts and missing waiting evidence')
+        check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'briefing: no horizontal overflow')
+        page.locator('#briefing [data-go="replay"]').click();page.wait_for_timeout(700)
+        page.locator('#briefing-panel').evaluate('(e)=>e.open=false')
+        if pair:
+            before=page.locator('.swap-capacity>span').all_text_contents()
+            check(before==[f"{pair['from']['seats']} seats",f"{pair['to']['seats']} seats"],'planner: current capacities match the exact proposed pair')
+            page.locator('#compare-swap').focus();start=time.monotonic();page.locator('#compare-swap').press('Enter')
+            check(time.monotonic()-start<2,'judge: swap responds within two seconds')
+            check(page.evaluate("document.activeElement.id==='compare-swap'"),'keyboard: comparison retains focus after replacing its content')
+            check('Simulated exchange' in page.locator('#executive-status').inner_text(),'screen reader: comparison announces the changed result')
+            check(page.locator('.swap-capacity>span').all_text_contents()==before[::-1],'planner: exchange changes each trip to the other supplied capacity')
+            check('simulated' in page.locator('.executive-state').inner_text(),'planner: changed capacities are visibly simulated')
+            check(str(pair['empty_km']) in page.locator('.swap-constraint').inner_text(),'planner: empty-running tradeoff stays beside the action')
+            page.locator('#executive details summary').click();check('not checked' in page.locator('#executive details').inner_text().lower(),'planner: unchecked operational constraints are exposed')
+            check('full proposal:' in page.locator('#executive details').inner_text() and 'this pair only' in page.locator('#executive details').inner_text(),'planner: programme-wide costs are distinguished from the selected pair')
+            page.locator('#meet-worker').click()
+        else:
+            check('No paired vehicle exchange' in page.locator('#executive').inner_text(),'planner: no feasible exchange is explicit')
+            page.locator('[data-view=stories]').click();page.locator('[data-person=\"1\"]').click();page.locator('#story-next').click()
+        check(page.evaluate("insiyabScene.role==='site_worker' && insiyabScene.kind==='simulated'"),'site worker: decision opens the matching changed perspective')
+        page.wait_for_timeout(1650 if not reduced else 50)
+        frames=page.evaluate('insiyabScene.frames');page.wait_for_timeout(120)
+        check(page.evaluate('insiyabScene.frames')==frames,'accessibility: transition stops rendering after its final state')
+        if reduced:check(page.evaluate('insiyabScene.moving.every(x=>x===-1)'),'accessibility: reduced motion immediately reaches the arrival state')
+        old=page.evaluate('insiyabScene.camera.position.toArray()');pixels=page.locator('#scene canvas').screenshot()
+        page.locator('[data-camera]').click()
+        check(page.evaluate('insiyabScene.camera.position.toArray()')!=old and page.locator('#scene canvas').screenshot()!=pixels,'site worker: seat-view control changes the real camera and pixels')
+        page.evaluate('window.firstTwinRenderer=insiyabScene.renderer')
+        page.locator('[data-person="1"]').click()
+        placement="()=>{const people=insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats');return new Set(people.map(p=>p.position.toArray().join(','))).size===people.length}"
+        check(page.evaluate(placement),'site worker: every passenger above seats occupies a distinct position')
+        if page.evaluate("insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats').length>=2"):
+            page.evaluate("()=>{const p=insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats');window.originalPosition=p[1].position.clone();p[1].position.copy(p[0].position)}")
+            try:assert page.evaluate(placement)
+            except AssertionError:print('PASS twin: negative control catches overlapping standing figures',flush=True)
+            else:raise AssertionError('Standing-position check cannot fail')
+            page.evaluate("insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats')[1].position.copy(originalPosition)")
+        for i in range(16):page.locator(f'[data-person="{i%4}"]').click()
+        check(page.evaluate('insiyabScene.renderer===firstTwinRenderer'),'graphics: repeated role changes reuse one WebGL context')
+        page.locator('[data-person="3"]').click();page.locator('#story-next').click()
+        check('do not establish' in page.locator('#scene-caption').inner_text(),'driver: closed doors are not evidence of an empty stop')
+        check(page.locator('#story-assumption').is_visible() and 'cannot tell us who was waiting' in page.locator('#story-assumption').inner_text(),'driver: request assumption is beside the finding, not hidden below the scene')
+        page.locator('[data-replay]').click();check('illustration only' in page.locator('.scene-reading').inner_text(),'driver: stop-request interaction remains explicitly illustrative')
+        page.locator('[data-person="2"]').click();page.locator('#story-next').click()
+        check(page.locator('#story-action a').get_attribute('href')=='khutwa/','office worker: the offer goes to the existing passenger flow')
+        check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'accessibility: no horizontal overflow after every role')
+        check(not errors,f'no unhandled errors: {errors}')
+        check(not remote,f'network disabled throughout: {remote}')
+        context.close()
+    browser.close()
+print('TWIN REVIEW PASS')

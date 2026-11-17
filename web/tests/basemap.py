@@ -86,13 +86,14 @@ def check(name, ok, detail=''):
         print(f'  FAIL {name}' + (f': {detail}' if detail else ''))
 
 with sync_playwright() as pw:
-    browser = pw.chromium.launch()
+    browser = pw.chromium.launch(args=['--use-angle=metal'])
 
     def make_page(width, height):
         ctx = browser.new_context(
             viewport={'width': width, 'height': height},
             # Intercept to record all network requests
         )
+        ctx.route('**/*', lambda route: route.continue_() if route.request.url.startswith(BASE) else route.abort())
         page = ctx.new_page()
         # Collect all network requests (URLs)
         requests_seen = []

@@ -9,8 +9,13 @@ const bundle = path.resolve(args[args.indexOf('--bundle') + 1] || 'fixtures');
 const out = path.resolve(args[args.indexOf('--out') + 1] || '/tmp/insiyab-site');
 if (!args.includes('--bundle') || !args.includes('--out')) throw Error('Usage: node web/build.mjs --bundle <folder> --out <folder>');
 if (out === root || root.startsWith(out + '/') || out === bundle || bundle.startsWith(out + '/')) throw Error('Output must not contain source or bundle');
-try { await fs.access(path.join(here, 'node_modules/esbuild/lib/main.js')); }
-catch { const install = spawnSync('npm', ['ci', '--prefix', here, '--no-audit', '--no-fund'], {stdio:'inherit'}); if (install.status) process.exit(install.status); }
+const dependencies=JSON.parse(await fs.readFile(path.join(here,'package.json'),'utf8')).dependencies;
+let installNeeded=false;
+for(const [name,version] of Object.entries(dependencies)){
+  try{const installed=JSON.parse(await fs.readFile(path.join(here,'node_modules',name,'package.json'),'utf8'));if(installed.version!==version)installNeeded=true;}
+  catch(error){if(error.code==='ENOENT')installNeeded=true;else throw error;}
+}
+if(installNeeded){const install=spawnSync('npm',['ci','--prefix',here,'--no-audit','--no-fund'],{stdio:'inherit'});if(install.status!==0)throw Error('Pinned dependency installation failed');}
 const {build} = await import('esbuild');
 const {default: QRCode} = await import('qrcode');
 const checked = spawnSync('python3', [path.join(root, 'tools/contract_check.py'), bundle], {encoding:'utf8'});
@@ -35,9 +40,13 @@ await fs.writeFile(path.join(out,'bundle.js'), 'window.INSIYAB_BUNDLE=' + JSON.s
 await fs.writeFile(path.join(out,'stop-forecast.js'), "window.INSIYAB_BUNDLE['forecast/boardings-stop.json']=" + JSON.stringify(data['forecast/boardings-stop.json']).replace(/</g,'\\u003c') + ';\n');
 await build({entryPoints:[path.join(here,'src/app.js')],outfile:path.join(out,'app.js'),bundle:true,format:'iife',target:'es2022',minify:true,legalComments:'linked'});
 for (const name of ['index.html','style.css']) await fs.copyFile(path.join(here,'src',name),path.join(out,name));
-await fs.cp(path.join(here,'assets/scenes'),path.join(out,'scenes'),{recursive:true});
+await fs.copyFile(path.join(here,'node_modules/three/LICENSE'),path.join(out,'LICENSE-three.txt'));
 await fs.mkdir(path.join(out,'map'),{recursive:true});
-await fs.copyFile(path.join(here,'assets/map/dubai.pmtiles'),path.join(out,'map/dubai.pmtiles'));
+const mapBytes=await fs.readFile(path.join(here,'assets/map/dubai.pmtiles'));
+await fs.writeFile(path.join(out,'map/dubai.pmtiles'),mapBytes);
+await fs.writeFile(path.join(out,'map/offline.js'),'window.INSIYAB_MAP_BYTES='+JSON.stringify(mapBytes.toString('base64'))+';');
+await fs.copyFile(path.join(root,'opendata/public/basemap/PROVENANCE.md'),path.join(out,'MAP-NOTICE.md'));
+await fs.copyFile(path.join(root,'opendata/public/rta-gtfs/PROVENANCE.md'),path.join(out,'NETWORK-NOTICE.md'));
 await fs.mkdir(path.join(out,'fonts'),{recursive:true});
 for (const [font,subset,weights] of [['overpass','latin',[400,600]],['ibm-plex-sans','latin',[400,500]],['ibm-plex-mono','latin',[400]],['noto-kufi-arabic','arabic',[400]]]) {
   for (const weight of weights) await fs.copyFile(path.join(here,`node_modules/@fontsource/${font}/files/${font}-${subset}-${weight}-normal.woff2`),path.join(out,`fonts/${font}-${weight}.woff2`));

@@ -10,20 +10,25 @@
 //   roads  mid and light grey, never louder than the network
 
 import maplibregl from 'maplibre-gl';
-import {Protocol} from 'pmtiles';
+import {Protocol, PMTiles, FileSource} from 'pmtiles';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 
 // Register the pmtiles:// protocol once, even if initMap is called more than once.
 let protocolRegistered = false;
-function ensureProtocol() {
+async function ensureProtocol() {
   if (protocolRegistered) return;
   const protocol = new Protocol();
   maplibregl.addProtocol('pmtiles', (params, callback) => protocol.tile(params, callback));
+  if(location.protocol==='file:'){
+    await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='map/offline.js';script.onload=resolve;script.onerror=reject;document.head.append(script);});
+    const bytes=Uint8Array.from(atob(window.INSIYAB_MAP_BYTES),c=>c.charCodeAt(0));delete window.INSIYAB_MAP_BYTES;
+    protocol.add(new PMTiles(new FileSource(new File([bytes],'dubai.pmtiles'))));
+  }
   protocolRegistered = true;
 }
 
-export function initMap(container, onReady, onTileFail) {
-  ensureProtocol();
+export async function initMap(container, onReady, onTileFail) {
+  await ensureProtocol();
 
   const map = new maplibregl.Map({
     container,
@@ -33,7 +38,7 @@ export function initMap(container, onReady, onTileFail) {
       sources: {
         basemap: {
           type: 'vector',
-          url: 'pmtiles://map/dubai.pmtiles',
+          url: location.protocol==='file:'?'pmtiles://dubai.pmtiles':'pmtiles://'+new URL('map/dubai.pmtiles',location.href).href,
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
         }
       },
@@ -89,7 +94,6 @@ export function initMap(container, onReady, onTileFail) {
   // Compact attribution shows the OSM credit at 11px in the corner.
   // The credit is our own line, set in the page's type and always in view. MapLibre's control needs its stylesheet to sit in a corner,
   // and that stylesheet is not shipped: without it the control drifted to the middle of the map.
-  {const credit=document.createElement('p');credit.className='map-credit';credit.textContent='Street map © OpenStreetMap contributors';container.appendChild(credit);}
 
   // Create the deck.gl overlay. interleaved:false renders deck on a separate
   // canvas positioned absolutely on top of the MapLibre canvas.

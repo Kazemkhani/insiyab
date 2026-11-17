@@ -15,12 +15,16 @@ with sync_playwright() as p:
         page=context.new_page();errors=[];remote=[]
         page.on('pageerror',lambda error:errors.append(str(error)))
         page.on('request',lambda req:remote.append(req.url) if req.url.startswith(('http:','https:')) else None)
-        started=time.monotonic();page.goto(site.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized')
+        started=time.monotonic();page.goto(site.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized && insiyab.map?.isSourceLoaded("basemap")')
         check(time.monotonic()-started<3,f'{width}: usable within three seconds from folder, network off')
-        renderer=page.evaluate("""()=>{const gl=document.querySelector('canvas').getContext('webgl2'),ext=gl.getExtension('WEBGL_debug_renderer_info');return ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)}""")
+        renderer=page.evaluate("""()=>{const gl=document.querySelector('.maplibregl-canvas').getContext('webgl2'),ext=gl.getExtension('WEBGL_debug_renderer_info');return ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)}""")
         check('Metal' in renderer and 'SwiftShader' not in renderer,'real graphics chip: '+renderer)
         check(page.locator('#fixture').is_visible(),f'{width}: stand-in label visible')
         check(page.locator('#map-failure').is_hidden(),f'{width}: map rendered')
+        check(page.evaluate("insiyab.geoMode && insiyab.map.isSourceLoaded('basemap')"),f'{width}: opens on locally sourced Dubai geography')
+        if shots and width in [1280,390] and not reduced:page.screenshot(path=str(shots/f'overview-{width}x{height}.png'))
+        page.locator('#record-inspector').evaluate('(e)=>e.open=true')
+        page.locator('.forecast-summary').evaluate('(e)=>e.open=true')
         check(page.evaluate("Math.abs(insiyab.time-(INSIYAB_BUNDLE['metrics.json'].targets.find(t=>t.level==='route'&&t.target==='boardings').split.origins[0]))<120"),f'{width}: opens at untouched evaluation hours')
         first=page.evaluate('insiyab.time');page.wait_for_timeout(250);second=page.evaluate('insiyab.time')
         check(second==first if reduced else second>first,f'{width}: reduced motion respected' if reduced else f'{width}: clock and buses moving')
@@ -40,11 +44,7 @@ with sync_playwright() as p:
         check(all(e['height']>=44 for e in sizes),f'{width}: all controls at least 44px {sizes}')
         if width==390:check(page.locator('#time').bounding_box()['width']>=width-40,f'{width}: full-width time slider')
         if width in [1280,390] and not reduced:
-            # The first screen is now the day in plain words. One press of its first button brings the map and its clock into view.
-            check(page.locator('#briefing h1').is_visible() and page.locator('#briefing h1').bounding_box()['y']<height,f'{width}: the briefing is what a visitor reads first')
-            check(page.locator('#briefing .briefing-facts li').count()>=2 and page.locator('#briefing [data-go]').count()==3,f'{width}: the briefing gives its counts and three ways on')
-            page.locator('#briefing [data-go="replay"]').click();page.wait_for_timeout(700)
-            rect=page.locator('#play').bounding_box();check(0<=rect['y'] and rect['y']+rect['height']<=height,f'{width}: one press from the briefing puts the clock control in view')
+            rect=page.locator('#play').bounding_box();check(rect['y']+rect['height']<=height,f'{width}: clock control visible without scrolling')
             if shots:
                 page.evaluate("insiyab.setTime(INSIYAB_BUNDLE['metrics.json'].targets.find(t=>t.level==='route'&&t.target==='boardings').split.origins[0])");page.screenshot(path=str(shots/f'first-{width}x{height}.png'))
         page.locator('[data-route]').nth(1).click()
@@ -135,9 +135,13 @@ with sync_playwright() as p:
             check('Fictional' in page.locator('#fictional').inner_text(),f"{width}: {person['id']} fiction label")
             check('measured' in page.locator('#story-kind').inner_text().lower(),f"{width}: {person['id']} starts measured")
             check(person['title'] in page.locator('#scene-title').text_content(),f"{width}: {person['id']} figure is named")
-            page.evaluate("async()=>{for(const el of document.querySelectorAll('#scene image')){const image=new Image();image.src=el.getAttribute('href');await image.decode();}}")
-            check(page.locator('#scene image').count()==1,f"{width}: {person['id']} local Blender render decoded offline")
-            check(page.locator('#scene svg').is_visible(),f"{width}: {person['id']} scene exists")
+            check(page.evaluate("window.insiyabScene && insiyabScene.renderer.info.render.calls>0"),f"{width}: {person['id']} local Three.js scene rendered offline")
+            check(page.locator('#scene canvas').is_visible(),f"{width}: {person['id']} live third-person scene exists")
+            values=person['steps'][0].get('before') or {}
+            if isinstance(values.get('seats'),int):
+                check(page.evaluate("insiyabScene.scene.getObjectsByProperty('name','seat').length")==values['seats'],f"{width}: {person['id']} actual 3D seat meshes match the bundle")
+                check(page.evaluate("insiyabScene.scene.getObjectsByProperty('name','seated-passenger').length")==min(values['load'],values['seats']),f"{width}: {person['id']} actual 3D seated passengers match the bundle")
+                check(page.evaluate("insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats').length")==max(0,values['load']-values['seats']),f"{width}: {person['id']} actual 3D passengers above seats match the bundle")
             check(page.locator('#fixture').bounding_box()['y']>=0,f"{width}: {person['id']} stand-in label in viewport")
             check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f"{width}: {person['id']} no sideways scroll")
             if shots and width in [1280,390] and not reduced:
@@ -153,11 +157,15 @@ with sync_playwright() as p:
                 check('simulated' in page.locator('#story-kind').inner_text().lower(),f"{width}: {person['id']} change labelled simulated")
                 check(page.locator('#story-say').inner_text()==person['steps'][1]['say'],f"{width}: {person['id']} next step from bundle")
                 after=person['steps'][1].get('after') or {};was=person['steps'][1].get('before') or {}
+                if isinstance(after.get('seats'),int):check(page.evaluate("insiyabScene.scene.getObjectsByProperty('name','seat').length")==after['seats'],f"{width}: {person['id']} changed 3D capacity reads the scenario")
                 if isinstance(after.get('seats'),int) and isinstance(after.get('load'),int) and isinstance(was.get('seats'),int):
                     figs=page.locator('#story-seats .seat-figure')
                     check(figs.count()==2,f"{width}: {person['id']} the change is drawn as two counts, the day and the change")
                     check(figs.nth(0).locator('[data-seat]').count()==was['seats'] and figs.nth(1).locator('[data-seat]').count()==after['seats'] and figs.nth(1).locator('[data-excess]').count()==max(0,after['load']-after['seats']),f"{width}: {person['id']} each count equals the bundle's seats and shortfall")
-                check(page.locator('#scene').inner_html()!=before_story,f"{width}: {person['id']} scene changes on tap")
+                check(page.evaluate("insiyabScene.kind==='simulated' && insiyabScene.renderer.info.render.calls>0"),f"{width}: {person['id']} scene rerenders the simulated state on tap")
+                if person['id']=='planner':
+                    pair=page.evaluate("INSIYAB_BUNDLE['decisions.json'].decisions.find(d=>d.lever==='right_bus')?.swaps?.[0]??null")
+                    if pair:check(page.evaluate("insiyabScene.scene.getObjectsByProperty('name','bus').map(b=>b.children.filter(o=>o.name==='seat').length)")==[pair['to']['seats'],pair['from']['seats']],f'{width}: planner renders exchanged capacities on the two actual bus models')
                 check(page.locator('#story-decision > details > summary').count()==1,f"{width}: {person['id']} links its decision")
                 original_kind=page.locator('#story-kind').inner_text()
                 page.locator('#story-kind').evaluate("e=>e.textContent='Measured'")
@@ -187,7 +195,7 @@ with sync_playwright() as p:
         (mutant/'bundle.js').write_text('window.INSIYAB_BUNDLE='+json.dumps(data)+';')
         stop_data=json.loads((site/'data/forecast/boardings-stop.json').read_text());stop_data['fixture']=False
         (mutant/'stop-forecast.js').write_text("window.INSIYAB_BUNDLE['forecast/boardings-stop.json']="+json.dumps(stop_data)+';')
-        context=browser.new_context(offline=True);page=context.new_page();page.goto(mutant.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized')
+        context=browser.new_context(offline=True);page=context.new_page();page.goto(mutant.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized && insiyab.map?.isSourceLoaded("basemap")')
         page.locator('.day-summary summary').click()
         check(page.locator('[data-headline]').inner_text().replace(',','')==str(old+987),'mutated bundle count changes the screen')
         check(page.locator('#fixture').is_hidden(),'fixture false removes stand-in label')
