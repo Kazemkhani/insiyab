@@ -35,6 +35,8 @@
   function describe(o) {
     if (o.kind === 'earlier') return { title: 'Leave ' + plural(o.minutes_earlier, 'minute', 'minutes') + ' earlier', detail: clock(o.depart) + ' from this stop, route ' + o.route + '. No extra walk.' };
     if (o.kind === 'later') return { title: 'Leave ' + plural(o.minutes_later, 'minute', 'minutes') + ' later', detail: clock(o.depart) + ' from this stop, route ' + o.route + '. No extra walk.' };
+    // another route may call at this very stop: then there is no walk to speak of, and none is mentioned
+    if (!o.walk_metres) return { title: 'Take route ' + o.route + ' from this stop', detail: clock(o.depart) + ' from this stop. No extra walk.' + (o.extra_minutes ? ' About ' + plural(o.extra_minutes, 'minute', 'minutes') + ' longer in all.' : '') };
     return { title: 'Route ' + o.route + ', a ' + o.walk_minutes + '-minute walk', detail: clock(o.depart) + ' from ' + o.stop + ', ' + o.walk_metres + ' metres away. About ' + plural(o.extra_minutes, 'minute', 'minutes') + ' longer in all.' };
   }
 

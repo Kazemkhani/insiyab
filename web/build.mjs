@@ -36,6 +36,8 @@ await fs.writeFile(path.join(out,'stop-forecast.js'), "window.INSIYAB_BUNDLE['fo
 await build({entryPoints:[path.join(here,'src/app.js')],outfile:path.join(out,'app.js'),bundle:true,format:'iife',target:'es2022',minify:true,legalComments:'linked'});
 for (const name of ['index.html','style.css']) await fs.copyFile(path.join(here,'src',name),path.join(out,name));
 await fs.cp(path.join(here,'assets/scenes'),path.join(out,'scenes'),{recursive:true});
+await fs.mkdir(path.join(out,'map'),{recursive:true});
+await fs.copyFile(path.join(here,'assets/map/dubai.pmtiles'),path.join(out,'map/dubai.pmtiles'));
 await fs.mkdir(path.join(out,'fonts'),{recursive:true});
 for (const [font,subset,weights] of [['overpass','latin',[400,600]],['ibm-plex-sans','latin',[400,500]],['ibm-plex-mono','latin',[400]],['noto-kufi-arabic','arabic',[400]]]) {
   for (const weight of weights) await fs.copyFile(path.join(here,`node_modules/@fontsource/${font}/files/${font}-${subset}-${weight}-normal.woff2`),path.join(out,`fonts/${font}-${weight}.woff2`));

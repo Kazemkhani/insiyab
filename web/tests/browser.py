@@ -110,7 +110,10 @@ with sync_playwright() as p:
         page.wait_for_function('window.printCalled===true')
         check(page.evaluate('window.printCalled===true'),f'{width}: print command reached')
         swaps=page.evaluate("INSIYAB_BUNDLE['decisions.json'].decisions[0].swaps??[]")
-        for swap in swaps:
+        # one sheet holds only the first few pairs; when the day proposes more, the sheet says how many it left for the file
+        said=re.search(r'first (\d+) of (\d+) pairs',page.locator('#print-order').text_content());listed=int(said.group(1)) if said else len(swaps)
+        check(listed==len(swaps) or (said and int(said.group(2))==len(swaps) and 0<listed<len(swaps)),f'{width}: the order lists every pair or says how many of how many it lists')
+        for swap in swaps[:listed]:
             for side in ['from','to']:
                 check(swap[side]['trip_id'] in page.locator('#print-order').text_content(),f'{width}: printed swap includes exact {side} trip')
         check('SIMULATION. NOTHING WAS SENT.' in page.locator('#print-order').text_content(),f'{width}: print order carries simulation warning')

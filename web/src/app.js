@@ -1,6 +1,7 @@
 import {horizonChart,subsetChart,forecastChart,gapChart,gainChart} from './charts.mjs';
 import {sceneSVG,seatDiagram} from './scene.mjs';
 import {Deck, OrthographicView, COORDINATE_SYSTEM} from '@deck.gl/core';
+import {initMap} from './map.mjs';
 import {PathLayer,ScatterplotLayer,PolygonLayer,TextLayer} from '@deck.gl/layers';
 import {createModel, busesAt, boardingsAt, fitPaths, pointAlong, clock, number, rollingError, originRows} from './model.mjs';
 const B=window.INSIYAB_BUNDLE, M=createModel(B), $=id=>document.getElementById(id);
@@ -11,6 +12,14 @@ const C=Object.fromEntries(['ink','paper','flow','over','spare','simulated','lin
 const routeTarget=B['metrics.json'].targets.find(t=>t.target==='boardings'&&t.level==='route');
 const openingTime=routeTarget?.split.origins[0]??M.meta.origins[0]+3600;
 let time=Math.min(M.max,Math.max(M.min,openingTime)),playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,speed=300,deck,fit,selected=M.network.stops[0].stop_id,lastBin=-1,stopData=[],view='replay',forecastOrigin=M.meta.origins[0],lastErrorBin=-1,focusRoute='',closedGaps=false,roomState=null,playbackCount=null;
+// Map mode: geoMode=true uses MapLibre+MapboxOverlay; false uses OrthographicView fallback.
+let geoMode=false,decklike,mapGL;
+// Inverse of model.mjs equirectangular projection, so bus positions can be rendered in lon/lat.
+const _rCoords=M.network.routes.flatMap(r=>r.directions.flatMap(d=>d.shape));
+const _cLon=_rCoords.reduce((a,p)=>a+p[0],0)/_rCoords.length,_cLat=_rCoords.reduce((a,p)=>a+p[1],0)/_rCoords.length,_cosLat=Math.cos(_cLat*Math.PI/180)*10000;
+const unproject=([cx,cy])=>[cx/_cosLat+_cLon,-cy/10000+_cLat];
+function mapUnit(){if(!mapGL)return{lat:1e-5,lon:1e-5,cart:1};const z=mapGL.getZoom(),lat=mapGL.getCenter().lat,mpp=78271.52*Math.cos(lat*Math.PI/180)/Math.pow(2,z),ld=mpp/111320;return{lat:ld,lon:ld/Math.cos(lat*Math.PI/180),cart:mpp/11.132};}   // MapLibre's tiles are 512 pixels across
+function computeFitScale(){if(!mapGL)return 1;const z=mapGL.getZoom(),lat=mapGL.getCenter().lat,mpp=156543.03*Math.cos(lat*Math.PI/180)/Math.pow(2,z);return 11.132/mpp;}
 const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Has room';
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 $('fixture').hidden=!M.meta.fixture;
@@ -51,24 +60,42 @@ function render() {
   $('clock').value=clock(time);$('time').value=time;
   const bin=Math.floor(time/M.meta.bin_seconds);
   if(bin!==lastBin){stopData=boardingsAt(M,time);lastBin=bin;detail();if(view==='gap')renderGap();if(view==='forecast'&&B['forecast/boardings-stop.json'])renderChallenge();}
-  if(!deck||!fit)return;
-  const buses=busesAt(M,time).filter(b=>!focusRoute||b.route_id===focusRoute),unit=1/fit.scale;
+  if(!decklike||!fit)return;
+  const buses=busesAt(M,time).filter(b=>!focusRoute||b.route_id===focusRoute);
   const paths=M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),stopIds=new Set(paths.flatMap(p=>p.stops)),shownStops=stopData.filter(s=>stopIds.has(s.stop_id));
-  const shared={coordinateSystem:COORDINATE_SYSTEM.CARTESIAN};
-  deck.setProps({layers:[
-    ...forecastLayers(shared,unit),
-    ...gapLayers(shared,unit),
-    new PathLayer({...shared,id:'routes',data:paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
-    new PathLayer({...shared,id:'boardings',data:shownStops,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*3.5*unit]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
-    new ScatterplotLayer({...shared,id:'stops',data:shownStops,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
-    new PathLayer({...shared,id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*unit)),b.position],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
-    new PolygonLayer({...shared,id:'buses',data:buses,getPolygon:b=>{const [x,y]=b.position;return b.load>b.seats?[[x,y-9*unit],[x+8*unit,y+7*unit],[x-8*unit,y+7*unit]]:[[x-7*unit,y-5*unit],[x+7*unit,y-5*unit],[x+7*unit,y+5*unit],[x-7*unit,y+5*unit]];},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
-    new PathLayer({...shared,id:'load-bars',data:buses,getPath:b=>{const [x,y]=b.position;return [[x-7*unit,y+11*unit],[x+(-7+14*Math.min(1.5,b.load/b.seats))*unit,y+11*unit]];},getColor:busColour,getWidth:3,widthUnits:'pixels'}),
-    new ScatterplotLayer({...shared,id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>b.position,getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
-    new TextLayer({...shared,id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>b.position,getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),
-    new TextLayer({...shared,id:'route-labels',data:paths.filter(p=>p.direction===0),getPosition:d=>d.points[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:14,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
-    new TextLayer({...shared,id:'communities',data:view==='replay'&&$('entity-type').value==='community'?M.network.communities.filter(c=>c.community_id===selected):[],getPosition:c=>M.project(c.centroid),getText:c=>c.name_en,getPixelOffset:[0,-18],getSize:10,getColor:C.ink,fontFamily:'Plex',pickable:true,onClick:({object})=>object&&pick('community',object.community_id)})
-  ]});
+  if(geoMode){
+    const u=mapUnit();
+    decklike.setProps({layers:[
+      ...forecastLayers({},u),
+      ...gapLayers({},u),
+      new PathLayer({id:'routes',data:paths.filter(p=>p.direction===0),getPath:d=>d.shape,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
+      new PathLayer({id:'boardings',data:shownStops,getPath:s=>[[s.lon,s.lat],[s.lon,s.lat+Math.sqrt(s.on)*3.5*u.lat]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
+      new ScatterplotLayer({id:'stops',data:shownStops,getPosition:s=>[s.lon,s.lat],getRadius:focusRoute?4:2.5,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.muted,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
+      new PathLayer({id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[unproject(pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*u.cart))),unproject(b.position)],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
+      new ScatterplotLayer({id:'buses',data:buses,getPosition:b=>unproject(b.position),getRadius:b=>b.load>b.seats?7:5,radiusUnits:'pixels',getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
+      new ScatterplotLayer({id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>unproject(b.position),getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
+      new TextLayer({id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>unproject(b.position),getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),
+      new TextLayer({id:'route-labels',data:paths.filter(p=>p.direction===0),getPosition:d=>d.shape[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:14,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
+      new TextLayer({id:'communities',data:view==='replay'&&$('entity-type').value==='community'?M.network.communities.filter(c=>c.community_id===selected):[],getPosition:c=>c.centroid,getText:c=>c.name_en,getPixelOffset:[0,-18],getSize:10,getColor:C.ink,fontFamily:'Plex',pickable:true,onClick:({object})=>object&&pick('community',object.community_id)})
+    ]});
+  }else{
+    const unit=1/fit.scale;
+    const shared={coordinateSystem:COORDINATE_SYSTEM.CARTESIAN};
+    decklike.setProps({layers:[
+      ...forecastLayers(shared,unit),
+      ...gapLayers(shared,unit),
+      new PathLayer({...shared,id:'routes',data:paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
+      new PathLayer({...shared,id:'boardings',data:shownStops,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*3.5*unit]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
+      new ScatterplotLayer({...shared,id:'stops',data:shownStops,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
+      new PathLayer({...shared,id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*unit)),b.position],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
+      new PolygonLayer({...shared,id:'buses',data:buses,getPolygon:b=>{const [x,y]=b.position;return b.load>b.seats?[[x,y-9*unit],[x+8*unit,y+7*unit],[x-8*unit,y+7*unit]]:[[x-7*unit,y-5*unit],[x+7*unit,y-5*unit],[x+7*unit,y+5*unit],[x-7*unit,y+5*unit]];},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
+      new PathLayer({...shared,id:'load-bars',data:buses,getPath:b=>{const [x,y]=b.position;return [[x-7*unit,y+11*unit],[x+(-7+14*Math.min(1.5,b.load/b.seats))*unit,y+11*unit]];},getColor:busColour,getWidth:3,widthUnits:'pixels'}),
+      new ScatterplotLayer({...shared,id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>b.position,getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
+      new TextLayer({...shared,id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>b.position,getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),
+      new TextLayer({...shared,id:'route-labels',data:paths.filter(p=>p.direction===0),getPosition:d=>d.points[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:14,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
+      new TextLayer({...shared,id:'communities',data:view==='replay'&&$('entity-type').value==='community'?M.network.communities.filter(c=>c.community_id===selected):[],getPosition:c=>M.project(c.centroid),getText:c=>c.name_en,getPixelOffset:[0,-18],getSize:10,getColor:C.ink,fontFamily:'Plex',pickable:true,onClick:({object})=>object&&pick('community',object.community_id)})
+    ]});
+  }
   // The browser checks rendered layer data, not a separate animation model.
   window.insiyab={model:M,time,buses,fit,deck,setTime:t=>{time=+t;playing=false;$('play').textContent='Play';render();},get selected(){return selected;},get view(){return view;},get forecastOrigin(){return forecastOrigin;}};
 }
@@ -79,12 +106,40 @@ $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pause':'P
 $('time').oninput=e=>{time=+e.target.value;playing=false;$('play').textContent='Play';render();};
 $('speed').onchange=e=>{speed=+e.target.value;};
 records();render();
-function fitMap(){const summary=document.querySelector('.forecast-summary'),grid=document.querySelector('.replay-grid'),reading=document.querySelector('.reading');if(matchMedia('(max-width:800px)').matches){if(summary.parentElement!==grid)grid.insertBefore(summary,reading);}else if(summary!==reading.firstElementChild)reading.prepend(summary);if(!deck)return;const rect=$('map').getBoundingClientRect();if(!rect.width||!rect.height)return;fit=fitPaths(M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),rect.width,rect.height);deck.setProps({width:rect.width,height:rect.height,viewState:{target:fit.target,zoom:fit.zoom}});render();}
+function fitMap(){const summary=document.querySelector('.forecast-summary'),grid=document.querySelector('.replay-grid'),reading=document.querySelector('.reading');if(matchMedia('(max-width:800px)').matches){if(summary.parentElement!==grid)grid.insertBefore(summary,reading);}else if(summary!==reading.firstElementChild)reading.prepend(summary);if(!decklike)return;const rect=$('map').getBoundingClientRect();if(!rect.width||!rect.height)return;if(geoMode){if(!mapGL._insiyabFitted){const shapes=M.paths.filter(p=>!focusRoute||p.route_id===focusRoute).map(p=>p.shape).filter(Boolean);if(shapes.length){const lons=shapes.flatMap(s=>s.map(p=>p[0])),lats=shapes.flatMap(s=>s.map(p=>p[1]));mapGL.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]],{padding:30,animate:false});}mapGL._insiyabFitted=true;}fit=fitPaths(M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),rect.width,rect.height);}else{fit=fitPaths(M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),rect.width,rect.height);decklike.setProps({width:rect.width,height:rect.height,viewState:{target:fit.target,zoom:fit.zoom}});}render();}
 $('route-focus').innerHTML='<button data-route="" aria-pressed="true">All routes</button>'+M.network.routes.map(r=>`<button data-route="${escape(r.route_id)}" aria-pressed="false">${escape(r.short_name)}</button>`).join('');
 document.querySelectorAll('[data-route]').forEach(e=>e.onclick=()=>{focusRoute=e.dataset.route;document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',String(b===e)));if(focusRoute){const bus=busesAt(M,time).find(b=>b.route_id===focusRoute);if(bus)pick('bus',bus.trip_id);}fitMap();});
 async function start(){
   await document.fonts.ready;
-  deck=new Deck({canvas:$('map-canvas'),views:new OrthographicView({id:'network',flipY:true}),controller:false,initialViewState:{target:[0,0,0],zoom:0},getCursor:({isHovering})=>isHovering?'pointer':'default',onError:e=>{console.error(e);$('map-failure').hidden=false;}});
+  // Try MapLibre + MapboxOverlay first; fall back to pure deck.gl if WebGL unavailable.
+  let mapReady=false;
+  try{
+    await new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>reject(new Error('map timeout')),5000);
+      try{
+        const {map:m,overlay:o}=initMap($('map'),(m,o)=>{
+          clearTimeout(timer);
+          mapGL=m; const ov=o;
+          deck=ov._deck; decklike=ov; geoMode=true;
+          $('map').classList.add('has-basemap');
+          m.on('move',()=>{render();});
+          mapReady=true; resolve();
+        },()=>{
+          // Tiles failed (e.g. file://) — map works but show a small note.
+          // We do NOT use #map-failure here (that's for total rendering failure).
+          let tn=document.getElementById('map-tile-note');
+          if(!tn){tn=document.createElement('div');tn.id='map-tile-note';
+            tn.setAttribute('aria-hidden','true');$('map').appendChild(tn);}
+          tn.textContent='Street map not loaded: the network is drawn alone.';
+        });
+      }catch(e){clearTimeout(timer);reject(e);}
+    });
+  }catch(e){
+    // MapLibre unavailable (no WebGL) — use Cartesian fallback.
+    console.warn('MapLibre unavailable, falling back:',e);
+    deck=new Deck({canvas:$('map-canvas'),views:new OrthographicView({id:'network',flipY:true}),controller:false,initialViewState:{target:[0,0,0],zoom:0},getCursor:({isHovering})=>isHovering?'pointer':'default',onError:e2=>{console.error(e2);$('map-failure').hidden=false;}});
+    decklike=deck; geoMode=false;
+  }
   new ResizeObserver(fitMap).observe($('map'));
   let previous=performance.now(),lastRender=0;
   function tick(now){if(playing){time+=Math.min((now-previous)/1000,.2)*speed;if(time>M.max)time=M.min;if(now-lastRender>80){render();lastRender=now;}}previous=now;requestAnimationFrame(tick);}
@@ -105,9 +160,12 @@ function renderError(){
   $('error-counter').innerHTML=score.n?`<span class="error-title">Miss so far at ${clock(time)}</span><strong>${number(score.model)} <small>forecast</small></strong><strong>${number(score.naive)} <small>naive forecast</small></strong><span class="source">passengers / route / ${M.meta.bin_seconds/60} min · ${score.n} completed bins<br>forecast/boardings-route.json · ${M.meta.service_date}</span>`:'<span>Waiting for the first one-hour forecast bin to finish. No error is known yet.</span>';
 }
 async function setView(next){
+  const enteringGap=next==='gap'&&view!=='gap';
   view=next;playing=false;$('play').textContent='Play';
   document.querySelectorAll('nav button').forEach(e=>e.setAttribute('aria-current',e.dataset.view===next?'page':'false'));
   $('replay').hidden=['model','stories'].includes(next);$('model').hidden=next!=='model';$('stories').hidden=next!=='stories';
+  // The gap screen opens on the hour with the most passengers above the seats: an hour with none shows a visitor nothing to close.
+  if(enteringGap){const by=new Map();for(const r of B['gap.json'].rows)by.set(r.hour_start,(by.get(r.hour_start)??0)+r.over);const worst=[...by].sort((x,y)=>y[1]-x[1]||x[0]-y[0])[0];if(worst&&worst[1]>0){time=worst[0]+60;playing=false;$('play').textContent='Play';}}
   $('gap-controls').hidden=next!=='gap';$('gap-results').hidden=next!=='gap';$('replay').classList.toggle('gap-view',next==='gap');
   $('forecast-controls').hidden=next!=='forecast';$('pick-stop').hidden=next!=='forecast';
   $('replay').classList.toggle('forecast-view',next==='forecast');
@@ -121,12 +179,13 @@ async function setView(next){
 document.querySelectorAll('nav button').forEach(e=>e.onclick=()=>setView(e.dataset.view));
 function freezeForecast(){forecastOrigin=[...M.meta.origins].reverse().find(o=>o<=time)??M.meta.origins[0];$('frozen-at').textContent=`Made at ${clock(forecastOrigin)}. Quarter hour ending ${clock(forecastOrigin+3600)}. forecast/boardings-stop.json · ${M.meta.service_date}`;render();}
 $('freeze').onclick=freezeForecast;
-function forecastLayers(shared,unit){
+function forecastLayers(shared,u){
   if(view!=='forecast'||!B['forecast/boardings-stop.json'])return [];
   const rows=originRows(B['forecast/boardings-stop.json'],forecastOrigin,3600).filter(r=>r.horizon===3600);
   const data=[...new Set(rows.map(r=>r.id))].map(id=>{
     const bins=rows.filter(r=>r.id===id),known=bins.filter(r=>r.bin_start+B['forecast/boardings-stop.json'].bin_seconds<=time && r.actual!==null);
-    return {id,position:M.stops.get(id).position,forecast:bins.reduce((s,r)=>s+r.forecast,0),actual:known.length?known.reduce((s,r)=>s+r.actual,0):null};
+    const stop=M.stops.get(id);
+    return {id,position:geoMode?[stop.lon,stop.lat]:stop.position,forecast:bins.reduce((s,r)=>s+r.forecast,0),actual:known.length?known.reduce((s,r)=>s+r.actual,0):null};
   });
   return [new ScatterplotLayer({...shared,id:'forecast-halos',data,getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.forecast)*4,radiusUnits:'pixels',radiusMaxPixels:34,filled:false,stroked:true,getLineColor:[...C.spare,130],getLineWidth:2,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('forecast-stop').value=object.id;forecastSeries();pick('stop',object.id);}}}),new ScatterplotLayer({...shared,id:'actual-halos',data:data.filter(d=>d.actual!==null),getPosition:d=>d.position,getRadius:d=>Math.sqrt(d.actual)*4,radiusUnits:'pixels',radiusMaxPixels:34,getFillColor:[...C.flow,90]})];
 }
@@ -193,12 +252,12 @@ function renderModel(){
 $('model-target').onchange=renderModel;$('model-horizon').onchange=renderModel;$('model-choice').onchange=renderModel;
 
 function gapRows(){const hour=Math.floor(time/B['gap.json'].bin_seconds)*B['gap.json'].bin_seconds;return B['gap.json'].rows.filter(r=>r.hour_start===hour);}
-function gapLayers(shared,unit){
+function gapLayers(shared,u){
   if(view!=='gap')return [];
   const rows=gapRows().map(r=>({...r,path:M.paths.find(p=>p.route_id===r.route_id&&p.direction===r.direction)}));
   const decisions=closedGaps?B['decisions.json'].decisions:[];
-  const positions=decisions.flatMap(d=>d.where.stop_ids.map(id=>({id:d.id,title:d.title,position:M.stops.get(id).position})));
-  return [new PathLayer({...shared,id:'gaps',data:rows,getPath:r=>r.path.points.map(p=>[p[0]+(r.direction?4:-4)*unit,p[1]]),getColor:r=>[...(r.over>0?C.over:C.spare),closedGaps?100:230],getWidth:7,widthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('gap-hour').textContent=`${M.routes.get(object.route_id).short_name}, direction ${object.direction}: ${object.over} passengers above seats; ${object.spare} spare seats. Supplied route-hour totals. gap.json · ${M.meta.service_date}`;}}}),new ScatterplotLayer({...shared,id:'decision-places',data:positions,getPosition:d=>d.position,getRadius:13,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.simulated,getLineWidth:3,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>object&&document.getElementById('decision-'+object.id)?.scrollIntoView({behavior:'instant',block:'start'})})];
+  const positions=decisions.flatMap(d=>d.where.stop_ids.map(id=>{const stop=M.stops.get(id);return{id:d.id,title:d.title,position:geoMode?[stop.lon,stop.lat]:stop.position};}));
+  return [new PathLayer({...shared,id:'gaps',data:rows,getPath:r=>geoMode?r.path.shape.map(p=>[p[0]+(r.direction?4:-4)*u.lon,p[1]]):r.path.points.map(p=>[p[0]+(r.direction?4:-4)*u,p[1]]),getColor:r=>[...(r.over>0?C.over:C.spare),closedGaps?100:230],getWidth:7,widthUnits:'pixels',pickable:true,onClick:({object})=>{if(object){$('gap-hour').textContent=`${M.routes.get(object.route_id).short_name}, direction ${object.direction}: ${object.over} passengers above seats; ${object.spare} spare seats. Supplied route-hour totals. gap.json · ${M.meta.service_date}`;}}}),new ScatterplotLayer({...shared,id:'decision-places',data:positions,getPosition:d=>d.position,getRadius:13,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.simulated,getLineWidth:3,lineWidthUnits:'pixels',pickable:true,onClick:({object})=>object&&document.getElementById('decision-'+object.id)?.scrollIntoView({behavior:'instant',block:'start'})})];
 }
 const metricLabel=key=>({passenger_minutes_over_seats:'passenger-minutes without a seat',passengers_over_seats_minutes:'passenger-minutes without a seat',empty_seat_km:'seat-kilometres run empty',minutes_saved_per_trip:'minutes saved per trip',passengers_shifted:'passengers shifted',load:'passengers on board',seats:'seats',points:'Khutwa points',doors_not_opened:'stop visits with doors closed'}[key]??key.replaceAll('_',' '));
 function renderGap(){
@@ -226,7 +285,7 @@ function renderDecisions(){
 }
 async function printOrder(id){
   const d=B['decisions.json'].decisions.find(d=>d.id===id);
-  $('print-order').innerHTML=`<p class="fixture">${M.meta.fixture?'STAND-IN DATA, NOT A RESULT':'Aggregate records only'}</p><h1>SIMULATION. NOTHING WAS SENT.</h1>${decisionHTML(d,true)}${d.swaps?.length?`<h2>Proposed vehicle exchange</h2><table class="swap-table"><thead><tr><th>Pair</th><th>Route · trip</th><th>Start</th><th>Current vehicle</th><th>Seats / peak load</th></tr></thead><tbody>${d.swaps.map((pair,i)=>[pair.from,pair.to].map((t,j)=>`<tr class="${j===0?'pair-start':''}"><td>${j===0?i+1:'↳'}</td><td>${escape(t.route_id)} · ${escape(t.trip_id)}</td><td>${clock(t.start)}</td><td>${escape(t.vehicle)} · ${escape(t.bus_type)}</td><td>${t.seats} / ${t.largest_load}</td></tr>`).join('')).join('')}</tbody></table><p>Exchange the two vehicles within each numbered pair. Planner review required: depot, vehicle blocks, access and driver duties have not been validated.</p>`:'<p>No specific vehicle exchange supplied. A planner must validate and assign trips.</p>'}<img width="90" height="90" src="qr-${encodeURIComponent(d.id)}.svg" alt="QR code back to this decision"><p class="source">insiyab.amirkazemkhani.com/#decision-${escape(d.id)}</p><p>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</p>`;
+  $('print-order').innerHTML=`<p class="fixture">${M.meta.fixture?'STAND-IN DATA, NOT A RESULT':'Aggregate records only'}</p><h1>SIMULATION. NOTHING WAS SENT.</h1>${decisionHTML(d,true)}${d.swaps?.length?`<h2>Proposed vehicle exchange</h2><table class="swap-table"><thead><tr><th>Pair</th><th>Route · trip</th><th>Start</th><th>Current vehicle</th><th>Seats / peak load</th></tr></thead><tbody>${d.swaps.slice(0,PRINT_PAIRS).map((pair,i)=>[pair.from,pair.to].map((t,j)=>`<tr class="${j===0?'pair-start':''}"><td>${j===0?i+1:'↳'}</td><td>${escape(t.route_id)} · ${escape(t.trip_id)}</td><td>${clock(t.start)}</td><td>${escape(t.vehicle)} · ${escape(t.bus_type)}</td><td>${t.seats} / ${t.largest_load}</td></tr>`).join('')).join('')}</tbody></table>${d.swaps.length>PRINT_PAIRS?`<p class="small">The first ${PRINT_PAIRS} of ${d.swaps.length} pairs, in the order the day's records put them. The rest are in decisions.json.</p>`:''}<p>Exchange the two vehicles within each numbered pair. Planner review required: depot, vehicle blocks, access and driver duties have not been validated.</p>`:'<p>No specific vehicle exchange supplied. A planner must validate and assign trips.</p>'}<img width="90" height="90" src="qr-${encodeURIComponent(d.id)}.svg" alt="QR code back to this decision"><p class="source">insiyab.amirkazemkhani.com/#decision-${escape(d.id)}</p><p>A student prototype for the RTA Future Move Hackathon. Not an RTA product.</p>`;
   $('print-order').hidden=false;await $('print-order').querySelector('img').decode();await document.fonts.ready;window.print();
 }
 window.addEventListener('afterprint',()=>{$('print-order').hidden=true;});
@@ -269,6 +328,7 @@ async function pollRoom(){
 setInterval(()=>{if(view==='gap')pollRoom();},1500);
 if(location.hash.startsWith('#decision-')){closedGaps=true;setView('gap');setTimeout(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView(),0);}
 
+const PRINT_PAIRS=4;   // an order is one sheet of A4: a real day proposes more pairs than a sheet holds
 let personIndex=0,stepIndex=0;
 $('people').innerHTML=B['personas.json'].personas.map((p,i)=>`<button data-person="${i}">${escape(p.title)}</button>`).join('');
 document.querySelectorAll('[data-person]').forEach(e=>e.onclick=()=>{personIndex=+e.dataset.person;stepIndex=0;renderStory();window.scrollTo(0,0);});

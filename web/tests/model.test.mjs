@@ -5,7 +5,8 @@ import {createModel,locateBus,pointAlong,fitPaths,boardingsAt} from '../src/mode
 const root=path.resolve(import.meta.dirname,'../..'),bundle={};
 function load(dir){for(const name of fs.readdirSync(path.join(root,'fixtures',dir))){const relative=path.join(dir,name),full=path.join(root,'fixtures',relative);if(fs.statSync(full).isDirectory())load(relative);else if(name.endsWith('.json'))bundle[relative]=JSON.parse(fs.readFileSync(full));}}
 load('');const m=createModel(bundle),t=m.trips[0],a=t.visits[0],b=t.visits[1];
-assert.equal(locateBus(t,a.act_arr-1),null);assert.deepEqual(locateBus(t,a.act_dep).position,m.stops.get(a.stop_id).position);
+assert.equal(locateBus(t,a.act_arr-1),null);// On a real street a stop stands beside the road, so a bus drawn on its route is near the stop's point, not on it: within a hundredth of the route's own extent.
+{const at=locateBus(t,a.act_dep).position,stop=m.stops.get(a.stop_id).position,xs=t.path.points.map(p=>p[0]),ys=t.path.points.map(p=>p[1]),extent=Math.hypot(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys));assert.ok(Math.hypot(at[0]-stop[0],at[1]-stop[1])<=extent/100,'a bus waiting at a stop is drawn on its route beside that stop');}
 assert.ok(Math.abs(locateBus(t,(a.act_dep+b.act_arr)/2).distance-(a.distance+b.distance)/2)<1e-7);
 assert.equal(locateBus(t,t.visits.at(-1).act_dep+1),null);
 console.log('PASS dwell, movement, endpoints and inactive bus');

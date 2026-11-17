@@ -1588,3 +1588,19 @@ h2,.decision h2,.cautions h2{font-size:20px;line-height:1.25}
 .forecast-view .reading,.forecast-view .replay-grid>.forecast-summary{display:none!important}
 .forecast-view .replay-grid{display:block;border-top:2px solid var(--ink);margin-top:40px;padding-top:24px}
 .forecast-view #pick-stop>.section-heading h2{font-size:32px;line-height:1.15}   /* on this screen that heading is the screen's title */
+
+/* ── MapLibre basemap integration ───────────────────────────────────────── */
+/* When MapLibre is active, the MapLibre canvas fills #map; hide the old deck canvas */
+#map.has-basemap #map-canvas{display:none}
+/* MapLibre container must have position:relative so the canvas and attribution sit correctly */
+#map{position:relative}
+/* MapLibre attribution: 11px, bottom-right, always visible */
+.maplibregl-ctrl-attrib{font-size:11px!important;line-height:1.4}
+.maplibregl-ctrl-attrib a{color:var(--ink);opacity:0.7}
+/* Cooperative gestures overlay (Ctrl+scroll hint) */
+.maplibregl-cooperative-gestures-screen{font-family:var(--font-body);font-size:13px;background:rgba(10,10,11,0.75);color:#fff}
+/* Tile-fail note (injected by app.js when PMTiles cannot be fetched, e.g. file://) */
+#map-tile-note{font-size:11px;color:var(--ink);opacity:0.7;position:absolute;bottom:4px;left:8px;pointer-events:none;z-index:10}
+#story-values{flex-wrap:wrap;gap:16px 32px}#story-values p{min-width:0}   /* a real day has counts in the thousands: two large numbers must be able to wrap */
+.map-credit{position:absolute;left:8px;bottom:6px;margin:0;z-index:5;font:400 11px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink);background:var(--paper);padding:1px 6px;pointer-events:none}
+.maplibregl-ctrl-attrib{display:none}
