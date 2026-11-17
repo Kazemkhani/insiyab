@@ -1,3 +1,4 @@
+import {createGuide} from './guide.mjs';
 import {horizonChart,subsetChart,forecastChart,gapChart,gainChart} from './charts.mjs';
 import {seatDiagram} from './scene.mjs';
 import {showTwin} from './twin-scene.mjs';
@@ -221,7 +222,7 @@ async function start(){
   function tick(now){if(playing){time+=Math.min((now-previous)/1000,.2)*speed;if(time>M.max)time=M.min;if(now-lastRender>80){render();lastRender=now;}}previous=now;requestAnimationFrame(tick);}
   requestAnimationFrame(tick);
 }
-start().catch(e=>{console.error(e);$('map-failure').hidden=false;});
+let mapStarted=false;
 
 const oneHour=3600;
 const limit=B['metrics.json'].targets.find(t=>t.target==='boardings'&&t.level==='route')?.tested_on??`Tested on later hours of one day, ${new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(M.meta.service_date+'T00:00:00Z'))}. Not tested on another day.`;
@@ -237,11 +238,13 @@ function renderError(){
 }
 async function setView(next){
   const enteringGap=next==='gap'&&view!=='gap';
+  $('guide').hidden=next!=='guide';document.body.classList.toggle('guide-open',next==='guide');$('guide-return').hidden=next==='guide';
+  if(next!=='guide'&&!mapStarted){mapStarted=true;start().catch(e=>{console.error(e);$('map-failure').hidden=false;});}
   view=next;playing=false;$('play').textContent='Play';
   $('executive-intro').hidden=next!=='replay';$('map-modes').hidden=next!=='replay';$('executive').hidden=next!=='replay';
   syncMapMode();
   document.querySelectorAll('nav button').forEach(e=>e.setAttribute('aria-current',e.dataset.view===next?'page':'false'));
-  $('replay').hidden=['model','stories'].includes(next);$('model').hidden=next!=='model';$('stories').hidden=next!=='stories';
+  $('replay').hidden=['guide','model','stories'].includes(next);$('model').hidden=next!=='model';$('stories').hidden=next!=='stories';
   // The gap screen opens on the hour with the most passengers above the seats: an hour with none shows a visitor nothing to close.
   if(enteringGap){const by=new Map();for(const r of B['gap.json'].rows)by.set(r.hour_start,(by.get(r.hour_start)??0)+r.over);const worst=[...by].sort((x,y)=>y[1]-x[1]||x[0]-y[0])[0];if(worst&&worst[1]>0){time=worst[0]+60;playing=false;$('play').textContent='Play';}}
   $('gap-controls').hidden=next!=='gap';$('gap-results').hidden=next!=='gap';$('replay').classList.toggle('gap-view',next==='gap');
@@ -252,6 +255,7 @@ async function setView(next){
   if(next==='model')renderModel();
   if(next==='gap'){renderGap();pollRoom();}
   if(next==='stories')renderStory();
+  if(next==='guide')guide.show();
   fitMap();render();window.scrollTo(0,0);
   document.querySelector(`nav button[data-view="${next}"]`)?.focus({preventScroll:true});
 }
@@ -410,7 +414,7 @@ async function pollRoom(){
   }
 }
 setInterval(()=>{if(view==='gap')pollRoom();},1500);
-if(location.hash.startsWith('#decision-')){closedGaps=true;setView('gap');setTimeout(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView(),0);}
+
 
 const PRINT_PAIRS=4;   // an order is one sheet of A4: a real day proposes more pairs than a sheet holds
 let personIndex=0,stepIndex=0;
@@ -445,3 +449,9 @@ function renderStory(){
   $('story-record').innerHTML=`<details><summary>See the day’s records for this stop or route</summary><p>${number(boardings)} boardings ${person.anchor.stop_id?'at this stop':'on this route'} in the quarter hour beginning ${clock(bin)}. Measured, not a count of people waiting.</p><p>Nearest recorded departure: ${clock(closest.act_dep)}, ${escape(closest.trip_id)}. ${closest.load} passengers on board; ${closest.seats} seats. ${number((closest.act_dep-closest.sched_dep)/60)} minutes relative to the timetable. Measured.</p><p class="source">replay/route-${escape(person.anchor.route_id)}.json · ${M.meta.service_date}. Story values above use personas.json; this is the nearest replay record, not a reconstructed personal journey.</p></details>`;
   render();
 }
+
+const guide=createGuide(B,M,next=>{setView(next);if(next==='replay'){playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;$('play').textContent=playing?'Pause':'Play';}});
+$('guide-return').onclick=()=>setView('guide');
+document.querySelector('.brand').onclick=e=>{e.preventDefault();guide.restart();setView('guide');};
+if(location.hash.startsWith('#decision-')){closedGaps=true;setView('gap');setTimeout(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView(),0);}
+else setView('guide');

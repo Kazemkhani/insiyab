@@ -20,9 +20,9 @@ with sync_playwright() as p:
         page=context.new_page();errors=[];remote=[]
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.on('request',lambda r:remote.append(r.url) if r.url.startswith(('http:','https:')) else None)
-        page.goto(site.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized && insiyab.map?.isSourceLoaded("basemap")')
+        page.goto(site.as_uri()+'/index.html');page.locator('#guide-explore').click();page.wait_for_function('window.insiyab && insiyab.deck.isInitialized && insiyab.map?.isSourceLoaded("basemap")')
         check(page.locator('#map-credit').is_visible() and 'OpenStreetMap' in page.locator('#map-credit').inner_text(),'judge: public map has visible attribution')
-        check(page.evaluate("insiyab.geoMode && insiyab.map.isSourceLoaded('basemap')"),'judge: offline street tiles load from the bundled archive')
+        check(page.wait_for_function("insiyab.geoMode && insiyab.map.isSourceLoaded('basemap') && insiyab.map.areTilesLoaded()"),'judge: offline street tiles load from the bundled archive')
         check(page.evaluate("()=>{const layer=insiyab.deck.props.layers.find(l=>l.id==='buses'),b=layer.props.data[0];return [b.seats-1,b.seats,b.seats+1].map(load=>layer.props.getPolygon({...b,load}).length).join(',')==='16,4,3'}"),'accessibility: room, full and above seats have distinct rendered shapes')
         if page.locator('#play').inner_text()=='Pause':page.locator('#play').click()
         if network.get('source'):
@@ -156,7 +156,7 @@ with sync_playwright() as p:
         failed=pathlib.Path(tmp);shutil.copytree(site,failed,dirs_exist_ok=True);(failed/'map/offline.js').unlink()
         context=browser.new_context(offline=True,viewport={'width':390,'height':844});page=context.new_page();errors=[]
         page.on('pageerror',lambda e:errors.append(str(e)))
-        page.goto(failed.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized')
+        page.goto(failed.as_uri()+'/index.html');page.locator('#guide-explore').click();page.wait_for_function('window.insiyab && insiyab.deck.isInitialized')
         check(page.evaluate('!insiyab.geoMode'),'failure control: missing offline map selects the network-only renderer')
         check(page.evaluate("()=>{const layer=insiyab.deck.props.layers.find(l=>l.id==='buses'),b=layer.props.data[0];return [b.seats-1,b.seats,b.seats+1].map(load=>layer.props.getPolygon({...b,load}).length).join(',')==='16,4,3'}"),'fallback: room, full and above seats match the same legend')
         check('network is drawn alone' in page.locator('#map-tile-note').inner_text(),'fallback: missing streets are disclosed')

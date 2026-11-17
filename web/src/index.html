@@ -2,8 +2,14 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#F6F5F1"><title>Insiyab | A seat for the journey</title><meta name="description" content="Replay the bus day, test the forecast, and see which decisions could put seats where passengers need them."><link rel="icon" href="data:,"><link rel="stylesheet" href="style.css"></head>
 <body>
 <div id="fixture" class="fixture" hidden>STAND-IN DATA, NOT A RESULT</div>
-<header><a class="brand" href="#replay">Insiyab <span lang="ar" dir="rtl">انسياب</span></a><nav aria-label="Views"><button data-view="replay" aria-current="page">Overview</button><button data-view="forecast">Forecast</button><button data-view="gap">Decisions</button><button data-view="model">Reliability</button><button data-view="stories">Four people</button></nav></header>
+<header><a class="brand" href="#replay">Insiyab <span lang="ar" dir="rtl">انسياب</span></a><button id="guide-return" hidden>Guided demo</button><nav aria-label="Views"><button data-view="replay" aria-current="page">Overview</button><button data-view="forecast">Forecast</button><button data-view="gap">Decisions</button><button data-view="model">Reliability</button><button data-view="stories">Four people</button></nav></header>
 <main>
+<section id="guide" hidden aria-labelledby="guide-title">
+<div class="guide-top"><p id="guide-progress"></p><button id="guide-explore">Explore the full dashboard</button></div>
+<ol id="guide-steps" aria-label="Demo chapters"></ol>
+<div class="guide-layout"><div id="guide-copy"></div><div class="guide-art"><div id="guide-scene"></div><p id="guide-scene-note"></p></div></div>
+<button id="guide-back">Back</button>
+</section>
 <section id="replay" class="view">
 <div class="intro" id="executive-intro"><div><p class="eyebrow">Service planning · Digital twin</p><h1>Dubai’s bus network.</h1><p class="purpose">Where are passengers short of seats? Compare a change.</p></div><a class="qr" href="https://insiyab.amirkazemkhani.com"><img src="qr.svg" alt="QR code to open Insiyab" width="84" height="84"><span>Open on your phone</span></a></div>
 <div id="map-modes" class="map-modes"><span id="map-scope"></span></div>

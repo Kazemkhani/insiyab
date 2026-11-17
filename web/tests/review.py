@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory(prefix='insiyab-review-') as tmp, sync_playwrig
  local_file=mutant/'stop-forecast.js';local_file.write_text("window.INSIYAB_BUNDLE['forecast/boardings-stop.json']="+json.dumps(stop)+';')
  b=p.chromium.launch(args=['--use-angle=metal']);ctx=b.new_context(offline=True,viewport={'width':1280,'height':720});pg=ctx.new_page();errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
  def open_page():
-  pg.goto(mutant.as_uri()+'/index.html');pg.wait_for_function('window.insiyab&&insiyab.deck.isInitialized')
+  pg.goto(mutant.as_uri()+'/index.html');pg.locator('#guide-explore').click();pg.wait_for_function('window.insiyab&&insiyab.deck.isInitialized')
  open_page();check('Review network edition' in pg.locator('#map-credit').inner_text() and pg.locator('#network-invented').inner_text()=='Review operational qualification','source attribution changes with the supplied network metadata');pg.locator('[data-view=model]').click()
  check('Best naive forecast in this table: 0.01.' in pg.locator('#model-sentence').inner_text(),'strongest naive is compared even when last in the file')
  check('The naive forecast misses less.' in pg.locator('#model-sentence').inner_text(),'loss is stated instead of presenting every model as a win')

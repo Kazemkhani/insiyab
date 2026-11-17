@@ -13,7 +13,7 @@ try:
   b=p.chromium.launch(args=['--use-angle=metal']);c=b.new_context();page=c.new_page();errors=[];writes=[]
   page.on('pageerror',lambda e:errors.append(str(e)))
   page.on('request',lambda r:writes.append(r) if r.method=='POST' and '/api/room/phase' in r.url else None)
-  page.goto(url);page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.locator('[data-view=gap]').click();page.locator('#playback').wait_for(state='visible');page.wait_for_timeout(1700)
+  page.goto(url);page.locator('#guide-explore').click();page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.locator('[data-view=gap]').click();page.locator('#playback').wait_for(state='visible');page.wait_for_timeout(1700)
   check(page.locator('#presenter').is_hidden(),'memory-only relay keeps playback primary and hides presenter mutations')
   page.locator('#playback').click();page.wait_for_timeout(1700);check('Played back' in page.locator('#room-count').inner_text(),'polling a memory-only relay preserves playback')
   c.request.post(url+'/__test/store',data={'kind':'shared'});page.locator('#presenter').wait_for(state='visible')
@@ -39,7 +39,7 @@ try:
    page.set_viewport_size({'width':1280,'height':720})
   check(page.evaluate("localStorage.length===0&&sessionStorage.length===0") and 'local-test-code' not in page.content() and all('local-test-code' not in r.url for r in writes),'presenter code is not in storage, markup or URLs')
   page.locator('#end-offer').click();page.wait_for_function("document.querySelector('#presenter-status').textContent.includes('has ended')");check(c.request.get(url+'/api/room/state').json()['phase']=='closed','presenter can end the room offer')
-  count=len(writes);page.reload();page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.locator('[data-view=gap]').click();page.locator('#presenter').wait_for(state='visible');page.locator('#close-gaps').click();check(len(writes)==count,'reload forgets presenter authority')
+  count=len(writes);page.reload();page.locator('#guide-explore').click();page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.locator('[data-view=gap]').click();page.locator('#presenter').wait_for(state='visible');page.locator('#close-gaps').click();check(len(writes)==count,'reload forgets presenter authority')
   c.request.post(url+'/__test/fail',data={'fail':True});page.locator('#playback').wait_for(state='visible');page.locator('#playback').click();check('Played back, nobody is connected' in page.locator('#room-count').inner_text(),'store failure falls back to explicitly labelled playback')
   check(not errors,'room journey has no unhandled page errors');phone_context.close();c.close();b.close()
 finally:

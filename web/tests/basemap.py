@@ -103,6 +103,7 @@ with sync_playwright() as pw:
     # ── Test 1: 1280×720 desktop ─────────────────────────────────────────
     page, reqs = make_page(1280, 720)
     page.goto(f'{BASE}/index.html', wait_until='networkidle', timeout=30000)
+    page.locator('#guide-explore').click()
 
     # Wait for insiyab to be ready
     try:
@@ -178,6 +179,7 @@ with sync_playwright() as pw:
     # ── Test 2: 390×844 mobile ───────────────────────────────────────────
     page2, reqs2 = make_page(390, 844)
     page2.goto(f'{BASE}/index.html', wait_until='networkidle', timeout=30000)
+    page2.locator('#guide-explore').click()
     try:
         page2.wait_for_function('window.insiyab && insiyab.deck && insiyab.deck.isInitialized', timeout=15000)
         deck_ok2 = True

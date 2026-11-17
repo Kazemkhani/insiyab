@@ -14,14 +14,14 @@ export function showTwin(host,person,step,model,decision){
   const canvas=graphics?.canvas??document.createElement('canvas');canvas.setAttribute('aria-label',`${person.title}. Interactive third-person illustration. Drag to look around. Seat counts come from the selected story.`);canvas.setAttribute('role','img');host.append(canvas);
   const tools=document.createElement('div');tools.className='scene-tools';tools.innerHTML='<button type="button" data-camera>See the seats</button><button type="button" data-replay>Replay arrival</button>';host.append(tools);
   let renderer=graphics?.renderer;
-  try{if(!renderer){renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});graphics={canvas,renderer};}}catch{canvas.remove();tools.remove();const message=document.createElement('p');message.textContent='3D is unavailable on this graphics chip. The same seat counts and story are shown alongside.';host.append(message);return;}
+  try{if(!renderer){renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});graphics={canvas,renderer};}}catch{canvas.remove();tools.remove();const message=document.createElement('p');message.className='scene-failure';message.textContent='3D is unavailable on this graphics chip. The same seat counts and story are shown alongside.';host.append(message);return;}
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(palette.paper);
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+  renderer.toneMapping=THREE.NoToneMapping;
   const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(36,1,.1,180),controls=new OrbitControls(camera,canvas);
-  controls.enablePan=false;controls.minDistance=9;controls.maxDistance=35;controls.minPolarAngle=.15;controls.maxPolarAngle=Math.PI*.47;controls.enableDamping=false;
+  canvas.style.touchAction='pan-y pinch-zoom';controls.enablePan=false;controls.touches.ONE=null;controls.touches.TWO=THREE.TOUCH.DOLLY_ROTATE;controls.minDistance=9;controls.maxDistance=35;controls.minPolarAngle=.15;controls.maxPolarAngle=Math.PI*.47;controls.enableDamping=false;
   const materials=new Map();
-  function material(colour,opts={}){const key=colour+JSON.stringify(opts);if(!materials.has(key))materials.set(key,new THREE.MeshStandardMaterial({color:palette[colour]??colour,roughness:.78,metalness:.04,...opts}));return materials.get(key);}
+  function material(colour,opts={}){const key=colour+JSON.stringify(opts);if(!materials.has(key))materials.set(key,(['over','spare','simulated','flow'].includes(colour)||opts.unlit?new THREE.MeshBasicMaterial({color:palette[colour]??colour,...Object.fromEntries(Object.entries(opts).filter(([k])=>k!=='unlit'))}):new THREE.MeshStandardMaterial({color:palette[colour]??colour,roughness:.78,metalness:.04,...opts})));return materials.get(key);}
   function mesh(geometry,colour,parent=scene,position=[0,0,0],opts={}){const m=new THREE.Mesh(geometry,material(colour,opts));m.position.set(...position);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
   function box(w,h,d,colour,parent,position,opts){return mesh(new THREE.BoxGeometry(w,h,d),colour,parent,position,opts);}
   function cylinder(rt,rb,h,colour,parent,position){return mesh(new THREE.CylinderGeometry(rt,rb,h,24),colour,parent,position);}
@@ -55,10 +55,11 @@ export function showTwin(host,person,step,model,decision){
     return g;
   }
   const light=new THREE.DirectionalLight(palette.paper,3.3);light.position.set(-7,15,9);light.castShadow=true;light.shadow.mapSize.set(2048,2048);light.shadow.camera.left=-18;light.shadow.camera.right=18;light.shadow.camera.top=16;light.shadow.camera.bottom=-16;light.shadow.normalBias=.035;scene.add(light,new THREE.HemisphereLight(palette.paper,palette.grey,2.4));
-  box(32,.12,24,'paper',scene,[0,-.15,0]);
+  box(160,.12,140,'paper',scene,[0,-.15,0],{unlit:true});
+  if(step.kind==='simulated'){const badge=document.createElement('span');badge.className='scene-simulation';badge.textContent='SIMULATED';host.append(badge);}
   const value=step.after??step.before??{},seatCount=Number.isInteger(value.seats)?value.seats:null,load=Number.isInteger(value.load)?value.load:null;
   if(seatCount!==null&&load!==null){const reading=document.createElement('div');reading.className='scene-reading';reading.innerHTML=`<strong>${load} passengers</strong><span>${seatCount} seats · cutaway view</span>`;host.append(reading);}
-  const actors=[],moving=[];let requestDemo=null;
+  const actors=[],moving=[],addedSeats=[];let requestDemo=null;
   function bus(parent,seats,passengers,position,scale=1){
     const g=new THREE.Group();g.name='bus';g.position.set(...position);g.scale.setScalar(scale);parent.add(g);
     const rows=Math.ceil((seats??32)/4),length=Math.max(8,rows*.58+2.2),state=passengers>seats?'over':step.kind==='simulated'?'simulated':'flow';
@@ -72,7 +73,7 @@ export function showTwin(host,person,step,model,decision){
     for(const x of [-length*.31,length*.31])for(const z of [-1.22,1.22]){const w=cylinder(.45,.45,.22,'ink',g,[x,.47,z]);w.rotation.x=Math.PI/2;const hub=cylinder(.22,.22,.23,'grey',g,[x,.47,z]);hub.rotation.x=Math.PI/2;}
     for(let i=0;i<(seats??0);i++){
       const row=Math.floor(i/4),col=i%4,x=-length/2+.78+row*.58,z=[-.88,-.42,.42,.88][col];
-      const chair=new THREE.Group();chair.position.set(x,.82,z);chair.name='seat';chair.userData.occupied=i<(passengers??0);g.add(chair);
+      const chair=new THREE.Group();chair.position.set(x,.82,z);chair.name='seat';chair.userData.occupied=i<(passengers??0);g.add(chair);if(step.motion==='capacity-change'&&i>=step.previousSeats)addedSeats.push(chair);
       box(.43,.10,.36,i<(passengers??0)?'ink':'spare',chair,[0,.30,0]);box(.10,.47,.36,i<(passengers??0)?'ink':'spare',chair,[-.20,.53,0]);
       if(i<(passengers??0)){const occupant=personFigure('passenger',chair,[0,-.02,0],'ink',true,.65);occupant.name='seated-passenger';occupant.rotation.y=Math.PI/2;}
     }
@@ -124,7 +125,7 @@ export function showTwin(host,person,step,model,decision){
     box(3.0,.12,.48,'paper',scene,[-2.5,.7,4.7]);for(const x of [-3.7,-1.3])box(.08,.7,.40,'ink',scene,[x,.36,4.7]);
     cylinder(.045,.045,2.9,'ink',scene,[3.6,1.5,3]);box(.58,.65,.10,'paper',scene,[3.6,2.85,3]);
     const p=personFigure(person.id,scene,[1.8,.2,3.7],'ink',false,1.1);p.rotation.y=Math.PI;actors.push(p);
-    const vehicle=bus(scene,seatCount,load,[-1,0,-.3]);moving.push({object:vehicle,from:-17,to:-1});
+    const vehicle=bus(scene,seatCount,load,[-1,0,-.3]);if(step.motion!=='capacity-change')moving.push({object:vehicle,from:-17,to:-1});
     if(phone){
       const device=box(.28,.46,.05,'ink',p,[-.34,1.20,-.25]);device.rotation.x=-.25;box(.23,.36,.06,'paper',p,[-.34,1.20,-.25]);
       label('Voluntary choice · Khutwa',1.8,3.3,3.7,4.1);
@@ -140,6 +141,7 @@ export function showTwin(host,person,step,model,decision){
   function animate(now){
     const p=reduced?1:Math.min(1,(now-start)/1500),ease=1-Math.pow(1-p,3);
     for(const m of moving)m.object.position[m.axis??'x']=m.from+(m.to-m.from)*ease;
+    for(const chair of addedSeats)chair.scale.setScalar(Math.max(.001,ease));
     for(const a of actors)a.rotation.y=(planner?Math.PI:driver?Math.PI:Math.PI)+(1-ease)*.18;
     draw();if(p<1)raf=requestAnimationFrame(animate);
   }
@@ -149,5 +151,5 @@ export function showTwin(host,person,step,model,decision){
   canvas.onwebglcontextlost=event=>{event.preventDefault();title.textContent='3D paused · graphics context lost. Counts remain alongside.';};
   resize();replay();
   const api={scene,camera,renderer,role:person.id,kind:step.kind,get standingBounds(){scene.updateMatrixWorld(true);return scene.getObjectsByProperty('name','passenger-above-seats').map(p=>{const box=new THREE.Box3().setFromObject(p);return {min:box.min.toArray(),max:box.max.toArray()};});},get frames(){return frames;},get moving(){return moving.map(m=>m.object.position.x);},reduced};window.insiyabScene=api;
-  active={dispose(){disposed=true;cancelAnimationFrame(raf);observer.disconnect();controls.dispose();scene.traverse(o=>{o.geometry?.dispose();o.shadow?.map?.dispose();if(o.material?.map)o.material.map.dispose();if(o.material)o.material.dispose?.();});for(const m of materials.values())m.dispose();renderer.renderLists.dispose();}};
+  active={dispose(){disposed=true;cancelAnimationFrame(raf);observer.disconnect();controls.dispose();host.replaceChildren();scene.traverse(o=>{o.geometry?.dispose();o.shadow?.map?.dispose();if(o.material?.map)o.material.map.dispose();if(o.material)o.material.dispose?.();});for(const m of materials.values())m.dispose();renderer.renderLists.dispose();}};
 }
