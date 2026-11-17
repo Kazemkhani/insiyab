@@ -260,156 +260,84 @@
     <h2>How it is built</h2>
 
     <p>
-      The Dataiku Flow has four processing zones.  Each zone is a set
-      of recipes that read raw data, clean it, and produce the aggregated
-      datasets this webapp reads.
+      The Flow in Dataiku has four zones, one for each question this app answers, with the same names as the tabs.
+      Eight of its fourteen steps are visual Group recipes; six are short Python recipes, each opening with a plain
+      description of what it does. Every figure in this app is read live from the tables those steps write.
     </p>
 
     <div class="flow-zone">
       <h3>Zone: Passenger demand</h3>
-      <p class="caption">
-        Reads RTA's nol card transaction records for 15 December 2025.
-        Each tap-on and tap-off becomes a boarding or alighting event,
-        placed at the nearest stop on the matching trip, then aggregated.
-      </p>
+      <p class="caption">The question: how many people board, where and when? Starts from RTA's nol taps for Monday 15 December 2025.</p>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
-        <span>
-          <strong>count_taps</strong>: matches each nol tap to a trip using
-          vehicle number and time; handles door-open (boarding) and
-          drive-through (count) tap types; places taps at the stop that
-          best fits time and direction.
-        </span>
+        <span><strong>count_taps</strong>: reads the taps. A check-in is a boarding and a check-out an alighting. Taps before 03:00 belong to the end of the service day, so they count as hours 24 to 26. The card, the device and the vehicle are dropped here: the output, taps_by_route_stop_hour, holds counts only.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>demand_by_hour</strong>: total boardings and alightings by
-          service-day hour.  Read by The day tab and the Passenger demand tab.
-        </span>
+        <span><strong>demand_by_hour</strong>: boardings and alightings added up by hour. Read by The day and Passenger demand.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>demand_by_route_hour</strong>: split by route.
-          About 3,700 rows.  Read by the Passenger demand tab.
-        </span>
+        <span><strong>demand_by_route_hour</strong>: the same by route and hour. Read by Passenger demand, Supply and capacity and the forecast.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>demand_by_stop</strong>: boardings and alightings by stop.
-          About 2,600 rows.  Read by the Passenger demand tab (top 15).
-        </span>
+        <span><strong>demand_by_stop</strong>: the same by stop. Read by Passenger demand.</span>
       </div>
     </div>
 
     <div class="flow-zone">
       <h3>Zone: Service reliability</h3>
-      <p class="caption">
-        Reads RTA's automated vehicle location (AVL) feed.
-        Aligns each actual departure to its scheduled time, computes the
-        lateness, and aggregates it three ways.
-      </p>
+      <p class="caption">The question: does the bus leave on time? Starts from RTA's running-time table and the fleet list.</p>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
-        <span>
-          <strong>clean_running_time</strong>: parses two-digit years, times
-          without seconds, and service-day hours past 24:00; rejects trips
-          with implausible running times; outputs one row per departure.
-        </span>
+        <span><strong>clean_running_time</strong>: one row per bus per stop. Turns clock text into seconds on the service-day clock (after midnight is written 24:00 to 30:59), works out how late each departure was against its own scheduled time, and adds the bus type. The driver and the vehicle number are dropped here. Output: stop_departures_clean.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>punctuality_by_hour</strong>: aggregates departure lateness
-          by service-day hour (3 to 30; hours 24-30 are after midnight).
-          Read by The day tab and the Service reliability tab.
-        </span>
+        <span><strong>punctuality_by_hour</strong>: share of departures 5 or more minutes late, average lateness, share leaving early and share of stops passed without opening the doors, by hour. Read by The day.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>punctuality_by_route_hour</strong>: same split by route.
-          About 3,200 rows.  Read by the Service reliability tab.
-        </span>
+        <span><strong>punctuality_by_route_hour</strong>: the same by route and hour. Read by Service reliability.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>punctuality_by_bus_type</strong>: split by vehicle type
-          (STANDARD, DOUBLE, ARTICULATED, MIDI, COACH).  Read by the
-          Service reliability tab.
-        </span>
+        <span><strong>punctuality_by_bus_type</strong>: the same by bus type. Read by Service reliability.</span>
       </div>
     </div>
 
     <div class="flow-zone">
       <h3>Zone: Supply and capacity</h3>
-      <p class="caption">
-        Joins departure counts and demand figures.  Applies RTA's planning
-        rule: passengers boarding divided by seats per bus gives buses needed,
-        and classifies each route-hour by status.
-      </p>
+      <p class="caption">The question: were enough buses sent? Uses the results of the two zones above.</p>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
-        <span>
-          <strong>buses_needed_rule</strong>: joins punctuality (trips run,
-          seats per bus, standing places) with demand (boardings) on route
-          and hour.  Routes not in the running-time table are flagged.
-          Computes buses needed under both the seated rule and the standing
-          rule (places per bus from the fleet register, marked not verified).
-        </span>
+        <span><strong>buses_needed_rule</strong>: applies RTA's planning rule as its scheduling engineer described it: boardings in the hour, divided by what one bus carries, gives the buses needed. Counts the trips that started on each route in each hour and their seats, joins the boardings, and works the rule twice: seats only, and seats plus standing (the fleet list marks standing as not verified). A route with taps but no trip in the running-time table is marked, not counted as short. Output: supply_vs_demand_by_route_hour. Read by Supply and capacity and What if.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>supply_vs_demand_by_route_hour</strong>: full route-hour
-          table with buses needed, buses short, and status.
-          Read by the Supply and capacity tab and the What-if tab.
-        </span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span>
-          <strong>supply_status_by_hour</strong>: count of route-hours in
-          each status, by hour.  Read by the Supply and capacity tab.
-        </span>
+        <span><strong>supply_status_by_hour</strong>: how many routes were short, in balance or under a fifth used, by hour. Read by Supply and capacity.</span>
       </div>
     </div>
 
     <div class="flow-zone">
       <h3>Zone: Forecast</h3>
-      <p class="caption">
-        Builds a gradient-boosted tree model that predicts how long a trip
-        will take.  Tested on the evening peak and compared against the
-        timetable and simple baselines.
-      </p>
+      <p class="caption">The question: how long will each trip really take? Uses the running-time table, the fleet list and the boardings from Passenger demand.</p>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
-        <span>
-          <strong>build_trip_table</strong>: joins one row per trip from AVL,
-          demand, timetable, and fleet register; adds lag features (how late
-          the previous trip on this bus finished, what boardings were in the
-          last full hour on this route).
-        </span>
+        <span><strong>build_trip_table</strong>: one row per trip, holding only what was knowable 30 minutes before it was due to leave: the planned running time, the stops, the time of day, the bus type, how the route ran in the two hours before (finished trips only), how late this bus finished its previous trip (only if it had finished), and boardings on the route in the last full hour. The vehicle number links a bus to its previous trip and is then dropped.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
-        <span>
-          <strong>forecast_running_time</strong>: trains a gradient-boosted
-          tree on trips before 16:00, scores trips from 16:00 to end of
-          service.  Outputs trip-level forecasts plus feature importances.
-        </span>
+        <span><strong>forecast_running_time</strong>: gradient-boosted trees (LightGBM). Learns from trips due before 16:00 and is tested on every trip from 16:00 on. Scored against RTA's timetable and two simple forecasts, with the average miss, RMSE and MAPE, and a range for the gain from drawing whole routes again 200 times. Outputs: running_time_forecast, running_time_metrics, running_time_drivers.</span>
       </div>
       <div class="flow-step">
         <span class="flow-step-kind">Python</span>
-        <span>
-          <strong>running_time_bands</strong> (optional): groups each
-          route-hour into percentile bands (median, 85th percentile) to show
-          planners how much buffer is needed.  Built separately; the Forecast
-          tab shows a note if this dataset is absent.
-        </span>
+        <span><strong>running_time_bands</strong>: for each route, direction and hour: the planned running time, the middle trip, and the time that covers 85 trips in 100. The difference is the extra time that hour needs.</span>
+      </div>
+      <div class="flow-step">
+        <span class="flow-step-kind visual">Group</span>
+        <span><strong>running_time_ledger_by_hour</strong>: those extra minutes added up by hour of the day.</span>
       </div>
     </div>
 
