@@ -204,3 +204,23 @@ He confirmed in the render: six sizes on the main site; no null, "1 stops", "Roo
 | R13 | First-view words still to change: "naive forecast" with no gloss, "MAE", "Comparing Boosted trees...", sentences over 25 words on the gap and model screens | **Open.** |
 
 His line on each screen: the day, almost; the forecast, partly; the gap, partly; the model, almost; four people, no; a decision's evidence, yes; Khutwa, almost.
+
+## Review 4, 17 November, about 05:55. An art director on the four live 3D scenes (public address, commit 8e68b23, a real graphics chip; not a real phone)
+
+Amir's bar: "make the 3D world class". The reviewer's verdict: none of the eight scene-steps is world class. The site worker's two steps and the office worker's first are acceptable; the planner's two, the office worker's second and the driver's two are weak. The counts are all true: he counted the seat and passenger meshes in every scene against the numbers beside it and found no mismatch. Sixty frames a second on a laptop.
+
+| # | Finding | For |
+|---|---|---|
+| A1 | It is not third person over the shoulder. The camera is a high, far view of an object on a tile (`twin-scene.mjs:21, :132`); the named person is 19 in 100 of the frame's height and the shelter roof is what the eye finds first. | Lane 2 |
+| A2 | The first frame is an empty stop: the bus starts off screen, and nothing lands when it arrives. The standing passengers are never revealed, they are simply there. | Lane 2 |
+| A3 | The second step is not a change, it is a different bus sliding in. For the planner and the driver the two steps are close to identical pixel for pixel, and two buttons ("Replay change", "Replay view") move nothing. | Lane 2 |
+| A4 | The bus has no windows, no door and no route number; the stop's flag is blank though the bundle has the stop's real name; the driver's cab reads as a golf cart. | Lane 2 |
+| A5 | The light is three.js's default look, not the site's flat one, and it shifts the colours: passengers without a seat render coral (224,84,64) where the token is (178,58,46); the floor renders grey, not paper, so the scene is a grey rectangle on the page; shadows read as dirt. Red and blue fall under 3 to 1 against the floor. | Lane 2 |
+| A6 | The word "simulated" is nowhere inside the scene on a simulated step. | Lane 2 |
+| A7 | On a phone the scene is 260 pixels tall with buttons over its bottom fifth, and a one-finger swipe over it turns the camera where the visitor meant to scroll the page. | Lane 2 |
+| A8 | With no WebGL the message is hidden under the scene's title. | Lane 2 |
+| A9 | Each scene builds 650 to 1,050 separate shapes and draws 1,300 to 2,100 times a frame; on a slow processor mounting takes 300 to 800 milliseconds. | Lane 2 |
+
+His ten changes, in order of effect for effort: (1) fix the light and the ground: no tone mapping, a paper background, a large paper ground that fades with fog and has no edge; (2) lock state colours to the tokens with unlit materials; (3) clear label backgrounds, drop the duplicated title, put the word SIMULATED in the scene; (4) reframe: the person in the near third at 1.3 scale, camera at about (3.6, 2.0, 7.4) looking at (-1.5, 1.3, 0), field of view 32, the shelter moved so it never covers the bus; the driver from behind his right shoulder through a windscreen; (5) make the bus a bus: a window band, a door, the real route number and the real stop name as textures; (6) give the finding a beat on one bus that stays: hold 400 ms, lift the roof over 600 ms, pop the standing passengers in one by one with the count ticking; for the change, slide the extra rows in and walk each standing figure to a seat; (7) real motion for the planner (the two buses swap on an arc) and the driver (the road slows to a halt at an empty stop; then does not); (8) share shapes and draw passengers as instances; (9) on a phone, a taller scene, tools under it, and a swipe that scrolls; (10) the view from above: seats that do not vanish into the floor, and a name over the person.
+
+Three larger things he would build in a few hours: the real street under the stop, from the shipped map's own buildings and the route's real path; passengers boarding one by one with the count ticking; and before and after in one picture with a divider to drag.
