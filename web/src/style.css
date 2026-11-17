@@ -1754,3 +1754,9 @@ h2,.decision h2,.cautions h2{font-size:20px;line-height:1.25}
 #briefing-panel{margin-top:24px;border-top:1px solid var(--line)}#briefing-panel>summary{padding:16px 0;cursor:pointer}.briefing .briefing-title{font-size:32px;max-width:none}.briefing{border-bottom:0;margin-bottom:0}.briefing-go [data-go]{min-height:48px}
 
 #map-tile-note{top:8px;bottom:auto;max-width:calc(100% - 110px);background:var(--paper);padding:4px 6px;opacity:1}
+
+/* Inspection connects a proposal to its recorded trip without changing history. */
+.swap-picker{display:block;font-size:12px;margin:12px 0 0}.swap-picker select{width:100%;min-height:44px;margin-top:4px;font-size:13px}
+.swap-trip .trip-on-map{text-align:left;margin:-6px 0 0;min-height:44px;padding:0;border:0;text-decoration:underline;text-underline-offset:4px;font-size:12px;background:transparent}.swap-trip{padding:8px 0;gap:12px}.swap-trip>div{gap:0}
+#public-selection .text-action{min-height:44px;padding:8px 0 0;text-align:left;font-size:12px}
+#network-invented{margin:12px 0 0;max-width:80ch}

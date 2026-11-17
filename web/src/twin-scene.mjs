@@ -94,7 +94,7 @@ export function showTwin(host,person,step,model,decision){
     const swap=decision?.swaps?.[0];
     if(swap){
       const after=step.kind==='simulated';bus(scene,after?swap.to.seats:swap.from.seats,swap.from.largest_load,[-1.5,1.35,.25],.22);bus(scene,after?swap.from.seats:swap.to.seats,swap.to.largest_load,[1.4,1.35,.25],.22);
-      label(`${swap.from.largest_load} passengers`, -1.5,2.05,.25,2.1);label(`${swap.to.largest_load} passengers`,1.4,2.05,.25,2.1);
+      label(`${swap.from.largest_load} at trip peak`, -1.5,2.05,.25,2.1);label(`${swap.to.largest_load} at trip peak`,1.4,2.05,.25,2.1);
     }
     label(step.kind==='simulated'?'PROPOSED EXCHANGE':'FIND THE SEAT SHORTAGE',0,4.5,-1,5);
     streetCamera.set(8,7,11);seatCamera.set(0,9,9);target.set(0,1.5,0);

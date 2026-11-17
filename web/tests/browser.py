@@ -62,7 +62,7 @@ with sync_playwright() as p:
         page.evaluate('insiyab.setTime(insiyab.forecastOrigin)')
         check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='actual-halos').props.data.length===0"),f'{width}: no actuals revealed ahead of clock')
         page.evaluate('insiyab.setTime(insiyab.forecastOrigin+3600)')
-        check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='actual-halos').props.data.length>0"),f'{width}: reality fills forecast after clock passes bin')
+        check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='actual-halos').props.data.length===0"),f'{width}: map keeps selected actual hidden even after clock passes bin')
         check('naive forecast' in page.locator('#error-counter').inner_text(),f'{width}: rolling error against naive visible')
         check(page.locator('[data-actual]').inner_text()=='?' and page.locator('#challenge [data-actual-bin="'+page.locator('#forecast-time').input_value()+'"]').count()==0,f'{width}: challenge hides actual in both text and chart')
         started=time.monotonic();page.locator('#reveal').click()

@@ -12,6 +12,7 @@ with tempfile.TemporaryDirectory(prefix='insiyab-review-') as tmp, sync_playwrig
  target['results'] += [dict(r,model='review_strong_naive',mae=.01,rmse=.02) for r in list(target['results']) if r['model']==naive['model']]
  for r in target['results']:
   if r['model'] not in [m['model'] for m in target['models'] if m['is_baseline']]:r['skill_vs']='review_strong_naive'
+ data['network.json'].setdefault('source',{}).update(credit='Review network edition',invented='Review operational qualification')
  (mutant/'bundle.js').write_text('window.INSIYAB_BUNDLE='+json.dumps(data)+';')
  stop=json.loads((site/'data/forecast/boardings-stop.json').read_text());first=stop['series'][0];duplicate=json.loads(json.dumps(first))
  for r in duplicate['rows']:r.update(forecast=999.25,lo=998,hi=1001,actual=None)
@@ -21,11 +22,11 @@ with tempfile.TemporaryDirectory(prefix='insiyab-review-') as tmp, sync_playwrig
  b=p.chromium.launch(args=['--use-angle=metal']);ctx=b.new_context(offline=True,viewport={'width':1280,'height':720});pg=ctx.new_page();errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
  def open_page():
   pg.goto(mutant.as_uri()+'/index.html');pg.wait_for_function('window.insiyab&&insiyab.deck.isInitialized')
- open_page();pg.locator('[data-view=model]').click()
+ open_page();check('Review network edition' in pg.locator('#map-credit').inner_text() and pg.locator('#network-invented').inner_text()=='Review operational qualification','source attribution changes with the supplied network metadata');pg.locator('[data-view=model]').click()
  check('Best naive forecast in this table: 0.01.' in pg.locator('#model-sentence').inner_text(),'strongest naive is compared even when last in the file')
  check('The naive forecast misses less.' in pg.locator('#model-sentence').inner_text(),'loss is stated instead of presenting every model as a win')
  pg.locator('[data-view=forecast]').click();pg.wait_for_function("!!INSIYAB_BUNDLE['forecast/boardings-stop.json']")
- pg.locator('#forecast-series').select_option('1');check('999.25' in pg.locator('#challenge').inner_text(),'second series for the same stop can be inspected')
+ pg.locator('#forecast-stop').select_option(first['id']);pg.locator('#forecast-series').select_option('1');check('999.25' in pg.locator('#challenge').inner_text(),'second series for the same stop can be inspected')
  pg.locator('#reveal').click();check('No actual count supplied.' in pg.locator('[data-miss]').inner_text(),'missing actual is not displayed as zero or scored')
  pg.locator('#forecast-stop').select_option(missing);check(pg.locator('#reveal').is_hidden() and 'No forecast was supplied for this stop' in pg.locator('#challenge').inner_text(),'stop with no series never borrows another stop forecast')
  local_file.unlink();open_page();pg.locator('[data-view=forecast]').click();pg.wait_for_function("document.querySelector('#challenge').textContent.includes('could not be opened')")
