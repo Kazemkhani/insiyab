@@ -145,7 +145,8 @@ echo "deployed $SHORT to $DEPLOYED; checking $CHECK"
 
 # 12. Served equals built, by hash, for every file. The old version can be served briefly, so wait up to 90 seconds.
 same() { ( cd "$UP" && find . -type f ! -path './.vercel/*' ! -path './api/*' ! -name vercel.json | sed 's|^\./||' ) | while read -r f; do
-    want="$(shasum -a 256 "$UP/$f" | cut -d' ' -f1)"; got="$(curl -sL --max-time 30 "$CHECK/$f" | shasum -a 256 | cut -d' ' -f1)"
+    want="$(shasum -a 256 "$UP/$f" | cut -d' ' -f1)"; got=""
+    for again in 1 2; do got="$(curl -sL --max-time 90 "$CHECK/$f" | shasum -a 256 | cut -d' ' -f1)"; [ "$want" = "$got" ] && break; done   # one slow answer is not a wrong file: ask twice, and wait longer
     [ "$want" = "$got" ] || { echo "$f"; return 1; }; done; }
 OKAY=0; BAD=""; for wait in 0 10 20 30 30; do sleep "$wait"; BAD="$(same)"; [ -z "$BAD" ] && { OKAY=1; break; }; done
 [ "$OKAY" = "1" ] || stop "served differs from built: $BAD"
