@@ -109,29 +109,9 @@ def prepare(tables):
     # --- prepare_log ---
     prepare_log = pd.DataFrame(day["log"])
 
-    # --- vehicle_attributes: v1/v2... mapped to bus specs (no body number) ---
-    fleet = t.get("fleet", pd.DataFrame())
-    va_rows = []
-    if len(fleet) and "body" in day["visits"].columns:
-        # visits has body removed; rebuild from fleet using the same names dict
-        # names dict is {body: "v1",...} — we reconstruct it from fleet + visits
-        # Actually, model.prepare drops body from visits but we can get it from fleet
-        # The vehicle column in visits IS the stand-in. We build vehicle→attrs from fleet.
-        # The mapping is sorted(body) → v1, v2,...
-        bodies = sorted(fleet["Body_number"].dropna().unique() if "Body_number" in fleet.columns else [])
-        name_map = {b: f"v{i + 1}" for i, b in enumerate(bodies)}
-        for _, fr in fleet.iterrows():
-            body = fr.get("Body_number") or fr.get("body", "")
-            vname = name_map.get(str(body).strip(), "")
-            if vname:
-                va_rows.append({
-                    "vehicle": vname,
-                    "bus_type": str(fr.get("Bus_Type") or fr.get("bus_type", "")).strip().upper() or "UNKNOWN",
-                    "model_year": str(fr.get("Model Year") or fr.get("model_year", "")),
-                    "manufacturer": str(fr.get("Manufacturer") or fr.get("manufacturer", "")).strip(),
-                })
-    vehicle_attributes = pd.DataFrame(va_rows) if va_rows else pd.DataFrame(
-        columns=["vehicle", "bus_type", "model_year", "manufacturer"])
+    # --- vehicle_attributes: taken directly from the day dict (built in model.prepare) ---
+    vehicle_attributes = day.get("vehicle_attributes", pd.DataFrame(
+        columns=["vehicle", "bus_type", "model_year", "seats", "manufacturer"]))
 
     return {
         "stop_visits": stop_visits,

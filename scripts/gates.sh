@@ -37,6 +37,7 @@ SUITES=(
   tests/test_census.py
   tests/test_engine.py
   tests/test_notebook.py
+  tests/test_real_formats.py
   live/tests/run.sh
   web/tests/run.sh
   rider/tests/run.sh

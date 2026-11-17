@@ -99,3 +99,51 @@ The slides say teams "may add open data". The verified list, with addresses and 
 4. **Counts are totals; journeys are private.** A count of boardings at a stop is a total and may be shown, however small. A journey from one stop to another made by fewer than five cards is never shown: such a cell is left out.
 5. **The public site shows made-up stand-in data, labelled on every screen, until rule 1 is settled.** If export of totals is allowed, the site switches to real totals by replacing the files in `artifacts/`; nothing else changes.
 6. **Open data keeps its source.** Every table built from public data carries the address, the date fetched and the licence.
+
+## 7. Formats seen in Dataiku on 17 November 2026
+
+The engine was run for the first time on RTA's real tables. Every column arrives as a string. The formats below are what was observed; they differ from the stand-in fixtures in several ways that the engine now detects and handles automatically.
+
+### Running_time (`avl` table), 259,435 rows
+
+| Column | Real format | Notes |
+|---|---|---|
+| `Date` | `15-DEC-2025` | Day-month-year, four-digit year. Handled by `iso_dates`. |
+| `Body` | Digits only, 3–7 characters, e.g. `6424` | Matches `Body_number` in Fleet_List directly. |
+| `Sched_Arr`, `Act_Arr`, `Sched_Dep`, `Act_Dep` | `HH:MM:SS`, service-day clock. Hours run 03–30. A time after midnight is written 24:xx:xx to 30:xx:xx, NOT wrapped back to 00. | The engine detects any scheduled time above 23:59:59 and skips the midnight-unwrapping step it uses for the stand-in. |
+| `Door_Satus` (column name is a typo in the real data) | `Door Open` or `Drive Through` | `insiyab_flow._normalise` renames this to `Door_Status` before the engine reads it. `Door Open` means the door opened; `Drive Through` means it did not. |
+| `Direction` | `1` (outbound) or `2` (inbound) | The engine detects minimum value 1 and subtracts 1 to give 0/1. |
+| `Stop_ID` | Six digits | 99.5% match GTFS `stop_id`. |
+| `Stop_Seq` | 1 or 2 digits | |
+| `Trip_ID` | Ten digits | |
+| `Trip_end` | Empty except on the last stop of a trip | |
+| `Diff_in_seconds` | Empty on 11,098 rows | |
+| `Route` | Forms like `F27`, `77`, `91A`, `8`, `320` | |
+
+### Nol taps (`nol` table), 1,056,343 rows
+
+| Column | Real format | Notes |
+|---|---|---|
+| `Transaction_date` | `15-DEC-25` (two-digit year) | Handled by `iso_dates` via `pd.to_datetime(format="mixed")`. Pandas interprets year 25 as 2025. |
+| `Transaction_Time` | `HH:MM` with no seconds, hours 00–23 | The engine's `seconds()` already handles the optional seconds field. Hours 00–02 on the service date are after midnight and are adjusted to 24+h (add 86,400) before trip matching. Hour 03 is ambiguous and is left at its literal time. |
+| `Body_EVD_ID` | `B6424_EVD_02`; 79 rows have a form like `B6424_XX_XX123` | The engine extracts the first run of digits after the leading `B` and strips leading zeros: `B6424_EVD_02` → `6424`, which matches AVL `Body` and Fleet `Body_number` directly. The 79 odd-form bodies are handled the same way. |
+| `CKI` / `CKO` | `1` / `0`; exactly one is `1` on each row | 544,583 check-ins, 511,760 check-outs. |
+| `Stop_Id` | Six digits on most rows; five digits on 11,103 rows; non-numeric text on 106 rows | Stop IDs are compared as written (whitespace stripped). Five-digit IDs in NOL do not automatically match six-digit AVL/GTFS IDs; this inflates the "tap placed at different stop than it reported" count in the log but does not affect trip placement, which uses body and time only. |
+| `Route` | Forms like `F27`, `77`, `91A`, `X28` | |
+
+### Fleet_List
+
+| Column | Real format | Notes |
+|---|---|---|
+| `Body_number` | Digits, matches AVL `Body` directly | |
+| `Bus_Type` | `STANDARD`, `DOUBLE`, `ARTICULATED`, `MIDI`, `COACH` | |
+| `Model Year` | Four-digit year | |
+| `No_of_Seats` | Integer | Standing capacity column is marked not verified and is not used. |
+
+### GTFS (stops, trips, routes, stop_times, calendar, shapes)
+
+The feed covers September–December 2026. Its calendar does not include 15 December 2025. The engine falls back to the same weekday's services and notes this in the log. The scheduled times inside Running_time are the day's own plan; GTFS times are from a different season.
+
+### Communities
+
+The table arrives as a map export with columns `snippet`, `name`, `description`, `id`, `ExtendedData`, `Polygon`. `ExtendedData` is a JSON structure whose `SimpleData` list holds `COMM_NUM`, `CNAME_E` and `CNAME_A`. `Polygon` is a JSON structure whose `LinearRing.coordinates` holds space-separated `lon,lat,alt` triples. `insiyab_flow.communities_from_map_export` converts this to the four columns the engine reads (`comm_num`, `cname_e`, `cname_a`, `shape` as WKT).

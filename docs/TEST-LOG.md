@@ -246,3 +246,16 @@ No failed request, no sideways scroll, no dead link in the first 20, Khutwa runs
 One statement of his is wrong and is not carried forward: that map tiles come from tile.openstreetmap.org through Leaflet. The site ships its own map file and no such address is in `web/src` or `web/build.mjs` (searched), and the deploy's own check finds no request to another origin.
 
 His five changes by points for the hour: the real-data run (he says +6); the feature list on Reliability; plain words for the model's name; a neutral first state on Decisions; one picture of the Dataiku flow.
+
+## What RTA's scheduling engineer told the team, 17 November, about 13:20 (from Amir's recording)
+
+Not a review of our work: how RTA plans today. Each line changes something we build or say.
+
+| What he said | What it changes |
+|---|---|
+| A route is planned from where passengers board and where they go, hour by hour (or by quarter of an hour): passengers boarding in the hour, divided by what one bus carries, gives the buses needed. | This rule is now a step in the Dataiku flow (`buses_needed_rule`), applied to every route and hour of the real day. We speak in his unit: buses needed against buses run. |
+| One bus is planned at about 35 seated and about 35 standing. | RTA plans with standing. We keep seats and standing as two separate figures, and say the fleet list marks standing "not verified". |
+| The route network changes four times a year. Timetables change every month or two. The limit is publishing the change to stops and journey planners, not deciding it. | Deployability: running times and frequencies feed the next timetable change; vehicle allocation and route changes feed the quarterly one. We do not promise changes by the hour. |
+| A surge is met with spare buses sent from stations where staff are on the ground. The test: is the next bus already full, is it late, how often does the route run. If more wait than a bus carries and none comes within the route's frequency, a bus is sent. Drivers and stations speak to the control centre live. | The live use of the forecast is his own test, run ahead of time: the next bus forecast full and none following within the frequency. A watchlist for the control centre, not a new process. |
+| Most stops are not monitored; only some major ones. Cameras that count people are planned, not installed. | Confirms we must say "boardings", never people waiting. The forecast fills the gap until cameras exist, and can take their counts later. |
+| Complaints about waiting reach one call centre for all of RTA. A repeated complaint changes the timetable at the next cycle. | The passenger side (the reward, the survey) is a second source of the same signal. It stays last in the story. |

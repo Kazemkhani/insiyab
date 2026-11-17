@@ -19,7 +19,13 @@ import pandas as pd
 
 BIN = 900
 DAY_START = 4 * 3600
-DOOR_OPEN = {"open", "opened", "1", "true", "yes", "y"}
+DOOR_OPEN = {"open", "door open", "opened", "1", "true", "yes", "y"}
+# MIDNIGHT_WRAP_HOUR: on the extended service-day clock, tap hours 00-02 on the service date are after midnight.
+# Hour 03 is ambiguous (first buses depart then) so it is left at its literal time.
+MIDNIGHT_WRAP_HOUR = 3
+# Hard-failure thresholds — a run that breaches these has produced nothing useful.
+TAP_PLACE_FAIL_THRESHOLD = 0.5    # more than half the taps unplaced → body or clock mismatch
+MAX_SCHEDULED_HOUR = 36           # a service day ends by ~30 h; 36 catches the clock-doubling bug
 FILES = {"nol": "nol_transactions.csv", "avl": "bus_runtime_avl.csv", "fleet": "bus_fleet.csv", "communities": "community_boundaries.csv"}
 GTFS = ["agency", "routes", "trips", "stop_times", "stops", "calendar", "calendar_dates", "frequencies", "shapes", "transfers", "translations", "feed_info"]
 
@@ -100,21 +106,32 @@ def prepare(tables, service_date=None):
     v["date"] = iso_dates(v["date"])
     service_date = iso_dates(pd.Series([service_date])).iat[0] if service_date else v["date"].mode().iat[0]
     v["route_id"] = route_name(v["route_raw"]); v["stop_id"] = v["stop_id"].str.strip()
-    v["direction"] = pd.to_numeric(v["direction"], errors="coerce").fillna(0).astype(int).clip(0, 1)
+    # Real data uses Direction 1/2; the stand-in uses 0/1. Detect by minimum value and normalise to 0/1.
+    _dir_num = pd.to_numeric(v["direction"], errors="coerce")
+    if _dir_num.dropna().min() >= 1:
+        _dir_num = _dir_num - 1
+    v["direction"] = _dir_num.fillna(0).astype(int).clip(0, 1)
     v["seq"] = pd.to_numeric(v["seq"], errors="coerce")
-    # The day runs past midnight, and on a real network past 04:00 too: a night bus is still out at 04:10, written as 04:10 on the day's date.
-    # So a clock time is not placed by a fixed hour. Each vehicle's rows are followed in the order the report gives them: when its clock
-    # falls back by more than six hours it has passed midnight. Only a vehicle's first row needs a rule: before DAY_START it is past midnight.
     for c in ("sched_arr", "act_arr", "sched_dep", "act_dep"):
         v[c] = seconds(v[c])
-    base = v["sched_arr"].fillna(v["sched_dep"]); prev = base.groupby(v["body"], sort=False).shift(1)
-    wrapped = (base < prev - 6 * 3600).astype(int).groupby(v["body"], sort=False).cumsum()
-    first = base.groupby(v["body"], sort=False).transform("first")
-    day_of_row = (wrapped + (first < DAY_START).astype(int)).clip(upper=1) * 86400
-    anchor = base + day_of_row
-    for c in ("sched_arr", "act_arr", "sched_dep", "act_dep"):
-        t = v[c] + day_of_row
-        v[c] = t + np.where(t < anchor - 12 * 3600, 86400, 0) - np.where(t > anchor + 12 * 3600, 86400, 0)      # a row that itself straddles midnight
+    base = v["sched_arr"].fillna(v["sched_dep"])
+    # Real data uses a 24-plus service-day clock (times up to ~30 h, written as 24:xx-30:xx).
+    # The stand-in wraps at midnight and needs the per-vehicle unwrapping logic below.
+    # Detect: any scheduled time above 23:59:59 means the data is already on the service-day clock.
+    _uses_extended_clock = bool(base.max() > 86399)
+    if not _uses_extended_clock:
+        # Stand-in and any wrapped-clock format: unwrap past-midnight times.
+        # Each vehicle's rows are followed in the order the report gives them: when its clock
+        # falls back by more than six hours it has passed midnight.  Only the first row of each
+        # vehicle needs a rule: before DAY_START it is past midnight.
+        prev = base.groupby(v["body"], sort=False).shift(1)
+        wrapped = (base < prev - 6 * 3600).astype(int).groupby(v["body"], sort=False).cumsum()
+        first = base.groupby(v["body"], sort=False).transform("first")
+        day_of_row = (wrapped + (first < DAY_START).astype(int)).clip(upper=1) * 86400
+        anchor = base + day_of_row
+        for c in ("sched_arr", "act_arr", "sched_dep", "act_dep"):
+            t = v[c] + day_of_row
+            v[c] = t + np.where(t < anchor - 12 * 3600, 86400, 0) - np.where(t > anchor + 12 * 3600, 86400, 0)
     no_time = v[["sched_arr", "sched_dep"]].isna().any(axis=1) | v["seq"].isna()
     v = v[~no_time].copy()
     filled = int(v["act_arr"].isna().sum() + v["act_dep"].isna().sum())
@@ -132,16 +149,26 @@ def prepare(tables, service_date=None):
     for c in ("sched_arr", "sched_dep"):
         v[c] = v[c].astype(int)
     moved = int((before != v[["act_arr", "act_dep"]].to_numpy()).any(axis=1).sum())
+    _door_not_opened = int((~v["door_opened"]).sum())
+    _latest_sched_hour = int(v["sched_arr"].max() // 3600) if len(v) else 0
     note("runtime report", "one row is one bus at one stop; rows with no scheduled time or no stop sequence are left out; a missing actual time takes the scheduled one; a time that ran backwards is moved up to the time before it",
          rows_in=len(raw), rows_out=len(v), rows_without_a_scheduled_time=no_time.sum(), actual_times_filled_from_schedule=filled, rows_whose_clock_ran_backwards=moved,
-         route_numbers_rewritten=(v["route_raw"].str.strip() != v["route_id"]).sum(), trips=v["trip_id"].nunique(), door_not_opened=(~v["door_opened"]).sum(),
-         rows_placed_after_midnight=(v["sched_arr"] >= 86400).sum(), latest_scheduled_hour=int(v["sched_arr"].max() // 3600))
+         route_numbers_rewritten=(v["route_raw"].str.strip() != v["route_id"]).sum(), trips=v["trip_id"].nunique(), door_not_opened=_door_not_opened,
+         rows_placed_after_midnight=(v["sched_arr"] >= 86400).sum(), latest_scheduled_hour=_latest_sched_hour)
+    if len(v) > 0 and _door_not_opened == len(v):
+        raise ValueError(f"runtime report: none of the {len(v)} stop visits recorded a door opening. "
+                         f"Check that the Door_Status values match DOOR_OPEN (current set: {sorted(DOOR_OPEN)!r}).")
+    if _latest_sched_hour > MAX_SCHEDULED_HOUR:
+        raise ValueError(f"runtime report: latest scheduled hour is {_latest_sched_hour}, above the {MAX_SCHEDULED_HOUR}h ceiling. "
+                         f"The service-day clock has probably been doubled (86 400 added to already-extended times).")
 
     # --- the fleet: seats for each vehicle ----------------------------------------------------------------------
     f = cols(tables["fleet"], "Body_number", "Bus_Type", "Model Year", "No_of_Seats")
     f.columns = ["body", "bus_type", "model_year", "seats"]
     f["seats"] = pd.to_numeric(f["seats"], errors="coerce"); f["model_year"] = pd.to_numeric(f["model_year"], errors="coerce")
     f["bus_type"] = f["bus_type"].str.strip().str.upper().replace("", "UNKNOWN")
+    _mfr_col = next((c for c in tables["fleet"].columns if _key(c) == "manufacturer"), None)
+    f["manufacturer"] = tables["fleet"][_mfr_col].astype(str).str.strip() if _mfr_col else ""
     f = f.drop_duplicates("body")
     v = v.merge(f, on="body", how="left")
     unknown = v["seats"].isna() | (v["seats"] <= 0)
@@ -157,14 +184,30 @@ def prepare(tables, service_date=None):
     t.columns = ["date", "clock", "body", "card", "cki", "cko", "stop_tapped"]
     dup = t.duplicated(keep="first"); t = t[~dup].copy()
     t["date"] = iso_dates(t["date"])
+    # Real data: Body_EVD_ID is 'B6424_EVD_02'; extract the first run of digits after the leading B, strip leading zeros.
+    # Stand-in: Body_EVD_ID is 'STANDIN-B00', which does not start with B followed by digits+underscore, so left as-is.
+    _evd = t["body"].str.extract(r'^B(\d+)_', expand=False)
+    _evd_match = _evd.notna()
+    if _evd_match.any():
+        t.loc[_evd_match, "body"] = _evd[_evd_match].str.lstrip("0").replace("", "0")
     t["time"] = seconds(t["clock"]) + np.where(t["date"].str.strip() > service_date, 86400, 0)
+    # Extended-clock data: taps in hours 00-02 on the service date are after midnight on the service day.
+    # They carry the service date but their clock time is 00:xx to 02:xx. Adjust to the matching position
+    # on the service-day clock (add 86 400). Hour 03 is ambiguous and is left at its literal time.
+    _taps_adjusted_to_next_cycle = 0
+    if _uses_extended_clock:
+        _midnight = (t["time"] < MIDNIGHT_WRAP_HOUR * 3600) & (t["date"].str.strip() == service_date)
+        t.loc[_midnight, "time"] = t.loc[_midnight, "time"] + 86400
+        _taps_adjusted_to_next_cycle = int(_midnight.sum())
     t["on"] = pd.to_numeric(t["cki"], errors="coerce").fillna(0).eq(1); t["off"] = pd.to_numeric(t["cko"], errors="coerce").fillna(0).eq(1)
     early = int(((seconds(t["clock"]) < DAY_START) & (t["date"].str.strip() == service_date)).sum())
     odd = t["time"].isna() | ~(t["on"] ^ t["off"])
     t = t[~odd].copy(); t["time"] = t["time"].astype(int)
     cards = t["card"].nunique()
-    note("taps", "one row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out",
-         rows_in=len(raw), repeated_rows=dup.sum(), rows_neither_or_both_or_no_time=odd.sum(), rows_out=len(t), check_ins=t["on"].sum(), check_outs=t["off"].sum(), cards_counted=cards, taps_before_day_start_dated_the_service_day=early)
+    _taps_note = dict(rows_in=len(raw), repeated_rows=dup.sum(), rows_neither_or_both_or_no_time=odd.sum(), rows_out=len(t), check_ins=t["on"].sum(), check_outs=t["off"].sum(), cards_counted=cards, taps_before_day_start_dated_the_service_day=early)
+    if _uses_extended_clock:
+        _taps_note["taps_adjusted_to_next_service_cycle"] = _taps_adjusted_to_next_cycle
+    note("taps", "one row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out", **_taps_note)
 
     # --- taps to trips: the tap belongs to the stop its vehicle reached last ------------------------------------
     left = t[["time", "body", "on", "off", "stop_tapped", "card"]].sort_values("time", kind="stable")
@@ -172,8 +215,12 @@ def prepare(tables, service_date=None):
     j = pd.merge_asof(left, right, left_on="time", right_on="act_arr", by="body", direction="backward")
     lost = j["trip_id"].isna()
     wrong = (~lost) & (j["stop_tapped"].str.strip() != j["stop_id"])
+    _share_not_placed = lost.mean() if len(j) else 0
     note("taps to trips", "a tap is given to the stop visit of its vehicle with the latest actual arrival at or before the tap; a tap whose vehicle is not in the runtime report, or that comes before its first arrival, cannot be placed and is left out of loads and counts",
-         taps_in=len(j), taps_not_placed=lost.sum(), share_not_placed=lost.mean() if len(j) else 0, taps_whose_own_stop_differs_from_the_stop_placed=wrong.sum())
+         taps_in=len(j), taps_not_placed=lost.sum(), share_not_placed=_share_not_placed, taps_whose_own_stop_differs_from_the_stop_placed=wrong.sum())
+    if _share_not_placed > TAP_PLACE_FAIL_THRESHOLD:
+        raise ValueError(f"taps to trips: {int(lost.sum())} of {len(j)} taps ({_share_not_placed:.1%}) could not be placed on a trip; "
+                         f"threshold is {TAP_PLACE_FAIL_THRESHOLD:.0%}. Check that Body_EVD_ID was parsed to plain digits matching AVL Body.")
     j = j[~lost].copy(); j["seq"] = j["seq"].astype(int)
     # people who will come back: for each alighting, when that card next tapped. Only the stop and the two times leave this file, never the card.
     jc = j.sort_values(["card", "time"], kind="stable"); nxt = jc.groupby("card", sort=False)["time"].shift(-1)
@@ -283,8 +330,16 @@ def prepare(tables, service_date=None):
 
     v["vehicle"] = v["body"].map(names)
     visits = v[["trip_id", "route_id", "direction", "seq", "stop_id", "vehicle", "bus_type", "seats", "model_year", "sched_arr", "act_arr", "sched_dep", "act_dep", "door_opened", "on", "off", "load"]]
+    # vehicle_attributes: stand-in names mapped to bus specs — no body number leaves this dict.
+    _vattr = v[["vehicle", "bus_type", "model_year", "seats"]].drop_duplicates("vehicle").copy()
+    _body_to_vname = v[["body", "vehicle"]].drop_duplicates("body").set_index("body")["vehicle"]
+    _fleet_mfr = f[["body", "manufacturer"]].drop_duplicates("body").copy()
+    _fleet_mfr["vehicle"] = _fleet_mfr["body"].map(_body_to_vname)
+    _fleet_mfr = _fleet_mfr.dropna(subset=["vehicle"])[["vehicle", "manufacturer"]]
+    vehicle_attributes = _vattr.merge(_fleet_mfr, on="vehicle", how="left")
+    vehicle_attributes["manufacturer"] = vehicle_attributes["manufacturer"].fillna("")
     return {"network_source": tables.get("network_source"), "service_date": service_date, "visits": visits, "stops": s, "communities": comms, "routes": routes, "series": series, "Y": Y, "S": S, "first_bin": first_bin,
-            "alightings": came_back,
+            "alightings": came_back, "vehicle_attributes": vehicle_attributes,
             "fleet_types": f.groupby("bus_type")["seats"].median().dropna().astype(int).reset_index().to_dict("records"), "log": log}
 
 
