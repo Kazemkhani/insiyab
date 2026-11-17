@@ -1,11 +1,15 @@
 # Insiyab: the problem, the answer, and the words to say
 
-Written by lane 1 on 17 November, 18:00. Pitch: Wednesday 18 November, 10:30. Ten minutes, then five of questions.
+Written by lane 1 on 17 November, 18:00; reworded in plain English at 20:30 after Amir said the problem was not clear. Pitch: Wednesday 18 November, 10:30. Ten minutes, then five of questions.
 Every figure here was read from the Dataiku flow on RTA's real service day, Monday 15 December 2025. Read them off the screen when you say them.
 
 ## The problem, in one sentence
 
-**RTA gives each bus route one running time and one layover of about 16 minutes for the whole day, but evening trips take longer than that plan allows, so the lateness is passed from each trip to the bus's next one.**
+**The timetable gives each bus route the same trip time all day. In the evening the trip takes longer, so buses fall behind, and stay behind.**
+
+Said through one bus (use this on stage; it is on the pitch page): **the timetable said 19:23, and the bus left at 19:36.** Someone at the stop planned their evening around 19:23. The driver did nothing wrong. The bus was still finishing its last trip, because that trip took 96 minutes and the timetable gave it 67. The 67, the 96 and the 16-minute break are measured on route 310 at 18:00; the two clock times are arithmetic on them (18:00 + 67 + 16 = 19:23; 18:00 + 96 = 19:36). If asked, say it is the typical trip turned into clock times, not one real passenger.
+
+Words to use: "trip time", not "running time"; "the break between trips", not "layover"; "the delay is handed on", not "lateness is inherited"; "hours of driving time", with "bus hours" only for the planners.
 
 ## How we know (four facts, each one a step in the Flow)
 
@@ -32,15 +36,16 @@ Times are when each part starts. Words in quotation marks are to be spoken; say 
 
 **0:00 · The film (60 seconds).** Say nothing. Let it play.
 
-**1:00 · The problem. Screen: web app, tab 1 "The day".**
+**1:00 · The problem. Screen: the pitch page (insiyab.amirkazemkhani.com/pitch/), scrolled through its six numbers to "The timetable said 19:23"; then the web app, tab 1 "The day".**
+"The timetable said 19:23. The bus left at 19:36. Someone at that stop did nothing wrong, and neither did the driver. Let me show you why it happened, and why it happens every evening."
 "This is one real day of Dubai's buses. Monday 15 December 2025. One million card taps, eleven thousand trips.
 Look at the two peaks. At eight in the morning, forty-eight thousand people board. At six in the evening, forty-nine thousand. The same crowd.
 But in the morning, one departure in five leaves late. In the evening, it is nearly one in two.
 Same buses. Same drivers. Same passengers. So it is not the crowd. Something else changes at six o'clock."
 
 **2:15 · The cause. Screen: tab 2 "Planner's worklist", point at the first row.**
-"Here is what changes. Route 310 at six in the evening. The timetable gives it 67 minutes. It took 96.
-Every route has one running time for the whole day, and a layover of about sixteen minutes at every hour. Sixteen minutes cannot absorb a trip that runs half an hour long. So the bus starts its next trip late, and the one after.
+"Here is what changes. Route 310 at six in the evening. The timetable gives the trip 67 minutes. It took 96.
+Every route gets the same trip time all day, and the bus gets a break of about sixteen minutes before its next trip, at every hour. Sixteen minutes is not enough to win back half an hour. So the bus starts its next trip late, and the one after. That is the 19:23 that left at 19:36.
 We counted it. Of the late starts we could trace, 870 out of 936 followed the same bus arriving late.
 Nobody is doing anything wrong. The timetable was written for a day where six in the evening behaves like ten in the morning."
 
@@ -52,7 +57,7 @@ Across the evening peak it comes to 244 bus hours of running time the timetable 
 **5:00 · The model. Screen: tab 6 "Forecast".**
 "Behind that list is a forecast. Thirty minutes before each trip, how long will it really take?
 We trained it on the morning and midday only, and tested it on the evening it had never seen. Your timetable misses by a little over eight minutes a trip. The model misses by under seven. Fifteen per cent closer, and the range of that does not include zero.
-We compared it with two simple rules, and with a second kind of model. The table shows all of them, with the three error measures."
+We compared it with two simple rules, and with a second model built in Dataiku's visual machine learning. The table shows all of them, with the three error measures."
 (Point at the hour-by-hour chart.) "And here is where it stops helping. After nine at night the timetable is as good as the model. We show that, because you should know where not to rely on it."
 
 **6:30 · How it is built. Screen: the Dataiku Flow.**
@@ -65,11 +70,11 @@ Most of the steps are visual recipes. The names of the zones are the names of th
 **8:30 · What we do not claim. No screen change.**
 "This is one day. The model is only a little better than a simple rule, and we show the number. It tells you where the timetable is short. It does not tell you why traffic is slow."
 
-**9:00 · One step further (the extra). Screen: the story site or the phone drill.**
+**9:00 · One step further (the extra). Screen: the phone drill if it is ready and rehearsed; otherwise no change.**
 "And one step further. The same forecast can warn the control centre about one bus, today." (If the drill is ready: run it. If not: one sentence.) "And passengers offered a bus with room can be thanked with points. Those are the next phase."
 
 **9:40 · Close.**
-"Dubai's buses do not fail in the morning. They fail at six in the evening, and the timetable is why. We forecast the real evening, and we tell the planner where to give it time. Thank you."
+"The timetable said 19:23. With this, the timetable can say a time the bus will keep. Dubai's buses do not fail in the morning. They fail at six in the evening, and the timetable is why. We forecast the real evening, and we tell the planner where to give it time. Thank you."
 
 ## Where each part scores
 
@@ -95,3 +100,7 @@ Most of the steps are visual recipes. The names of the zones are the names of th
 ## Not in this pitch
 
 AI phone calls as the main idea, skipping stops, agents scanning for events, routes that change by the day. If asked: "we looked at those and cut them; this is the one we can stand behind."
+
+## About the second model (do not overclaim)
+
+Cobuild trained Ridge regression and LightGBM with Dataiku's visual machine learning and saved the Ridge model in the Forecast zone. Its test is the last 40 per cent of the day (4,454 trips, 16:22 to the end). There the timetable misses by 6.02 minutes, Ridge by 5.90 and LightGBM by 7.23: two per cent better than the timetable, not more. Our 15 per cent is on the evening peak, 16:00 to 18:59. If asked why they differ: "the gain is in the peak; late at night the timetable is already right, and we show that."
