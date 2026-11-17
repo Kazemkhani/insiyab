@@ -209,15 +209,152 @@ def prepare(tables, service_date=None):
         _taps_note["taps_adjusted_to_next_service_cycle"] = _taps_adjusted_to_next_cycle
     note("taps", "one row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out", **_taps_note)
 
-    # --- taps to trips: the tap belongs to the stop its vehicle reached last ------------------------------------
-    left = t[["time", "body", "on", "off", "stop_tapped", "card"]].sort_values("time", kind="stable")
+    # --- taps to trips: priority-ordered placement ------------------------------------------
+    # Detect whether tap times carry seconds (stand-in: HH:MM:SS; real data: HH:MM).
+    # With no seconds, the tap time represents the whole minute [t, t+59]: a stop arriving
+    # up to 59 s after t is still a candidate.  With seconds the comparison is exact.
+    _has_seconds_in_taps = bool(t["clock"].astype(str).str.contains(r':\d{2}:\d{2}', regex=True).any())
+    _tap_window = 0 if _has_seconds_in_taps else 59
+
+    # Per-trip metadata: first/last stop+seq, trip start (first act_arr), trip end (last act_dep).
+    _vs = v.sort_values(["trip_id", "seq"])
+    _tf = (_vs.groupby("trip_id", sort=False).first().reset_index()
+           [["trip_id", "body", "stop_id", "seq", "act_arr"]]
+           .rename(columns={"stop_id": "first_stop", "seq": "first_seq", "act_arr": "trip_start"}))
+    _tl = (_vs.groupby("trip_id", sort=False).last().reset_index()
+           [["trip_id", "stop_id", "seq", "act_arr", "act_dep"]]
+           .rename(columns={"stop_id": "last_stop", "seq": "last_seq", "act_arr": "last_arr", "act_dep": "trip_end"}))
+    _tmd = _tf.merge(_tl, on="trip_id")
+    _tmd_s = _tmd.sort_values(["body", "trip_start"]).copy()
+    _tmd_s["next_trip_id"]    = _tmd_s.groupby("body")["trip_id"].shift(-1)
+    _tmd_s["next_first_stop"] = _tmd_s.groupby("body")["first_stop"].shift(-1)
+    _tmd_s["next_first_seq"]  = _tmd_s.groupby("body")["first_seq"].shift(-1)
+    _tmd_s["prev_trip_id"]    = _tmd_s.groupby("body")["trip_id"].shift(1)
+    _tmd_s["prev_last_stop"]  = _tmd_s.groupby("body")["last_stop"].shift(1)
+    _tmd_s["prev_last_seq"]   = _tmd_s.groupby("body")["last_seq"].shift(1)
+    _tbound = _tmd_s.set_index("trip_id")
+    _trip_start_map = _tf.set_index("trip_id")["trip_start"]   # trip_id → first stop act_arr
+    _trip_last_arr  = _tl.set_index("trip_id")["last_arr"]     # trip_id → last stop act_arr
+
+    # Stop-visit lookup used for stop_tapped matching: (trip_id, stop_id) → all (seq, act_arr).
+    _sv = v[["trip_id", "stop_id", "seq", "act_arr"]].copy()
+    _sv["stop_id"] = _sv["stop_id"].str.strip()
+
+    # Step 1 — initial backward merge: last stop arrival at or before the tap time.
+    left = t[["time", "body", "on", "off", "stop_tapped", "card"]].sort_values("time", kind="stable").reset_index(drop=True)
     right = v[["act_arr", "body", "trip_id", "seq", "stop_id"]].sort_values("act_arr", kind="stable")
     j = pd.merge_asof(left, right, left_on="time", right_on="act_arr", by="body", direction="backward")
+    j["stop_tapped"] = j["stop_tapped"].str.strip()
+    j["stop_id"]     = j["stop_id"].str.strip()
+    j["_i"] = np.arange(len(j))
+
+    # Enrich j with per-trip first/last/next/prev metadata.
+    _bound_cols = ["last_stop", "last_seq", "trip_end", "first_stop", "first_seq",
+                   "next_trip_id", "next_first_stop", "next_first_seq",
+                   "prev_trip_id", "prev_last_stop", "prev_last_seq"]
+    j = j.join(_tbound[_bound_cols], on="trip_id", how="left")
+
+    lost_j = j["trip_id"].isna()
+    _p_next_stop = _p_next_first = _p_prev = _p_own_stop = 0
+
+    # Step 2 — rule (a)+(b): check-in at or near a trip's last stop → try the NEXT trip first.
+    # Triggers when the tap is placed on the last stop, or when the tap's minute-window reaches
+    # or passes the trip's last departure (the bus is laying over).
+    _cand_next = (~lost_j) & j["on"] & j["next_trip_id"].notna() & (
+        (j["seq"] == j["last_seq"]) |
+        (j["time"] + _tap_window >= j["trip_end"])
+    )
+    if _cand_next.any():
+        _j_cn = j.loc[_cand_next, ["_i", "time", "stop_tapped",
+                                    "next_trip_id", "next_first_stop", "next_first_seq"]].copy()
+        _sv_nt = _sv.rename(columns={"trip_id": "next_trip_id", "stop_id": "tap_stop",
+                                      "seq": "_ns", "act_arr": "_na"})
+        _cn = _j_cn.merge(_sv_nt, left_on=["next_trip_id", "stop_tapped"],
+                          right_on=["next_trip_id", "tap_stop"], how="left")
+        _cn["_dist"] = (_cn["_na"] - _cn["time"]).abs().fillna(np.inf)
+        _cn = _cn.sort_values("_dist").drop_duplicates("_i", keep="first")
+        _has_m = _cn["_na"].notna()
+        # (b) stop_tapped IS a stop of the next trip — use it.
+        _via_stop = _cn.loc[_has_m, ["_i", "next_trip_id", "_ns", "tap_stop", "_na"]].copy()
+        _via_stop.columns = ["_i", "new_trip", "new_seq", "new_stop", "new_arr"]
+        # stop_tapped NOT on next trip — fall back to its first stop.
+        _via_first = _cn.loc[~_has_m, ["_i", "next_trip_id", "next_first_stop", "next_first_seq"]].copy()
+        _via_first.columns = ["_i", "new_trip", "new_stop", "new_seq"]
+        _via_first["new_arr"] = _via_first["new_trip"].map(_trip_start_map)
+        _p_next_stop  = len(_via_stop)
+        _p_next_first = len(_via_first)
+        _all_next = pd.concat([_via_stop, _via_first], ignore_index=True, sort=False).set_index("_i")
+        _all_next["new_arr"] = pd.to_numeric(_all_next["new_arr"], errors="coerce")
+        _all_next["new_seq"] = pd.to_numeric(_all_next["new_seq"], errors="coerce")
+        _msk_n = j["_i"].isin(_all_next.index)
+        for _fc, _nc in [("trip_id", "new_trip"), ("seq", "new_seq"),
+                          ("stop_id", "new_stop"), ("act_arr", "new_arr")]:
+            j.loc[_msk_n, _fc] = j.loc[_msk_n, "_i"].map(_all_next[_nc]).values
+
+    # Step 3 — rule (a)+(b): check-out placed on a trip's first stop → try the PREVIOUS trip.
+    _cand_prev = (~lost_j) & j["off"] & j["prev_trip_id"].notna() & (j["seq"] == j["first_seq"])
+    if _cand_prev.any():
+        _j_cp = j.loc[_cand_prev, ["_i", "time", "stop_tapped",
+                                    "prev_trip_id", "prev_last_stop", "prev_last_seq"]].copy()
+        _sv_pt = _sv.rename(columns={"trip_id": "prev_trip_id", "stop_id": "tap_stop",
+                                      "seq": "_ps", "act_arr": "_pa"})
+        _cp = _j_cp.merge(_sv_pt, left_on=["prev_trip_id", "stop_tapped"],
+                          right_on=["prev_trip_id", "tap_stop"], how="left")
+        _cp["_dist"] = (_cp["_pa"] - _cp["time"]).abs().fillna(np.inf)
+        _cp = _cp.sort_values("_dist").drop_duplicates("_i", keep="first")
+        _has_p = _cp["_pa"].notna()
+        _via_stop_p = _cp.loc[_has_p, ["_i", "prev_trip_id", "_ps", "tap_stop", "_pa"]].copy()
+        _via_stop_p.columns = ["_i", "new_trip", "new_seq", "new_stop", "new_arr"]
+        _via_last_p = _cp.loc[~_has_p, ["_i", "prev_trip_id", "prev_last_stop", "prev_last_seq"]].copy()
+        _via_last_p.columns = ["_i", "new_trip", "new_stop", "new_seq"]
+        _via_last_p["new_arr"] = _via_last_p["new_trip"].map(_trip_last_arr)
+        _p_prev = len(_via_stop_p) + len(_via_last_p)
+        _all_prev = pd.concat([_via_stop_p, _via_last_p], ignore_index=True, sort=False).set_index("_i")
+        _all_prev["new_arr"] = pd.to_numeric(_all_prev["new_arr"], errors="coerce")
+        _all_prev["new_seq"] = pd.to_numeric(_all_prev["new_seq"], errors="coerce")
+        _msk_p = j["_i"].isin(_all_prev.index)
+        for _fc, _nc in [("trip_id", "new_trip"), ("seq", "new_seq"),
+                          ("stop_id", "new_stop"), ("act_arr", "new_arr")]:
+            j.loc[_msk_p, _fc] = j.loc[_msk_p, "_i"].map(_all_prev[_nc]).values
+
+    # Step 4 — rule (b) on the same trip: when tap times lack seconds, the tap's own Stop_Id
+    # picks the stop within the backward trip (the minute window makes the backward result
+    # unreliable by up to 59 s).  Skipped for seconds-format data so the stand-in is unchanged.
+    if _tap_window > 0:
+        _remaining = (~lost_j) & (j["stop_id"] != j["stop_tapped"])
+        if _remaining.any():
+            _j_own = j.loc[_remaining, ["_i", "time", "stop_tapped", "trip_id"]].copy()
+            _sv_own = _sv.rename(columns={"stop_id": "tap_stop", "seq": "_os", "act_arr": "_oa"})
+            _own = _j_own.merge(_sv_own, left_on=["trip_id", "stop_tapped"],
+                                right_on=["trip_id", "tap_stop"], how="inner")
+            if len(_own):
+                _own["_dist"] = (_own["_oa"] - _own["time"]).abs()
+                _own = _own.sort_values("_dist").drop_duplicates("_i", keep="first")
+                _p_own_stop = len(_own)
+                _own_idx = _own.set_index("_i")
+                _msk_o = j["_i"].isin(_own_idx.index)
+                j.loc[_msk_o, "seq"]     = j.loc[_msk_o, "_i"].map(_own_idx["_os"]).values
+                j.loc[_msk_o, "stop_id"] = j.loc[_msk_o, "_i"].map(_own_idx["tap_stop"]).values
+                j.loc[_msk_o, "act_arr"] = j.loc[_msk_o, "_i"].map(_own_idx["_oa"]).values
+
+    # Step 5 — rule (c): everything else stays as the backward merge found it.
+    _p_fallback = int((~lost_j).sum()) - _p_next_stop - _p_next_first - _p_prev - _p_own_stop
+    j = j.drop(columns=["_i"] + _bound_cols)
     lost = j["trip_id"].isna()
-    wrong = (~lost) & (j["stop_tapped"].str.strip() != j["stop_id"])
+    wrong = (~lost) & (j["stop_tapped"] != j["stop_id"])
     _share_not_placed = lost.mean() if len(j) else 0
-    note("taps to trips", "a tap is given to the stop visit of its vehicle with the latest actual arrival at or before the tap; a tap whose vehicle is not in the runtime report, or that comes before its first arrival, cannot be placed and is left out of loads and counts",
-         taps_in=len(j), taps_not_placed=lost.sum(), share_not_placed=_share_not_placed, taps_whose_own_stop_differs_from_the_stop_placed=wrong.sum())
+    note("taps to trips",
+         "placement priority: (b) tap's own Stop_Id on candidate trip, (c) time-nearest fallback; "
+         "check-in at last stop offered to next trip first (stop matching Stop_Id, else first stop); "
+         "check-out at first stop offered to previous trip; "
+         "tap times without seconds treated as the full minute [t, t+59]",
+         taps_in=len(j), taps_not_placed=lost.sum(), share_not_placed=_share_not_placed,
+         taps_whose_own_stop_differs_from_the_stop_placed=wrong.sum(),
+         placed_by_stop_id_on_next_trip=_p_next_stop,
+         placed_on_next_trip_first_stop=_p_next_first,
+         placed_by_stop_id_on_previous_trip=_p_prev,
+         placed_by_stop_id_on_own_trip=_p_own_stop,
+         placed_by_time_nearest_fallback=_p_fallback)
     if _share_not_placed > TAP_PLACE_FAIL_THRESHOLD:
         raise ValueError(f"taps to trips: {int(lost.sum())} of {len(j)} taps ({_share_not_placed:.1%}) could not be placed on a trip; "
                          f"threshold is {TAP_PLACE_FAIL_THRESHOLD:.0%}. Check that Body_EVD_ID was parsed to plain digits matching AVL Body.")

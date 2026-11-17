@@ -97,12 +97,17 @@
    "text": "one row is one tap: a check-in (CKI is 1) or a check-out (CKO is 1); a row repeated exactly is counted once; a row with no time, or that is neither or both, is left out"
   },
   {
+   "placed_by_stop_id_on_next_trip": 0,
+   "placed_by_stop_id_on_own_trip": 0,
+   "placed_by_stop_id_on_previous_trip": 0,
+   "placed_by_time_nearest_fallback": 21571,
+   "placed_on_next_trip_first_stop": 0,
    "share_not_placed": 0,
    "stage": "taps to trips",
    "taps_in": 21571,
    "taps_not_placed": 0,
    "taps_whose_own_stop_differs_from_the_stop_placed": 384,
-   "text": "a tap is given to the stop visit of its vehicle with the latest actual arrival at or before the tap; a tap whose vehicle is not in the runtime report, or that comes before its first arrival, cannot be placed and is left out of loads and counts"
+   "text": "placement priority: (b) tap's own Stop_Id on candidate trip, (c) time-nearest fallback; check-in at last stop offered to next trip first (stop matching Stop_Id, else first stop); check-out at first stop offered to previous trip; tap times without seconds treated as the full minute [t, t+59]"
   },
   {
    "alightings_not_recorded_and_spread": 1703,

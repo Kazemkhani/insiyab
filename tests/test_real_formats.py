@@ -363,6 +363,173 @@ except ValueError as e:
           str(e)[:200])
 
 # ---------------------------------------------------------------------------
+# new assertion 1: boardings at the last stop of a trip must be a small share
+# ---------------------------------------------------------------------------
+# Before the terminus-redirect fix, ~1/5 of all boardings landed on a trip's
+# last stop (a passenger tapping during a layover got credited to the
+# finishing trip rather than the starting one).  After the fix this share
+# should be very small.  We use the real-format output because the real data
+# exercises the HH:MM path where the redirect fires.
+
+v_rf_sorted = v_rf.sort_values(["trip_id", "seq"])
+_last_seq_rf = v_rf_sorted.groupby("trip_id")["seq"].transform("last")
+_last_stop_on = v_rf.loc[v_rf["seq"] == _last_seq_rf, "on"].sum()
+_total_on_rf  = int(v_rf["on"].sum())
+_last_stop_on_share = _last_stop_on / max(1, _total_on_rf)
+print(f"  boardings at last stop of trip: {int(_last_stop_on)} / {_total_on_rf} ({_last_stop_on_share:.2%})")
+# Threshold: allow up to 5 % (before fix this was ~20 %; perfect is 0 %).
+check("real format: boardings at last stop of a trip are a small share (< 5%)",
+      _last_stop_on_share < 0.05,
+      f"last-stop boardings = {int(_last_stop_on)}, total = {_total_on_rf}, share = {_last_stop_on_share:.2%}")
+
+# ---------------------------------------------------------------------------
+# new assertion 2: trips with negative load must be rare
+# ---------------------------------------------------------------------------
+# A negative load means more people got off than the model thinks were on the
+# bus: that is a counting error.  The fix reduces this sharply.
+
+_min_load_rf = v_rf["load"].min() if len(v_rf) else 0
+_neg_load_trips_rf = int(v_rf[v_rf["load"] < 0]["trip_id"].nunique())
+_total_trips_rf = int(v_rf["trip_id"].nunique())
+print(f"  trips with negative load (real format): {_neg_load_trips_rf} / {_total_trips_rf}")
+# Threshold: fewer than 10 % of trips (before fix this was ~62 %).
+check("real format: trips with negative load are rare (< 10% of trips)",
+      (_neg_load_trips_rf / max(1, _total_trips_rf)) < 0.10,
+      f"trips with negative load = {_neg_load_trips_rf} / {_total_trips_rf}")
+
+# ---------------------------------------------------------------------------
+# new assertion 3: HH:MM placement counters are logged
+# ---------------------------------------------------------------------------
+# After the fix, the stage log includes placement-rule counters that did not
+# exist before.  Assert they are present and that placed_by_time_nearest_fallback
+# is not the only rule that fired.
+
+_tap_log_rf = next((e for e in day_rf["log"] if e["stage"] == "taps to trips"), None)
+check("real format: taps-to-trips log has new placement counters",
+      _tap_log_rf is not None and "placed_by_time_nearest_fallback" in _tap_log_rf,
+      "key 'placed_by_time_nearest_fallback' missing from log")
+if _tap_log_rf:
+    _placed_next_stop  = _tap_log_rf.get("placed_by_stop_id_on_next_trip", 0)
+    _placed_next_first = _tap_log_rf.get("placed_on_next_trip_first_stop", 0)
+    _placed_prev       = _tap_log_rf.get("placed_by_stop_id_on_previous_trip", 0)
+    _placed_own        = _tap_log_rf.get("placed_by_stop_id_on_own_trip", 0)
+    _placed_fallback   = _tap_log_rf.get("placed_by_time_nearest_fallback", 0)
+    print(f"  taps placed by stop_id on next trip  : {_placed_next_stop}")
+    print(f"  taps placed on next trip first stop  : {_placed_next_first}")
+    print(f"  taps placed by stop_id on prev trip  : {_placed_prev}")
+    print(f"  taps placed by stop_id on own trip   : {_placed_own}")
+    print(f"  taps placed by time-nearest fallback : {_placed_fallback}")
+    # At least some taps were redirected to next/previous trip or own stop.
+    _redirected = _placed_next_stop + _placed_next_first + _placed_prev + _placed_own
+    check("real format: at least some taps were redirected (placement rules b/c active)",
+          _redirected > 0,
+          f"all {_placed_fallback} taps placed by fallback only; check terminus-redirect logic")
+
+# ---------------------------------------------------------------------------
+# new assertion 4: hand-made terminus-layover case
+# ---------------------------------------------------------------------------
+# One synthetic vehicle (STANDIN-B99) runs two back-to-back trips that share
+# a terminus stop.  A check-in tap arrives during the layover with Stop_Id
+# matching the terminus (which is both the last stop of trip 1 and the first
+# stop of trip 2).  After the fix the boarding must land on trip 2, not trip 1.
+
+print()
+print("--- terminus-layover hand-made case ---")
+
+# Stop IDs already present in the stand-in GTFS so the engine accepts them.
+_T_A = "200301"   # Al Baraha Bus Station 1
+_T_B = "195101"   # Gold Souq Bus Station External
+_T_C = "385007"   # Al Ghubaiba Bus Station 7  (the shared terminus)
+
+# Service-day seconds for the synthetic schedule.
+def _hms(h, m, s=0): return f"{h:02d}:{m:02d}:{s:02d}"
+
+_AVL_COLS = ["Date", "Day_type", "Body", "Trip_ID", "Route", "Driver_id",
+             "Direction", "Stop_Seq", "Stop_ID", "Stop_Name",
+             "Sched_Arr", "Act_Arr", "Sched_Dep", "Act_Dep",
+             "Difference", "Door_Status", "block_no", "avm_pattern_id",
+             "Trip_end", "Diff_in_seconds", "OP_Hour", "TID"]
+_NOL_COLS = ["Transaction_date", "Transaction_Time", "Body_EVD_ID",
+             "device_id", "device_id_hex", "NOL_ID",
+             "CKI", "CKO", "Route", "Stop_name", "Amount", "Stop_Id"]
+
+def _avl_row(body, trip_id, seq, stop_id, arr_hms, dep_hms, door="Closed"):
+    return {c: "" for c in _AVL_COLS} | {
+        "Date": "2025-12-15", "Day_type": "Weekday",
+        "Body": body, "Trip_ID": str(trip_id), "Route": "8",
+        "Direction": "0", "Stop_Seq": str(seq), "Stop_ID": stop_id,
+        "Sched_Arr": arr_hms, "Act_Arr": arr_hms,
+        "Sched_Dep": dep_hms, "Act_Dep": dep_hms,
+        "Door_Status": door,
+    }
+
+def _nol_row(body, time_hms, cki, cko, stop_id, card="STANDIN-N99999"):
+    return {c: "" for c in _NOL_COLS} | {
+        "Transaction_date": "2025-12-15",
+        "Transaction_Time": time_hms,
+        "Body_EVD_ID": body,
+        "NOL_ID": card,
+        "CKI": str(cki), "CKO": str(cko),
+        "Route": "8", "Stop_Id": stop_id,
+    }
+
+# Trip 99001: A -> B -> C (terminus, door opens).  Departs at 10:11.
+# Layover:  10:11 - 10:16
+# Trip 99002: C -> B -> A.  Arrives at C at 10:16, door opens.
+_synth_avl = pd.DataFrame([
+    _avl_row("STANDIN-B99", 99001, 1, _T_A, _hms(10, 0),  _hms(10, 0)),
+    _avl_row("STANDIN-B99", 99001, 2, _T_B, _hms(10, 5),  _hms(10, 5)),
+    _avl_row("STANDIN-B99", 99001, 3, _T_C, _hms(10, 10), _hms(10, 11), door="Open"),
+    _avl_row("STANDIN-B99", 99002, 1, _T_C, _hms(10, 16), _hms(10, 16), door="Open"),
+    _avl_row("STANDIN-B99", 99002, 2, _T_B, _hms(10, 21), _hms(10, 21)),
+    _avl_row("STANDIN-B99", 99002, 3, _T_A, _hms(10, 26), _hms(10, 26)),
+])
+# Check-in at 10:12:30 (during layover), Stop_Id = C (the terminus = first stop of trip 2).
+# Without the fix this boards on trip 99001 / stop C (last stop of trip 1).
+# With the fix it must board on trip 99002 / stop C (first stop of trip 2).
+_synth_nol = pd.DataFrame([
+    _nol_row("STANDIN-B99", _hms(10, 12, 30), 1, 0, _T_C),
+])
+
+# Fleet entry for the synthetic vehicle (minimum required columns).
+_synth_fleet = pd.DataFrame([{
+    "Body_number": "STANDIN-B99", "Manufacturer": "STAND-IN",
+    "Bus_Type": "STANDARD", "Model Year": "2020",
+    "No_of_Seats": "50", "RTA Standing": "", "Total": "50",
+}])
+
+# Build combined tables from the stand-in plus synthetic rows.
+avl_base  = pd.read_csv(os.path.join(STANDIN_DIR, "bus_runtime_avl.csv"), dtype=str, keep_default_na=False)
+nol_base  = pd.read_csv(os.path.join(STANDIN_DIR, "nol_transactions.csv"), dtype=str, keep_default_na=False)
+fleet_base = pd.read_csv(os.path.join(STANDIN_DIR, "bus_fleet.csv"), dtype=str, keep_default_na=False)
+
+avl_aug   = pd.concat([avl_base,   _synth_avl],   ignore_index=True)
+nol_aug   = pd.concat([nol_base,   _synth_nol],   ignore_index=True)
+fleet_aug = pd.concat([fleet_base, _synth_fleet], ignore_index=True)
+
+tables_aug = dict(tables_ref)
+tables_aug["avl"]   = avl_aug
+tables_aug["nol"]   = nol_aug
+tables_aug["fleet"] = fleet_aug
+
+day_aug = prepare(tables_aug)
+v_aug   = day_aug["visits"]
+
+# Find where the synthetic check-in landed.
+_synth_visits = v_aug[v_aug["trip_id"].astype(str).isin(["99001", "99002"])]
+_b99_on = _synth_visits[_synth_visits["on"] > 0]
+
+if len(_b99_on) == 0:
+    check("terminus layover: check-in boards on next trip", False,
+          "no boarding found for the synthetic vehicle at all")
+else:
+    _trip_boarded = str(_b99_on.iloc[0]["trip_id"])
+    _seq_boarded  = int(_b99_on.iloc[0]["seq"])
+    check("terminus layover: check-in boards on next trip (99002), not on trip 99001's last stop",
+          _trip_boarded == "99002" and _seq_boarded == 1,
+          f"boarded on trip={_trip_boarded}, seq={_seq_boarded} (expected trip=99002, seq=1)")
+
+# ---------------------------------------------------------------------------
 # report the HH:MM loss explicitly
 # ---------------------------------------------------------------------------
 
