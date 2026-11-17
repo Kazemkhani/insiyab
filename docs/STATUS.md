@@ -1,4 +1,4 @@
-DEPLOYED AND VERIFIED e2ef425 https://insiyab.amirkazemkhani.com 2026-11-17 05:55 +04
+DEPLOYED AND VERIFIED 9d6b8ee https://insiyab.amirkazemkhani.com 2026-11-17 06:38 +04
 
 - Live on the public address, on stand-in data, labelled. The first screen is a real map of Dubai (OpenStreetMap streets, shipped with the site) with RTA's real routes and stops, every bus moving through the day, and one proposed vehicle exchange beside it in plain words, with the day's briefing under it. Then the forecast, the decisions, the model's reliability, four people each with a live 3D third-person scene drawn from the day's counts (lane 2's), the Khutwa passenger page and the room relay.
 - What is real and what is invented on that map: the network is RTA's own public timetable feed as published in late 2021 (nine routes, 478 stops, one Monday's 799 trips; opendata/public/rta-gtfs/PROVENANCE.md). The passengers, vehicles and lateness are invented. Nothing shown comes from the data RTA gave the hackathon.
