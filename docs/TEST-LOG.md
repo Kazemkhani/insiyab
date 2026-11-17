@@ -224,3 +224,25 @@ Amir's bar: "make the 3D world class". The reviewer's verdict: none of the eight
 His ten changes, in order of effect for effort: (1) fix the light and the ground: no tone mapping, a paper background, a large paper ground that fades with fog and has no edge; (2) lock state colours to the tokens with unlit materials; (3) clear label backgrounds, drop the duplicated title, put the word SIMULATED in the scene; (4) reframe: the person in the near third at 1.3 scale, camera at about (3.6, 2.0, 7.4) looking at (-1.5, 1.3, 0), field of view 32, the shelter moved so it never covers the bus; the driver from behind his right shoulder through a windscreen; (5) make the bus a bus: a window band, a door, the real route number and the real stop name as textures; (6) give the finding a beat on one bus that stays: hold 400 ms, lift the roof over 600 ms, pop the standing passengers in one by one with the count ticking; for the change, slide the extra rows in and walk each standing figure to a seat; (7) real motion for the planner (the two buses swap on an arc) and the driver (the road slows to a halt at an empty stop; then does not); (8) share shapes and draw passengers as instances; (9) on a phone, a taller scene, tools under it, and a swipe that scrolls; (10) the view from above: seats that do not vanish into the floor, and a name over the person.
 
 Three larger things he would build in a few hours: the real street under the stop, from the shipped map's own buildings and the route's real path; passengers boarding one by one with the count ticking; and before and after in one picture with a divider to drag.
+
+## Review 5, 17 November, 06:10 to 06:30. An independent judge with the scoring sheet, on the public address at e2ef425
+
+Five visitors (a non-technical judge, a data scientist, a passenger, a planner, a phone) at 1280x720 and 390x844 and once with reduced motion. His total: **72 of 100** (58, then 64, before): practical 15, documentation 10, innovation 16, model 16, accuracy 15. He puts the ceiling on invented data at 72 to 75. This is one reviewer's score, not a measurement. Lane 2's cut 59af82d (a guided opening) landed while he worked, so his first-minute findings describe the screen before it.
+
+No failed request, no sideways scroll, no dead link in the first 20, Khutwa runs to its end, the stand-in band is the first thing painted on every view, and the map credit with the feed's 2021 edition is on every view.
+
+| # | Finding | For | State |
+|---|---|---|---|
+| V1 | Every number is from invented tables. A judge who asks "did you run this on RTA's data?" hears "not yet". The decisive gap. | Amir, lane 1 | Open: waits on the mentor's answer and the run in Dataiku |
+| V2 | Decisions opens with BEFORE 5,764 and CURRENT 5,764: it reads as "nothing changed" until "Close the gaps" is pressed, and that label does not say what it does. | Lane 2 | Open |
+| V3 | He could not find what the model leans on anywhere on Reliability, though `metrics.json` has 17 features. | Lane 2 | **Disputed, not settled.** The source renders it (`web/src/app.js:327`, "What the model uses", into `#model-features`). Either it is hidden where he looked or he missed it. Lane 2 to say which. |
+| V4 | "Comparing Boosted trees with a loss made for counts, one model for every stop and every horizon" is the label of a control on Reliability. A non-technical judge stops there. (R13, still open.) "Naive forecast" is used with no gloss. | Lane 2 | Open |
+| V5 | The four people are soft grey 3D figures on a flat typographic site; the driver's two steps look the same. (Agrees with Review 4.) | Lane 2 | Open |
+| V6 | No Dataiku flow anywhere, and Dataiku is the named partner. (J11, open since Review 1.) | Lane 1, Amir | Open: needs Dataiku signed in |
+| V7 | Presentation delivery scores 0 of 6 until somebody has rehearsed it. | Lane 4, Amir | Open |
+| V8 | On a phone the map credit link is 15 px tall and the name link 31 px. | Lane 2 | Open, minor |
+| V9 | A non-technical judge's three sentences after the first screen: a map with full buses; something about swapping a small bus for a big one; "I never saw the word forecast until I clicked the tab". | Lane 2 | Superseded in part by 59af82d; to be checked on that cut |
+
+One statement of his is wrong and is not carried forward: that map tiles come from tile.openstreetmap.org through Leaflet. The site ships its own map file and no such address is in `web/src` or `web/build.mjs` (searched), and the deploy's own check finds no request to another origin.
+
+His five changes by points for the hour: the real-data run (he says +6); the feature list on Reliability; plain words for the model's name; a neutral first state on Decisions; one picture of the Dataiku flow.

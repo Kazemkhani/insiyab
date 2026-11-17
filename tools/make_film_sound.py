@@ -28,13 +28,13 @@ LINES = [
     (4.6, "The bus is his way to work."),
     (8.6, "It comes. And it is full."),
     (13.0, "No seat."),
-    (15.6, "Across the city, in that same half hour, a bigger bus runs almost empty."),
-    (22.0, "Too many people here. Too few there. And nobody can see it."),
+    (15.6, "On another route, on another trip, a bigger bus runs almost empty."),
+    (22.0, "Too many people here. Too many empty seats there. And no timetable shows it."),
     (29.6, "Nobody did anything wrong. The timetable was written before the day happened."),
-    (35.6, "Insiyab reads the day while it is still happening."),
-    (39.4, "It sees how many will be waiting, up to two hours ahead. And how late each bus is running, stops before it arrives."),
-    (46.6, "So a planner can put the bigger bus where the people are."),
-    (50.4, "And a passenger can choose the bus with room, and be thanked for it."),
+    (35.0, "Insiyab replays the day, minute by minute, and looks ahead."),
+    (38.8, "It forecasts how many will board at each stop, up to two hours ahead. And how late each bus will be, stops before it arrives."),
+    (47.5, "So a planner can put the bigger bus where the people are."),
+    (50.7, "And a passenger can choose the bus with room, and be thanked for it."),
     (54.6, "Same buses. Same drivers. A seat for the journey."),
     (58.4, "Insiyab."),
 ]
@@ -140,7 +140,7 @@ def mix(out):
         release += 0.055 * level * pad_in * shimmer * (np.sin(2 * np.pi * freq * t) + 0.5 * np.sin(2 * np.pi * freq * 1.003 * t))
     for s in np.arange(36.0, 54.1, 1.0):                                                                        # once a second: order
         place(release, burst(1500, 0.05, 0.012), s, 0.09)
-    for clip_name, start, level in (("whoosh", 15.4, 0.6), ("page-turn", 46.5, 0.5), ("beat", 46.6, 0.7), ("chime", 51.6, 0.7), ("card-tap", 53.2, 0.7)):
+    for clip_name, start, level in (("whoosh", 15.4, 0.6), ("page-turn", 47.4, 0.5), ("beat", 47.5, 0.7), ("chime", 51.9, 0.7), ("card-tap", 53.5, 0.7)):
         path = os.path.join(out, clip_name + ".wav")
         if os.path.exists(path): place(release, load(path), start, level); cues.append((clip_name, start))
 
