@@ -14,11 +14,29 @@
  *   How it is built      static
  */
 
-// ── Colour tokens ───────────────────────────────────────────────────
+// ── Colour tokens (match story/index.html exactly) ──────────────────
 const C = {
-  paper: '#F6F5F1', ink: '#12263A', flow: '#0E5A5A',
-  over: '#B23A2E', spare: '#2F6690', sim: '#8A5A00',
-  g1: '#E6E8EA', g2: '#C3C9CF', g3: '#8C96A0', g4: '#5A6672',
+  // Brand palette
+  sand:     '#F5EFE3',   // page background
+  card:     '#FFFCF6',   // card background
+  line:     '#E4D9C4',   // borders / grid lines
+  ink:      '#1E1A16',   // body text
+  muted:    '#6F6350',   // secondary text / axis labels
+  sea:      '#0E5A73',   // model line, on-time, in-balance, the forecast
+  red:      '#E21F26',   // LATENESS AND SHORTFALL ONLY
+  gold:     '#C8A24A',   // simple-rule bar, accents
+  goldtext: '#7E5F17',   // text on gold chip
+  neutral:  '#D8CBB2',   // timetable / neutral bars / boardings area
+  // Aliases used throughout existing chart code
+  paper:    '#F5EFE3',   // = sand
+  flow:     '#0E5A73',   // = sea
+  over:     '#E21F26',   // = red
+  spare:    '#D8CBB2',   // boardings line/area (neutral, not blue)
+  sim:      '#7E5F17',   // simulated text
+  g1:       '#E4D9C4',   // = line (grid)
+  g2:       '#E4D9C4',   // = line (axis)
+  g3:       '#6F6350',   // = muted
+  g4:       '#6F6350',   // = muted
 };
 
 // ── State ────────────────────────────────────────────────────────────
@@ -405,11 +423,11 @@ function buildHeatmap(data) {
 
 // ── Stacked bar chart: status by hour ─────────────────────────────────
 const STATUS_ORDER = [
-  { key: 'short even with standing', color: '#7A1A14' },
-  { key: 'short of seats',           color: C.over   },
-  { key: 'in balance',               color: C.flow   },
-  { key: 'under a fifth used',       color: C.spare  },
-  { key: 'route not in the running-time table', color: C.g3 },
+  { key: 'short even with standing', color: '#7A1A14'   },
+  { key: 'short of seats',           color: C.red      },
+  { key: 'in balance',               color: C.sea      },
+  { key: 'under a fifth used',       color: C.neutral  },
+  { key: 'route not in the running-time table', color: C.muted },
 ];
 
 function buildStackedBar(data) {
@@ -497,12 +515,9 @@ function buildStatusLegend(container) {
 
 // ── Tab 1: The day ────────────────────────────────────────────────────
 async function renderDay() {
-  const headlineEl = document.getElementById('day-headline');
-  const chartEl    = document.getElementById('day-chart');
-  const statsEl    = document.getElementById('day-stats');
-  const whyEl      = document.getElementById('day-why');
+  const chartEl = document.getElementById('day-chart');
+  const whyEl   = document.getElementById('day-why');
 
-  setLoading(headlineEl);
   setLoading(chartEl);
 
   try {
@@ -511,77 +526,58 @@ async function renderDay() {
       S.dHour  || apiFetch('/api/demand-by-hour').then(function(d) { return (S.dHour = d); }),
     ]);
 
-    // Pick the worst evening peak hour (15:00-20:00, count >= 500) for
-    // both the headline and the stat tile so they always agree.
-    const candidateRows = ph.filter(function(r) {
-      return r.hour >= 15 && r.hour <= 20 && Number(r.count || 0) >= 500;
-    });
-    const worstRow = candidateRows.reduce(function(best, r) {
-      return (!best || Number(r.late_5min_avg) > Number(best.late_5min_avg)) ? r : best;
-    }, null);
-    // Compare specifically with the 07:00 hour
-    const morningRow = ph.find(function(r) { return r.hour === 7; });
+    // Fill the four stat tiles using 08:00 and 18:00 specifically
+    var ph8  = ph.find(function(r) { return r.hour === 8;  });
+    var ph18 = ph.find(function(r) { return r.hour === 18; });
+    var dh8  = dh.find(function(r) { return r.hour === 8;  });
+    var dh18 = dh.find(function(r) { return r.hour === 18; });
+    var setTile = function(id, val) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = val || '';
+    };
+    setTile('day-b8',  fmtNum(dh8  && dh8.boardings_sum));
+    setTile('day-l8',  fmtPct(ph8  && ph8.late_5min_avg, 0));
+    setTile('day-b18', fmtNum(dh18 && dh18.boardings_sum));
+    setTile('day-l18', fmtPct(ph18 && ph18.late_5min_avg, 0));
 
-    if (worstRow && morningRow) {
-      const pct = Math.round(Number(worstRow.late_5min_avg) * 100);
-      const pct7 = Math.round(Number(morningRow.late_5min_avg) * 100);
-      headlineEl.textContent = 'At ' + fmtHour(worstRow.hour) + ', ' + pct +
-        '% of ' + fmtNum(worstRow.count) + ' departures left 5 or more minutes late, ' +
-        'against ' + pct7 + '% of ' + fmtNum(morningRow.count) + ' at 07:00. ' +
-        'The supply and capacity tab shows where buses ran short at the same hour.';
-    } else if (worstRow) {
-      const pct = Math.round(Number(worstRow.late_5min_avg) * 100);
-      headlineEl.textContent = 'At ' + fmtHour(worstRow.hour) + ', ' + pct +
-        '% of ' + fmtNum(worstRow.count) + ' departures left 5 or more minutes late.';
-    } else {
-      headlineEl.textContent = 'Evening peak lateness could not be computed from the available data.';
-    }
-
-    // Dual-axis chart: lateness line drawn only for hours with >= 500 departures (fix D)
-    const chartData = ph.map(function(r) {
-      const dRow = dh.find(function(d) { return d.hour === r.hour; });
+    // Dual-axis chart: lateness line drawn only for hours with >= 500 departures
+    var chartData = ph.map(function(r) {
+      var dRow = dh.find(function(d) { return d.hour === r.hour; });
       return {
-        hour:     r.hour,
-        late5:    Number(r.late_5min_avg) || 0,
+        hour:      r.hour,
+        late5:     Number(r.late_5min_avg) || 0,
         boardings: dRow ? Number(dRow.boardings_sum) || 0 : 0,
-        count:    Number(r.count) || 0,
+        count:     Number(r.count) || 0,
       };
-    }).sort(function(a,b) { return a.hour - b.hour; });
+    }).sort(function(a, b) { return a.hour - b.hour; });
 
     chartEl.innerHTML = '';
     chartEl.appendChild(buildDualLine(chartData, { minLatenessCount: 500 }));
 
-    // Stats — worst-hour tile uses the same worstRow as the headline
-    const peakBoard = dh.reduce(function(best, r) {
-      return (!best || Number(r.boardings_sum) > Number(best.boardings_sum)) ? r : best;
-    }, null);
-    const dtAvg = ph.reduce(function(s, r) { return s + (Number(r.drive_through_avg) || 0); }, 0) / ph.length;
-
-    statsEl.innerHTML =
-      stat(fmtPct(worstRow && worstRow.late_5min_avg, 0),
-           'worst hour (' + fmtHour(worstRow && worstRow.hour) + ')',
-           'punctuality_by_hour', 'over') +
-      stat(fmtNum(peakBoard && peakBoard.boardings_sum),
-           'boardings at peak (' + fmtHour(peakBoard && peakBoard.hour) + ')',
-           'demand_by_hour', 'spare') +
-      stat(fmtPct(dtAvg, 1),
-           'drive-throughs (avg, all hours)',
-           'punctuality_by_hour', '');
-
     // Why copy
-    whyEl.innerHTML =
-      '<strong>What this is:</strong> measured departures and nol card boardings on 15 December 2025. ' +
-      '<strong>What is a finding:</strong> lateness and demand peak in the same hours. ' +
-      '<strong>What is an open question:</strong> whether the shortage of buses causes the lateness, ' +
-      'or whether lateness causes missed connections that inflate boardings, is not measured here.' +
-      '<br><span style="font-size:var(--sz11);color:var(--g3)">Lateness line shown only for hours with 500 or more recorded departures.</span>';
+    if (whyEl) {
+      whyEl.innerHTML =
+        '<strong>What this is:</strong> measured departures and nol card boardings, 15 December 2025. ' +
+        '<strong>Finding:</strong> lateness and demand peak in the same two hours. ' +
+        '<strong>Open question:</strong> whether the bus shortage causes the lateness, or lateness ' +
+        'causes missed connections that inflate boardings, is not settled here.' +
+        '<br><span style="font-size:var(--sz11);color:var(--muted)">Lateness line shown only for hours with 500 or more recorded departures.</span>';
+    }
 
-    // Worklist link (fix B)
-    const wlLink = document.getElementById('day-worklist-link');
+    // Worklist link
+    var wlLink = document.getElementById('day-worklist-link');
     if (wlLink) wlLink.style.display = '';
 
+    // Presenter notes for this tab
+    _presenterData.day = {
+      say: 'On 15 December 2025, the morning and evening peaks carried roughly the same crowd. ' +
+           'The evening was three times more likely to leave late.',
+      point: 'the red lateness line peaking in the right half of the chart',
+      next: 'tab 2 — Planner\'s worklist',
+    };
+    _updatePresenterPanel('day');
+
   } catch (e) {
-    setError(headlineEl, e.message);
     setError(chartEl, e.message);
   }
 }
@@ -672,11 +668,19 @@ async function renderDemand() {
     if (!S.dRouteHour) S.dRouteHour = await apiFetch('/api/demand-by-route-hour');
     if (!S.dStop)      S.dStop      = await apiFetch('/api/demand-by-stop');
 
+    // Fill headline spans
+    var dh8  = S.dHour.find(function(r) { return r.hour === 8; });
+    var dh18 = S.dHour.find(function(r) { return r.hour === 18; });
+    var hlB8  = document.getElementById('dem-hl-b8');
+    var hlB18 = document.getElementById('dem-hl-b18');
+    if (hlB8)  hlB8.textContent  = fmtNum(dh8  && dh8.boardings_sum);
+    if (hlB18) hlB18.textContent = fmtNum(dh18 && dh18.boardings_sum);
+
     // Boardings by hour
     hourEl.innerHTML = '';
     const hourData = S.dHour.slice().sort(function(a,b) { return a.hour - b.hour; });
     hourEl.appendChild(buildBar(hourData, 'hour', 'boardings_sum', {
-      color: C.spare, yLabel: 'boardings',
+      color: C.neutral, yLabel: 'boardings',
     }));
 
     // Top 15 stops
@@ -798,6 +802,18 @@ async function renderSupply() {
     }
 
     if (S.supplyHour) selEl.value = S.supplyHour;
+
+    // Fill headline span with routes-short count at 18:00
+    var hlN = document.getElementById('sup-hl-n');
+    if (hlN) {
+      var shortAt18 = 0;
+      S.supplyStatus.forEach(function(r) {
+        if (r.hour === 18 && (r.status === 'short of seats' || r.status === 'short even with standing')) {
+          shortAt18 += Number(r.count || 0);
+        }
+      });
+      hlN.textContent = fmtNum(shortAt18);
+    }
 
     // Lead sentence: routes short and routes with room at the chosen hour, and the hour of the day with most room.
     // One function, so the first paint and a change of hour can never disagree.
@@ -1182,12 +1198,13 @@ function _fcMethodBars(eveningRows) {
   if (!maxMae) return '';
 
   const METHOD_COLOUR = {
-    'RTA timetable (the plan)': C.ink,
+    'RTA timetable (the plan)': C.neutral,  // timetable = neutral bar
   };
   function barColour(method) {
     if (METHOD_COLOUR[method]) return METHOD_COLOUR[method];
-    if (method && method.toLowerCase().indexOf('model') >= 0) return C.flow;
-    return C.g3;
+    if (method && method.toLowerCase().indexOf('model') >= 0) return C.sea;   // model = sea
+    if (method && method.toLowerCase().indexOf('simple') >= 0) return C.gold; // simple rule = gold
+    return C.muted;
   }
 
   let html = '<div class="method-bar-wrap">';
@@ -1487,10 +1504,13 @@ async function renderForecast() {
     const modelRow = eveningMetrics.find(function(r) { return r.method && r.method.indexOf('Model') >= 0 && r.method.indexOf('timetable features') >= 0; });
     const ttRow    = eveningMetrics.find(function(r) { return r.method === 'RTA timetable (the plan)'; });
 
-    // 1. Summary sentence
+    // 1. Summary sentence + headline span
     const summaryEl = document.getElementById('fc-summary');
     if (summaryEl && modelRow && ttRow) {
       const gain = modelRow.gain_vs_timetable != null ? Math.round(Number(modelRow.gain_vs_timetable) * 100) : null;
+      // Fill headline span
+      var hlPct = document.getElementById('fc-hl-pct');
+      if (hlPct) hlPct.textContent = gain != null ? String(gain) : '?';
       const gainLow  = modelRow.gain_low  != null ? Math.round(Number(modelRow.gain_low)  * 100) : null;
       const gainHigh = modelRow.gain_high != null ? Math.round(Number(modelRow.gain_high) * 100) : null;
       const rangeStr = (gainLow != null && gainHigh != null) ? ' (' + gainLow + ' to ' + gainHigh + '%)' : '';
@@ -1866,6 +1886,17 @@ async function renderWorklist() {
     if (focalEl) {
       if (S.wlBands && S.wlBands.length) {
         focalEl.innerHTML = _wlFocalHtml(S.wlBands);
+        // Fill the headline span with the same evening figure
+        var hlNum = document.getElementById('wl-hl-num');
+        if (hlNum) {
+          var inEvPM = function(r) { return (r.hour || 0) >= 16 && (r.hour || 0) <= 18; };
+          var mins = function(rows, col) { return rows.reduce(function(s, r) { return s + (Number(r[col]) || 0); }, 0); };
+          var ledger = (S.wlLedger && S.wlLedger.length) ? S.wlLedger : null;
+          var evHours = ledger
+            ? mins(ledger.filter(inEvPM), 'extra_bus_minutes_at_p85_sum') / 60
+            : mins(S.wlBands.filter(inEvPM), 'extra_bus_minutes_at_p85') / 60;
+          hlNum.textContent = fmtNum(Math.round(evHours));
+        }
       } else {
         focalEl.innerHTML = '<p class="not-built">running_time_bands has not been built yet.</p>';
       }
@@ -1944,7 +1975,7 @@ const TAB_RENDERERS = {
   demand:       renderDemand,
   supply:       renderSupply,
   whatif:       renderWhatIf,
-  build:        function() {},  // static content
+  build:        renderBuild,
   forecast:     renderForecast,
 };
 
@@ -1967,6 +1998,9 @@ function switchTab(id) {
       console.error('Tab ' + id + ' render error:', e);
     });
   }
+
+  // Update presenter panel notes for newly active tab
+  _updatePresenterPanel(id);
 }
 
 // ── What-if event wiring ──────────────────────────────────────────────
@@ -2042,24 +2076,94 @@ function wireWhatIf() {
 }
 
 // ── Keyboard navigation ────────────────────────────────────────────────
+// ── Presenter guide ───────────────────────────────────────────────────
+// Per-tab notes are populated by each renderer into this object.
+var _presenterData = {};
+
+function _updatePresenterPanel(tabId) {
+  var panel = document.getElementById('presenter-panel');
+  if (!panel || panel.dataset.hidden !== 'false') return;
+  var d = _presenterData[tabId] || {};
+  var say   = document.getElementById('pn-say-text');
+  var point = document.getElementById('pn-point-text');
+  var next  = document.getElementById('pn-next-text');
+  if (say)   say.textContent   = d.say   || '';
+  if (point) point.textContent = d.point || '';
+  if (next)  next.textContent  = d.next  || '';
+}
+
+function _togglePresenter() {
+  var panel = document.getElementById('presenter-panel');
+  var btn   = document.getElementById('presenter-btn');
+  if (!panel) return;
+  var isShown = panel.dataset.hidden === 'false';
+  panel.dataset.hidden = isShown ? 'true' : 'false';
+  if (btn) {
+    btn.setAttribute('aria-pressed', String(!isShown));
+    btn.textContent = isShown ? 'Presenter notes' : 'Hide notes';
+  }
+  if (!isShown) {
+    // Populate for current tab
+    var active = document.querySelector('.tab-btn.active');
+    if (active) _updatePresenterPanel(active.dataset.tab);
+  }
+}
+
 function wireKeyboard() {
-  const tabBar = document.getElementById('tab-bar');
-  if (!tabBar) return;
-  tabBar.addEventListener('keydown', function(e) {
-    const btns = Array.from(tabBar.querySelectorAll('.tab-btn:not([hidden])'));
-    const idx  = btns.indexOf(document.activeElement);
-    if (idx < 0) return;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+  // Tab-bar arrow navigation (focus movement within tab strip)
+  var tabBar = document.getElementById('tab-bar');
+  if (tabBar) {
+    tabBar.addEventListener('keydown', function(e) {
+      var btns = Array.from(tabBar.querySelectorAll('.tab-btn:not([hidden])'));
+      var idx  = btns.indexOf(document.activeElement);
+      if (idx < 0) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        btns[(idx + 1) % btns.length].focus();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        btns[(idx + btns.length - 1) % btns.length].focus();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        document.activeElement.click();
+      }
+    });
+  }
+
+  // Global: Left/Right arrow = previous/next tab; P = toggle presenter
+  document.addEventListener('keydown', function(e) {
+    // Skip when typing in an input or select
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+
+    var allBtns = Array.from(document.querySelectorAll('#tab-bar .tab-btn'));
+    var activeBtn = document.querySelector('#tab-bar .tab-btn.active');
+    var idx = allBtns.indexOf(activeBtn);
+
+    if (e.key === 'ArrowRight') {
       e.preventDefault();
-      btns[(idx + 1) % btns.length].focus();
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      var next = allBtns[(idx + 1) % allBtns.length];
+      if (next) switchTab(next.dataset.tab);
+    } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      btns[(idx + btns.length - 1) % btns.length].focus();
-    } else if (e.key === 'Enter' || e.key === ' ') {
+      var prev = allBtns[(idx + allBtns.length - 1) % allBtns.length];
+      if (prev) switchTab(prev.dataset.tab);
+    } else if (e.key === 'p' || e.key === 'P') {
+      // Only if not in a form field (already guarded above)
       e.preventDefault();
-      document.activeElement.click();
+      _togglePresenter();
     }
   });
+
+  // Presenter button click
+  var presBtn = document.getElementById('presenter-btn');
+  if (presBtn) {
+    presBtn.addEventListener('click', _togglePresenter);
+  }
+
+  // Initialise panel state
+  var panel = document.getElementById('presenter-panel');
+  if (panel) panel.dataset.hidden = 'true';
 }
 
 // Forecast tab is always shown; no probe needed.
@@ -2082,3 +2186,21 @@ function wireKeyboard() {
 
   // No background probe needed — forecast tab is always visible.
 })();
+
+// How it is built: the counts in the headline come from the Flow itself.
+async function renderBuild() {
+  const words = ['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+  try {
+    const d = await apiFetch('/api/flow-steps');
+    if (!d || d.error) throw new Error(d && d.error || 'no answer');
+    const z = document.getElementById('bld-hl-zones'), st = document.getElementById('bld-hl-steps'), u = document.getElementById('bld-hl-unit'), src = document.getElementById('bld-hl-src');
+    if (z) z.textContent = words[d.zones] || String(d.zones);
+    if (st) st.textContent = String(d.steps);
+    if (u) u.textContent = ' steps.';
+    if (src) src.textContent = d.visual + ' visual recipes and ' + d.code + ' short Python recipes, in ' + d.zones + ' zones. Counted live from the Flow in Dataiku.';
+  } catch (e) {
+    const src = document.getElementById('bld-hl-src');
+    if (src) src.textContent = 'The Flow could not be counted just now. The zones below are listed by hand.';
+  }
+}
+

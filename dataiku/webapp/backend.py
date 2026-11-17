@@ -335,3 +335,17 @@ def running_time_ledger_by_hour():
         return jsonify({"error": err})
     rows.sort(key=lambda r: (r.get("hour") or 0))
     return jsonify(rows)
+
+
+@app.route("/api/flow-steps")
+def flow_steps():
+    """Counts the Flow's own zones and steps, live, so the app never states a stale number about how it is built."""
+    try:
+        project = dataiku.api_client().get_default_project()
+        recipes = project.list_recipes()
+        code = sum(1 for r in recipes if r.get("type") in ("python", "r", "sql_query", "shell", "pyspark"))
+        zones = [z.name for z in project.get_flow().list_zones() if z.name != "Default"]
+        return jsonify({"steps": len(recipes), "code": code, "visual": len(recipes) - code, "zones": len(zones), "zone_names": zones})
+    except Exception as e:  # shown on the page as its own sentence, never as a number
+        return jsonify({"error": "The Flow could not be counted: " + str(e)[:200]})
+

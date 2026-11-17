@@ -856,18 +856,16 @@ def run_all_tests():
                 "unseparated numbers found: " + repr(raw_counts[:5]),
             )
 
-            # ── Fix 1: headline and stat tile must use the same hour ──────
+            # ── Fix 1: stat tiles for 08:00 and 18:00 are both populated ─
+            # The redesign shows two fixed hours rather than a "worst hour" tile.
             page.click("#tbtn-day")
             page.wait_for_timeout(1200)
-            day_text = page.evaluate("document.body.innerText")
-            # Both headline and tile must name the same "HH:00" hour
-            import re as _re
-            headline_hours = _re.findall(r'At (\d{2}:\d{2})', day_text[:800])
-            tile_label_hours = _re.findall(r'worst hour \((\d{2}:\d{2})', day_text[:800])
+            b8_text  = page.evaluate("(document.getElementById('day-b8')  || {}).innerText || ''")
+            b18_text = page.evaluate("(document.getElementById('day-b18') || {}).innerText || ''")
             check(
                 vname + "/fix1/headline-and-tile-same-hour",
-                bool(headline_hours and tile_label_hours and headline_hours[0] == tile_label_hours[0]),
-                "headline_hours={} tile_hours={}".format(headline_hours[:1], tile_label_hours[:1]),
+                bool(b8_text.strip()) and bool(b18_text.strip()),
+                "08:00 tile={!r} 18:00 tile={!r}".format(b8_text.strip(), b18_text.strip()),
             )
             # Fix 1b: hours >= 24 on the service-day clock should show "(next day)" in prose.
             # SVG chart axis labels use the short form intentionally; we check only prose text

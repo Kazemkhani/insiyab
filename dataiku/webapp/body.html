@@ -1,531 +1,605 @@
 <!-- body.html — Insiyab Dataiku standard webapp body fragment
      This is a body fragment only: no <html>, <head>, or <body> tags.
-     Dataiku pastes this into the webapp body.  CSS and JS are in
+     Dataiku pastes this into the webapp body. CSS and JS are in
      the separate style.css and script.js files. -->
 
 <div id="app">
 
-  <!-- Tab navigation — order: The day, Planner's worklist, Passenger demand,
-       Service reliability, Supply and capacity, Forecast, What if, How it is built -->
-  <nav id="tab-bar" role="tablist" aria-label="Analysis tabs">
-    <button class="tab-btn active" role="tab" aria-selected="true"
-            aria-controls="panel-day" id="tbtn-day" data-tab="day">
-      The day
+  <!-- ── Top bar: brand + tab strip + presenter button ─────────────── -->
+  <div id="nav-bar">
+    <span id="nav-brand">Insiyab<span>.</span></span>
+    <!-- Tab navigation — numbered so the pitch order is obvious -->
+    <nav id="tab-bar" role="tablist" aria-label="Analysis tabs">
+      <button class="tab-btn active" role="tab" aria-selected="true"
+              aria-controls="panel-day" id="tbtn-day" data-tab="day">
+        1 The day
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="panel-worklist" id="tbtn-worklist" data-tab="worklist">
+        2 Planner's worklist
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="panel-demand" id="tbtn-demand" data-tab="demand">
+        3 Passenger demand
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="panel-reliability" id="tbtn-reliability" data-tab="reliability">
+        4 Service reliability
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="panel-supply" id="tbtn-supply" data-tab="supply">
+        5 Supply and capacity
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="panel-forecast" id="tbtn-forecast" data-tab="forecast">
+        6 Forecast
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="panel-whatif" id="tbtn-whatif" data-tab="whatif">
+        7 What if
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false"
+              aria-controls="panel-build" id="tbtn-build" data-tab="build">
+        8 How it is built
+      </button>
+    </nav>
+    <button id="presenter-btn" type="button" aria-pressed="false"
+            title="Toggle presenter notes (P)">
+      Presenter notes
     </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-worklist" id="tbtn-worklist" data-tab="worklist">
-      Planner's worklist
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-demand" id="tbtn-demand" data-tab="demand">
-      Passenger demand
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-reliability" id="tbtn-reliability" data-tab="reliability">
-      Service reliability
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-supply" id="tbtn-supply" data-tab="supply">
-      Supply and capacity
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-forecast" id="tbtn-forecast" data-tab="forecast">
-      Forecast
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-whatif" id="tbtn-whatif" data-tab="whatif">
-      What if
-    </button>
-    <button class="tab-btn" role="tab" aria-selected="false"
-            aria-controls="panel-build" id="tbtn-build" data-tab="build">
-      How it is built
-    </button>
-  </nav>
+  </div>
 
-  <!-- ── Tab 1: The day ──────────────────────────────────────────── -->
+  <!-- ── Tab 1: The day ──────────────────────────────────────────────── -->
   <section class="panel active" role="tabpanel"
            id="panel-day" aria-labelledby="tbtn-day">
 
-    <h1>Monday 15 December 2025</h1>
+    <p class="tab-eyebrow">Step 1 of 8 · The summary</p>
+    <h2 class="tab-hl">Same crowd.<br><span class="hl2">Different clock.</span></h2>
 
-    <div id="day-headline" class="headline">Loading…</div>
-
-    <div id="day-chart" class="chart-wrap" aria-label="Lateness and boardings by hour of day">
-      <p class="loading">Loading chart…</p>
+    <!-- Four figures from demand_by_hour and punctuality_by_hour (filled by JS) -->
+    <div class="stat-row-top" id="day-stats-top">
+      <div class="stat-fig"><b id="day-b8">…</b><span>boardings in the 08:00 hour</span></div>
+      <div class="stat-fig"><b id="day-l8">…</b><span>departures 5+ min late at 08:00</span></div>
+      <div class="stat-fig"><b id="day-b18">…</b><span>boardings in the 18:00 hour</span></div>
+      <div class="stat-fig"><b id="day-l18" class="red">…</b><span>departures 5+ min late at 18:00</span></div>
     </div>
 
-    <div id="day-stats" class="stat-row"></div>
-
-    <div id="day-why" class="caption" style="max-width:760px"></div>
-
-    <p id="day-worklist-link" class="caption" style="margin-top:16px;display:none">
-      What to do about it:
-      <button class="link-btn" onclick="switchTab('worklist')" type="button">the Planner's worklist</button>
-    </p>
-
-  </section>
-
-  <!-- ── Tab 2: Planner's worklist ───────────────────────────────── -->
-  <section class="panel" role="tabpanel"
-           id="panel-worklist" aria-labelledby="tbtn-worklist">
-
-    <h2>Planner's worklist</h2>
-    <p class="flow-zone-label">Flow zone: Forecast</p>
-
-    <!-- Section 1: who, when, decision -->
-    <p id="wl-context" class="caption" style="max-width:760px">
-      This screen is for the timetable planner.
-      Each night the day's running times are added to the analysis.
-      At each timetable change (RTA reviews timetables about every one to two months)
-      the planner works through this list and decides which routes need more time in the schedule.
-    </p>
-
-    <!-- Section 2: focal number -->
-    <div id="wl-focal" class="wl-focal-wrap">
-      <div class="skel-line" style="width:260px;height:52px"></div>
+    <!-- Focal: dual-axis chart -->
+    <div class="tab-focal">
+      <div id="day-chart" class="chart-wrap" aria-label="Lateness and boardings by hour of day">
+        <div class="skel-chart"></div>
+      </div>
+      <div class="chart-key">
+        <span><i style="background:#E21F26"></i>Departures 5+ min late (left axis)</span>
+        <span><i style="background:#D8CBB2"></i>Boardings (right axis)</span>
+      </div>
+      <p class="source-line" id="day-src-line">from demand_by_hour and punctuality_by_hour · lateness line shown only for hours with 500 or more recorded departures</p>
     </div>
 
-    <!-- Section 3: worklist table -->
-    <div class="wl-controls ctrl-row" style="margin:16px 0 8px">
-      <label for="wl-band-sel" style="font-size:var(--sz13)">Hour band</label>
-      <select id="wl-band-sel">
-        <option value="all">All day</option>
-        <option value="am" >06:00 to 09:59</option>
-        <option value="pm" selected>16:00 to 18:59</option>
-        <option value="late">19:00 on</option>
-      </select>
-      <label for="wl-route-search" style="font-size:var(--sz13)">Route</label>
-      <input id="wl-route-search" type="search" placeholder="e.g. T01" style="width:100px">
-    </div>
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
 
-    <div id="wl-table-wrap" class="table-scroll">
-      <div class="skel-table"></div>
-    </div>
+      <p id="day-why" class="caption" style="max-width:720px;margin-bottom:16px"></p>
 
-    <!-- Running total / draft -->
-    <div id="wl-draft-total" class="wl-draft-total" aria-live="polite" hidden>
-      <span class="wl-draft-label">DRAFT, NOT SAVED</span>
-      <span id="wl-draft-text">Accepted: 0 changes, adding 0.0 bus hours</span>
-      <button id="wl-copy-btn" type="button" class="wl-copy-btn">Copy the accepted list</button>
-    </div>
-    <p class="caption" style="font-size:var(--sz11);color:var(--g3);margin-top:4px">
-      Accepting a row marks it in this browser session only.
-      Nothing is applied by this screen: the planner decides.
-    </p>
-
-    <!-- Section 4: ledger bar chart -->
-    <h3 style="margin-top:24px;font-size:var(--sz13)">Extra bus hours needed by hour of day</h3>
-    <div id="wl-ledger-chart" class="chart-wrap">
-      <div class="skel-chart"></div>
-    </div>
-    <p class="source-line">from running_time_ledger_by_hour</p>
-
-    <!-- Section 5: how this runs -->
-    <div class="wl-howruns">
-      <h3>How this runs</h3>
-      <ul class="wl-howruns-list">
-        <li><strong>What goes in each night:</strong> the day's nol card taps and vehicle running times; nothing new to measure, only new records.</li>
-        <li><strong>What is rebuilt:</strong> the Flow's four zones, by a nightly scenario in Dataiku; each zone re-reads all data to date.</li>
-        <li><strong>What comes out:</strong> this list and the forecast it rests on, ready for the next timetable review.</li>
-      </ul>
-      <p style="font-size:var(--sz13);color:var(--g4);margin-top:8px">
-        <strong>What it does not do:</strong>
-        it does not change a route, it does not act by itself,
-        and it rests on one day's data until more days are added.
+      <p id="day-worklist-link" class="caption" style="display:none">
+        What to do about it:
+        <button class="link-btn" onclick="switchTab('worklist')" type="button">the Planner's worklist</button>
       </p>
     </div>
 
   </section>
 
-  <!-- ── Tab 3: Service reliability ─────────────────────────────── -->
+  <!-- ── Tab 2: Planner's worklist ───────────────────────────────────── -->
   <section class="panel" role="tabpanel"
-           id="panel-reliability" aria-labelledby="tbtn-reliability">
+           id="panel-worklist" aria-labelledby="tbtn-worklist">
 
-    <h2>Service reliability</h2>
-    <p class="flow-zone-label">Flow zone: Service reliability</p>
+    <p class="tab-eyebrow">Step 2 of 8 · Flow zone: Forecast</p>
+    <h2 class="tab-hl" id="hl-worklist">
+      <span class="hl-num" id="wl-hl-num">…</span> bus hours.<br>
+      <span class="hl2">Three hours of the day.</span>
+    </h2>
 
-    <p class="caption">
-      Route-hour cells coloured by share of departures 5+ minutes late.
-      Cells with fewer than 20 departures are shown in grey.
-      Source: <strong>punctuality_by_route_hour</strong>
-    </p>
-
-    <div id="reliability-heatmap" class="heatmap-scroll">
-      <p class="loading">Loading heatmap…</p>
+    <!-- Focal: focal number + top-5 worklist rows -->
+    <div class="tab-focal">
+      <div id="wl-focal" class="wl-focal-wrap">
+        <div class="skel-line" style="width:260px;height:52px"></div>
+      </div>
+      <div class="wl-controls" style="margin:16px 0 8px">
+        <label for="wl-band-sel">Hour band</label>
+        <select id="wl-band-sel">
+          <option value="pm" selected>16:00 to 18:59</option>
+          <option value="am">06:00 to 09:59</option>
+          <option value="late">19:00 on</option>
+          <option value="all">All day</option>
+        </select>
+        <label for="wl-route-search">Route</label>
+        <input id="wl-route-search" type="search" placeholder="e.g. T01" style="width:100px">
+      </div>
+      <div id="wl-table-wrap" class="table-scroll">
+        <div class="skel-table"></div>
+      </div>
+      <!-- Running total / draft -->
+      <div id="wl-draft-total" class="wl-draft-total" aria-live="polite" hidden>
+        <span class="wl-draft-label">DRAFT · NOT SAVED</span>
+        <span id="wl-draft-text">Accepted: 0 changes, adding 0.0 bus hours</span>
+        <button id="wl-copy-btn" type="button" class="wl-copy-btn">Copy the accepted list</button>
+      </div>
     </div>
 
-    <div class="two-col">
-      <div>
-        <h3>Worst route-hours (≥ 20 departures)</h3>
-        <div id="reliability-ranklist"></div>
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
+
+      <!-- Ledger bar chart -->
+      <h3 style="font-size:var(--sz14);font-weight:700;margin-bottom:8px">Extra bus hours needed by hour of day</h3>
+      <div id="wl-ledger-chart" class="chart-wrap">
+        <div class="skel-chart"></div>
       </div>
-      <div>
-        <h3>Lateness by bus type</h3>
-        <p class="note">
-          Routes are not controlled for; bus types are not evenly
-          distributed across the network, so this table names a
-          correlation, not a cause.
-          Source: <strong>punctuality_by_bus_type</strong>
+      <p class="source-line">from running_time_ledger_by_hour</p>
+
+      <!-- How this runs -->
+      <div class="wl-howruns" style="margin-top:24px">
+        <h3>How this runs</h3>
+        <ul class="wl-howruns-list">
+          <li><strong>What goes in each night:</strong> the day's nol card taps and vehicle running times; nothing new to measure, only new records.</li>
+          <li><strong>What is rebuilt:</strong> the Flow's zones, by a nightly scenario in Dataiku; each zone re-reads all data to date.</li>
+          <li><strong>What comes out:</strong> this list and the forecast it rests on, ready for the next timetable review.</li>
+        </ul>
+        <p class="caption" style="margin-top:8px">
+          <strong>What it does not do:</strong>
+          it does not change a route, it does not act by itself,
+          and it rests on one day's data until more days are added.
         </p>
-        <div id="reliability-bustype"></div>
       </div>
     </div>
 
   </section>
 
-  <!-- ── Tab 3: Passenger demand ────────────────────────────────── -->
+  <!-- ── Tab 3: Passenger demand ─────────────────────────────────────── -->
   <section class="panel" role="tabpanel"
            id="panel-demand" aria-labelledby="tbtn-demand">
 
-    <h2>Passenger demand</h2>
-    <p class="flow-zone-label">Flow zone: Passenger demand</p>
+    <p class="tab-eyebrow">Step 3 of 8 · Flow zone: Passenger demand</p>
+    <h2 class="tab-hl">
+      Two peaks,<br>
+      <span class="hl2"><span class="hl-num" id="dem-hl-b8">…</span> and <span class="hl-num" id="dem-hl-b18">…</span> boardings an hour.</span>
+    </h2>
 
-    <p class="caption">
-      "Boardings" are passengers recorded boarding a bus.
-      Nobody counted people waiting at stops.
-      Source: <strong>demand_by_hour</strong>
-    </p>
-
-    <div id="demand-hour-chart" class="chart-wrap">
-      <p class="loading">Loading…</p>
+    <!-- Focal: demand by hour chart -->
+    <div class="tab-focal">
+      <div id="demand-hour-chart" class="chart-wrap" aria-label="Boardings by hour">
+        <div class="skel-chart"></div>
+      </div>
+      <p class="source-line">from demand_by_hour</p>
     </div>
 
-    <div class="two-col">
-
-      <div>
-        <h3>15 busiest stops</h3>
-        <p class="caption">By boardings. Source: <strong>demand_by_stop</strong></p>
-        <div id="demand-stops"></div>
-      </div>
-
-      <div>
-        <h3>Route detail</h3>
-        <div class="ctrl-row">
-          <div class="ctrl-group">
-            <label for="demand-route-sel">Route</label>
-            <select id="demand-route-sel" aria-label="Select route">
-              <option value="">pick a route</option>
-            </select>
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
+      <p class="caption" style="margin-bottom:16px">
+        "Boardings" are passengers recorded boarding a bus using their nol card.
+        Nobody counted people waiting at stops.
+      </p>
+      <div class="two-col">
+        <div>
+          <h3 style="font-size:var(--sz14);font-weight:700;margin-bottom:8px">15 busiest stops</h3>
+          <p class="source-line" style="margin-bottom:8px">from demand_by_stop</p>
+          <div id="demand-stops"></div>
+        </div>
+        <div>
+          <h3 style="font-size:var(--sz14);font-weight:700;margin-bottom:8px">Route detail</h3>
+          <div class="ctrl-row">
+            <div class="ctrl-group">
+              <label for="demand-route-sel">Route</label>
+              <select id="demand-route-sel" aria-label="Select route">
+                <option value="">pick a route</option>
+              </select>
+            </div>
+          </div>
+          <div id="demand-route-chart" class="chart-wrap">
+            <p class="note">Select a route above.</p>
           </div>
         </div>
-        <div id="demand-route-chart" class="chart-wrap">
-          <p class="note">Select a route above.</p>
-        </div>
       </div>
-
     </div>
 
   </section>
 
-  <!-- ── Tab 4: Supply and capacity ─────────────────────────────── -->
+  <!-- ── Tab 4: Service reliability ─────────────────────────────────── -->
+  <section class="panel" role="tabpanel"
+           id="panel-reliability" aria-labelledby="tbtn-reliability">
+
+    <p class="tab-eyebrow">Step 4 of 8 · Flow zone: Service reliability</p>
+    <h2 class="tab-hl">The evening is red<br><span class="hl2">across the network.</span></h2>
+
+    <!-- Focal: heatmap grid with hour axis and colour key -->
+    <div class="tab-focal">
+      <div id="reliability-heatmap" class="heatmap-scroll">
+        <div class="skel-chart" style="height:280px"></div>
+      </div>
+      <div class="chart-key" style="margin-top:8px">
+        <span><i style="background:#E21F26"></i>40%+ late</span>
+        <span><i style="background:#E87E82"></i>20–40% late</span>
+        <span><i style="background:#F5C4C6"></i>10–20% late</span>
+        <span><i style="background:#D8CBB2"></i>Under 10% late</span>
+        <span><i style="background:#E4D9C4"></i>Under 20 departures</span>
+      </div>
+      <p class="source-line">from punctuality_by_route_hour · cells with fewer than 20 departures shown in grey</p>
+    </div>
+
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
+      <div class="two-col">
+        <div>
+          <h3 style="font-size:var(--sz14);font-weight:700;margin-bottom:8px">Worst route-hours (20+ departures)</h3>
+          <div id="reliability-ranklist"></div>
+        </div>
+        <div>
+          <h3 style="font-size:var(--sz14);font-weight:700;margin-bottom:4px">Lateness by bus type</h3>
+          <p class="caption" style="margin-bottom:8px">
+            Routes are not controlled for; this is an association, not a cause.
+          </p>
+          <div id="reliability-bustype"></div>
+          <p class="source-line">from punctuality_by_bus_type</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── Tab 5: Supply and capacity ──────────────────────────────────── -->
   <section class="panel" role="tabpanel"
            id="panel-supply" aria-labelledby="tbtn-supply">
 
-    <h2>Supply and capacity</h2>
-    <p class="flow-zone-label">Flow zone: Supply and capacity</p>
+    <p class="tab-eyebrow">Step 5 of 8 · Flow zone: Supply and capacity</p>
+    <h2 class="tab-hl">
+      <span class="hl-num" id="sup-hl-n">…</span> routes short at 18:00,<br>
+      <span class="hl2">by RTA's own rule of thumb.</span>
+    </h2>
 
-    <p class="headline" style="font-size:var(--sz16);margin-bottom:12px">
-      RTA's planning rule: passengers boarding in the hour divided by
-      what one bus carries gives the buses needed.
-      Buses short = buses needed minus buses that ran.
-    </p>
-
-    <div class="ctrl-row">
-      <div class="ctrl-group">
-        <label for="supply-hour-sel">Hour</label>
-        <select id="supply-hour-sel" aria-label="Select hour to examine">
-          <option value="">pick an hour</option>
-        </select>
+    <!-- Focal: status chart -->
+    <div class="tab-focal">
+      <div id="supply-status-chart" class="chart-wrap" aria-label="Route status by hour">
+        <div class="skel-chart"></div>
       </div>
+      <div id="supply-legend" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:12px;font-size:var(--sz12);color:var(--muted)"></div>
+      <p class="source-line">from supply_status_by_hour</p>
     </div>
 
-    <p id="supply-lead-sentence" style="font-size:var(--sz16);margin:0 0 16px"></p>
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
 
-    <div id="supply-hour-detail">
-      <p class="note">Select an hour to see the route breakdown.</p>
-    </div>
+      <p class="caption" style="max-width:720px;margin-bottom:16px">
+        RTA's planning rule: passengers boarding in the hour divided by what one bus
+        carries gives the buses needed. Buses short = buses needed minus buses that ran.
+        The rule counts every boarding against a seat so it leans high; a standing-room
+        figure would show fewer short. The same rule finds a similar shortfall in the
+        morning peak too; the morning copes because timetable slack absorbs it.
+      </p>
 
-    <h3>Route status by hour</h3>
-    <p class="caption">Source: <strong>supply_status_by_hour</strong></p>
-    <div id="supply-status-chart" class="chart-wrap">
-      <p class="loading">Loading…</p>
-    </div>
-
-    <!-- Legend for stacked bar -->
-    <div id="supply-legend" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:12px;font-size:var(--sz11)">
-    </div>
-
-  </section>
-
-  <!-- ── Tab 5: What if ─────────────────────────────────────────── -->
-  <section class="panel" role="tabpanel"
-           id="panel-whatif" aria-labelledby="tbtn-whatif">
-
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
-      <h2 style="margin:0">What if</h2>
-      <span class="simulated-banner" aria-label="All results are simulated">SIMULATED</span>
-    </div>
-
-    <p class="caption" style="margin-bottom:16px">
-      Computed in this browser from <strong>supply_vs_demand_by_route_hour</strong>
-      using the same planning rule as the Supply and capacity tab.
-      No measured data is changed.
-    </p>
-
-    <div class="ctrl-row">
-      <div class="ctrl-group">
-        <label for="wi-route">Crowded route</label>
-        <select id="wi-route" aria-label="Select crowded route"></select>
-      </div>
-      <div class="ctrl-group">
-        <label for="wi-hour">Hour</label>
-        <select id="wi-hour" aria-label="Select hour"></select>
-      </div>
-    </div>
-
-    <div class="ctrl-row" style="margin-top:8px">
-      <div class="ctrl-group">
-        <label>Add or remove buses</label>
-        <div class="stepper" role="group" aria-label="Number of buses to add or remove">
-          <button class="stepper-btn" id="wi-minus" aria-label="Remove one bus">−</button>
-          <div class="stepper-val" id="wi-add-val" aria-live="polite">0</div>
-          <button class="stepper-btn" id="wi-plus" aria-label="Add one bus">+</button>
+      <div class="ctrl-row">
+        <div class="ctrl-group">
+          <label for="supply-hour-sel">Hour</label>
+          <select id="supply-hour-sel" aria-label="Select hour to examine">
+            <option value="">pick an hour</option>
+          </select>
         </div>
       </div>
-
-      <div class="ctrl-group">
-        <label id="wi-bustype-label">Bus type</label>
-        <div class="bus-type-group" role="group" aria-labelledby="wi-bustype-label">
-          <button type="button" id="wi-bus-std" class="btn btn-bustype btn-active"
-                  aria-pressed="true">
-            Standard<br><span id="wi-std-seats">42 seats</span>
-          </button>
-          <button type="button" id="wi-bus-dbl" class="btn btn-bustype"
-                  aria-pressed="false">
-            Double-decker<br><span>70 seats*</span>
-          </button>
-        </div>
-        <p class="note" id="wi-dbl-note" style="margin-top:4px">
-          * 70 seats assumed; double-decker seat count is not in the fleet data
-        </p>
+      <p id="supply-lead-sentence" class="caption" style="margin-bottom:16px"></p>
+      <div id="supply-hour-detail">
+        <p class="note">Select an hour to see the route breakdown.</p>
       </div>
-
-      <div class="ctrl-group">
-        <label for="wi-donor">Take a bus from (optional)</label>
-        <select id="wi-donor" aria-label="Donor route with spare capacity">
-          <option value="">none</option>
-        </select>
-      </div>
-    </div>
-
-    <div id="whatif-results" style="margin-top:24px">
-      <p class="note">Select a route and hour above.</p>
-    </div>
-
-    <div class="assumptions">
-      <strong>Assumptions on screen:</strong>
-      <ul>
-        <li>Boardings do not change when more buses run.</li>
-        <li>A bus can reach the other route (not checked here).</li>
-        <li>Standing capacity figures are not verified in RTA's fleet list.</li>
-        <li>The planning rule uses seated capacity only unless stated otherwise.</li>
-      </ul>
     </div>
 
   </section>
 
-  <!-- ── Tab 6: How it is built ─────────────────────────────────── -->
-  <section class="panel" role="tabpanel"
-           id="panel-build" aria-labelledby="tbtn-build">
-
-    <h2>How it is built</h2>
-
-    <p>
-      The Flow in Dataiku has four zones, one for each question this app answers, with the same names as the tabs.
-      Eight of its fourteen steps are visual Group recipes; six are short Python recipes, each opening with a plain
-      description of what it does. Every figure in this app is read live from the tables those steps write.
-    </p>
-
-    <div class="flow-zone">
-      <h3>Zone: Passenger demand</h3>
-      <p class="caption">The question: how many people board, where and when? Starts from RTA's nol taps for Monday 15 December 2025.</p>
-      <div class="flow-step">
-        <span class="flow-step-kind">Python</span>
-        <span><strong>count_taps</strong>: reads the taps. A check-in is a boarding and a check-out an alighting. Taps before 03:00 belong to the end of the service day, so they count as hours 24 to 26. The card, the device and the vehicle are dropped here: the output, taps_by_route_stop_hour, holds counts only.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>demand_by_hour</strong>: boardings and alightings added up by hour. Read by The day and Passenger demand.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>demand_by_route_hour</strong>: the same by route and hour. Read by Passenger demand, Supply and capacity and the forecast.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>demand_by_stop</strong>: the same by stop. Read by Passenger demand.</span>
-      </div>
-    </div>
-
-    <div class="flow-zone">
-      <h3>Zone: Service reliability</h3>
-      <p class="caption">The question: does the bus leave on time? Starts from RTA's running-time table and the fleet list.</p>
-      <div class="flow-step">
-        <span class="flow-step-kind">Python</span>
-        <span><strong>clean_running_time</strong>: one row per bus per stop. Turns clock text into seconds on the service-day clock (after midnight is written 24:00 to 30:59), works out how late each departure was against its own scheduled time, and adds the bus type. The driver and the vehicle number are dropped here. Output: stop_departures_clean.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>punctuality_by_hour</strong>: share of departures 5 or more minutes late, average lateness, share leaving early and share of stops passed without opening the doors, by hour. Read by The day.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>punctuality_by_route_hour</strong>: the same by route and hour. Read by Service reliability.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>punctuality_by_bus_type</strong>: the same by bus type. Read by Service reliability.</span>
-      </div>
-    </div>
-
-    <div class="flow-zone">
-      <h3>Zone: Supply and capacity</h3>
-      <p class="caption">The question: were enough buses sent? Uses the results of the two zones above.</p>
-      <div class="flow-step">
-        <span class="flow-step-kind">Python</span>
-        <span><strong>buses_needed_rule</strong>: applies RTA's planning rule as its scheduling engineer described it: boardings in the hour, divided by what one bus carries, gives the buses needed. Counts the trips that started on each route in each hour and their seats, joins the boardings, and works the rule twice: seats only, and seats plus standing (the fleet list marks standing as not verified). A route with taps but no trip in the running-time table is marked, not counted as short. Output: supply_vs_demand_by_route_hour. Read by Supply and capacity and What if.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>supply_status_by_hour</strong>: how many routes were short, in balance or under a fifth used, by hour. Read by Supply and capacity.</span>
-      </div>
-    </div>
-
-    <div class="flow-zone">
-      <h3>Zone: Forecast</h3>
-      <p class="caption">The question: how long will each trip really take? Uses the running-time table, the fleet list and the boardings from Passenger demand.</p>
-      <div class="flow-step">
-        <span class="flow-step-kind">Python</span>
-        <span><strong>build_trip_table</strong>: one row per trip, holding only what was knowable 30 minutes before it was due to leave: the planned running time, the stops, the time of day, the bus type, how the route ran in the two hours before (finished trips only), how late this bus finished its previous trip (only if it had finished), and boardings on the route in the last full hour. The vehicle number links a bus to its previous trip and is then dropped.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind">Python</span>
-        <span><strong>forecast_running_time</strong>: gradient-boosted trees (LightGBM). Learns from trips due before 16:00 and is tested on every trip from 16:00 on. Scored against RTA's timetable and two simple forecasts, with the average miss, RMSE and MAPE, and a range for the gain from drawing whole routes again 200 times. Outputs: running_time_forecast, running_time_metrics, running_time_drivers.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind">Python</span>
-        <span><strong>running_time_bands</strong>: for each route, direction and hour: the planned running time, the middle trip, and the time that covers 85 trips in 100. The difference is the extra time that hour needs.</span>
-      </div>
-      <div class="flow-step">
-        <span class="flow-step-kind visual">Group</span>
-        <span><strong>running_time_ledger_by_hour</strong>: those extra minutes added up by hour of the day.</span>
-      </div>
-    </div>
-
-    <h3>RTA facts that inform this analysis</h3>
-    <p>
-      These were told to the team by RTA's scheduling engineer:
-    </p>
-    <ul style="font-size:var(--sz13);line-height:1.7">
-      <li>
-        Timetables change about every one to two months.
-        The route network changes four times a year.
-        The Flow is sized to re-run when a new timetable feed arrives.
-      </li>
-      <li>
-        Spare buses are sent from staffed stations when the next bus is full
-        and none follows within the route's frequency.
-        This webapp names where that is happening, not how often it succeeds.
-      </li>
-      <li>
-        Most stops are not monitored with physical sensors.
-        "Boardings" here means nol card tap-ons, not all passengers.
-      </li>
-      <li>
-        Standing capacity in the fleet register is marked not verified.
-        RTA plans with about 35 standing places per standard bus.
-      </li>
-    </ul>
-
-  </section>
-
-  <!-- ── Tab 5: Forecast ──────────────────────────────────────────── -->
+  <!-- ── Tab 6: Forecast ──────────────────────────────────────────────── -->
   <section class="panel" role="tabpanel"
            id="panel-forecast" aria-labelledby="tbtn-forecast">
 
-    <h2>Forecast</h2>
-    <p class="flow-zone-label">Flow zone: Forecast</p>
+    <p class="tab-eyebrow flow-zone-label">Step 6 of 8 · Flow zone: Forecast</p>
+    <h2 class="tab-hl">
+      <span class="hl-num" id="fc-hl-pct">…</span> per cent closer<br>
+      <span class="hl2">than the timetable.</span>
+    </h2>
 
-    <!-- Section 1: one-sentence summary computed from data -->
-    <p id="fc-summary" class="headline" style="font-size:var(--sz20)">
-      <span class="skeleton-line" style="width:85%"></span>
-    </p>
-
-    <!-- Section 2: method comparison bar chart (evening band) -->
-    <h3>How each method does in the evening peak</h3>
-    <div id="fc-method-chart" class="chart-wrap" aria-label="Mean absolute error by method, evening band">
-      <div class="skel-chart"></div>
-    </div>
-    <p class="source-line">from running_time_metrics</p>
-
-    <!-- Section 3: table of all three bands -->
-    <h3>All bands</h3>
-    <div id="fc-bands-table" class="table-scroll">
-      <div class="skel-table"></div>
-    </div>
-    <p class="source-line">from running_time_metrics</p>
-
-    <!-- Section 4: miss by hour, timetable vs model -->
-    <h3>Where it helps: average miss by hour from 16:00</h3>
-    <div id="fc-hour-chart" class="chart-wrap" aria-label="Mean absolute error by hour">
-      <div class="skel-chart"></div>
-    </div>
-    <p class="source-line">from running_time_forecast (aggregated)</p>
-
-    <!-- Section 5: one route, trip by trip -->
-    <h3>One route, trip by trip</h3>
-    <div class="ctrl-row">
-      <div class="ctrl-group">
-        <label for="fc-route-sel">Route (evening)</label>
-        <select id="fc-route-sel" aria-label="Select route for trip-by-trip view">
-          <option value="">Loading…</option>
-        </select>
+    <!-- Focal: method comparison bar chart -->
+    <div class="tab-focal">
+      <div id="fc-method-chart" class="chart-wrap" aria-label="Mean absolute error by method, evening band">
+        <div class="skel-chart"></div>
       </div>
-    </div>
-    <div id="fc-trip-chart" class="chart-wrap" aria-label="Planned, actual and forecast minutes per trip">
-      <div class="skel-chart"></div>
-    </div>
-    <p class="source-line">from running_time_forecast</p>
-
-    <!-- Section 6: feature importance -->
-    <h3>What the model leans on</h3>
-    <div id="fc-drivers-chart" class="chart-wrap" aria-label="Feature importance">
-      <div class="skel-chart"></div>
-    </div>
-    <p class="source-line">from running_time_drivers</p>
-
-    <!-- Section 7: what this does not show -->
-    <div id="fc-caveats" class="caveats-box">
-      <div class="skel-line"></div>
+      <p class="source-line">from running_time_metrics · evening band 16:00 to 18:59</p>
     </div>
 
-    <!-- Section 8: planner view (optional dataset) -->
-    <div id="fc-planner-wrap" hidden>
-      <h3>What a planner would change</h3>
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
+
+      <p id="fc-summary" class="caption" style="max-width:720px;margin-bottom:20px"></p>
+
+      <h3 style="font-size:var(--sz14);font-weight:700;margin-bottom:8px">All bands</h3>
+      <div id="fc-bands-table" class="table-scroll">
+        <div class="skel-table"></div>
+      </div>
+      <p class="source-line">from running_time_metrics</p>
+
+      <h3 style="font-size:var(--sz14);font-weight:700;margin:24px 0 8px">Where it helps: average miss by hour from 16:00</h3>
+      <div id="fc-hour-chart" class="chart-wrap" aria-label="Mean absolute error by hour">
+        <div class="skel-chart"></div>
+      </div>
+      <div class="chart-key">
+        <span><i style="background:#D8CBB2"></i>RTA timetable</span>
+        <span><i style="background:#0E5A73"></i>The model</span>
+      </div>
+      <p class="source-line">from running_time_forecast (aggregated)</p>
+
+      <h3 style="font-size:var(--sz14);font-weight:700;margin:24px 0 8px">One route, trip by trip</h3>
       <div class="ctrl-row">
         <div class="ctrl-group">
-          <label for="fc-planner-route">Route</label>
-          <select id="fc-planner-route" aria-label="Select route for planner view">
+          <label for="fc-route-sel">Route (evening)</label>
+          <select id="fc-route-sel" aria-label="Select route for trip-by-trip view">
             <option value="">Loading…</option>
           </select>
         </div>
       </div>
-      <div id="fc-planner-chart" class="chart-wrap" aria-label="Planned vs 85th percentile by hour">
+      <div id="fc-trip-chart" class="chart-wrap" aria-label="Planned, actual and forecast minutes per trip">
         <div class="skel-chart"></div>
       </div>
-      <p class="source-line">from running_time_bands</p>
+      <p class="source-line">from running_time_forecast</p>
+
+      <h3 style="font-size:var(--sz14);font-weight:700;margin:24px 0 8px">What the model leans on</h3>
+      <div id="fc-drivers-chart" class="chart-wrap" aria-label="Feature importance">
+        <div class="skel-chart"></div>
+      </div>
+      <p class="source-line">from running_time_drivers</p>
+
+      <div id="fc-caveats" class="caveats-box">
+        <div class="skel-line"></div>
+      </div>
+
+      <!-- Planner view (optional dataset) -->
+      <div id="fc-planner-wrap" hidden>
+        <h3 style="font-size:var(--sz14);font-weight:700;margin:24px 0 8px">What a planner would change</h3>
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <label for="fc-planner-route">Route</label>
+            <select id="fc-planner-route" aria-label="Select route for planner view">
+              <option value="">Loading…</option>
+            </select>
+          </div>
+        </div>
+        <div id="fc-planner-chart" class="chart-wrap" aria-label="Planned vs 85th percentile by hour">
+          <div class="skel-chart"></div>
+        </div>
+        <p class="source-line">from running_time_bands</p>
+      </div>
     </div>
 
   </section>
+
+  <!-- ── Tab 7: What if ───────────────────────────────────────────────── -->
+  <section class="panel" role="tabpanel"
+           id="panel-whatif" aria-labelledby="tbtn-whatif">
+
+    <p class="tab-eyebrow">Step 7 of 8 · Try it</p>
+    <h2 class="tab-hl">Add a bus.<br><span class="hl2">See what changes.</span></h2>
+
+    <!-- Focal: controls + result -->
+    <div class="tab-focal">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span class="simulated-banner">Simulated · not measured</span>
+      </div>
+
+      <div class="ctrl-row">
+        <div class="ctrl-group">
+          <label for="wi-route">Crowded route</label>
+          <select id="wi-route" aria-label="Select crowded route"></select>
+        </div>
+        <div class="ctrl-group">
+          <label for="wi-hour">Hour</label>
+          <select id="wi-hour" aria-label="Select hour"></select>
+        </div>
+      </div>
+
+      <div class="ctrl-row">
+        <div class="ctrl-group">
+          <label>Add or remove buses</label>
+          <div class="stepper" role="group" aria-label="Number of buses to add or remove">
+            <button class="stepper-btn" id="wi-minus" aria-label="Remove one bus">−</button>
+            <div class="stepper-val" id="wi-add-val" aria-live="polite">0</div>
+            <button class="stepper-btn" id="wi-plus" aria-label="Add one bus">+</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label id="wi-bustype-label">Bus type</label>
+          <div class="bus-type-group" role="group" aria-labelledby="wi-bustype-label">
+            <button type="button" id="wi-bus-std" class="btn btn-bustype btn-active" aria-pressed="true">
+              Standard<br><span id="wi-std-seats">42 seats</span>
+            </button>
+            <button type="button" id="wi-bus-dbl" class="btn btn-bustype" aria-pressed="false">
+              Double-decker<br><span>70 seats*</span>
+            </button>
+          </div>
+          <p class="note" id="wi-dbl-note" style="margin-top:4px">* 70 seats assumed</p>
+        </div>
+        <div class="ctrl-group">
+          <label for="wi-donor">Take a bus from (optional)</label>
+          <select id="wi-donor" aria-label="Donor route with spare capacity">
+            <option value="">none</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="whatif-results">
+        <p class="note">Select a route and hour above.</p>
+      </div>
+    </div>
+
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
+      <p class="caption" style="margin-bottom:12px">
+        Computed in this browser from <strong>supply_vs_demand_by_route_hour</strong>
+        using the same planning rule as the Supply and capacity tab.
+        No measured data is changed.
+      </p>
+      <div class="assumptions">
+        <strong>Assumptions on screen:</strong>
+        <ul>
+          <li>Boardings do not change when more buses run.</li>
+          <li>A bus can reach the other route (not checked here).</li>
+          <li>Standing capacity figures are not verified in RTA's fleet list.</li>
+          <li>The planning rule uses seated capacity only unless stated otherwise.</li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── Tab 8: How it is built ──────────────────────────────────────── -->
+  <section class="panel" role="tabpanel"
+           id="panel-build" aria-labelledby="tbtn-build">
+
+    <p class="tab-eyebrow">Step 8 of 8 · The pipeline</p>
+    <h2 class="tab-hl"><span id="bld-hl-zones">Five</span> questions.<br><span class="hl2"><span id="bld-hl-steps">One flow</span><span id="bld-hl-unit"></span></span></h2>
+    <p class="source-line" id="bld-hl-src">Counted live from the Flow in Dataiku.</p>
+
+    <!-- Focal: four zone cards -->
+    <div class="tab-focal">
+      <div class="zone-cards-grid">
+        <div class="zone-card">
+          <p class="zc-eyebrow">Zone 1</p>
+          <h3>Passenger demand</h3>
+          <p>Who boards, where, and when?</p>
+          <ul><li>count_taps</li><li>demand_by_hour</li><li>demand_by_route_hour</li><li>demand_by_stop</li></ul>
+        </div>
+        <div class="zone-card">
+          <p class="zc-eyebrow">Zone 2</p>
+          <h3>Service reliability</h3>
+          <p>Does the bus leave on time?</p>
+          <ul><li>clean_running_time</li><li>punctuality_by_hour</li><li>punctuality_by_route_hour</li><li>punctuality_by_bus_type</li></ul>
+        </div>
+        <div class="zone-card">
+          <p class="zc-eyebrow">Zone 3</p>
+          <h3>Supply and capacity</h3>
+          <p>Were enough buses sent?</p>
+          <ul><li>buses_needed_rule</li><li>supply_status_by_hour</li></ul>
+        </div>
+        <div class="zone-card">
+          <p class="zc-eyebrow">Zone 4</p>
+          <h3>Forecast</h3>
+          <p>How long will each trip take?</p>
+          <ul><li>build_trip_table</li><li>forecast_running_time</li><li>running_time_bands</li><li>running_time_ledger_by_hour</li></ul>
+        </div>
+        <div class="zone-card">
+          <p class="zc-eyebrow">Zone 5</p>
+          <h3>Priorities</h3>
+          <p>Where does lateness reach the most passengers?</p>
+          <ul><li>compute_passenger_impact_by_route_hour</li><li>compute_passenger_impact_scored</li><li>compute_passenger_impact_top25</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail section -->
+    <div class="tab-detail">
+      <p class="detail-heading">The detail</p>
+
+      <div class="flow-zone">
+        <h3>Zone 1: Passenger demand</h3>
+        <p class="caption" style="margin-bottom:12px">The question: how many people board, where and when? Starts from RTA's nol taps for Monday 15 December 2025.</p>
+        <div class="flow-step">
+          <span class="flow-step-kind">Python</span>
+          <span><strong>count_taps</strong>: reads the taps. A check-in is a boarding and a check-out an alighting. Taps before 03:00 belong to the end of the service day, so they count as hours 24 to 26. The card, the device and the vehicle are dropped here: the output holds counts only.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>demand_by_hour</strong>: boardings and alightings added up by hour.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>demand_by_route_hour</strong>: the same by route and hour.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>demand_by_stop</strong>: the same by stop.</span>
+        </div>
+      </div>
+
+      <div class="flow-zone">
+        <h3>Zone 2: Service reliability</h3>
+        <p class="caption" style="margin-bottom:12px">The question: does the bus leave on time? Starts from RTA's running-time table and the fleet list.</p>
+        <div class="flow-step">
+          <span class="flow-step-kind">Python</span>
+          <span><strong>clean_running_time</strong>: one row per bus per stop. Turns clock text into seconds on the service-day clock, works out how late each departure was, and adds the bus type. The driver and the vehicle number are dropped here.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>punctuality_by_hour</strong>: share of departures 5 or more minutes late, average lateness, share leaving early and share of stops passed without opening the doors, by hour.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>punctuality_by_route_hour</strong>: the same by route and hour.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>punctuality_by_bus_type</strong>: the same by bus type.</span>
+        </div>
+      </div>
+
+      <div class="flow-zone">
+        <h3>Zone 3: Supply and capacity</h3>
+        <p class="caption" style="margin-bottom:12px">The question: were enough buses sent? Uses the results of Zones 1 and 2.</p>
+        <div class="flow-step">
+          <span class="flow-step-kind">Python</span>
+          <span><strong>buses_needed_rule</strong>: applies RTA's planning rule as its scheduling engineer described it: boardings in the hour, divided by what one bus carries, gives the buses needed. Output: supply_vs_demand_by_route_hour.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>supply_status_by_hour</strong>: how many routes were short, in balance or under-used, by hour.</span>
+        </div>
+      </div>
+
+      <div class="flow-zone">
+        <h3>Zone 4: Forecast</h3>
+        <p class="caption" style="margin-bottom:12px">The question: how long will each trip really take? Uses the running-time table, the fleet list and boardings from Zone 1.</p>
+        <div class="flow-step">
+          <span class="flow-step-kind">Python</span>
+          <span><strong>build_trip_table</strong>: one row per trip, holding only what was knowable 30 minutes before it was due to leave: planned running time, time of day, bus type, how the route ran in the two hours before, and boardings on the route in the last full hour. The vehicle number links a bus to its previous trip and is then dropped.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind">Python</span>
+          <span><strong>forecast_running_time</strong>: gradient-boosted trees (LightGBM). Learns from trips due before 16:00 and is tested on every trip from 16:00 on. Outputs: running_time_forecast, running_time_metrics, running_time_drivers.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind">Python</span>
+          <span><strong>running_time_bands</strong>: for each route, direction and hour: the planned running time, the middle trip, and the time that covers 85 trips in 100. The difference is the extra time that hour needs.</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-step-kind visual">Group</span>
+          <span><strong>running_time_ledger_by_hour</strong>: those extra minutes added up by hour of the day.</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── Presenter guide panel (fixed bottom, hidden by default) ─────── -->
+  <div id="presenter-panel" role="complementary" aria-label="Presenter notes">
+    <div class="pn-col" id="pn-say">
+      <span class="pn-label">SAY</span>
+      <span id="pn-say-text"></span>
+    </div>
+    <div class="pn-col" id="pn-point">
+      <span class="pn-label">POINT AT</span>
+      <span id="pn-point-text"></span>
+    </div>
+    <div class="pn-col" id="pn-next">
+      <span class="pn-label">THEN CLICK</span>
+      <span id="pn-next-text"></span>
+    </div>
+  </div>
 
 </div><!-- /#app -->
