@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Insiyab: Dubai's bus day, replayed</title>
+<meta name="description" content="One real service day of Dubai's buses, replayed in 3D: why the evening breaks, and a forecast that knows 30 minutes early.">
+<meta name="theme-color" content="#0E5A73">
+<style>
+:root{--sea:#0E5A73;--red:#E21F26;--gold:#C8A24A;--goldtext:#7E5F17;--sand:#F5EFE3;--card:#FFFCF6;--line:#E4D9C4;--ink:#1E1A16;--muted:#6F6350}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--sand);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:inherit;text-decoration:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--sea);color:#CFE1E6;font-size:13px;border-bottom:3px solid var(--gold)}
+nav .brand{color:#fff;font-weight:600;font-size:17px}
+nav .brand span{color:var(--gold)}
+nav .links{display:flex;gap:24px}
+nav .links a:hover,nav .links a:focus-visible{color:#fff}
+a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+#descent{position:relative;height:720vh}
+.sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cap{position:absolute;left:32px;top:50%;width:min(380px,calc(100% - 64px));background:rgba(255,252,246,.94);border:1px solid var(--line);border-radius:20px;padding:22px 24px;opacity:0;pointer-events:none;transform:translateY(calc(-50% + var(--d,0px)));will-change:opacity,transform}
+.cap .n{font-size:13px;color:var(--sea);font-weight:600;margin-bottom:10px}
+.cap h2{font-size:clamp(26px,3vw,38px);font-weight:700;letter-spacing:-.03em;line-height:1.08}
+.cap p{font-size:15px;color:var(--muted);margin-top:12px;line-height:1.55}
+.cap p b{color:var(--ink);font-weight:600}
+.cap.hero{left:0;right:0;top:15%;width:auto;background:none;border:none;text-align:center;transform:translateY(var(--d,0px))}
+.cap.hero .n{font-size:14px}
+.cap.hero h1{font-size:clamp(64px,11vw,150px);font-weight:700;letter-spacing:-.05em;line-height:.9}
+.cap.hero h1 span{color:var(--gold)}
+.cap.hero p{font-size:clamp(18px,2.4vw,28px);font-weight:600;color:var(--ink);margin-top:14px}
+.cap.hero p span{color:var(--muted)}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;margin-top:14px}
+.cm{background:#DFECEF;color:var(--sea)}.ci{background:#F1E7D0;color:var(--goldtext)}
+.r{color:var(--red)}.s{color:var(--sea)}
+.lbl{position:absolute;transform:translate(-50%,-100%);font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 11px;white-space:nowrap;pointer-events:none;opacity:0;line-height:1.3}
+.lbl b{font-weight:600}
+.hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px;white-space:nowrap}
+.note{position:absolute;bottom:12px;right:18px;font-size:11px;color:#8A7C66}
+.progress{position:absolute;left:0;bottom:0;height:3px;background:var(--sea);width:0}
+section{padding:140px 24px}
+.wrap{max-width:1080px;margin:0 auto}
+.ey{font-size:14px;color:var(--sea);font-weight:600;margin-bottom:14px}
+.big{font-size:clamp(40px,6vw,80px);font-weight:700;letter-spacing:-.04em;line-height:1.03}
+.big span{color:var(--muted)}
+.lede{font-size:clamp(18px,2vw,24px);color:var(--muted);font-weight:500;max-width:780px;margin-top:24px;line-height:1.45}
+.lede b{color:var(--ink);font-weight:600}
+.bars{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:64px;height:360px}
+.bar{display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.bar b{font-size:clamp(28px,3.4vw,44px);font-weight:700;letter-spacing:-.03em;margin-bottom:10px}
+.bar b small{font-size:16px;color:var(--muted);font-weight:500}
+.bar .fill{height:0;border-radius:14px 14px 4px 4px;background:#D8CBB2;transition:height 1.6s cubic-bezier(.2,.7,.2,1)}
+.bar span{font-size:14px;color:var(--muted);margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:48px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px}
+.card .k{font-size:12px;color:var(--sea);font-weight:600;margin-bottom:8px}
+.card h3{font-size:19px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+.card p{font-size:15px;color:var(--muted);margin-top:8px}
+.card ul{list-style:none;margin-top:14px}
+.card li{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:#4A4033;padding:7px 0;border-top:1px solid var(--line)}
+.ask{background:var(--sea);color:#fff;text-align:center}
+.ask .big{color:#fff}
+.ask .lede{color:#CFE1E6;margin-left:auto;margin-right:auto}
+.ask .lede b{color:#fff}
+footer{background:var(--ink);color:#B9AE9A;font-size:13px;padding:40px 24px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 1s ease,transform 1s ease}
+.reveal.in{opacity:1;transform:none}
+/* data sections: every chart is drawn from the DATA block in the script, which was read from the Dataiku flow */
+.alt{background:#FBF7EF}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:56px}
+.fig{border-top:1px solid var(--line);padding-top:16px}
+.fig b{display:block;font-size:clamp(34px,4.4vw,60px);font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.fig span{display:block;font-size:14px;color:var(--muted);margin-top:10px}
+.chart{margin-top:56px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.src{font-size:12px;color:#8A7C66;margin-top:12px}
+.key{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:14px}
+.key i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tscroll{overflow-x:auto;margin-top:48px}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:15px;font-variant-numeric:tabular-nums}
+th{font-size:12px;font-weight:600;color:var(--muted);text-align:right;padding:10px 12px;border-bottom:1px solid var(--ink)}
+td{text-align:right;padding:13px 12px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+td.add{color:var(--red);font-weight:700}
+td.rt{font-weight:700}
+@media(max-width:760px){
+nav .links{display:none}
+.cap{left:16px;right:16px;width:auto;top:auto;bottom:22px;transform:translateY(var(--d,0px))}
+.cap.hero{top:12%;bottom:auto}
+.cap p{font-size:14px}
+.hint{bottom:auto;top:64px}
+.bars{height:240px;gap:10px}
+section{padding:100px 20px}
+}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.bar .fill{transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="#top">Insiyab<span>.</span></a>
+  <div class="links">
+    <a href="#descent">The day</a>
+    <a href="#clock">Why</a>
+    <a href="#worklist">The worklist</a>
+    <a href="#forecast">Forecast</a>
+    <a href="#built">How it's built</a>
+  </div>
+</nav>
+
+<div id="descent">
+  <div class="sticky" id="top">
+    <canvas id="cv" aria-hidden="true"></canvas>
+    <div id="lbls"></div>
+
+    <div class="cap hero" data-c="0" data-w="0.07">
+      <p class="n">RTA Future Move Hackathon, with Dataiku</p>
+      <h1>Insiyab<span>.</span></h1>
+      <p>The evening breaks. <span>Ride down to see why.</span></p>
+    </div>
+    <div class="cap" data-c="0.19">
+      <p class="n">01 · The day</p>
+      <h2>1,071 buses. 11,201 trips.</h2>
+      <p>Monday 15 December 2025: <b>1,056,343</b> card taps on <b>166</b> city routes.</p>
+      <span class="chip cm">Measured on the real day</span>
+    </div>
+    <div class="cap" data-c="0.34">
+      <p class="n">02 · The gap</p>
+      <h2>16 in 100. Then <span class="r">47</span>.</h2>
+      <p>Departures leaving 5+ minutes late at <b>07:00</b> and at <b>19:00</b>. Each cube is 1 in 100; red is late.</p>
+      <span class="chip cm">Measured on the real day</span>
+    </div>
+    <div class="cap" data-c="0.5">
+      <p class="n">03 · The cause</p>
+      <h2>67 planned. <span class="r">96</span> taken.</h2>
+      <p>Route 310 at 18:00. The layover is <b>about 16 minutes at every hour</b>, so it can't absorb 29 extra minutes, and the next trip leaves <b class="r">13 minutes late</b>.</p>
+      <span class="chip ci">Illustration built from measured figures</span>
+    </div>
+    <div class="cap" data-c="0.65">
+      <p class="n">04 · The spread</p>
+      <h2>Lateness rides with the bus.</h2>
+      <p><b>870 of 936</b> late starts followed the same bus arriving late. Each cube is one late start. A second analysis, defined differently, finds 604 of 998.</p>
+      <span class="chip cm">Measured on the real day</span>
+    </div>
+    <div class="cap" data-c="0.79">
+      <p class="n">05 · The shortfall</p>
+      <h2><span class="r">118</span> routes short at 18:00.</h2>
+      <p>By RTA's own planning rule of thumb; <b class="s">2</b> had room. The rule counts every boarding against a seat, so it leans high. Positions on the ring are arbitrary.</p>
+      <span class="chip cm">Measured on the real day</span>
+    </div>
+    <div class="cap" data-c="0.93" data-w="0.09">
+      <p class="n">06 · The forecast</p>
+      <h2>15% closer than the timetable.</h2>
+      <p>Average miss over 2,043 evening trips, predicted 30 minutes ahead: <b>8.25</b>, 7.42, <b class="s">6.97</b> minutes.</p>
+      <span class="chip cm">Measured on the real day</span>
+    </div>
+
+    <div class="hint" id="hint">Scroll to ride down</div>
+    <span class="note">3D scene illustrative · figures measured</span>
+    <div class="progress" id="prog"></div>
+  </div>
+</div>
+
+<section id="clock">
+  <div class="wrap">
+    <p class="ey reveal">Why it is not the crowd</p>
+    <h2 class="big reveal">Same crowd.<br><span>Different clock.</span></h2>
+    <p class="lede reveal">The two peaks carry almost the same number of passengers. The morning copes. The evening does not. So the cause is not demand: it is how long the trips take against what the timetable allows.</p>
+    <div class="pair reveal">
+      <div class="fig"><b id="f-b8"></b><span>boardings in the 08:00 hour</span></div>
+      <div class="fig"><b id="f-l8"></b><span>of departures 5+ minutes late at 08:00</span></div>
+      <div class="fig"><b id="f-b18"></b><span>boardings in the 18:00 hour</span></div>
+      <div class="fig"><b id="f-l18" class="r"></b><span>of departures 5+ minutes late at 18:00</span></div>
+    </div>
+    <div class="chart reveal" id="ch-clock" role="img" aria-label="Boardings by hour as bars, with the share of departures five or more minutes late as a line. Two boarding peaks of similar height; the late share is far higher in the evening."></div>
+    <div class="key reveal"><span><i style="background:#D8CBB2"></i>Boardings in the hour</span><span><i style="background:var(--red)"></i>Departures 5+ minutes late, per cent</span></div>
+    <p class="src reveal">Read from the Dataiku flow: demand_by_hour and punctuality_by_hour. Hours with fewer than 500 departures are left off the line. Times after midnight belong to the same service day.</p>
+    <span class="chip cm reveal">Measured on the real day</span>
+  </div>
+</section>
+
+<section class="alt" id="short">
+  <div class="wrap">
+    <p class="ey reveal">Where the timetable is short</p>
+    <h2 class="big reveal"><span id="f-eve" class="r"></span> bus hours.<br><span>Three hours of the day.</span></h2>
+    <p class="lede reveal">For each route, direction and hour: the running time RTA planned, against the time that would cover 85 trips in 100. The difference, added up, is the running time the timetable does not hold. Across the whole day it is <b id="f-day"></b> bus hours.</p>
+    <div class="chart reveal" id="ch-ledger" role="img" aria-label="Extra bus hours needed by hour of the day. The three evening hours from 16:00 stand far above the rest."></div>
+    <p class="src reveal">Read from the Dataiku flow: running_time_ledger_by_hour. A second analysis by a teammate, with other code, finds 569 bus hours for the day.</p>
+    <span class="chip cm reveal">Measured on the real day</span>
+  </div>
+</section>
+
+<section id="worklist">
+  <div class="wrap">
+    <p class="ey reveal">What a planner gets</p>
+    <h2 class="big reveal">A list.<br><span>Not a dashboard.</span></h2>
+    <p class="lede reveal">The routes and hours where the plan falls furthest short, and the minutes each one needs. The planner accepts or sets aside each row. <b>Nothing applies itself.</b></p>
+    <div class="tscroll reveal"><table id="tb-work" aria-label="The eight route and hour rows needing the most extra running time"></table></div>
+    <p class="src reveal">Read from the Dataiku flow: running_time_bands, rows with 5 or more trips, ranked by extra minutes times trips. In the Dataiku web app this is the "Planner's worklist" tab, with Accept and Set aside on each row.</p>
+    <span class="chip cm reveal">Measured on the real day</span>
+  </div>
+</section>
+
+<section id="forecast" class="alt">
+  <div class="wrap">
+    <p class="ey reveal">The forecast</p>
+    <h2 class="big reveal">Know the evening<br><span>30 minutes early.</span></h2>
+    <p class="lede reveal">Gradient-boosted trees, trained on the trips before 16:00 and tested on an evening they had never seen. Average miss in minutes; lower is better.</p>
+    <div class="bars reveal">
+      <div class="bar"><b>8.25<small> min</small></b><div class="fill" data-h="100"></div><span>RTA's timetable</span></div>
+      <div class="bar"><b>7.42<small> min</small></b><div class="fill" data-h="89.9" style="background:var(--gold)"></div><span>Best simple rule: this route earlier that day</span></div>
+      <div class="bar"><b class="s">6.97<small> min</small></b><div class="fill" data-h="84.5" style="background:var(--sea)"></div><span>The model: 15% better, range 12% to 19%</span></div>
+    </div>
+    <div class="tscroll reveal"><table id="tb-acc" aria-label="Three accuracy measures for three methods on 2,043 evening trips"></table></div>
+    <p class="src reveal">Read from the Dataiku flow: running_time_metrics, trips due from 16:00 to 18:59. MAE is the average miss; RMSE weights large misses more; MAPE is the miss as a share of the trip.</p>
+    <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:120px">Where it helps, hour by hour.</h3>
+    <div class="chart reveal" id="ch-miss" role="img" aria-label="Average miss by hour from 16:00 for the timetable and the model. The model is closer in the evening peak and no better late at night."></div>
+    <div class="key reveal"><span><i style="background:#D8CBB2"></i>RTA's timetable</span><span><i style="background:var(--sea)"></i>The model</span></div>
+    <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:120px">What it does not do.</h3>
+    <div class="grid reveal">
+      <div class="card"><h3>Only 6% past the simple rule.</h3><p>Most of the gain comes from knowing how the route ran earlier that day.</p></div>
+      <div class="card"><h3>Live signals add nothing at 30 minutes.</h3><p>A bus's previous trip has not finished when the forecast is made.</p></div>
+      <div class="card"><h3>After 21:00, the timetable wins.</h3><p>It is an evening-peak tool, and we say so.</p></div>
+      <div class="card"><h3>One day of data.</h3><p>Every number comes from Monday 15 December 2025.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="fleet">
+  <div class="wrap">
+    <p class="ey reveal">One more thing the day shows</p>
+    <h2 class="big reveal">The double-deckers<br><span>run closest to time.</span></h2>
+    <p class="lede reveal">Share of departures 5+ minutes late, by type of bus. <b>This is an association, not a cause:</b> the routes each type runs are not the same, and that is not controlled for here.</p>
+    <div class="chart reveal" id="ch-type" role="img" aria-label="Share of departures five or more minutes late by bus type."></div>
+    <p class="src reveal">Read from the Dataiku flow: punctuality_by_bus_type, types with 2,000 or more departures.</p>
+    <span class="chip cm reveal">Measured on the real day</span>
+  </div>
+</section>
+
+<section id="built" class="alt">
+  <div class="wrap">
+    <p class="ey reveal">How it's built</p>
+    <h2 class="big reveal">Inside Dataiku.<br><span>Where RTA can run it.</span></h2>
+    <p class="lede reveal">Fourteen steps in four zones: eight visual Group recipes and six short Python recipes. One rebuild from RTA's raw tables takes <b>131 seconds</b>. The web app's tabs carry the same names as the zones.</p>
+    <div class="grid reveal">
+      <div class="card"><p class="k">Zone 1</p><h3>Passenger demand</h3><p>Who boards, where, and when.</p><ul><li>count_taps</li><li>demand_by_hour</li><li>demand_by_route_hour</li><li>demand_by_stop</li></ul></div>
+      <div class="card"><p class="k">Zone 2</p><h3>Service reliability</h3><p>Does the bus leave on time?</p><ul><li>clean_running_time</li><li>punctuality_by_hour</li><li>punctuality_by_route_hour</li><li>punctuality_by_bus_type</li></ul></div>
+      <div class="card"><p class="k">Zone 3</p><h3>Supply and capacity</h3><p>Were enough buses sent?</p><ul><li>buses_needed_rule</li><li>supply_status_by_hour</li></ul></div>
+      <div class="card"><p class="k">Zone 4</p><h3>Forecast</h3><p>How long will each trip take?</p><ul><li>build_trip_table</li><li>forecast_running_time</li><li>running_time_bands</li><li>running_time_ledger_by_hour</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="ey reveal">Who uses it</p>
+    <h2 class="big reveal">A planner.<br><span>Every timetable change.</span></h2>
+    <p class="lede reveal">RTA changes timetables every one to two months and routes four times a year. Each night adds a day of records. Before each change, a planner opens the worklist, sees where the evening runs long, and decides how much time to give it. <b>Boardings, never people "waiting".</b> Nothing about one card, one driver or one vehicle is shown.</p>
+  </div>
+</section>
+
+<section class="ask">
+  <div class="wrap">
+    <h2 class="big reveal">Give the evening<br>its time.</h2>
+    <p class="lede reveal">About <b>244 bus hours</b> of extra running time from 16:00 to 18:59 would cover 85 trips in 100. About 630 across the whole day.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Insiyab · RTA Future Move Hackathon, with Dataiku</span>
+    <span>Data: one service day, 15 December 2025, provided by RTA. Illustrations are labelled.</span>
+  </div>
+</footer>
+
+<script>
+/* DATA: read from the Dataiku flow (project INSIYAB) through its web app on 17 November 2026. Nothing below is typed from memory.
+   late: [hour, per cent of departures 5+ min late, departures]; board: [hour, boardings]; ledger: [hour, extra bus hours at the 85th percentile];
+   work: [route, hour, trips, planned min, middle trip min, 85th percentile min, minutes to add]; type: [bus type, per cent late, departures];
+   acc: [method, MAE, RMSE, MAPE per cent] for 2,043 trips due 16:00 to 18:59; miss: [hour, timetable miss, model miss] in minutes. */
+const DATA={
+late:[[4,7.1,1175],[5,8.3,4786],[6,12.4,11851],[7,16.3,14970],[8,18.7,16023],[9,17.9,16112],[10,16.6,14787],[11,20.4,13281],[12,19.1,12528],[13,18.3,12264],[14,19.8,12288],[15,22,12984],[16,25.1,14248],[17,34.4,14877],[18,45.1,14959],[19,46.6,15475],[20,38.2,15400],[21,28.5,14345],[22,22.3,12262],[23,11.2,8501],[24,13.8,3894],[25,22.9,916]],
+board:[[4,1845],[5,9875],[6,29223],[7,45131],[8,48724],[9,34524],[10,23149],[11,20644],[12,19361],[13,19881],[14,19916],[15,22178],[16,29958],[17,42151],[18,49707],[19,40056],[20,30442],[21,23715],[22,18005],[23,9696],[24,4064],[25,1159]],
+ledger:[[5,4.3],[6,48.6],[7,40.4],[8,36.8],[9,27.5],[10,20.8],[11,12.1],[12,12.1],[13,18.8],[14,21.4],[15,30.9],[16,76.8],[17,92.4],[18,74.8],[19,45.2],[20,29.1],[21,20.7],[22,9.1],[23,3.9],[24,1.9],[25,1.5],[26,0.8]],
+work:[["310",18,10,67.3,96.4,104.4,37.2],["F07",6,5,72,134.2,137.5,65.5],["320",17,5,87.5,142.8,152,64.5],["320",18,6,92,129.3,136.3,44.3],["320",16,5,78,101.3,120.4,42.4],["F19A",17,6,54.8,74.8,80.5,25.8],["X22",19,5,87,109.5,117.2,30.2],["310",16,7,70.5,68.8,92,21.5]],
+type:[["Double-decker",13.2,13096],["Standard",24.5,202976],["Articulated",25,18378],["Midi",27.5,18243],["Coach",29.4,4599]],
+acc:[["RTA's timetable",8.25,12.57,10.5],["Best simple rule",7.42,11.62,9.3],["The model",6.97,10.76,9.0]]
+};
+(function(){
+const NS='http://www.w3.org/2000/svg',RED='#E21F26',SEA='#0E5A73',SANDG='#D8CBB2',MUTED='#6F6350',LINE='#E4D9C4',INK='#1E1A16';
+const el=(n,a,t)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e};
+const fmt=n=>Math.round(n).toLocaleString('en-GB');
+const hh=h=>String(h%24).padStart(2,'0')+':00';
+const set=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};
+const at=(rows,h)=>rows.find(r=>r[0]===h);
+
+// headline figures, computed from DATA
+set('f-b8',fmt(at(DATA.board,8)[1]));set('f-b18',fmt(at(DATA.board,18)[1]));
+set('f-l8',at(DATA.late,8)[1].toFixed(0)+'%');set('f-l18',at(DATA.late,18)[1].toFixed(0)+'%');
+const eve=DATA.ledger.filter(r=>r[0]>=16&&r[0]<=18).reduce((s,r)=>s+r[1],0),day=DATA.ledger.reduce((s,r)=>s+r[1],0);
+set('f-eve',fmt(eve));set('f-day',fmt(day));
+
+function frame(id,W,H){const host=document.getElementById(id);const svg=el('svg',{viewBox:'0 0 '+W+' '+H,preserveAspectRatio:'xMidYMid meet'});host.appendChild(svg);return svg}
+const txt=(svg,x,y,s,o)=>svg.appendChild(el('text',Object.assign({x,y,'font-size':13,fill:MUTED,'font-family':'inherit'},o||{}),s));
+
+// 1. same crowd, different clock: boardings as bars, late share as a line
+(function(){const W=1080,H=380,L=56,Rr=56,T=20,B=40,svg=frame('ch-clock',W,H);
+ const hrs=DATA.board.map(r=>r[0]),iw=(W-L-Rr)/hrs.length,ih=H-T-B,mb=50000,ml=50;
+ [0,25000,50000].forEach(v=>{const y=T+ih-(v/mb)*ih;svg.appendChild(el('line',{x1:L,x2:W-Rr,y1:y,y2:y,stroke:LINE}));txt(svg,L-8,y+4,fmt(v),{'text-anchor':'end'});txt(svg,W-Rr+8,y+4,(v/mb*ml).toFixed(0)+'%',{fill:RED})});
+ DATA.board.forEach((r,i)=>{const h=(r[1]/mb)*ih;svg.appendChild(el('rect',{x:L+i*iw+3,y:T+ih-h,width:iw-6,height:h,rx:4,fill:(r[0]===8||r[0]===18)?'#BFAE8E':SANDG}));if(r[0]%3===0)txt(svg,L+i*iw+iw/2,H-14,hh(r[0]),{'text-anchor':'middle'})});
+ const pts=DATA.late.filter(r=>hrs.includes(r[0])).map(r=>[L+hrs.indexOf(r[0])*iw+iw/2,T+ih-(r[1]/ml)*ih,r]);
+ svg.appendChild(el('polyline',{points:pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '),fill:'none',stroke:RED,'stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round'}));
+ pts.forEach(p=>{if(p[2][0]===8||p[2][0]===18||p[2][0]===19){svg.appendChild(el('circle',{cx:p[0],cy:p[1],r:6,fill:RED,stroke:'#FFFCF6','stroke-width':2}));txt(svg,p[0],p[1]-14,p[2][1].toFixed(0)+'%',{'text-anchor':'middle',fill:RED,'font-weight':700,'font-size':16})}});
+})();
+
+// 2. extra bus hours by hour
+(function(){const W=1080,H=340,L=56,Rr=16,T=28,B=40,svg=frame('ch-ledger',W,H);const iw=(W-L-Rr)/DATA.ledger.length,ih=H-T-B,m=100;
+ [0,50,100].forEach(v=>{const y=T+ih-(v/m)*ih;svg.appendChild(el('line',{x1:L,x2:W-Rr,y1:y,y2:y,stroke:LINE}));txt(svg,L-8,y+4,String(v),{'text-anchor':'end'})});
+ txt(svg,L,14,'bus hours');
+ DATA.ledger.forEach((r,i)=>{const h=(r[1]/m)*ih,hot=r[0]>=16&&r[0]<=18;svg.appendChild(el('rect',{x:L+i*iw+3,y:T+ih-h,width:iw-6,height:h,rx:4,fill:hot?RED:SANDG}));if(hot)txt(svg,L+i*iw+iw/2,T+ih-h-8,r[1].toFixed(0),{'text-anchor':'middle',fill:RED,'font-weight':700,'font-size':15});if(r[0]%3===0||hot)txt(svg,L+i*iw+iw/2,H-14,hh(r[0]),{'text-anchor':'middle'})});
+})();
+
+// 3. the worklist
+(function(){const t=document.getElementById('tb-work');
+ t.innerHTML='<thead><tr><th>Route</th><th>Hour</th><th>Trips</th><th>Planned, min</th><th>Middle trip, min</th><th>Covers 85 in 100, min</th><th>Add, min</th></tr></thead><tbody>'+
+ DATA.work.map(r=>'<tr><td class="rt">'+r[0]+'</td><td>'+hh(r[1])+'</td><td>'+r[2]+'</td><td>'+r[3].toFixed(1)+'</td><td>'+r[4].toFixed(1)+'</td><td>'+r[5].toFixed(1)+'</td><td class="add">+'+r[6].toFixed(1)+'</td></tr>').join('')+'</tbody>'})();
+
+// 4. accuracy table
+(function(){const t=document.getElementById('tb-acc');
+ t.innerHTML='<thead><tr><th>Method, 2,043 evening trips</th><th>MAE, min</th><th>RMSE, min</th><th>MAPE</th><th>Against the timetable</th></tr></thead><tbody>'+
+ DATA.acc.map((r,i)=>'<tr><td class="rt">'+r[0]+'</td><td>'+r[1].toFixed(2)+'</td><td>'+r[2].toFixed(2)+'</td><td>'+r[3].toFixed(1)+'%</td><td>'+(i?Math.round((1-r[1]/DATA.acc[0][1])*100)+'% closer':'the yardstick')+'</td></tr>').join('')+'</tbody>'})();
+
+// 5. bus types
+(function(){const W=1080,rowH=52,L=170,Rr=90,H=DATA.type.length*rowH+10,svg=frame('ch-type',W,H),m=35;
+ DATA.type.forEach((r,i)=>{const y=i*rowH+8,w=(r[1]/m)*(W-L-Rr),best=i===0;txt(svg,L-14,y+25,r[0],{'text-anchor':'end','font-size':16,fill:INK,'font-weight':best?700:500});
+  svg.appendChild(el('rect',{x:L,y:y+4,width:w,height:32,rx:6,fill:best?SEA:SANDG}));txt(svg,L+w+12,y+26,r[1].toFixed(1)+'%',{'font-size':17,fill:best?SEA:INK,'font-weight':700});txt(svg,W-4,y+26,fmt(r[2])+' departures',{'text-anchor':'end','font-size':12})})})();
+
+// 6. miss by hour: drawn only if the figures were captured (kept honest: no hour is invented)
+(function(){const host=document.getElementById('ch-miss');const M=DATA.miss;if(!M||!M.length){host.parentNode.querySelectorAll('#ch-miss, #ch-miss + .key').forEach(n=>n.remove());const h=[...document.querySelectorAll('#forecast h3')].find(x=>/hour by hour/.test(x.textContent));if(h)h.remove();return}
+ const W=1080,H=320,L=56,Rr=16,T=20,B=40,svg=frame('ch-miss',W,H),iw=(W-L-Rr)/M.length,ih=H-T-B,m=10;
+ [0,5,10].forEach(v=>{const y=T+ih-(v/m)*ih;svg.appendChild(el('line',{x1:L,x2:W-Rr,y1:y,y2:y,stroke:LINE}));txt(svg,L-8,y+4,v+' min',{'text-anchor':'end'})});
+ M.forEach((r,i)=>{const bw=(iw-10)/2;[[r[1],SANDG],[r[2],SEA]].forEach((p,k)=>{const h=(p[0]/m)*ih;svg.appendChild(el('rect',{x:L+i*iw+4+k*bw,y:T+ih-h,width:bw-2,height:h,rx:3,fill:p[1]}))});txt(svg,L+i*iw+iw/2,H-14,hh(r[0]),{'text-anchor':'middle'})})})();
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+if(!window.THREE){document.getElementById('hint').textContent='The 3D scene could not load. The story continues below.';document.querySelectorAll('.cap').forEach(c=>{c.style.position='static';c.style.opacity='1';c.style.transform='none';c.style.margin='16px auto'});document.getElementById('descent').style.height='auto';document.querySelector('.sticky').style.cssText='position:static;height:auto;overflow:visible;padding:80px 16px';document.getElementById('cv').style.display='none';return}
+const PAL={red:0xE21F26,sea:0x0E5A73,gold:0xC8A24A,ink:0x1E1A16,sandGrey:0xD8CBB2,soft:0xE6DAC2,ghost:0x8DB3C0,sand:0xF5EFE3};
+const RED=PAL.red,SEA=PAL.sea,GOLD=PAL.gold,INK=PAL.ink,SANDG=PAL.sandGrey,SOFT=PAL.soft,GHOST=PAL.ghost;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const Lam=c=>new THREE.MeshLambertMaterial({color:c});
+let seed=5;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+
+const descent=document.getElementById('descent'),stage=document.querySelector('.sticky');
+const R3=new THREE.WebGLRenderer({canvas:document.getElementById('cv'),antialias:true,alpha:true});
+R3.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+const S=new THREE.Scene();S.fog=new THREE.Fog(PAL.sand,14,40);
+S.add(new THREE.HemisphereLight(0xfffaf0,0xd9ccb3,0.8));
+const dl=new THREE.DirectionalLight(0xfff4e0,0.5);dl.position.set(6,14,8);S.add(dl);
+const cam=new THREE.PerspectiveCamera(38,1.6,0.1,200);
+new ResizeObserver(()=>{const w=stage.clientWidth,h=stage.clientHeight;R3.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}).observe(stage);
+
+// helix road
+const TURNS=5.5,DROP=25,R=6;
+const Hx=(s,r)=>{r=r||R;const th=s*TURNS*Math.PI*2;return new THREE.Vector3(r*Math.cos(th),-s*DROP,r*Math.sin(th))};
+const dm=new THREE.Object3D();const NS=440;
+const segM=new THREE.InstancedMesh(new THREE.BoxGeometry(1.5,0.06,1),Lam(0xCFC4B1),NS);
+const edgeM=new THREE.InstancedMesh(new THREE.BoxGeometry(0.08,0.16,1),Lam(GOLD),NS);
+const curbM=new THREE.InstancedMesh(new THREE.BoxGeometry(0.06,0.1,1),Lam(0xBFB29A),NS);
+const dashM=new THREE.InstancedMesh(new THREE.BoxGeometry(0.05,0.07,1),Lam(0xFFFCF6),NS);
+function seg(M,i,r,dy,sl){const a=Hx(i/NS,r),b=Hx((i+1)/NS,r);dm.position.copy(a).add(b).multiplyScalar(0.5);dm.position.y+=dy;dm.scale.set(1,1,1);dm.lookAt(b.x,b.y+dy,b.z);dm.scale.set(1,1,a.distanceTo(b)*sl);dm.updateMatrix();M.setMatrixAt(i,dm.matrix)}
+for(let i=0;i<NS;i++){seg(segM,i,R,0,1.03);seg(edgeM,i,R+0.76,0.08,1.03);seg(curbM,i,R-0.76,0.05,1.03);seg(dashM,i,R,0.005,0.45)}
+[segM,edgeM,curbM,dashM].forEach(m=>S.add(m));
+for(let i=0;i<14;i++){const a=i/14*Math.PI*2;const c=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,DROP+1.5,8),Lam(0xE2D6BF));c.position.set((R+1.05)*Math.cos(a),-DROP/2,(R+1.05)*Math.sin(a));S.add(c)}
+
+// city on top
+const gr=new THREE.Mesh(new THREE.RingGeometry(7.6,42,96),Lam(0xEFE6D3));gr.rotation.x=-Math.PI/2;gr.position.y=0.25;S.add(gr);
+const rim=new THREE.Mesh(new THREE.RingGeometry(7.45,7.6,96),Lam(GOLD));rim.rotation.x=-Math.PI/2;rim.position.y=0.26;S.add(rim);
+for(let i=0;i<80;i++){const a=rnd()*Math.PI*2,r=9+rnd()*16;const w=0.6+rnd()*0.9,h=0.4+rnd()*(r<14?3.2:1.6);const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,0.6+rnd()*0.9),Lam([0xFBF7EF,0xF1E8D6,0xE6DAC2][i%3]));m.position.set(r*Math.cos(a),0.25+h/2,r*Math.sin(a));S.add(m);if(h>2.2){const t=new THREE.Mesh(new THREE.BoxGeometry(w*0.5,0.18,0.3),Lam(SEA));t.position.set(r*Math.cos(a),0.25+h+0.09,r*Math.sin(a));S.add(t)}}
+function palm(x,y,z){const t=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.06,0.9,6),Lam(0xA9875A));t.position.set(x,y+0.45,z);S.add(t);for(let i=0;i<5;i++){const l=new THREE.Mesh(new THREE.ConeGeometry(0.08,0.55,4),Lam(0x6E8F4A));l.position.set(x,y+0.92,z);l.rotation.set(1.1,i*1.256,0);S.add(l)}}
+for(let i=0;i<14;i++){const a=i/14*Math.PI*2+0.1;palm(8.3*Math.cos(a),0.25,8.3*Math.sin(a))}
+const floor=new THREE.Mesh(new THREE.CircleGeometry(7.4,64),Lam(0xEFE6D3));floor.rotation.x=-Math.PI/2;floor.position.y=-DROP-0.05;S.add(floor);
+
+// buses
+const wg=new THREE.CylinderGeometry(0.075,0.075,0.05,14);wg.rotateX(Math.PI/2);
+function makeBus(){const g=new THREE.Group();const add=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),Lam(c));m.position.set(x,y,z);g.add(m)};
+add(1.2,0.34,0.36,0xFFFCF6,0,0.27,0);add(1.21,0.09,0.365,SEA,0,0.15,0);add(1.212,0.018,0.367,GOLD,0,0.205,0);
+add(1.0,0.13,0.372,0x22323A,-0.05,0.335,0);add(0.02,0.17,0.31,0x22323A,0.6,0.33,0);add(1.08,0.05,0.3,0xE6DAC2,0,0.465,0);
+add(0.02,0.05,0.22,0xF2B33D,0.606,0.42,0);add(0.02,0.04,0.06,0xFFF3C4,0.606,0.16,0.12);add(0.02,0.04,0.06,0xFFF3C4,0.606,0.16,-0.12);
+add(0.02,0.04,0.06,RED,-0.606,0.17,0.12);add(0.02,0.04,0.06,RED,-0.606,0.17,-0.12);
+const wh=[];[[0.38,0.17],[0.38,-0.17],[-0.38,0.17],[-0.38,-0.17]].forEach(([x,z])=>{const w=new THREE.Mesh(wg,Lam(INK));w.position.set(x,0.075,z);g.add(w);wh.push(w)});
+g.rotation.y=-Math.PI/2;const o=new THREE.Group();o.add(g);o.userData.wh=wh;return o}
+function onRoad(b,s,lane){const p=Hx(s,R+lane),q=Hx(Math.min(1,s+0.002),R+lane);if(s>=0.998){q.copy(p).add(Hx(s,R+lane).sub(Hx(s-0.002,R+lane)))}b.position.copy(p);b.position.y+=0.03;b.lookAt(q.x,q.y+0.03,q.z)}
+const hb=makeBus();S.add(hb);
+const others=[];for(let i=0;i<6;i++){const b=makeBus();b.userData.s=0.08+i*0.16;b.userData.lane=i%2?0.35:-0.35;S.add(b);others.push(b)}
+
+// exhibits, one per stop
+const C=[0.19,0.34,0.5,0.65,0.79,0.93];
+const ex=C.map(c=>{const g=new THREE.Group();g.position.y=-c*DROP;g.scale.setScalar(0.001);g.visible=false;S.add(g);return{g,c,s:0}});
+ex.forEach(e=>{const d=new THREE.Mesh(new THREE.CylinderGeometry(3.6,3.6,0.08,64),Lam(0xFBF7EF));d.position.y=0.04;e.g.add(d);const r=new THREE.Mesh(new THREE.TorusGeometry(3.6,0.03,6,96),Lam(GOLD));r.rotation.x=Math.PI/2;r.position.y=0.08;e.g.add(r)});
+// 01 giant bus
+const big=makeBus();big.scale.setScalar(2.6);big.position.y=0.08;ex[0].g.add(big);
+// 02 towers: 16 and 47 of 100 late
+const cg=new THREE.BoxGeometry(0.2,0.2,0.2);const mL=Lam(RED),mB=Lam(SANDG);
+[[16,-1.3],[47,1.3]].forEach(([late,x0])=>{for(let i=0;i<100;i++){const layer=Math.floor(i/25),r=i%25;const m=new THREE.Mesh(cg,i>=100-late?mL:mB);m.position.set(x0+((r%5)-2)*0.24,0.2+layer*0.24,(Math.floor(r/5)-2)*0.24);ex[1].g.add(m)}});
+// 03 time-space: planned 67 + layover 16 vs actual 96
+const K=0.024,HT=1.5;const ug=new THREE.BoxGeometry(1,0.08,0.08);
+function ramp(t0,y0,t1,y1,z,c,th,op){const m=new THREE.Mesh(ug,new THREE.MeshLambertMaterial({color:c,transparent:!!op,opacity:op||1}));const x0=(t0-106)*K,x1=(t1-106)*K,L=Math.hypot(x1-x0,y1-y0);m.position.set((x0+x1)/2,0.15+(y0+y1)/2,z);m.rotation.z=Math.atan2(y1-y0,x1-x0);m.scale.set(L,th||1,th||1);ex[2].g.add(m)}
+const A=67;
+ramp(0,0,A,HT,-0.5,GHOST);ramp(A,HT,A+16,HT,-0.5,SEA,2.4,0.6);ramp(A+16,HT,2*A+16,0,-0.5,GHOST);
+ramp(0,0,96,HT,0.5,RED);ramp(A+16,HT+0.22,96,HT+0.22,0.5,RED,2.4);ramp(96,HT,192,0,0.5,RED);
+[-0.5,0.5].forEach(z=>[0,HT].forEach(y=>ramp(-4,y,214,y,z,SOFT,0.4)));
+// 04 field: 870 of 936
+const gm=new THREE.InstancedMesh(new THREE.BoxGeometry(0.09,0.09,0.09),Lam(0xffffff),936);
+const cR=new THREE.Color(RED),cG=new THREE.Color(SANDG);
+for(let i=0;i<936;i++){const c=i%36,r=Math.floor(i/36);dm.position.set((c-17.5)*0.12,0.13,(r-12.5)*0.12);dm.rotation.set(0,0,0);dm.scale.set(1,1,1);dm.updateMatrix();gm.setMatrixAt(i,dm.matrix);gm.setColorAt(i,i<870?cR:cG)}
+ex[3].g.add(gm);
+// 05 ring: 166 routes, 118 short, 2 with room (order arbitrary)
+const N=166,ord=[...Array(N).keys()];for(let i=N-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[ord[i],ord[j]]=[ord[j],ord[i]]}
+const sh=new Set(ord.slice(0,118)),rm=new Set(ord.slice(118,120));
+const pg=new THREE.BoxGeometry(0.1,1,0.1);pg.translate(0,0.5,0);
+const pm=new THREE.InstancedMesh(pg,Lam(0xffffff),N);
+for(let i=0;i<N;i++){const a=i/N*Math.PI*2;dm.position.set(3.1*Math.cos(a),0.08,3.1*Math.sin(a));dm.rotation.set(0,-a,0);dm.scale.set(1,sh.has(i)?1.6:1.1,1);dm.updateMatrix();pm.setMatrixAt(i,dm.matrix);pm.setColorAt(i,new THREE.Color(sh.has(i)?RED:rm.has(i)?SEA:SOFT))}
+ex[4].g.add(pm);
+// 06 forecast bars
+const bg=new THREE.BoxGeometry(0.9,1,0.9);bg.translate(0,0.5,0);
+[[8.25,SANDG,-1.5],[7.42,GOLD,0],[6.97,SEA,1.5]].forEach(([v,c,x])=>{const m=new THREE.Mesh(bg,Lam(c));m.position.set(x,0.08,0);m.scale.y=v*0.3;ex[5].g.add(m)});
+
+// labels projected from 3D
+const LB=document.getElementById('lbls');const labels=[];
+function L(t,e,x,y,z){const d=document.createElement('div');d.className='lbl';d.innerHTML=t;LB.appendChild(d);labels.push({d,e,v:new THREE.Vector3(x,y,z)})}
+L('One of 1,071 buses',0,0,1.75,0);
+L('<b>16%</b> · 07:00',1,-1.3,1.45,0);L('<b class="r">47%</b> · 19:00',1,1.3,1.45,0);
+L('<span class="s">Timetable: 67 min</span>',2,(30-106)*K,1.2,-0.5);L('<span class="r">Took 96 min</span>',2,(48-106)*K,0.55,0.5);L('<b class="r">13 min late</b>',2,(89-106)*K,HT+0.75,0.5);
+L('<b>870 of 936</b> late starts',3,0,0.6,-1.7);
+L('<b class="r">118 short</b> · <span class="s">2 with room</span>',4,0,2.1,0);
+L('8.25 min · timetable',5,-1.5,8.25*0.3+0.45,0);L('7.42 · simple rule',5,0,7.42*0.3+0.45,0);L('<b class="s">6.97 · the model</b>',5,1.5,6.97*0.3+0.45,0);
+
+// scroll drives the descent
+const caps=[...document.querySelectorAll('.cap')],hint=document.getElementById('hint'),prog=document.getElementById('prog');
+const cl=v=>Math.min(1,Math.max(0,v));
+const sm=(a,b,x)=>{const t=cl((x-a)/(b-a));return t*t*(3-2*t)};
+let p=0,ps=0,on=true;
+function readScroll(){const r=descent.getBoundingClientRect();p=cl(-r.top/(r.height-innerHeight))}
+addEventListener('scroll',readScroll,{passive:true});readScroll();
+new IntersectionObserver(e=>{on=e[0].isIntersecting}).observe(descent);
+
+const look=new THREE.Vector3(0,-5,0),fol=new THREE.Vector3(),fl=new THREE.Vector3(),hp=new THREE.Vector3(0,16,15),hl=new THREE.Vector3(0,-6,0),tp=new THREE.Vector3(),tl=new THREE.Vector3(),pv=new THREE.Vector3();
+cam.position.copy(hp);
+const clock=new THREE.Clock();let T=0;
+(function loop(){const dt=Math.min(clock.getDelta(),0.05);T+=dt;
+ if(on){
+  ps+=(p-ps)*Math.min(1,dt*(reduce?20:5));
+  prog.style.width=(ps*100).toFixed(2)+'%';
+  hint.style.opacity=String(1-sm(0.01,0.05,ps));
+  const hs=Math.max(0.0005,ps*0.985+0.003);onRoad(hb,hs,-0.35);
+  others.forEach(b=>{const u=b.userData;if(!reduce)u.s=(u.s+dt*0.006)%0.995;onRoad(b,u.s+0.003,u.lane)});
+  [hb,...others].forEach(b=>b.userData.wh.forEach(w=>{w.rotation.z-=dt*6}));
+  ex.forEach(e=>{const t=Math.abs(ps-e.c)<0.1?1:0;e.s+=(t-e.s)*Math.min(1,dt*4);e.g.visible=e.s>0.02;e.g.scale.setScalar(Math.max(0.001,e.s));e.g.rotation.y=reduce?0:T*0.12});
+  const th=hs*TURNS*Math.PI*2,by=-hs*DROP,ang=th+0.55,cr=12.5+sm(0.88,1,ps)*2;
+  fol.set(cr*Math.cos(ang),by+2.9,cr*Math.sin(ang));fl.set(0,by+0.7,0).lerp(hb.position,0.28);
+  const k=sm(0,0.13,ps);tp.lerpVectors(hp,fol,k);tl.lerpVectors(hl,fl,k);
+  cam.position.lerp(tp,Math.min(1,dt*5));look.lerp(tl,Math.min(1,dt*5));cam.lookAt(look);
+  caps.forEach(c=>{const cc=+c.dataset.c,w=+(c.dataset.w||0.065);c.style.opacity=cl(1-Math.abs(ps-cc)/w).toFixed(3);c.style.setProperty('--d',(reduce?0:(ps-cc)*-300).toFixed(1)+'px')});
+  R3.render(S,cam);
+  const W=stage.clientWidth,H=stage.clientHeight;
+  labels.forEach(o=>{const e=ex[o.e];if(e.s<0.75){o.d.style.opacity=0;return}pv.copy(o.v);e.g.localToWorld(pv);pv.project(cam);if(pv.z>1){o.d.style.opacity=0;return}o.d.style.left=((pv.x*0.5+0.5)*W)+'px';o.d.style.top=((-pv.y*0.5+0.5)*H)+'px';o.d.style.opacity=String(cl((e.s-0.75)*4))});
+ }
+ requestAnimationFrame(loop)})();
+})();
+</script>
+<script>
+// reveals and bars below the descent (kept apart from the 3D so the page still reads if the 3D cannot load)
+(function(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');e.target.querySelectorAll('.fill').forEach(f=>{f.style.height=f.dataset.h+'%'});io.unobserve(e.target)}),{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el))})();
+</script>
+</body>
+</html>
