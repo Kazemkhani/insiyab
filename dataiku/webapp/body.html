@@ -5,12 +5,16 @@
 
 <div id="app">
 
-  <!-- Tab navigation — order: The day, Passenger demand, Service reliability,
-       Supply and capacity, Forecast, What if, How it is built -->
+  <!-- Tab navigation — order: The day, Planner's worklist, Passenger demand,
+       Service reliability, Supply and capacity, Forecast, What if, How it is built -->
   <nav id="tab-bar" role="tablist" aria-label="Analysis tabs">
     <button class="tab-btn active" role="tab" aria-selected="true"
             aria-controls="panel-day" id="tbtn-day" data-tab="day">
       The day
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false"
+            aria-controls="panel-worklist" id="tbtn-worklist" data-tab="worklist">
+      Planner's worklist
     </button>
     <button class="tab-btn" role="tab" aria-selected="false"
             aria-controls="panel-demand" id="tbtn-demand" data-tab="demand">
@@ -54,9 +58,86 @@
 
     <div id="day-why" class="caption" style="max-width:760px"></div>
 
+    <p id="day-worklist-link" class="caption" style="margin-top:16px;display:none">
+      What to do about it:
+      <button class="link-btn" onclick="switchTab('worklist')" type="button">the Planner's worklist</button>
+    </p>
+
   </section>
 
-  <!-- ── Tab 2: Service reliability ─────────────────────────────── -->
+  <!-- ── Tab 2: Planner's worklist ───────────────────────────────── -->
+  <section class="panel" role="tabpanel"
+           id="panel-worklist" aria-labelledby="tbtn-worklist">
+
+    <h2>Planner's worklist</h2>
+    <p class="flow-zone-label">Flow zone: Forecast</p>
+
+    <!-- Section 1: who, when, decision -->
+    <p id="wl-context" class="caption" style="max-width:760px">
+      This screen is for the timetable planner.
+      Each night the day's running times are added to the analysis.
+      At each timetable change (RTA reviews timetables about every one to two months)
+      the planner works through this list and decides which routes need more time in the schedule.
+    </p>
+
+    <!-- Section 2: focal number -->
+    <div id="wl-focal" class="wl-focal-wrap">
+      <div class="skel-line" style="width:260px;height:52px"></div>
+    </div>
+
+    <!-- Section 3: worklist table -->
+    <div class="wl-controls ctrl-row" style="margin:16px 0 8px">
+      <label for="wl-band-sel" style="font-size:var(--sz13)">Hour band</label>
+      <select id="wl-band-sel">
+        <option value="all">All day</option>
+        <option value="am" >06:00 to 09:59</option>
+        <option value="pm" selected>16:00 to 18:59</option>
+        <option value="late">19:00 on</option>
+      </select>
+      <label for="wl-route-search" style="font-size:var(--sz13)">Route</label>
+      <input id="wl-route-search" type="search" placeholder="e.g. T01" style="width:100px">
+    </div>
+
+    <div id="wl-table-wrap" class="table-scroll">
+      <div class="skel-table"></div>
+    </div>
+
+    <!-- Running total / draft -->
+    <div id="wl-draft-total" class="wl-draft-total" aria-live="polite" hidden>
+      <span class="wl-draft-label">DRAFT, NOT SAVED</span>
+      <span id="wl-draft-text">Accepted: 0 changes, adding 0.0 bus hours</span>
+      <button id="wl-copy-btn" type="button" class="wl-copy-btn">Copy the accepted list</button>
+    </div>
+    <p class="caption" style="font-size:var(--sz11);color:var(--g3);margin-top:4px">
+      Accepting a row marks it in this browser session only.
+      Nothing is applied by this screen: the planner decides.
+    </p>
+
+    <!-- Section 4: ledger bar chart -->
+    <h3 style="margin-top:24px;font-size:var(--sz13)">Extra bus hours needed by hour of day</h3>
+    <div id="wl-ledger-chart" class="chart-wrap">
+      <div class="skel-chart"></div>
+    </div>
+    <p class="source-line">from running_time_ledger_by_hour</p>
+
+    <!-- Section 5: how this runs -->
+    <div class="wl-howruns">
+      <h3>How this runs</h3>
+      <ul class="wl-howruns-list">
+        <li><strong>What goes in each night:</strong> the day's nol card taps and vehicle running times; nothing new to measure, only new records.</li>
+        <li><strong>What is rebuilt:</strong> the Flow's four zones, by a nightly scenario in Dataiku; each zone re-reads all data to date.</li>
+        <li><strong>What comes out:</strong> this list and the forecast it rests on, ready for the next timetable review.</li>
+      </ul>
+      <p style="font-size:var(--sz13);color:var(--g4);margin-top:8px">
+        <strong>What it does not do:</strong>
+        it does not change a route, it does not act by itself,
+        and it rests on one day's data until more days are added.
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ── Tab 3: Service reliability ─────────────────────────────── -->
   <section class="panel" role="tabpanel"
            id="panel-reliability" aria-labelledby="tbtn-reliability">
 

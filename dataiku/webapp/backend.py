@@ -72,11 +72,16 @@ _COLS = {
     "running_time_drivers": [
         "feature", "share",
     ],
-    # Optional — may not exist on the first run
+    # Planner's worklist zone (optional — may not exist on the first run)
     "running_time_bands": [
         "route", "direction", "hour", "trips", "sched_run_min",
         "actual_p50_min", "actual_p85_min", "extra_min_at_p85",
-        "share_running_over_plan",
+        "extra_bus_minutes_at_p85", "spare_bus_minutes_in_plan",
+        "share_running_over_plan", "share_ending_5min_late", "layover_sched_min",
+    ],
+    "running_time_ledger_by_hour": [
+        "hour", "trips_sum", "extra_bus_minutes_at_p85_sum",
+        "spare_bus_minutes_in_plan_sum", "count",
     ],
 }
 
@@ -319,4 +324,14 @@ def running_time_bands():
     rows, err = _read("running_time_bands")
     if err:
         return jsonify({"error": err})
+    return jsonify(rows)
+
+
+@app.route("/api/running-time-ledger-by-hour")
+def running_time_ledger_by_hour():
+    """Optional dataset — returns {"error": "..."} if not built yet."""
+    rows, err = _read("running_time_ledger_by_hour")
+    if err:
+        return jsonify({"error": err})
+    rows.sort(key=lambda r: (r.get("hour") or 0))
     return jsonify(rows)

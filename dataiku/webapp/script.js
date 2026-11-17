@@ -31,6 +31,10 @@ const S = {
   fcMetrics: null, fcSummary: null, fcDrivers: null, fcBands: null,
   fcRoute: null,          // currently selected route in the trip chart
   fcPlannerRoute: null,   // currently selected route in the planner chart
+  // Worklist state (undefined = not yet fetched; null = fetched but absent)
+  wlBands: undefined, wlLedger: undefined,
+  wlAccepted: {},         // row key -> true
+  wlSetAside: {},         // row key -> true
   wi: { addBuses: 0, useDouble: false, route: null, hour: null, donor: '' },
 };
 
@@ -155,8 +159,11 @@ function makeSvg(vw, vh, label) {
 }
 
 // ── Dual-axis line chart: lateness (left) + boardings (right) by hour ─
-function buildDualLine(data) {
-  // data: [{hour, late5, boardings}]
+function buildDualLine(data, opts) {
+  // data: [{hour, late5, boardings, count?}]
+  // opts.minLatenessCount: skip lateness for hours with fewer departures
+  opts = opts || {};
+  const minCount = opts.minLatenessCount || 0;
   const W = 760, H = 240;
   const ml = 64, mr = 68, mt = 24, mb = 52;
   const iW = W - ml - mr, iH = H - mt - mb;
@@ -199,11 +206,17 @@ function buildDualLine(data) {
   g.appendChild(se('path', { d: bArea, fill: C.spare, opacity: 0.12, stroke: 'none' }));
   g.appendChild(se('path', { d: bPath, fill: 'none', stroke: C.spare, 'stroke-width': 2 }));
 
-  // Lateness line
-  let lPath = data.map(function(d, i) {
-    return (i === 0 ? 'M' : 'L') + xS(d.hour).toFixed(1) + ',' + yL(d.late5 || 0).toFixed(1);
-  }).join(' ');
-  g.appendChild(se('path', { d: lPath, fill: 'none', stroke: C.over, 'stroke-width': 2.5 }));
+  // Lateness line: only hours with count >= minCount (fix D — spikes from handful of departures)
+  const lateData = minCount > 0 ? data.filter(function(d) { return (d.count || 0) >= minCount; }) : data;
+  if (lateData.length >= 2) {
+    // Build connected segments (gaps where count < minCount)
+    let lPath = '';
+    lateData.forEach(function(d, i) {
+      const cmd = (i === 0) ? 'M' : 'L';
+      lPath += cmd + xS(d.hour).toFixed(1) + ',' + yL(d.late5 || 0).toFixed(1) + ' ';
+    });
+    g.appendChild(se('path', { d: lPath.trim(), fill: 'none', stroke: C.over, 'stroke-width': 2.5 }));
+  }
 
   // X axis
   g.appendChild(seLine(0, iH, iW, iH, { stroke: C.g2 }));
@@ -524,18 +537,19 @@ async function renderDay() {
       headlineEl.textContent = 'Evening peak lateness could not be computed from the available data.';
     }
 
-    // Dual-axis chart
+    // Dual-axis chart: lateness line drawn only for hours with >= 500 departures (fix D)
     const chartData = ph.map(function(r) {
       const dRow = dh.find(function(d) { return d.hour === r.hour; });
       return {
-        hour: r.hour,
-        late5: Number(r.late_5min_avg) || 0,
+        hour:     r.hour,
+        late5:    Number(r.late_5min_avg) || 0,
         boardings: dRow ? Number(dRow.boardings_sum) || 0 : 0,
+        count:    Number(r.count) || 0,
       };
     }).sort(function(a,b) { return a.hour - b.hour; });
 
     chartEl.innerHTML = '';
-    chartEl.appendChild(buildDualLine(chartData));
+    chartEl.appendChild(buildDualLine(chartData, { minLatenessCount: 500 }));
 
     // Stats — worst-hour tile uses the same worstRow as the headline
     const peakBoard = dh.reduce(function(best, r) {
@@ -559,7 +573,12 @@ async function renderDay() {
       '<strong>What this is:</strong> measured departures and nol card boardings on 15 December 2025. ' +
       '<strong>What is a finding:</strong> lateness and demand peak in the same hours. ' +
       '<strong>What is an open question:</strong> whether the shortage of buses causes the lateness, ' +
-      'or whether lateness causes missed connections that inflate boardings, is not measured here.';
+      'or whether lateness causes missed connections that inflate boardings, is not measured here.' +
+      '<br><span style="font-size:var(--sz11);color:var(--g3)">Lateness line shown only for hours with 500 or more recorded departures.</span>';
+
+    // Worklist link (fix B)
+    const wlLink = document.getElementById('day-worklist-link');
+    if (wlLink) wlLink.style.display = '';
 
   } catch (e) {
     setError(headlineEl, e.message);
@@ -1296,13 +1315,18 @@ function _fcTripChart(trips) {
   // Axis label
   g.appendChild(seText(-padL + 2, padT + iH / 2, 'min', { transform: 'rotate(-90,' + (-padL + 12) + ',' + (padT + iH / 2) + ')', 'font-size': 10, fill: C.g4 }));
 
-  // Legend
-  g.appendChild(seLine(iW - 150, padT + 5, iW - 138, padT + 5, { stroke: C.g3, 'stroke-width': 2 }));
-  g.appendChild(seText(iW - 134, padT + 9, 'Planned', { 'font-size': 10, fill: C.g3 }));
-  g.appendChild(seLine(iW - 100, padT + 5, iW - 88, padT + 5, { stroke: C.ink, 'stroke-width': 2 }));
-  g.appendChild(seText(iW - 84, padT + 9, 'Actual', { 'font-size': 10, fill: C.ink }));
-  g.appendChild(seLine(iW - 50, padT + 5, iW - 38, padT + 5, { stroke: C.flow, 'stroke-width': 2 }));
-  g.appendChild(seText(iW - 34, padT + 9, 'Forecast', { 'font-size': 10, fill: C.flow }));
+  // Legend row above the plot — left-aligned, spaced so labels never collide
+  const legendItems = [
+    { col: C.g3,  label: 'Planned' },
+    { col: C.ink, label: 'Actual' },
+    { col: C.flow, label: 'Forecast' },
+  ];
+  let lxCursor = 0;
+  legendItems.forEach(function(item) {
+    g.appendChild(seLine(lxCursor, padT - 8, lxCursor + 16, padT - 8, { stroke: item.col, 'stroke-width': 2 }));
+    g.appendChild(seText(lxCursor + 20, padT - 4, item.label, { 'font-size': 10, fill: item.col }));
+    lxCursor += 90;
+  });
 
   const wrap = document.createElement('div');
   wrap.className = 'chart-wrap';
@@ -1575,9 +1599,347 @@ async function _loadTripChart() {
   }
 }
 
+// ── Planner's worklist tab ────────────────────────────────────────────
+
+function _wlRowKey(r) {
+  return (r.route || '') + '|' + (r.direction || '') + '|' + (r.hour || 0);
+}
+
+function _wlBandFilter(r, band) {
+  const h = r.hour || 0;
+  if (band === 'am')   return h >= 6  && h <= 9;
+  if (band === 'pm')   return h >= 16 && h <= 18;
+  if (band === 'late') return h >= 19;
+  return true; // 'all'
+}
+
+function _wlUpdateDraftTotal() {
+  const totalEl = document.getElementById('wl-draft-total');
+  const textEl  = document.getElementById('wl-draft-text');
+  if (!totalEl || !textEl) return;
+  const accepted = Object.keys(S.wlAccepted).filter(function(k) { return S.wlAccepted[k]; });
+  if (accepted.length === 0) {
+    totalEl.setAttribute('hidden', '');
+    return;
+  }
+  totalEl.removeAttribute('hidden');
+  // Compute total bus hours from the accepted rows
+  let totalMins = 0;
+  if (S.wlBands) {
+    S.wlBands.forEach(function(r) {
+      if (S.wlAccepted[_wlRowKey(r)]) {
+        totalMins += Number(r.extra_bus_minutes_at_p85) || 0;
+      }
+    });
+  }
+  textEl.textContent = 'Accepted: ' + fmtNum(accepted.length) + ' change' +
+    (accepted.length !== 1 ? 's' : '') + ', adding ' +
+    (totalMins / 60).toFixed(1) + ' bus hours';
+}
+
+function _wlBuildTable(rows, band, routeSearch) {
+  // Filter
+  const search = (routeSearch || '').trim().toLowerCase();
+  let filtered = rows.filter(function(r) {
+    return (r.trips || 0) >= 5 && _wlBandFilter(r, band);
+  });
+  if (search) {
+    filtered = filtered.filter(function(r) {
+      return (r.route || '').toLowerCase().indexOf(search) >= 0;
+    });
+  }
+  // Sort by extra_bus_minutes_at_p85 descending, take top 25
+  filtered.sort(function(a, b) {
+    return (Number(b.extra_bus_minutes_at_p85) || 0) - (Number(a.extra_bus_minutes_at_p85) || 0);
+  });
+  const top = filtered.slice(0, 25);
+
+  if (!top.length) {
+    return '<p class="caption" style="color:var(--g3)">No rows match the current filter.</p>';
+  }
+
+  let html = '<table class="data-table wl-table"><thead><tr>';
+  html += '<th>Route</th>';
+  html += '<th>Direction</th>';
+  html += '<th class="num">Hour</th>';
+  html += '<th class="num">Trips</th>';
+  html += '<th class="num">Planned min</th>';
+  html += '<th class="num">Median actual</th>';
+  html += '<th class="num">85th pct</th>';
+  html += '<th class="num" style="color:var(--over)">Add min</th>';
+  html += '<th class="num">Over plan</th>';
+  html += '<th class="num">5+ min late</th>';
+  html += '<th></th>';
+  html += '</tr></thead><tbody>';
+
+  top.forEach(function(r) {
+    const key = _wlRowKey(r);
+    const isAccepted  = !!S.wlAccepted[key];
+    const isSetAside  = !!S.wlSetAside[key];
+    const rowClass = isAccepted ? ' wl-row-accepted' : (isSetAside ? ' wl-row-set-aside' : '');
+    const extra = r.extra_min_at_p85 != null ? Math.round(Number(r.extra_min_at_p85) * 10) / 10 : null;
+    const hourStr = r.hour != null ? fmtHourShort(r.hour) : '';
+
+    html += '<tr class="' + rowClass + '" data-wl-key="' + key + '">';
+    html += '<td>' + (r.route || '') + '</td>';
+    html += '<td style="font-size:var(--sz11);color:var(--g4)">' + (r.direction || '') + '</td>';
+    html += '<td class="num">' + hourStr + '</td>';
+    html += '<td class="num">' + fmtNum(r.trips) + '</td>';
+    html += '<td class="num">' + (r.sched_run_min != null ? Number(r.sched_run_min).toFixed(1) : '—') + '</td>';
+    html += '<td class="num">' + (r.actual_p50_min != null ? Number(r.actual_p50_min).toFixed(1) : '—') + '</td>';
+    html += '<td class="num">' + (r.actual_p85_min != null ? Number(r.actual_p85_min).toFixed(1) : '—') + '</td>';
+    html += '<td class="num"><strong style="color:var(--over)">' + (extra != null ? '+' + extra : '—') + '</strong></td>';
+    html += '<td class="num">' + fmtPct(r.share_running_over_plan, 0) + '</td>';
+    html += '<td class="num">' + fmtPct(r.share_ending_5min_late, 0) + '</td>';
+    html += '<td style="white-space:nowrap">';
+    html += '<button type="button" class="wl-accept-btn' + (isAccepted ? ' accepted' : '') +
+            '" data-wl-action="accept" data-wl-key="' + key + '">Accept</button>';
+    html += '<button type="button" class="wl-setaside-btn' + (isSetAside ? ' set-aside' : '') +
+            '" data-wl-action="setaside" data-wl-key="' + key + '">Set aside</button>';
+    html += '</td>';
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  if (filtered.length > 25) {
+    html += '<p class="source-line">' + fmtNum(filtered.length - 25) + ' more rows not shown. Narrow the filter to see them.</p>';
+  }
+  return html;
+}
+
+function _wlLedgerChart(ledger) {
+  if (!ledger || !ledger.length) return _fcNotBuilt('running_time_ledger_by_hour');
+  const hours = ledger.map(function(r) { return r.hour; });
+  const maxVal = Math.max.apply(null, ledger.map(function(r) {
+    return (Number(r.extra_bus_minutes_at_p85_sum) || 0) / 60;
+  }));
+  if (!maxVal) return _fcNotBuilt('ledger data (no extra bus hours)');
+
+  const W = 560, H = 180, padL = 48, padR = 8, padT = 10, padB = 32;
+  const iW = W - padL - padR, iH = H - padT - padB;
+  const bW = Math.max(4, Math.floor(iW / (hours.length + 1)));
+  const xS = function(i) { return i * (iW / hours.length) + (iW / hours.length - bW) / 2; };
+  const yS = function(v) { return padT + iH - (v / maxVal) * iH; };
+
+  const svg = se('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
+  const g   = se('g', { transform: 'translate(' + padL + ',0)' });
+  svg.appendChild(g);
+
+  // Gridlines
+  [0.25, 0.5, 0.75, 1].forEach(function(f) {
+    const y = padT + iH * (1 - f);
+    g.appendChild(seLine(0, y, iW, y, { stroke: C.g1 }));
+    g.appendChild(seText(-4, y + 4, (maxVal * f).toFixed(1), { 'text-anchor': 'end', 'font-size': 10, fill: C.g4 }));
+  });
+
+  // Bars — evening hours highlighted
+  ledger.forEach(function(r, i) {
+    const val = (Number(r.extra_bus_minutes_at_p85_sum) || 0) / 60;
+    const h   = r.hour || 0;
+    const col = (h >= 16 && h <= 18) ? C.over : C.g2;
+    const barH = (val / maxVal) * iH;
+    const x = xS(i);
+    g.appendChild(seRect(x, padT + iH - barH, bW, barH, { fill: col }));
+    if (i % 3 === 0 || hours.length <= 8) {
+      g.appendChild(seText(x + bW / 2, padT + iH + 14, fmtHourShort(h), {
+        'text-anchor': 'middle', 'font-size': 10, fill: C.g4,
+      }));
+    }
+  });
+
+  // Axis label
+  g.appendChild(seText(-padL + 2, padT + iH / 2, 'bus hours', {
+    transform: 'rotate(-90,' + (-padL + 14) + ',' + (padT + iH / 2) + ')',
+    'font-size': 10, fill: C.g4,
+  }));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'chart-wrap';
+  wrap.appendChild(svg);
+  return wrap.outerHTML;
+}
+
+function _wlFocalHtml(bands, all) {
+  // The headline is the WHOLE evening figure, from the same hourly table the chart below draws
+  // (running_time_ledger_by_hour), so the number and the red bars can never disagree.
+  // The list covers only the route-direction-hours with 5 or more trips; the line under the number says how much of it.
+  const inEvening = function(r) { return (r.hour || 0) >= 16 && (r.hour || 0) <= 18; };
+  const mins = function(rows, col) { return rows.reduce(function(s, r) { return s + (Number(r[col]) || 0); }, 0); };
+  const listed = bands.filter(function(r) { return (r.trips || 0) >= 5; });
+  const listedEvening = listed.filter(inEvening);
+  const listedEveningHours = mins(listedEvening, 'extra_bus_minutes_at_p85') / 60;
+  const ledger = (S.wlLedger && S.wlLedger.length) ? S.wlLedger : null;
+  const eveningHours = ledger ? mins(ledger.filter(inEvening), 'extra_bus_minutes_at_p85_sum') / 60 : mins(bands.filter(inEvening), 'extra_bus_minutes_at_p85') / 60;
+  const allHours = ledger ? mins(ledger, 'extra_bus_minutes_at_p85_sum') / 60 : mins(bands, 'extra_bus_minutes_at_p85') / 60;
+  const src = ledger ? 'running_time_ledger_by_hour' : 'running_time_bands';
+
+  return '<div class="wl-focal-wrap">' +
+    '<div>' +
+      '<div class="wl-focal-main" id="wl-focal-number">' + fmtNum(Math.round(eveningHours)) + ' bus hours</div>' +
+      '<div class="wl-focal-label">more running time the 16:00 to 18:59 band needs, to cover 85 trips in 100<br>' +
+        'The list below holds the ' + fmtNum(listedEvening.length) + ' route, direction and hour rows with 5 or more trips: ' +
+        fmtNum(Math.round(listedEveningHours)) + ' of those bus hours.</div>' +
+      '<div class="source-line">from ' + src + '</div>' +
+    '</div>' +
+    '<div>' +
+      '<div class="wl-focal-side">' + fmtNum(Math.round(allHours)) + ' bus hours</div>' +
+      '<div class="wl-focal-side-label">the whole day</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function _wlWireTableEvents(tableWrap) {
+  if (!tableWrap) return;
+  // Attach once only. The table is redrawn inside this same element, and a second listener would
+  // undo the first: one click would accept and then un-accept the row.
+  if (tableWrap.dataset.wlWired === '1') return;
+  tableWrap.dataset.wlWired = '1';
+  tableWrap.addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-wl-action]');
+    if (!btn) return;
+    const key    = btn.dataset.wlKey;
+    const action = btn.dataset.wlAction;
+    const row    = tableWrap.querySelector('tr[data-wl-key="' + key + '"]');
+
+    if (action === 'accept') {
+      if (S.wlAccepted[key]) {
+        // Toggle off
+        delete S.wlAccepted[key];
+        btn.classList.remove('accepted');
+        if (row) row.classList.remove('wl-row-accepted');
+      } else {
+        S.wlAccepted[key] = true;
+        delete S.wlSetAside[key];
+        btn.classList.add('accepted');
+        const saBtn = tableWrap.querySelector('[data-wl-action="setaside"][data-wl-key="' + key + '"]');
+        if (saBtn) saBtn.classList.remove('set-aside');
+        if (row) { row.classList.add('wl-row-accepted'); row.classList.remove('wl-row-set-aside'); }
+      }
+    } else if (action === 'setaside') {
+      if (S.wlSetAside[key]) {
+        delete S.wlSetAside[key];
+        btn.classList.remove('set-aside');
+        if (row) row.classList.remove('wl-row-set-aside');
+      } else {
+        S.wlSetAside[key] = true;
+        delete S.wlAccepted[key];
+        btn.classList.add('set-aside');
+        const acBtn = tableWrap.querySelector('[data-wl-action="accept"][data-wl-key="' + key + '"]');
+        if (acBtn) acBtn.classList.remove('accepted');
+        if (row) { row.classList.add('wl-row-set-aside'); row.classList.remove('wl-row-accepted'); }
+      }
+    }
+    _wlUpdateDraftTotal();
+  });
+}
+
+function _wlRebuildTable() {
+  if (!S.wlBands) return;
+  const tableWrap = document.getElementById('wl-table-wrap');
+  if (!tableWrap) return;
+  const band = (document.getElementById('wl-band-sel') || {}).value || 'all';
+  const search = (document.getElementById('wl-route-search') || {}).value || '';
+  tableWrap.innerHTML = _wlBuildTable(S.wlBands, band, search);
+  _wlWireTableEvents(tableWrap);
+  _wlUpdateDraftTotal();
+}
+
+async function renderWorklist() {
+  try {
+    const [bandsResult, ledgerResult] = await Promise.all([
+      S.wlBands !== undefined
+        ? Promise.resolve(S.wlBands)
+        : apiFetch('/api/running-time-bands').then(function(d) {
+            S.wlBands = (d && !d.error) ? d : null;
+            return S.wlBands;
+          }).catch(function() { S.wlBands = null; return null; }),
+      S.wlLedger !== undefined
+        ? Promise.resolve(S.wlLedger)
+        : apiFetch('/api/running-time-ledger-by-hour').then(function(d) {
+            S.wlLedger = (d && !d.error) ? d : null;
+            return S.wlLedger;
+          }).catch(function() { S.wlLedger = null; return null; }),
+    ]);
+
+    // Focal number
+    const focalEl = document.getElementById('wl-focal');
+    if (focalEl) {
+      if (S.wlBands && S.wlBands.length) {
+        focalEl.innerHTML = _wlFocalHtml(S.wlBands);
+      } else {
+        focalEl.innerHTML = '<p class="not-built">running_time_bands has not been built yet.</p>';
+      }
+    }
+
+    // Table
+    if (S.wlBands && S.wlBands.length) {
+      _wlRebuildTable();
+      // Wire filters
+      const bandSel = document.getElementById('wl-band-sel');
+      if (bandSel && !bandSel._wlWired) {
+        bandSel._wlWired = true;
+        bandSel.addEventListener('change', _wlRebuildTable);
+      }
+      const routeSearch = document.getElementById('wl-route-search');
+      if (routeSearch && !routeSearch._wlWired) {
+        routeSearch._wlWired = true;
+        routeSearch.addEventListener('input', _wlRebuildTable);
+      }
+    } else {
+      const tableWrap = document.getElementById('wl-table-wrap');
+      if (tableWrap) tableWrap.innerHTML = '<p class="not-built">running_time_bands has not been built yet.</p>';
+    }
+
+    // Ledger chart
+    const ledgerEl = document.getElementById('wl-ledger-chart');
+    if (ledgerEl) {
+      ledgerEl.innerHTML = S.wlLedger ? _wlLedgerChart(S.wlLedger) : '<p class="not-built">running_time_ledger_by_hour has not been built yet.</p>';
+    }
+
+    // Copy button
+    const copyBtn = document.getElementById('wl-copy-btn');
+    if (copyBtn && !copyBtn._wlWired) {
+      copyBtn._wlWired = true;
+      copyBtn.addEventListener('click', function() {
+        const accepted = S.wlBands ? S.wlBands.filter(function(r) {
+          return S.wlAccepted[_wlRowKey(r)];
+        }) : [];
+        const lines = ['Accepted changes — Planner\'s worklist', ''];
+        accepted.forEach(function(r) {
+          const extra = r.extra_min_at_p85 != null ? '+' + Number(r.extra_min_at_p85).toFixed(1) + ' min' : '';
+          lines.push([r.route, r.direction, fmtHourShort(r.hour), extra].filter(Boolean).join('  '));
+        });
+        const text = lines.join('\n');
+        try {
+          navigator.clipboard.writeText(text).then(function() {
+            copyBtn.textContent = 'Copied';
+            setTimeout(function() { copyBtn.textContent = 'Copy the accepted list'; }, 2000);
+          });
+        } catch (e) {
+          // Fallback: create a textarea, select, and let the user copy
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          copyBtn.textContent = 'Text selected — press Ctrl+C';
+          setTimeout(function() { copyBtn.textContent = 'Copy the accepted list'; }, 3000);
+        }
+      });
+    }
+
+  } catch (e) {
+    const focalEl = document.getElementById('wl-focal');
+    if (focalEl) setError(focalEl, e.message);
+  }
+}
+
 // ── Tab switching ─────────────────────────────────────────────────────
 const TAB_RENDERERS = {
   day:          renderDay,
+  worklist:     renderWorklist,
   reliability:  renderReliability,
   demand:       renderDemand,
   supply:       renderSupply,

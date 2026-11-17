@@ -313,20 +313,51 @@ def _make_running_time_bands():
     for route in _ROUTES[:10]:
         ri = int(route[1:]) - 1
         for h in range(16, 21):
-            sched = 25 + ri * 2 + (h - 16) * 0.5
-            p50   = sched * 1.05
-            p85   = sched * 1.20 + (h - 16) * 0.8
+            sched  = 25 + ri * 2 + (h - 16) * 0.5
+            p50    = sched * 1.05
+            p85    = sched * 1.20 + (h - 16) * 0.8
+            extra  = p85 - sched
+            trips  = 8 + ri % 5
             rows.append({
-                "route":               route,
-                "direction":           "inbound",
-                "hour":                h,
-                "trips":               8 + ri % 5,
-                "sched_run_min":       round(sched, 2),
-                "actual_p50_min":      round(p50, 2),
-                "actual_p85_min":      round(p85, 2),
-                "extra_min_at_p85":    round(p85 - sched, 2),
-                "share_running_over_plan": round((p85 - sched) / sched, 4),
+                "route":                      route,
+                "direction":                  "inbound",
+                "hour":                       h,
+                "trips":                      trips,
+                "sched_run_min":              round(sched, 2),
+                "actual_p50_min":             round(p50, 2),
+                "actual_p85_min":             round(p85, 2),
+                "extra_min_at_p85":           round(extra, 2),
+                "extra_bus_minutes_at_p85":   round(extra * trips / 60 * 60, 2),
+                "spare_bus_minutes_in_plan":  round(sched * 0.05 * trips, 2),
+                "share_running_over_plan":    round(extra / sched, 4),
+                "share_ending_5min_late":     round(0.1 + ri * 0.02, 4),
+                "layover_sched_min":          round(5 + ri * 0.5, 2),
             })
+    return pd.DataFrame(rows)
+
+
+def _make_running_time_ledger_by_hour():
+    """Hour-level ledger across all routes/directions."""
+    rows = []
+    for h in range(6, 24):
+        extra_sum = 0
+        spare_sum = 0
+        trips_sum = 0
+        for route in _ROUTES[:10]:
+            ri = int(route[1:]) - 1
+            sched = 25 + ri * 2 + max(0, h - 16) * 0.5
+            extra = sched * 0.20 + max(0, h - 16) * 0.8
+            trips = 8 + ri % 5
+            extra_sum += extra * trips
+            spare_sum += sched * 0.05 * trips
+            trips_sum += trips
+        rows.append({
+            "hour":                           h,
+            "trips_sum":                      trips_sum,
+            "extra_bus_minutes_at_p85_sum":   round(extra_sum, 2),
+            "spare_bus_minutes_in_plan_sum":  round(spare_sum, 2),
+            "count":                          10,
+        })
     return pd.DataFrame(rows)
 
 
@@ -343,6 +374,7 @@ _DATA = {
     "running_time_forecast":          _make_running_time_forecast,
     "running_time_drivers":           _make_running_time_drivers,
     "running_time_bands":             _make_running_time_bands,
+    "running_time_ledger_by_hour":    _make_running_time_ledger_by_hour,
 }
 
 
@@ -495,6 +527,7 @@ def run_all_tests():
 
     TABS = [
         ("day",         "tbtn-day"),
+        ("worklist",    "tbtn-worklist"),
         ("demand",      "tbtn-demand"),
         ("reliability", "tbtn-reliability"),
         ("supply",      "tbtn-supply"),
@@ -692,6 +725,136 @@ def run_all_tests():
             page.wait_for_timeout(200)
             page.goto(BASE + "/")
             page.wait_for_timeout(1000)
+
+            # ── Planner's worklist tab ─────────────────────────────────────
+            page.click("#tbtn-worklist")
+            page.wait_for_timeout(2000)
+
+            # Worklist is SECOND tab (index 1 in the tab bar)
+            tab_buttons = page.evaluate("""
+                Array.from(document.querySelectorAll('.tab-btn')).map(function(b) { return b.dataset.tab; })
+            """)
+            check(
+                vname + "/worklist/tab-is-second",
+                len(tab_buttons) >= 2 and tab_buttons[1] == 'worklist',
+                "tab order: " + repr(tab_buttons[:4]),
+            )
+
+            # Focal number visible in first screenful at desktop width
+            if vp["width"] == 1280:
+                focal_in_view = page.evaluate("""
+                    (function() {
+                        var el = document.getElementById('wl-focal-number');
+                        if (!el) return false;
+                        var r = el.getBoundingClientRect();
+                        return r.top >= 0 && r.bottom <= window.innerHeight;
+                    })()
+                """)
+                check(
+                    vname + "/worklist/focal-number-in-first-screenful",
+                    focal_in_view,
+                    "wl-focal-number not in first screenful at 1280x720",
+                )
+
+            # Focal number has content
+            focal_text = page.evaluate("(document.getElementById('wl-focal-number') || {}).innerText || ''")
+            check(
+                vname + "/worklist/focal-number-not-empty",
+                "bus hours" in focal_text,
+                repr(focal_text[:60]),
+            )
+
+            # Accept button changes the draft total.
+            # Wait for Accept buttons to appear (async render) then trigger via JS:
+            # A REAL click, as a person makes it. An earlier version of this check set the state by script
+            # because the click "did not work": it did not work because the handler was attached twice and a
+            # click accepted and then un-accepted the row. The table is redrawn first (a change of hour band and
+            # back) so that a handler attached once per redraw would be caught again.
+            page.wait_for_selector('.wl-accept-btn', timeout=6000)
+            band = page.query_selector('#wl-band, select[id*="band"]')
+            if band:
+                opts = band.evaluate("e => Array.from(e.options).map(o => o.value)")
+                if len(opts) > 1:
+                    band.select_option(opts[1]); page.wait_for_timeout(300); band.select_option(opts[0]); page.wait_for_timeout(300)
+            page.wait_for_selector('.wl-accept-btn', timeout=6000)
+            page.locator('.wl-accept-btn').first.scroll_into_view_if_needed()
+            page.locator('.wl-accept-btn').first.click()
+            page.wait_for_timeout(300)
+            draft_visible = page.evaluate("""
+                (function() {
+                    var el = document.getElementById('wl-draft-total');
+                    var n = Object.keys(S.wlAccepted).filter(function(k){ return S.wlAccepted[k]; }).length;
+                    return !!el && !el.hasAttribute('hidden') && n === 1;
+                })()
+            """)
+            check(
+                vname + "/worklist/accept-shows-draft-total",
+                draft_visible,
+                "wl-draft-total still hidden after clicking Accept",
+            )
+            draft_text = page.evaluate("(document.getElementById('wl-draft-text') || {}).innerText || ''")
+            check(
+                vname + "/worklist/draft-total-has-content",
+                "accepted" in draft_text.lower() and "bus hours" in draft_text.lower(),
+                repr(draft_text[:80]),
+            )
+
+            # Absent-dataset path: break running_time_bands and reload
+            page.goto(BASE + "/test-break/running_time_bands")
+            page.wait_for_timeout(200)
+            # Also clear cached state via reload
+            page.goto(BASE + "/")
+            page.wait_for_timeout(1000)
+            page.click("#tbtn-worklist")
+            page.wait_for_timeout(2000)
+            wl_text = page.evaluate("document.body.innerText")
+            check(
+                vname + "/worklist/absent-dataset-shows-not-built",
+                "not been built yet" in wl_text.lower() or "not built yet" in wl_text.lower(),
+                repr(wl_text[:200]),
+            )
+            # Restore
+            page.goto(BASE + "/test-restore/running_time_bands")
+            page.wait_for_timeout(200)
+            page.goto(BASE + "/")
+            page.wait_for_timeout(1000)
+
+            # ── No chart text exceeds 16 px at 1280 wide ─────────────────
+            if vp["width"] == 1280:
+                # Check the day chart and worklist ledger chart for oversized text
+                page.click("#tbtn-day")
+                page.wait_for_timeout(1200)
+                max_text_px = page.evaluate("""
+                    (function() {
+                        var maxPx = 0;
+                        document.querySelectorAll('.chart-wrap svg text').forEach(function(el) {
+                            var cs = window.getComputedStyle(el);
+                            var sz = parseFloat(cs.fontSize) || 0;
+                            if (sz > maxPx) maxPx = sz;
+                        });
+                        return maxPx;
+                    })()
+                """)
+                check(
+                    vname + "/chart-text/max-font-size-at-most-16px",
+                    max_text_px <= 16,
+                    "max chart text size: {}px".format(max_text_px),
+                )
+
+            # ── Thousands separator for counts >= 1000 ─────────────────────
+            # Counts like "6,378" must carry a comma; years like "2025" are excluded.
+            page.click("#tbtn-day")
+            page.wait_for_timeout(1200)
+            day_text_full = page.evaluate("document.body.innerText")
+            import re as _re2
+            raw_numbers = _re2.findall(r'(?<![,\d])(\d{4,})(?![,\d])', day_text_full)
+            # Exclude calendar years (1900-2099) — they are not counts
+            raw_counts = [n for n in raw_numbers if not (len(n) == 4 and n[:2] in ('19', '20'))]
+            check(
+                vname + "/thousands/no-unseparated-counts",
+                len(raw_counts) == 0,
+                "unseparated numbers found: " + repr(raw_counts[:5]),
+            )
 
             # ── Fix 1: headline and stat tile must use the same hour ──────
             page.click("#tbtn-day")
