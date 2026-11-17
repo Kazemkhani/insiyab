@@ -21,9 +21,9 @@ const _rCoords=M.network.routes.flatMap(r=>r.directions.flatMap(d=>d.shape));
 const _cLon=_rCoords.reduce((a,p)=>a+p[0],0)/_rCoords.length,_cLat=_rCoords.reduce((a,p)=>a+p[1],0)/_rCoords.length,_cosLat=Math.cos(_cLat*Math.PI/180)*10000;
 const unproject=([cx,cy])=>[cx/_cosLat+_cLon,-cy/10000+_cLat];
 function mapUnit(){if(!mapGL)return{lat:1e-5,lon:1e-5,cart:1};const z=mapGL.getZoom(),lat=mapGL.getCenter().lat,mpp=78271.52*Math.cos(lat*Math.PI/180)/Math.pow(2,z),ld=mpp/111320;return{lat:ld,lon:ld/Math.cos(lat*Math.PI/180),cart:mpp/11.132};}   // MapLibre's tiles are 512 pixels across
-function computeFitScale(){if(!mapGL)return 1;const z=mapGL.getZoom(),lat=mapGL.getCenter().lat,mpp=156543.03*Math.cos(lat*Math.PI/180)/Math.pow(2,z);return 11.132/mpp;}
 const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Has room';
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
+const busShape=b=>b.load>b.seats?[[0,9],[8,-7],[-8,-7]]:b.load===b.seats?[[-6,-6],[6,-6],[6,6],[-6,6]]:Array.from({length:16},(_,i)=>[5*Math.cos(i*Math.PI/8),5*Math.sin(i*Math.PI/8)]);
 $('fixture').hidden=!M.meta.fixture;
 $('service-date').textContent=M.meta.service_date+' · Dubai time';
 $('provenance').textContent=`${M.meta.fixture?'Stand-in operational data; not evidence of actual passenger demand.':escape(M.meta.notes)} ${M.meta.generated_at?'Source bundle generated '+M.meta.generated_at+'.':''} Service day ${M.meta.service_date}. ${M.meta.fixture?'Operational counts are invented. The bundled routes and stops use an archived RTA public network; see the map source note.':'Measured values are supplied aggregate records.'}`;
@@ -107,7 +107,7 @@ function render() {
       new ScatterplotLayer({id:'stops',data:shownStops,getPosition:s=>[s.lon,s.lat],getRadius:focusRoute?4:2.5,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.muted,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
       new TextLayer({id:'stop-labels',data:focusRoute?shownStops:[],getPosition:s=>[s.lon,s.lat],getText:s=>s.name,getPixelOffset:[7,0],getTextAnchor:'start',getSize:11,getColor:C.ink,fontFamily:'Plex',background:true,getBackgroundColor:[...C.paper,235],backgroundPadding:[2,1]}),
       new PathLayer({id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[unproject(pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*u.cart))),unproject(b.position)],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
-      new PolygonLayer({id:'buses',data:buses,getPolygon:b=>{const [x,y]=unproject(b.position),points=b.load>b.seats?[[0,9],[8,-7],[-8,-7]]:b.load===b.seats?[[-6,-6],[6,-6],[6,6],[-6,6]]:Array.from({length:16},(_,i)=>[5*Math.cos(i*Math.PI/8),5*Math.sin(i*Math.PI/8)]);return points.map(([dx,dy])=>[x+dx*u.lon,y+dy*u.lat]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
+      new PolygonLayer({id:'buses',data:buses,getPolygon:b=>{const [x,y]=unproject(b.position),points=busShape(b);return points.map(([dx,dy])=>[x+dx*u.lon,y+dy*u.lat]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
       new ScatterplotLayer({id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>unproject(b.position),getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
       new TextLayer({id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>unproject(b.position),getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),
       new TextLayer({id:'route-labels',data:paths.filter(p=>p.direction===0),getPosition:d=>d.shape[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:14,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
@@ -123,7 +123,7 @@ function render() {
       new PathLayer({...shared,id:'boardings',data:shownStops,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*3.5*unit]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
       new ScatterplotLayer({...shared,id:'stops',data:shownStops,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
       new PathLayer({...shared,id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*unit)),b.position],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
-      new PolygonLayer({...shared,id:'buses',data:buses,getPolygon:b=>{const [x,y]=b.position;return b.load>b.seats?[[x,y-9*unit],[x+8*unit,y+7*unit],[x-8*unit,y+7*unit]]:[[x-7*unit,y-5*unit],[x+7*unit,y-5*unit],[x+7*unit,y+5*unit],[x-7*unit,y+5*unit]];},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
+      new PolygonLayer({...shared,id:'buses',data:buses,getPolygon:b=>{const [x,y]=b.position;return busShape(b).map(([dx,dy])=>[x+dx*unit,y-dy*unit]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
       new PathLayer({...shared,id:'load-bars',data:buses,getPath:b=>{const [x,y]=b.position;return [[x-7*unit,y+11*unit],[x+(-7+14*Math.min(1.5,b.load/b.seats))*unit,y+11*unit]];},getColor:busColour,getWidth:3,widthUnits:'pixels'}),
       new ScatterplotLayer({...shared,id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>b.position,getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
       new TextLayer({...shared,id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>b.position,getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),
@@ -145,18 +145,18 @@ function fitMap(){if(!decklike)return;const rect=$('map').getBoundingClientRect(
 async function start(){
   await document.fonts.ready;
   // Try MapLibre + MapboxOverlay first; fall back to pure deck.gl if WebGL unavailable.
-  let mapReady=false;
+  let mapAttempt,expired=false;
   try{
     await new Promise((resolve,reject)=>{
-      const timer=setTimeout(()=>reject(new Error('map timeout')),5000);
+      const timer=setTimeout(()=>{expired=true;reject(new Error('map timeout'));},5000);
       try{
         initMap($('map'),(m,o)=>{
-          clearTimeout(timer);
+          if(expired){m.remove();return;}clearTimeout(timer);
           mapGL=m; const ov=o;
           deck=ov._deck; decklike=ov; geoMode=true;
           $('map').classList.add('has-basemap');
           m.on('move',()=>{render();});
-          mapReady=true; resolve();
+          resolve();
         },()=>{
           // Tiles failed (e.g. file://) — map works but show a small note.
           // We do NOT use #map-failure here (that's for total rendering failure).
@@ -164,11 +164,13 @@ async function start(){
           if(!tn){tn=document.createElement('div');tn.id='map-tile-note';
             tn.setAttribute('aria-hidden','true');$('map').appendChild(tn);}
           tn.textContent='Street map not loaded: the network is drawn alone.';
-        }).catch(reject);
+        }).then(({map})=>{mapAttempt=map;if(expired)map.remove();}).catch(error=>{clearTimeout(timer);reject(error);});
       }catch(e){clearTimeout(timer);reject(e);}
     });
   }catch(e){
     // MapLibre unavailable (no WebGL) — use Cartesian fallback.
+    mapAttempt?.remove();$('map').classList.remove('has-basemap');
+    const note=document.createElement('p');note.id='map-tile-note';note.textContent='Street map unavailable. The supplied network is drawn alone.';$('map').append(note);
     console.warn('MapLibre unavailable, falling back:',e);
     deck=new Deck({canvas:$('map-canvas'),views:new OrthographicView({id:'network',flipY:true}),controller:false,initialViewState:{target:[0,0,0],zoom:0},getCursor:({isHovering})=>isHovering?'pointer':'default',onError:e2=>{console.error(e2);$('map-failure').hidden=false;}});
     decklike=deck; geoMode=false;

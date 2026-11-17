@@ -1,5 +1,5 @@
 """Adversarial geographic and 3D journeys; these are role-based checks, not user research."""
-import json, pathlib, sys, time
+import json, pathlib, sys, time, shutil, tempfile
 from playwright.sync_api import sync_playwright
 site=pathlib.Path(sys.argv[1]).resolve()
 network=json.loads((site/'data/network.json').read_text())
@@ -93,6 +93,18 @@ with sync_playwright() as p:
         check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'accessibility: no horizontal overflow after every role')
         check(not errors,f'no unhandled errors: {errors}')
         check(not remote,f'network disabled throughout: {remote}')
+        context.close()
+    with tempfile.TemporaryDirectory(prefix='insiyab-map-failure-') as tmp:
+        failed=pathlib.Path(tmp);shutil.copytree(site,failed,dirs_exist_ok=True);(failed/'map/offline.js').unlink()
+        context=browser.new_context(offline=True,viewport={'width':390,'height':844});page=context.new_page();errors=[]
+        page.on('pageerror',lambda e:errors.append(str(e)))
+        page.goto(failed.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized')
+        check(page.evaluate('!insiyab.geoMode'),'failure control: missing offline map selects the network-only renderer')
+        check(page.evaluate("()=>{const layer=insiyab.deck.props.layers.find(l=>l.id==='buses'),b=layer.props.data[0];return [b.seats-1,b.seats,b.seats+1].map(load=>layer.props.getPolygon({...b,load}).length).join(',')==='16,4,3'}"),'fallback: room, full and above seats match the same legend')
+        check('network is drawn alone' in page.locator('#map-tile-note').inner_text(),'fallback: missing streets are disclosed')
+        page.locator('#record-inspector').evaluate('(e)=>e.open=true');page.locator('#entity-type').select_option('bus')
+        check('seats' in page.locator('#detail').inner_text(),'fallback: supplied records remain usable')
+        check(not errors,f'fallback: failure causes no unhandled error: {errors}')
         context.close()
     browser.close()
 print('TWIN REVIEW PASS')
