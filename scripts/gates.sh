@@ -39,6 +39,7 @@ SUITES=(
   tests/test_notebook.py
   live/tests/run.sh
   web/tests/run.sh
+  rider/tests/run.sh
 )
 for s in ${SUITES[@]+"${SUITES[@]}"}; do
   if [ ! -f "$s" ]; then echo "FAIL $s (missing)"; FAIL=1; continue; fi
