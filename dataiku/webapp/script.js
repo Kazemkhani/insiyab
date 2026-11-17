@@ -774,57 +774,32 @@ async function renderSupply() {
 
     if (S.supplyHour) selEl.value = S.supplyHour;
 
-    // Lead sentence: how many route-hours short vs spare at the selected hour
-    const leadEl = document.getElementById('supply-lead-sentence');
-    if (leadEl && S.supplyHour) {
-      var shortN = 0, spareN = 0;
+    // Lead sentence: routes short and routes with room at the chosen hour, and the hour of the day with most room.
+    // One function, so the first paint and a change of hour can never disagree.
+    function supplyLead(hour) {
+      var shortN = 0, spareN = 0, spareByHour = {};
       S.supplyStatus.forEach(function(r) {
-        if (r.hour !== S.supplyHour) return;
-        if (r.status === 'short of seats' || r.status === 'short even with standing') {
-          shortN += Number(r.count || 0);
-        }
-        if (r.status === 'under a fifth used') {
-          spareN += Number(r.count || 0);
-        }
+        var n = Number(r.count || 0);
+        if (r.status === 'under a fifth used') spareByHour[r.hour] = (spareByHour[r.hour] || 0) + n;
+        if (r.hour !== hour) return;
+        if (r.status === 'short of seats' || r.status === 'short even with standing') shortN += n;
+        if (r.status === 'under a fifth used') spareN += n;
       });
-      var txt = 'At ' + fmtHour(S.supplyHour) + ', ' + shortN + ' route-hours ran short of buses';
-      if (spareN > 0) {
-        txt += ' while ' + spareN + ' had spare capacity in the same hour.';
-        txt += ' The short routes and the spare routes were in different parts of the network at the same time.';
-      } else {
-        txt += '.';
+      var bestH = null;
+      Object.keys(spareByHour).forEach(function(h) { if (bestH === null || spareByHour[h] > spareByHour[bestH]) bestH = h; });
+      var txt = 'At ' + fmtHour(hour) + ', by this rule ' + shortN + ' routes were short of buses and ' + spareN + ' had less than a fifth of their seats used.';
+      if (bestH !== null && Number(bestH) !== hour && spareByHour[bestH] > spareN) {
+        txt += ' The room is at other hours: at ' + fmtHour(Number(bestH)) + ', ' + spareByHour[bestH] + ' routes had less than a fifth of their seats used.';
+        txt += ' So the gap is mostly one of timing: buses are spread across the day more evenly than boardings are.';
       }
-      leadEl.textContent = txt;
-    } else if (leadEl) {
-      leadEl.textContent = '';
+      return txt;
     }
+    const leadEl = document.getElementById('supply-lead-sentence');
+    if (leadEl) leadEl.textContent = S.supplyHour ? supplyLead(S.supplyHour) : '';
 
     selEl.onchange = function() {
       S.supplyHour = selEl.value ? Number(selEl.value) : null;
-      // Update lead sentence when hour changes
-      var leadEl2 = document.getElementById('supply-lead-sentence');
-      if (leadEl2 && S.supplyHour) {
-        var shortN2 = 0, spareN2 = 0;
-        S.supplyStatus.forEach(function(r) {
-          if (r.hour !== S.supplyHour) return;
-          if (r.status === 'short of seats' || r.status === 'short even with standing') {
-            shortN2 += Number(r.count || 0);
-          }
-          if (r.status === 'under a fifth used') {
-            spareN2 += Number(r.count || 0);
-          }
-        });
-        var txt2 = 'At ' + fmtHour(S.supplyHour) + ', ' + shortN2 + ' route-hours ran short of buses';
-        if (spareN2 > 0) {
-          txt2 += ' while ' + spareN2 + ' had spare capacity in the same hour.';
-          txt2 += ' The short routes and the spare routes were in different parts of the network at the same time.';
-        } else {
-          txt2 += '.';
-        }
-        leadEl2.textContent = txt2;
-      } else if (leadEl2) {
-        leadEl2.textContent = '';
-      }
+      if (leadEl) leadEl.textContent = S.supplyHour ? supplyLead(S.supplyHour) : '';
       renderSupplyHourDetail(detailEl);
     };
 
