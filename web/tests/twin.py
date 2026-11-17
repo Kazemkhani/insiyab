@@ -23,6 +23,7 @@ with sync_playwright() as p:
         page.goto(site.as_uri()+'/index.html');page.wait_for_function('window.insiyab && insiyab.deck.isInitialized && insiyab.map?.isSourceLoaded("basemap")')
         check(page.locator('#map-credit').is_visible() and 'OpenStreetMap' in page.locator('#map-credit').inner_text(),'judge: public map has visible attribution')
         check(page.evaluate("insiyab.geoMode && insiyab.map.isSourceLoaded('basemap')"),'judge: offline street tiles load from the bundled archive')
+        check(page.evaluate("()=>{const layer=insiyab.deck.props.layers.find(l=>l.id==='buses'),b=layer.props.data[0];return [b.seats-1,b.seats,b.seats+1].map(load=>layer.props.getPolygon({...b,load}).length).join(',')==='16,4,3'}"),'accessibility: room, full and above seats have distinct rendered shapes')
         route=network['routes'][0]
         page.locator('#public-route').select_option(route['route_id'])
         check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='routes').props.data.every(r=>r.route_id==="+json.dumps(route['route_id'])+")"),'judge: route selector changes the rendered geography')
@@ -31,10 +32,13 @@ with sync_playwright() as p:
         zoom=page.evaluate('insiyab.map.getZoom()');page.locator('#zoom-in').click()
         check(page.evaluate('insiyab.map.getZoom()')>zoom,'judge: zoom control changes the camera')
         page.locator('#map-reset').click()
-        stop=network['stops'][0]
+        selected_stops=set(s for d in route['directions'] for s in d['stops'])
+        stop=next(s for s in network['stops'] if s['stop_id'] not in selected_stops)
         page.locator('#public-search').fill(stop['name']);page.locator('[data-public-stop]').first.click()
         check('invented, not RTA observations' in page.locator('#public-selection').inner_text(),'judge: a real stop does not turn invented counts into RTA observations')
         check(page.locator('#public-selection').is_visible(),'judge: selected stop has a readable record')
+        check(page.locator('#public-route').input_value()=='' and page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='stops').props.data.some(s=>s.stop_id===insiyab.selected)"),'judge: a search outside the focused route clears the filter and draws the chosen stop')
+        check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='routes').props.data.length===insiyab.model.paths.length"),'geographer: every supplied directional path is drawn, including return routes')
         page.locator('#public-search').fill('zzzz-no-such-stop');check('No published stop matches' in page.locator('#public-search-results').inner_text(),'judge: unknown stop has an explicit empty state')
         page.locator('#public-search').fill('')
         page.locator('#briefing-panel').evaluate('(e)=>e.open=true')
@@ -71,6 +75,7 @@ with sync_playwright() as p:
         page.locator('[data-person="1"]').click()
         placement="()=>{const people=insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats');return new Set(people.map(p=>p.position.toArray().join(','))).size===people.length}"
         check(page.evaluate(placement),'site worker: every passenger above seats occupies a distinct position')
+        check(page.evaluate("()=>{const boxes=insiyabScene.standingBounds;return boxes.every((a,i)=>boxes.every((b,j)=>i===j||a.min.some((v,k)=>v>=b.max[k]||a.max[k]<=b.min[k])))}"),'site worker: actual standing-figure bounds do not intersect')
         if page.evaluate("insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats').length>=2"):
             page.evaluate("()=>{const p=insiyabScene.scene.getObjectsByProperty('name','passenger-above-seats');window.originalPosition=p[1].position.clone();p[1].position.copy(p[0].position)}")
             try:assert page.evaluate(placement)

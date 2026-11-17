@@ -12,7 +12,7 @@ export function horizonChart(rows,horizon,label){
  for(const [key,name,cls] of [['naive','Naive','naive-line'],['model','Model','model-line']]){
   const valid=rows.map((v,i)=>({...v,i})).filter(v=>Number.isFinite(v[key]));out+=`<path class="${cls}" d="${valid.map((v,j)=>`${j?'L':'M'}${x(v.i)} ${y(v[key])}`).join(' ')}"/>`;
   out+=valid.map(v=>`<circle class="${cls} chart-dot" cx="${x(v.i)}" cy="${y(v[key])}" r="4"><title>${esc(name)}: ${number(v[key])}, ${v.horizon} ${esc(label)}</title></circle>`).join('');
-  const end=valid.at(-1);if(end)out+=text(r+10,y(end[key])+(key==='model'?-8:16),name,`class="${cls}"`);
+  const end=valid.at(-1);if(end){const other=key==='model'?'naive':'model',otherEnd=rows.filter(v=>Number.isFinite(v[other])).at(-1),ownY=y(end[key]),otherY=otherEnd?y(otherEnd[other]):NaN,offset=Math.abs(ownY-otherY)<18?(ownY<otherY?-9:ownY>otherY?9:key==='model'?-9:9):0;out+=text(r+10,ownY+4+offset,name,`class="${cls}"`);}
  }
  out+=rows.map((v,i)=>text(x(i),bottom+25,v.horizon,'text-anchor="middle"')).join('');out+=text((l+r)/2,h-5,label,'text-anchor="middle"');
  const active=rows.findIndex(v=>v.horizon===horizon);if(active>=0)out+=`<path class="chart-guide" d="M${x(active)} ${top}V${bottom}"/>`;

@@ -77,7 +77,7 @@ export function showTwin(host,person,step,model,decision){
       if(i<(passengers??0)){const occupant=personFigure('passenger',chair,[0,-.02,0],'ink',true,.65);occupant.name='seated-passenger';occupant.rotation.y=Math.PI/2;}
     }
     const above=Math.max(0,(passengers??0)-(seats??0)),spacing=(length-1.6)/Math.max(1,above);
-    for(let i=0;i<above;i++){const p=personFigure('passenger',g,[-length/2+.8+(i+.5)*spacing,.84,0],'over',false,.70);p.name='passenger-above-seats';}
+    for(let i=0;i<above;i++){const p=personFigure('passenger',g,[-length/2+.8+(i+.5)*spacing,.84,0],'over',false,.70);p.name='passenger-above-seats';p.rotation.y=Math.PI/2;}
     return g;
   }
   const planner=person.id==='planner',driver=person.id==='driver',phone=step.scene==='phone';
@@ -148,6 +148,6 @@ export function showTwin(host,person,step,model,decision){
   tools.querySelector('[data-camera]').onclick=e=>{isSeats=!isSeats;camera.position.copy(isSeats?seatCamera:streetCamera);controls.target.copy(target);controls.update();e.currentTarget.textContent=isSeats?'Third-person view':planner?'Look at the plan':driver?'View the stop':'See the seats';draw();};
   canvas.onwebglcontextlost=event=>{event.preventDefault();title.textContent='3D paused · graphics context lost. Counts remain alongside.';};
   resize();replay();
-  const api={scene,camera,renderer,role:person.id,kind:step.kind,get frames(){return frames;},get moving(){return moving.map(m=>m.object.position.x);},reduced};window.insiyabScene=api;
+  const api={scene,camera,renderer,role:person.id,kind:step.kind,get standingBounds(){scene.updateMatrixWorld(true);return scene.getObjectsByProperty('name','passenger-above-seats').map(p=>{const box=new THREE.Box3().setFromObject(p);return {min:box.min.toArray(),max:box.max.toArray()};});},get frames(){return frames;},get moving(){return moving.map(m=>m.object.position.x);},reduced};window.insiyabScene=api;
   active={dispose(){disposed=true;cancelAnimationFrame(raf);observer.disconnect();controls.dispose();scene.traverse(o=>{o.geometry?.dispose();o.shadow?.map?.dispose();if(o.material?.map)o.material.map.dispose();if(o.material)o.material.dispose?.();});for(const m of materials.values())m.dispose();renderer.renderLists.dispose();}};
 }

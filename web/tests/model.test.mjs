@@ -45,3 +45,12 @@ assert.ok(!hiddenChart.includes('data-actual-bin="0"')&&hiddenChart.includes('da
 assert.ok(revealedChart.includes('data-actual-bin="0"'));
 assert.throws(()=>assert.ok(hiddenChart.includes('data-actual-bin="0"')));
 console.log('PASS challenge chart hides its selected actual even behind the clock; negative control rejects early reveal');
+
+for(const [model,naive] of [[10,10.1],[10.1,10]]){
+ const markup=horizonChart([{horizon:15,model,naive},{horizon:60,model,naive}],60,'minutes ahead');
+ const labels=Object.fromEntries([...markup.matchAll(/<text x="[^"]+" y="([^"]+)" class="(model|naive)-line">/g)].map(m=>[m[2],+m[1]]));
+ assert.equal(labels.model>labels.naive,model<naive,'endpoint labels retain the vertical order of their data');
+ assert.ok(Math.abs(labels.model-labels.naive)>=18,'close endpoint labels remain readable');
+ assert.throws(()=>assert.equal(labels.model<labels.naive,model<naive));
+}
+console.log('PASS endpoint labels follow model and naive values in either order; negative control rejects swapped labels');

@@ -1748,7 +1748,7 @@ h2,.decision h2,.cautions h2{font-size:20px;line-height:1.25}
 @media(max-width:360px){#scene{height:260px}.scene-tools{gap:4px;left:6px;right:6px}.scene-tools button{font-size:11px;padding:8px}.public-map #map{height:270px}}
 
 /* One linked network, with operational counts kept explicit. */
-#route-focus{display:none}.map-modes{padding:8px 0}.map-modes #map-scope{margin:0;padding:0;font-size:13px}.map-credit{pointer-events:auto;right:auto;max-width:calc(100% - 70px);font:400 11px/1.4 Plex}.map-zoom{bottom:42px}#public-selection{bottom:64px}#map{height:clamp(340px,52vh,560px)}
+#route-focus{display:none}.map-modes{padding:8px 0}.map-modes #map-scope{margin:0;padding:0;font-size:13px}.map-credit{pointer-events:auto;right:auto;max-width:calc(100% - 70px);font:400 11px/1.4 Plex}.map-zoom{bottom:42px}#public-selection{bottom:64px}#map{height:clamp(280px,calc(100vh - 410px),560px)}
 @media(max-width:800px){#map{height:310px}.replay-grid{flex-direction:column}#replay>#executive-intro .purpose,#replay>#executive-intro .eyebrow{display:block}#map-scope{font-size:11px}}
 
 #briefing-panel{margin-top:24px;border-top:1px solid var(--line)}#briefing-panel>summary{padding:16px 0;cursor:pointer}.briefing .briefing-title{font-size:32px;max-width:none}.briefing{border-bottom:0;margin-bottom:0}.briefing-go [data-go]{min-height:48px}

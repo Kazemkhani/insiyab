@@ -47,9 +47,9 @@ with sync_playwright() as p:
             rect=page.locator('#play').bounding_box();check(rect['y']+rect['height']<=height,f'{width}: clock control visible without scrolling')
             if shots:
                 page.evaluate("insiyab.setTime(INSIYAB_BUNDLE['metrics.json'].targets.find(t=>t.level==='route'&&t.target==='boardings').split.origins[0])");page.screenshot(path=str(shots/f'first-{width}x{height}.png'))
-        page.locator('[data-route]').nth(1).click()
+        page.locator('#public-route').select_option(index=1)
         check(page.evaluate('new Set(insiyab.buses.map(b=>b.route_id)).size<=1'),f'{width}: focus filters buses to one route')
-        page.locator('[data-route]').first.click()
+        page.locator('#public-route').select_option('')
         check(page.evaluate("insiyab.deck.props.layers.find(l=>l.id==='communities').props.data.length===0"),f'{width}: overview has no overlapping community labels')
         page.locator('#entity-type').select_option('bus');check('seats' in page.locator('#detail').inner_text() and 'null' not in page.locator('#detail').inner_text(),f'{width}: bus details, with no null shown')
         page.locator('#entity-type').select_option('community');check('boardings over the service day' in page.locator('#detail').inner_text(),f'{width}: community totals')
@@ -145,6 +145,7 @@ with sync_playwright() as p:
             check(page.locator('#fixture').bounding_box()['y']>=0,f"{width}: {person['id']} stand-in label in viewport")
             check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f"{width}: {person['id']} no sideways scroll")
             if shots and width in [1280,390] and not reduced:
+                page.wait_for_timeout(1600)
                 page.screenshot(path=str(shots/f"{person['id']}-{width}x{height}.png"))
             before=person['steps'][0]['before']
             if 'load' in before and 'seats' in before and max(before['load'],before['seats'])<=220:

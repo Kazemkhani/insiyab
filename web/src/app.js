@@ -26,7 +26,7 @@ const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Has room
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 $('fixture').hidden=!M.meta.fixture;
 $('service-date').textContent=M.meta.service_date+' · Dubai time';
-$('provenance').textContent=`${M.meta.notes}. Source bundle generated ${M.meta.generated_at}. Service day ${M.meta.service_date}. ${M.meta.fixture?'Operational counts are invented. The bundled routes and stops use an archived RTA public network; see the map source note.':'Measured values are supplied aggregate records.'}`;
+$('provenance').textContent=`${M.meta.fixture?'Stand-in operational data; not evidence of actual passenger demand.':escape(M.meta.notes)} ${M.meta.generated_at?'Source bundle generated '+M.meta.generated_at+'.':''} Service day ${M.meta.service_date}. ${M.meta.fixture?'Operational counts are invented. The bundled routes and stops use an archived RTA public network; see the map source note.':'Measured values are supplied aggregate records.'}`;
 const headline=B['summary.json'].headline[0];
 $('headline').innerHTML=`<span class="big-number" data-headline>${number(headline.value)}</span><span class="headline-label">${escape(headline.label)}</span><span class="source">${escape(headline.kind)} · ${escape(headline.unit)}<br>${escape(headline.source)} · ${M.meta.service_date}</span>`;
 $('time').min=M.min;$('time').max=M.max;
@@ -34,7 +34,7 @@ $('play').textContent=playing?'Pause':'Play';
 $('map').append($('map-credit'));
 $('map-credit').innerHTML='<a href="https://www.dubaipulse.gov.ae/data/rta-public-transports/rta_gtfs-open" target="_blank" rel="noopener">RTA public network · 2021 archive</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>';
 function inspectPublicStop(id){
-  publicStop=id;const stop=M.stops.get(id);if(!stop)return;
+  publicStop=id;const stop=M.stops.get(id);if(!stop)return;focusRoute='';$('public-route').value='';
   const routes=M.paths.filter(r=>r.stops.includes(id));
   $('public-selection').hidden=false;
   $('public-selection').innerHTML=`<strong>${escape(stop.name)}</strong><span>${[...new Set(routes.map(r=>r.label))].map(escape).join(' · ')}</span><p>${M.meta.fixture?'Published stop location. Passenger counts in this example are invented, not RTA observations.':'Passenger counts come from the supplied service records.'}</p>`;
@@ -45,7 +45,7 @@ function syncMapMode(){
   $('map-note-context').textContent='Seats only';
 }
 $('public-route').insertAdjacentHTML('beforeend',M.network.routes.map(r=>`<option value="${escape(r.route_id)}">${escape(r.short_name)} · ${escape(r.long_name??r.name??'')}</option>`).join(''));
-$('public-route').onchange=e=>{focusRoute=e.target.value;publicStop='';$('public-selection').hidden=true;document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.route===focusRoute)));fitMap();};
+$('public-route').onchange=e=>{focusRoute=e.target.value;publicStop='';$('public-selection').hidden=true;fitMap();};
 $('public-search').oninput=e=>{const query=e.target.value.trim().toLowerCase();const results=query.length>=2?M.network.stops.filter(s=>s.name.toLowerCase().includes(query)).slice(0,6):[];$('public-search-results').innerHTML=results.map(s=>`<button data-public-stop="${escape(s.stop_id)}">${escape(s.name)}</button>`).join('');if(query.length>=2&&!results.length)$('public-search-results').textContent='No published stop matches.';document.querySelectorAll('[data-public-stop]').forEach(b=>b.onclick=()=>{inspectPublicStop(b.dataset.publicStop);$('public-search').focus({preventScroll:true});const stop=M.stops.get(b.dataset.publicStop);if(geoMode){mapGL.jumpTo({center:[stop.lon,stop.lat],zoom:14});}else{fit={target:[...stop.position,0],zoom:1,scale:2};deck?.setProps({viewState:{target:fit.target,zoom:fit.zoom}});}render();});};
 for(const [id,change] of [['zoom-in',.6],['zoom-out',-.6]])$(id).onclick=()=>{if(geoMode){mapGL.jumpTo({zoom:mapGL.getZoom()+change});return;}if(!fit||!deck)return;fit.zoom=Math.max(-6,Math.min(7,fit.zoom+change));fit.scale=2**fit.zoom;deck.setProps({viewState:{target:fit.target,zoom:fit.zoom}});render();};
 $('map-reset').onclick=fitMap;
@@ -102,12 +102,12 @@ function render() {
     decklike.setProps({layers:[
       ...forecastLayers({},u),
       ...gapLayers({},u),
-      new PathLayer({id:'routes',data:paths.filter(p=>p.direction===0),getPath:d=>d.shape,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
+      new PathLayer({id:'routes',data:paths,getPath:d=>d.shape,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
       new PathLayer({id:'boardings',data:shownStops,getPath:s=>[[s.lon,s.lat],[s.lon,s.lat+Math.sqrt(s.on)*3.5*u.lat]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
       new ScatterplotLayer({id:'stops',data:shownStops,getPosition:s=>[s.lon,s.lat],getRadius:focusRoute?4:2.5,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.muted,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
       new TextLayer({id:'stop-labels',data:focusRoute?shownStops:[],getPosition:s=>[s.lon,s.lat],getText:s=>s.name,getPixelOffset:[7,0],getTextAnchor:'start',getSize:11,getColor:C.ink,fontFamily:'Plex',background:true,getBackgroundColor:[...C.paper,235],backgroundPadding:[2,1]}),
       new PathLayer({id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[unproject(pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*u.cart))),unproject(b.position)],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
-      new ScatterplotLayer({id:'buses',data:buses,getPosition:b=>unproject(b.position),getRadius:b=>b.load>b.seats?7:5,radiusUnits:'pixels',getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
+      new PolygonLayer({id:'buses',data:buses,getPolygon:b=>{const [x,y]=unproject(b.position),points=b.load>b.seats?[[0,9],[8,-7],[-8,-7]]:b.load===b.seats?[[-6,-6],[6,-6],[6,6],[-6,6]]:Array.from({length:16},(_,i)=>[5*Math.cos(i*Math.PI/8),5*Math.sin(i*Math.PI/8)]);return points.map(([dx,dy])=>[x+dx*u.lon,y+dy*u.lat]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
       new ScatterplotLayer({id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>unproject(b.position),getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
       new TextLayer({id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>unproject(b.position),getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),
       new TextLayer({id:'route-labels',data:paths.filter(p=>p.direction===0),getPosition:d=>d.shape[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:14,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
@@ -119,7 +119,7 @@ function render() {
     decklike.setProps({layers:[
       ...forecastLayers(shared,unit),
       ...gapLayers(shared,unit),
-      new PathLayer({...shared,id:'routes',data:paths.filter(p=>p.direction===0),getPath:d=>d.points,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
+      new PathLayer({...shared,id:'routes',data:paths,getPath:d=>d.points,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
       new PathLayer({...shared,id:'boardings',data:shownStops,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*3.5*unit]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
       new ScatterplotLayer({...shared,id:'stops',data:shownStops,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
       new PathLayer({...shared,id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*unit)),b.position],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
@@ -142,8 +142,6 @@ $('time').oninput=e=>{time=+e.target.value;playing=false;$('play').textContent='
 $('speed').onchange=e=>{speed=+e.target.value;};
 records();render();
 function fitMap(){if(!decklike)return;const rect=$('map').getBoundingClientRect();if(!rect.width||!rect.height)return;const paths=M.paths.filter(p=>!focusRoute||p.route_id===focusRoute);fit=fitPaths(paths,rect.width,rect.height);if(geoMode){mapGL.resize();const points=paths.flatMap(p=>p.shape),lons=points.map(p=>p[0]),lats=points.map(p=>p[1]);mapGL.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]],{padding:24,animate:false});}else{decklike.setProps({width:rect.width,height:rect.height,viewState:{target:fit.target,zoom:fit.zoom}});}render();}
-$('route-focus').innerHTML='<button data-route="" aria-pressed="true">All routes</button>'+M.network.routes.map(r=>`<button data-route="${escape(r.route_id)}" aria-pressed="false">${escape(r.short_name)}</button>`).join('');
-document.querySelectorAll('[data-route]').forEach(e=>e.onclick=()=>{focusRoute=e.dataset.route;document.querySelectorAll('[data-route]').forEach(b=>b.setAttribute('aria-pressed',String(b===e)));if(focusRoute){const bus=busesAt(M,time).find(b=>b.route_id===focusRoute);if(bus)pick('bus',bus.trip_id);}fitMap();});
 async function start(){
   await document.fonts.ready;
   // Try MapLibre + MapboxOverlay first; fall back to pure deck.gl if WebGL unavailable.
