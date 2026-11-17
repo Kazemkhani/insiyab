@@ -1,0 +1,51 @@
+# The gates, on every push to main. Lane 3's. It needs no secret.
+# It fails loudly unless the last line of bash scripts/gates.sh is ALL GATES PASS.
+# Beyond Python 3 and Node it installs only what the gates themselves import today: the engine's libraries
+# (model/requirements.txt, and LightGBM), the site's packages (web/package-lock.json), and the browser
+# that lane 1's and lane 2's suites open. If those suites stop needing a browser, the two browser lines go.
+name: gates
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: gates-main
+  cancel-in-progress: true
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NODE_OPTIONS: --test-reporter=tap   # live/tests/run.sh reads node --test's TAP lines
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: The engine's libraries
+        run: python3 -m pip install -q -r model/requirements.txt lightgbm
+      - name: The site's packages
+        run: npm ci --prefix web --no-audit --no-fund
+      - name: The browser the suites open
+        run: |
+          python3 -m pip install -q playwright
+          python3 -m playwright install --with-deps chromium
+      - name: The gates
+        run: |
+          set -o pipefail
+          bash scripts/gates.sh 2>&1 | tee gates.log || true
+          last="$(tail -1 gates.log)"
+          echo "last line: $last"
+          if [ "$last" != "ALL GATES PASS" ]; then
+            echo "::error title=GATES FAILED::the last line of bash scripts/gates.sh was '$last', not ALL GATES PASS"
+            grep -E '^(FAIL|[0-9?]+ FAILED)' gates.log || true
+            exit 1
+          fi
+      - name: The Khutwa page's tests
+        run: |
+          bash rider/tests/run.sh 2>&1 | tee rider.log || true
+          [ "$(tail -1 rider.log)" = "ALL PASS" ] || { echo "::error title=rider tests failed::the last line was not ALL PASS"; exit 1; }
