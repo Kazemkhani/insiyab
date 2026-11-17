@@ -6,6 +6,10 @@ cd "$(dirname "$0")/.." || exit 1
 FAIL=0
 # The engine's tests need pandas, numpy and scikit-learn. bash scripts/setup.sh puts them in .venv; python3 is used if it has them.
 PY=python3; [ -x .venv/bin/python ] && PY=.venv/bin/python
+# One thread for the tree library. With one thread per core on tiny tables, and a busy machine, its threads spend their time waiting on
+# each other: on 17 November one gate sat for over 50 minutes this way and was stopped. On one thread the engine's test took 641 seconds
+# on that same busy machine and passed. Slow, but it ends.
+export OMP_NUM_THREADS=1
 "$PY" -c "import pandas, numpy, sklearn" 2>/dev/null || { echo "FAIL the engine's libraries are missing: run bash scripts/setup.sh once (it makes .venv from model/requirements.txt)"; FAIL=1; }
 BEFORE="$(git status --porcelain --untracked-files=no)"
 echo "gates on $(git rev-parse --short HEAD 2>/dev/null || echo 'no commit yet') ($(git rev-parse --abbrev-ref HEAD 2>/dev/null))"

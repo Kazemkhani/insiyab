@@ -188,8 +188,8 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
       <p class="n">04 · The delay travels</p>
       <div class="num"><span class="r">870</span><small>of 936</small></div>
       <p class="unit">late departures: the bus was late back from its last trip</p>
-      <div class="sub"><span><b>93%</b> of the late departures we could trace</span></div>
-      <p class="so">The bus is not broken and the driver is not slow. The delay is carried from one trip into the next, all evening.</p>
+      <div class="sub"><span><b>93%</b> came after a late arrival</span><span><b>62%</b> the bus was not back yet</span></div>
+      <p class="so">Of 936 late departures we could trace, 870 came after the same bus finished its last trip behind time. By a stricter count, in 589 of 945 the bus was still out when its next trip was due.</p>
       <span class="chip cm">Measured on the real day</span>
     </div>
     <div class="cap" data-c="0.79">
@@ -203,9 +203,9 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
     <div class="cap" data-c="0.93" data-w="0.09">
       <p class="n">06 · The forecast</p>
       <div class="num"><span class="s">15%</span><small>closer</small></div>
-      <p class="unit">Our forecast of the trip time is closer than the timetable</p>
+      <p class="unit">Our forecast of the trip time is closer than the timetable, from 16:00 to 19:00</p>
       <div class="sub"><span><b>8.25</b> min off: timetable</span><span><b>7.42</b> simple rule</span><span><b class="s">6.97</b> our forecast</span></div>
-      <p class="so">Made 30 minutes before the bus leaves. Tested on 2,043 evening trips the forecast had never seen.</p>
+      <p class="so">Made 30 minutes before the bus leaves. Tested on 2,043 evening-peak trips it had never seen. After 19:00 the timetable is as close or closer.</p>
       <span class="chip cm">Measured on the real day</span>
     </div>
 
@@ -226,7 +226,7 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
       <div><p class="k">1 · It is not more passengers</p><b>48,724 <span style="color:var(--muted);font-size:.5em">vs</span> 49,707</b><h3>People boarding at 8 am and at 6 pm. The same.</h3><p>But late buses go from 19% to 45%.</p></div>
       <div><p class="k">2 · The trip takes longer</p><b class="r">67 → 96</b><h3>Minutes in the timetable, minutes on the road.</h3><p>Route 310 at 6 pm, a typical trip.</p></div>
       <div><p class="k">3 · The break is too short</p><b>16</b><h3>Minutes between trips, the same all day.</h3><p>Not enough to win back 29.</p></div>
-      <div><p class="k">4 · So the next trip starts late</p><b class="r">870 <span style="color:var(--muted);font-size:.5em">of 936</span></b><h3>Late departures where the bus came back late.</h3><p>The delay is handed on.</p></div>
+      <div><p class="k">4 · So the next trip starts late</p><b class="r">870 <span style="color:var(--muted);font-size:.5em">of 936</span></b><h3>Late departures that came after the bus finished its last trip behind time.</h3><p>In 589 of 945 it was still out when the next trip was due.</p></div>
     </div>
     <p class="question reveal">Which routes, at which hours, need more time, <span>and how many minutes?</span></p>
     <span class="chip cm reveal" style="margin-top:28px">The four figures: measured on the real day</span>
@@ -267,8 +267,8 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
     <p class="ey reveal">Our answer</p>
     <h2 class="big reveal">Forecast the real evening.<br><span>Tell the planner where to give it time.</span></h2>
     <div class="steps reveal">
-      <div><p class="k">A forecast</p><b class="s">30 min</b><h3>before each trip: how long will it really take?</h3><p>15% closer than the timetable on an evening it never saw.</p></div>
-      <div><p class="k">A worklist</p><b>244</b><h3>bus hours, turned into minutes per route and hour.</h3><p>The planner accepts or sets aside each row.</p></div>
+      <div><p class="k">A forecast</p><b class="s">30 min</b><h3>before each trip: how long will it really take?</h3><p>15% closer than the timetable, 16:00 to 19:00, on an evening it never saw.</p></div>
+      <div><p class="k">A worklist</p><b>244</b><h3>hours of missing driving time, as minutes per route and hour.</h3><p>Measured from the day, not predicted. The planner accepts or sets aside each row.</p></div>
       <div><p class="k">A second ranking</p><b>695</b><h3>boardings in one hour on route C01 at 18:00, with 85% of departures late.</h3><p>Where lateness reaches the most passengers.</p></div>
     </div>
   </div>

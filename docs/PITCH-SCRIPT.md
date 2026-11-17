@@ -46,7 +46,7 @@ Same buses. Same drivers. Same passengers. So it is not the crowd. Something els
 **2:15 · The cause. Screen: tab 2 "Planner's worklist", point at the first row.**
 "Here is what changes. Route 310 at six in the evening. The timetable gives the trip 67 minutes. It took 96.
 Every route gets the same trip time all day, and the bus gets a break of about sixteen minutes before its next trip, at every hour. Sixteen minutes is not enough to win back half an hour. So the bus starts its next trip late, and the one after. That is the 19:23 that left at 19:36.
-We counted it. Of the late starts we could trace, 870 out of 936 followed the same bus arriving late.
+We counted it. Of the late departures we could trace, 870 out of 936 came after the same bus finished its last trip behind time. By a stricter count, six in ten: the bus was still out on the road when its next trip was due.
 Nobody is doing anything wrong. The timetable was written for a day where six in the evening behaves like ten in the morning."
 
 **3:45 · The question, and the answer. Stay on tab 2.**
@@ -55,8 +55,8 @@ This list answers it. Each row is a route and an hour: what you planned, what th
 Across the evening peak it comes to 244 bus hours of running time the timetable does not hold."
 
 **5:00 · The model. Screen: tab 6 "Forecast".**
-"Behind that list is a forecast. Thirty minutes before each trip, how long will it really take?
-We trained it on the morning and midday only, and tested it on the evening it had never seen. Your timetable misses by a little over eight minutes a trip. The model misses by under seven. Fifteen per cent closer, and the range of that does not include zero.
+"That list is measured from the day itself. The forecast is what lets you see it coming. Thirty minutes before each trip, how long will it really take?
+We trained it on the morning and midday only, and tested it on the evening it had never seen. Your timetable misses by a little over eight minutes a trip. The model misses by under seven. Fifteen per cent closer between four and seven in the evening, and the range of that does not include zero.
 We compared it with two simple rules, and with a second model built in Dataiku's visual machine learning. The table shows all of them, with the three error measures."
 (Point at the hour-by-hour chart.) "And here is where it stops helping. After nine at night the timetable is as good as the model. We show that, because you should know where not to rely on it."
 
@@ -104,3 +104,7 @@ AI phone calls as the main idea, skipping stops, agents scanning for events, rou
 ## About the second model (do not overclaim)
 
 Cobuild trained Ridge regression and LightGBM with Dataiku's visual machine learning and saved the Ridge model in the Forecast zone. Its test is the last 40 per cent of the day (4,454 trips, 16:22 to the end). There the timetable misses by 6.02 minutes, Ridge by 5.90 and LightGBM by 7.23: two per cent better than the timetable, not more. Our 15 per cent is on the evening peak, 16:00 to 18:59. If asked why they differ: "the gain is in the peak; late at night the timetable is already right, and we show that."
+
+## Lane 3's independent retest (21:05, 17 November; opendata/onday/FORECAST-RETEST.md)
+
+Done in a separate notebook with other code. The 15 per cent holds (6.96 against 8.25 minutes on the same 2,043 trips). Stricter tests give less: forecasting the next hour only, 8 per cent; whole routes held out, 10 per cent, level with a simple rule. Use these if a judge pushes on the 15: "a stricter test gives eight to ten, and we ran it." One more figure worth saying: the timetable's time covers 29 per cent of evening-peak trips, against the 85 in 100 a planner aims for. That figure is lane 3's and I have not recomputed it.
