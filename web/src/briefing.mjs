@@ -28,14 +28,14 @@ export function briefingHTML(bundle){
   const sure=p=>p&&Number.isFinite(p.skill_lo)&&p.skill_lo>0;
   const foresight=[
     latePool&&Number.isFinite(latePool.skill)&&{title:'How late will the bus be?',say:sure(latePool)?`Our forecast is ${Math.round(latePool.skill*100)} in 100 closer than assuming a late bus stays as late as it is.`:`Our forecast is not yet shown to beat assuming a late bus stays as late as it is.`,ok:sure(latePool)},
-    boardPool&&Number.isFinite(boardPool.skill)&&{title:'How many will be waiting?',say:sure(boardPool)?`Our forecast is ${Math.round(boardPool.skill*100)} in 100 closer than the best simple guess.`:`On one day this forecast is not yet shown to beat a simple guess, and we say so.`,ok:sure(boardPool)},
+    boardPool&&Number.isFinite(boardPool.skill)&&{title:'How many passengers will board?',say:sure(boardPool)?`Our forecast is ${Math.round(boardPool.skill*100)} in 100 closer than the best simple guess.`:`On one day this forecast is not yet shown to beat a simple guess, and we say so.`,ok:sure(boardPool)},
   ].filter(Boolean);
   return `<section class="briefing" aria-label="The day in brief">
 <p class="eyebrow">${esc(day(meta.service_date))}${scale?` · ${esc(scale)}`:''}</p>
 <h2 class="briefing-title">The service day, in numbers.</h2>
 <ol class="briefing-facts">${facts.map(f=>`<li class="tone-${f.tone}"><strong>${whole(f.n)}</strong><span>${esc(f.say)}</span></li>`).join('')}</ol>
 <p class="briefing-kind">${meta.fixture?'Counted from invented service records.':'Counted from the supplied service records.'} Seats are counted, not standing room. No boarding or alighting does not prove that nobody waited.</p>
-${decisions.length?`<h2>Three things a planner could do on Monday</h2>
+${decisions.length?`<h2>Proposals a planner could review</h2>
 <ol class="briefing-moves">${decisions.slice(0,3).map(d=>{const e=d.effect?.[0],l=LEVERS[d.lever]??{verb:d.title,unit:''};const moved=e&&Number.isFinite(e.before)&&Number.isFinite(e.after);
   return `<li><a href="#decision-${esc(d.id)}"><span class="move-verb">${esc(l.verb)}</span>${moved?(e.before===0?`<span class="move-effect"><b>${quantity(e.after)}</b><em>${esc(l.unit)}, at one stop in one hour · ${esc(e.kind)}</em></span>`:`<span class="move-effect"><b>${whole(e.before)}</b><i aria-hidden="true">to</i><b>${quantity(e.after)}</b><em>${esc(l.unit)} · ${esc(e.kind)}</em></span>`):''}</a></li>`;}).join('')}</ol>`:''}
 ${foresight.length?`<h2>Can it be seen coming?</h2><ul class="briefing-foresight">${foresight.map(f=>`<li class="${f.ok?'holds':'open'}"><b>${esc(f.title)}</b> ${esc(f.say)}</li>`).join('')}</ul><p class="briefing-kind">${esc(late?.tested_on??board?.tested_on??'')}</p>`:''}

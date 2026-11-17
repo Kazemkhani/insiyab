@@ -1752,3 +1752,5 @@ h2,.decision h2,.cautions h2{font-size:20px;line-height:1.25}
 @media(max-width:800px){#map{height:310px}.replay-grid{flex-direction:column}#replay>#executive-intro .purpose,#replay>#executive-intro .eyebrow{display:block}#map-scope{font-size:11px}}
 
 #briefing-panel{margin-top:24px;border-top:1px solid var(--line)}#briefing-panel>summary{padding:16px 0;cursor:pointer}.briefing .briefing-title{font-size:32px;max-width:none}.briefing{border-bottom:0;margin-bottom:0}.briefing-go [data-go]{min-height:48px}
+
+#map-tile-note{top:8px;bottom:auto;max-width:calc(100% - 110px);background:var(--paper);padding:4px 6px;opacity:1}

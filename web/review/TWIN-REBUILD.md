@@ -19,3 +19,11 @@ Automated journeys represent a nontechnical judge, service planner, passenger, d
 Before integration with the new shared network, council review found three defects: overlapping standing figures, an unscoped full-programme cost note and lost keyboard focus after a swap. All were corrected; its second pass returned SHIP. That review did not certify the later combined network integration. Final combined checks and screenshot evidence are recorded below after execution.
 
 International references and the decisions they informed are in INTERNATIONAL.md. No external programme's effect size is claimed for this prototype.
+
+## Integrated review fixes
+
+The geographic merge was reviewed independently by council's Codex reviewer. Its source probes found omitted return paths and a global stop search that preserved the selected route filter. Both are fixed and tested against actual rendered layers. A follow-up found inconsistent symbols in the network-only fallback. Both renderers now share one symbol function; a browser test removes the local map file and checks the fallback, notice and usable records.
+
+Visual inspection caught forecast endpoint labels in the wrong order and standing figures too close for the larger stand-in load. Labels now follow their values in both orders, and the 3D test measures nonintersecting figure bounds. The new upstream briefing is retained as a disclosure below the map. Its claims distinguish boardings from waiting passengers, zero boarding/alighting from an empty stop, and fractional expected responses from whole passengers.
+
+The final council follow-up found only the briefing's waiting-queue wording; that phrase is corrected to “How many passengers will board?” and checked in the rendered page. The council did not execute browser journeys or certify production. The parent executed the browser tests.

@@ -10,11 +10,11 @@ meta=json.loads((site/'data/meta.json').read_text());(out/'manifest.json').write
 with sync_playwright() as p:
  b=p.chromium.launch(args=['--use-angle=metal'])
  for name,view,duration in [('replay','replay',8),('forecast','forecast',6),('gap','gap',6),('planner','stories',3),('site_worker','stories',3),('office_worker','stories',3),('driver','stories',3)]:
-  c=b.new_context(viewport={'width':1280,'height':720},record_video_dir=str(out/'work'),record_video_size={'width':1280,'height':720},offline=True);page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(site.as_uri()+'/index.html');page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized');page.evaluate("insiyab.setTime(INSIYAB_BUNDLE['metrics.json'].targets.find(t=>t.level==='route'&&t.target==='boardings').split.origins[0])")
+  c=b.new_context(viewport={'width':1280,'height':720},record_video_dir=str(out/'work'),record_video_size={'width':1280,'height':720},offline=True);page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(site.as_uri()+'/index.html');page.wait_for_function('window.insiyab&&insiyab.deck.isInitialized&&insiyab.map?.isSourceLoaded("basemap")');page.evaluate("insiyab.setTime(INSIYAB_BUNDLE['metrics.json'].targets.find(t=>t.level==='route'&&t.target==='boardings').split.origins[0])")
   if view!='replay':page.locator(f'[data-view={view}]').click()
   if view=='replay':page.locator('#play').click()
   if view=='stories':
-   people=page.evaluate("INSIYAB_BUNDLE['personas.json'].personas.map(p=>p.id)");page.locator(f'[data-person="{people.index(name)}"]').click();page.evaluate("async()=>{for(const el of document.querySelectorAll('#scene image')){const i=new Image();i.src=el.getAttribute('href');await i.decode();}}")
+   people=page.evaluate("INSIYAB_BUNDLE['personas.json'].personas.map(p=>p.id)");page.locator(f'[data-person="{people.index(name)}"]').click();page.wait_for_function('window.insiyabScene&&insiyabScene.renderer.info.render.calls>0')
   page.evaluate('window.scrollTo(0,0)');page.wait_for_timeout(500)
   if view in ['gap','forecast']:
    page.wait_for_timeout(1200);page.locator('#close-gaps' if view=='gap' else '#reveal').click();page.evaluate('window.scrollTo(0,0)');page.wait_for_timeout((duration-1.2)*1000)
