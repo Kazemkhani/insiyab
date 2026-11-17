@@ -36,3 +36,4 @@ out/
 *.log
 # a browser tool some reviewers use leaves this behind
 .playwright-mcp/
+.venv-dss/
