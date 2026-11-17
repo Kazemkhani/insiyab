@@ -1,0 +1,213 @@
+route_name,route_kind,route_kind_from,stops_in_newest_report
+2BMUP,,,2
+3CRUP,,,2
+5,other,"route-stops code 0, meaning inferred",38
+5CRUP,,,2
+6,other,"route-stops code 0, meaning inferred",15
+6CRUP,,,2
+7,urban,route-stops code 1,37
+8,urban,route-stops code 1,92
+9,urban,route-stops code 1,41
+10,urban,route-stops code 1,35
+11,,,52
+11CUP,,,2
+12,urban,route-stops code 1,84
+13A,urban,route-stops code 1,81
+13B,express,"route-stops code 2, meaning inferred",51
+13D,urban,route-stops code 1,45
+14,other,"route-stops code 0, meaning inferred",48
+15,urban,route-stops code 1,72
+16,,,57
+17,urban,route-stops code 1,75
+20A,,,36
+20B,,,41
+21A,,,20
+21B,,,34
+22,urban,bus_routes table,42
+23,other,"route-stops code 0, meaning inferred",33
+24,urban,route-stops code 1,34
+25,,,36
+26,other,"route-stops code 0, meaning inferred",34
+26H,,,8
+27,urban,route-stops code 1,36
+28,urban,route-stops code 1,35
+29,urban,route-stops code 1,32
+30,urban,route-stops code 1,24
+31,urban,route-stops code 1,22
+32C,urban,route-stops code 1,59
+33,urban,route-stops code 1,61
+34,urban,route-stops code 1,51
+35,,,39
+36A,,,26
+36B,,,26
+37A,,,30
+37B,,,31
+43,urban,route-stops code 1,54
+44,urban,route-stops code 1,66
+50,urban,route-stops code 1,57
+51,,,24
+53,urban,bus_routes table,66
+55,urban,route-stops code 1,54
+56,urban,route-stops code 1,19
+61,urban,route-stops code 1,57
+62A,,,19
+62B,,,19
+63E,urban,route-stops code 1,73
+64,urban,route-stops code 1,78
+66,urban,route-stops code 1,41
+67,urban,route-stops code 1,46
+68,,,29
+77,urban,route-stops code 1,34
+81,urban,route-stops code 1,50
+83,urban,route-stops code 1,49
+84,urban,route-stops code 1,42
+85,urban,route-stops code 1,56
+88,urban,route-stops code 1,55
+88A,,,17
+88B,,,16
+91,urban,route-stops code 1,14
+93,urban,route-stops code 1,71
+93A,,,21
+93B,,,19
+95A,urban,route-stops code 1,25
+96,urban,route-stops code 1,58
+97,urban,route-stops code 1,26
+98E,urban,route-stops code 1,33
+99,urban,route-stops code 1,30
+110,,,2
+310,urban,route-stops code 1,20
+320,urban,route-stops code 1,56
+BM1,marine,bus_routes table,4
+BM2,marine,bus_routes table,2
+BM3,,,2
+C01,urban,route-stops code 1,47
+C03,urban,route-stops code 1,65
+C04,urban,route-stops code 1,45
+C05,urban,route-stops code 1,45
+C09,urban,route-stops code 1,59
+C10,urban,route-stops code 1,60
+C15,urban,route-stops code 1,35
+C18,urban,route-stops code 1,64
+C26,urban,route-stops code 1,56
+C28,urban,route-stops code 1,67
+CR3,,,2
+CR4,,,2
+CR5,,,2
+CR6,,,2
+CR9,,,2
+CR11,,,2
+D03,urban,route-stops code 1,3
+DA2,,,12
+DC2,,,5
+DH1,,,9
+DS1,,,5
+E16,intercity,"route-stops code 5, meaning inferred",56
+E100,intercity,"route-stops code 5, meaning inferred",6
+E101,intercity,"route-stops code 5, meaning inferred",5
+E201,intercity,"route-stops code 5, meaning inferred",16
+E303,intercity,"route-stops code 5, meaning inferred",27
+E306,intercity,"route-stops code 5, meaning inferred",25
+E307,intercity,"route-stops code 5, meaning inferred",17
+E307A,intercity,"route-stops code 5, meaning inferred",10
+E308,,,10
+E315,intercity,"route-stops code 5, meaning inferred",8
+E400,intercity,"route-stops code 5, meaning inferred",19
+E411,intercity,"route-stops code 5, meaning inferred",9
+E700,intercity,"route-stops code 5, meaning inferred",14
+ER1,,,4
+ER2,,,2
+F01,feeder,route-stops code 3,18
+F02,feeder,route-stops code 3,19
+F03,feeder,route-stops code 3,27
+F04,feeder,route-stops code 3,24
+F05,feeder,route-stops code 3,40
+F06,feeder,route-stops code 3,26
+F07,feeder,route-stops code 3,19
+F08,feeder,bus_routes table,44
+F09,feeder,route-stops code 3,14
+F10,feeder,route-stops code 3,62
+F11,feeder,route-stops code 3,17
+F12,feeder,route-stops code 3,11
+F13,feeder,route-stops code 3,5
+F14,feeder,route-stops code 3,18
+F15,feeder,route-stops code 3,25
+F16,feeder,route-stops code 3,12
+F17,feeder,route-stops code 3,5
+F18,feeder,bus_routes table,8
+F19A,feeder,route-stops code 3,17
+F19B,feeder,route-stops code 3,17
+F20,feeder,bus_routes table,25
+F21,feeder,bus_routes table,20
+F22,feeder,route-stops code 3,18
+F23,feeder,route-stops code 3,18
+F23A,feeder,route-stops code 3,12
+F24,feeder,bus_routes table,22
+F25,feeder,bus_routes table,28
+F26,feeder,route-stops code 3,57
+F26A,,,50
+F27,feeder,route-stops code 3,7
+F28,feeder,bus_routes table,12
+F29,,,14
+F30,feeder,route-stops code 3,11
+F31,feeder,bus_routes table,34
+F32,feeder,route-stops code 3,12
+F33,feeder,route-stops code 3,34
+F34,feeder,route-stops code 3,37
+F35,feeder,bus_routes table,28
+F36,feeder,route-stops code 3,35
+F37,feeder,route-stops code 3,22
+F38,,,26
+F39,,,46
+F40,,,23
+F41,feeder,bus_routes table,19
+F43,feeder,route-stops code 3,23
+F44,feeder,route-stops code 3,27
+F45,feeder,route-stops code 3,20
+F46,feeder,route-stops code 3,43
+F47,feeder,route-stops code 3,48
+F48,feeder,route-stops code 3,43
+F49,feeder,route-stops code 3,24
+F50,feeder,route-stops code 3,33
+F51,feeder,route-stops code 3,18
+F53,feeder,route-stops code 3,51
+F54,feeder,route-stops code 3,68
+F55,feeder,route-stops code 3,18
+F57,,,2
+F58,,,8
+F59,,,7
+F60,feeder,route-stops code 3,13
+F61,feeder,route-stops code 3,25
+F62,,,51
+F63,,,14
+F70,feeder,route-stops code 3,23
+F81,feeder,route-stops code 3,27
+FR1,,,2
+FR2,,,3
+FR3,,,1
+FR4,,,2
+FR5,intercity,"route-stops code 5, meaning inferred",3
+H03,urban,route-stops code 1,34
+J01,urban,route-stops code 1,27
+J02,urban,route-stops code 1,38
+J03,urban,route-stops code 1,13
+J04,urban,route-stops code 1,17
+J05,,,9
+JLT1,urban,bus_routes table,7
+JLT2,urban,bus_routes table,6
+N30,night,"route-stops code 4, meaning inferred",41
+N55,night,"route-stops code 4, meaning inferred",93
+S18,,,1
+S19,,,1
+SH1,,,5
+TR1,,,10
+TR2,,,8
+X02,express,"route-stops code 2, meaning inferred",18
+X13,express,"route-stops code 2, meaning inferred",41
+X22,express,"route-stops code 2, meaning inferred",26
+X23,express,"route-stops code 2, meaning inferred",45
+X25,express,"route-stops code 2, meaning inferred",41
+X28,urban,bus_routes table,58
+X64,express,"route-stops code 2, meaning inferred",40
+X91,,,44
+X92,express,"route-stops code 2, meaning inferred",16
+X94,express,"route-stops code 2, meaning inferred",30
