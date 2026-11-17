@@ -64,6 +64,9 @@ def main():
     check("network: every route lists stops that exist, with a shape of at least two points",
           bool(routes) and all(d.get("stops") and all(x in stops for x in d["stops"]) and len(d.get("shape", [])) >= 2 for r in routes.values() for d in r.get("directions", [])))
 
+    if net.get("source") is not None:
+        check("network: a public network names its publisher, its edition, its terms, a credit line, and what on it is invented", all(isinstance(net["source"].get(k), str) and net["source"][k] for k in ("publisher", "edition", "terms", "credit", "invented")), net["source"])
+
     # the replay: the day as it happened
     visits = trips = bad_ref = bad_time = bad_load = neg = 0
     listed = index.get("routes", [])

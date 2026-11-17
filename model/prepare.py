@@ -31,6 +31,9 @@ def load(folder):
     for g in GTFS:
         p = os.path.join(folder, "gtfs", g + ".txt")
         tables["gtfs_" + g] = read(p) if os.path.exists(p) else pd.DataFrame()
+    src = os.path.join(folder, "NETWORK-SOURCE.json")          # optional: where the network came from, to be credited on the map
+    if os.path.exists(src):
+        tables["network_source"] = __import__("json").load(open(src, encoding="utf-8"))
     return tables
 
 
@@ -269,7 +272,7 @@ def prepare(tables, service_date=None):
 
     v["vehicle"] = v["body"].map(names)
     visits = v[["trip_id", "route_id", "direction", "seq", "stop_id", "vehicle", "bus_type", "seats", "model_year", "sched_arr", "act_arr", "sched_dep", "act_dep", "door_opened", "on", "off", "load"]]
-    return {"service_date": service_date, "visits": visits, "stops": s, "communities": comms, "routes": routes, "series": series, "Y": Y, "S": S, "first_bin": first_bin,
+    return {"network_source": tables.get("network_source"), "service_date": service_date, "visits": visits, "stops": s, "communities": comms, "routes": routes, "series": series, "Y": Y, "S": S, "first_bin": first_bin,
             "alightings": came_back,
             "fleet_types": f.groupby("bus_type")["seats"].median().dropna().astype(int).reset_index().to_dict("records"), "log": log}
 

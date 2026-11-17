@@ -33,6 +33,7 @@ Which bundle the public site shows is decided in `docs/LANES.md` (Deploying): st
 - `stops`: `stop_id`, `name`, `lon`, `lat`, `community_id` (or null).
 - `routes`: `route_id`, `short_name`, `long_name`, `directions`: each has `direction` (0 or 1), `stops` (stop ids in order) and `shape` (a list of [lon, lat]).
 - `fleet_types`: `bus_type`, `seats`.
+- `source` (when the network is public data): `what`, `publisher`, `published_as`, `copy`, `edition`, `fetched`, `terms`, `credit` (one line to show on any screen that draws the network), `changed` (what was altered, if anything), `invented` (what on this network is not real), `provenance` (the file with the full account). A screen that draws the network shows `credit`, and where passengers are invented on a real network it says so in the words of `invented`.
 
 ### `replay/index.json` and `replay/route-<route_id>.json`: the day as it happened
 The index lists `route_id`, `file`, `trips`. Each route file has `trips`: `trip_id`, `direction`, `vehicle`, `bus_type`, `seats`, `model_year`, and `visits` in order. A visit has `stop_id`, `seq`, `sched_arr`, `act_arr`, `sched_dep`, `act_dep`, `door_opened` (true or false), `on`, `off`, `load` (people on board when the bus leaves).

@@ -39813,6 +39813,19 @@
    "short_name": "J01"
   }
  ],
+ "source": {
+  "changed": "The calendar's dates are moved to December 2025 so that the public Monday timetable is the plan for the stand-in day. No other row is changed.",
+  "copy": "MobilityData feed mdb-904",
+  "credit": "Network: RTA public timetable feed, 2021 edition",
+  "edition": "calendar 9 September 2021 to 31 December 2021",
+  "fetched": "2026-11-17",
+  "invented": "Every passenger, tap, vehicle and lateness on this network is invented. The stops, routes and timetable are RTA's public ones.",
+  "provenance": "opendata/public/rta-gtfs/PROVENANCE.md",
+  "published_as": "rta_gtfs-open on Dubai Pulse (now data.dubai)",
+  "publisher": "Roads and Transport Authority (RTA), Dubai",
+  "terms": "Dubai Open Data Licence (draft), with attribution to RTA",
+  "what": "Nine routes of RTA's public timetable feed, with their stops, paths and one Monday's trips"
+ },
  "stops": [
   {
    "community_id": "909",

@@ -38,7 +38,10 @@ def metres(lon1, lat1, lon2, lat2):
 
 def network(day):
     stops = [{"stop_id": r.stop_id, "name": r.name, "lon": round(float(r.lon), 6), "lat": round(float(r.lat), 6), "community_id": r.community_id} for r in day["stops"].itertuples()]
-    return {"communities": day["communities"], "stops": stops, "routes": day["routes"], "fleet_types": day["fleet_types"]}
+    out = {"communities": day["communities"], "stops": stops, "routes": day["routes"], "fleet_types": day["fleet_types"]}
+    if day.get("network_source"):
+        out["source"] = day["network_source"]                         # who published the network, which edition, and its credit line
+    return out
 
 
 def trips_of(day):

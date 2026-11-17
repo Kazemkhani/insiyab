@@ -30,7 +30,7 @@ taps that carry the stop before the right one; duplicated taps; empty stop names
 check-out; stop visits where the door did not open; three scheduled trips that did not run; stops outside every
 area; two buses with no model year and one with no total.
 """
-import csv, io, math, os, random, sys
+import csv, io, json, math, os, random, sys
 
 SEED = 20251215
 DATE, NEXT_DATE = "2025-12-15", "2025-12-16"
@@ -269,6 +269,15 @@ def build(nol_shape="tap"):
                            "A real table from the hackathon must never be put in this folder. scripts/gates.sh proves these files equal a fresh build.\n"}
     for name, cols in GTFS_COLS.items():
         files["gtfs/%s.txt" % name] = table(cols, g[name])
+    # Where the network came from, for a screen to credit: the engine copies this into network.json as it is.
+    files["NETWORK-SOURCE.json"] = json.dumps({
+        "what": "Nine routes of RTA's public timetable feed, with their stops, paths and one Monday's trips",
+        "publisher": "Roads and Transport Authority (RTA), Dubai", "published_as": "rta_gtfs-open on Dubai Pulse (now data.dubai)",
+        "copy": "MobilityData feed mdb-904", "edition": "calendar 9 September 2021 to 31 December 2021", "fetched": "2026-11-17",
+        "terms": "Dubai Open Data Licence (draft), with attribution to RTA", "credit": "Network: RTA public timetable feed, 2021 edition",
+        "changed": "The calendar's dates are moved to December 2025 so that the public Monday timetable is the plan for the stand-in day. No other row is changed.",
+        "invented": "Every passenger, tap, vehicle and lateness on this network is invented. The stops, routes and timetable are RTA's public ones.",
+        "provenance": "opendata/public/rta-gtfs/PROVENANCE.md"}, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
     return files
 
 
