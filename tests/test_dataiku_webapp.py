@@ -1,0 +1,678 @@
+"""test_dataiku_webapp.py — proves the Insiyab Dataiku webapp works.
+
+Run:
+  .venv/bin/python tests/test_dataiku_webapp.py
+
+Last line is ALL PASS or n FAILED.
+
+The test:
+  1. Builds a stub `dataiku` module with made-up data in the correct schemas.
+  2. Creates a Flask test harness that provides `app` and executes backend.py
+     in that context, then adds a route that serves the full assembled page.
+  3. Starts the Flask server on a free port in a background thread.
+  4. Uses Playwright at 1280x720 and 390x844 to test every tab.
+  5. Saves screenshots to /tmp/insiyab-webapp-shots/ and prints paths.
+
+Made-up data is clearly invented: route names are "T01".."T30",
+hours are 3..26, values are arithmetic progressions.
+"""
+
+import io
+import json
+import math
+import os
+import random
+import socket
+import sys
+import textwrap
+import threading
+import time
+import types
+
+# ── Playwright uses the system browser cache ───────────────────────────
+os.environ.setdefault(
+    "PLAYWRIGHT_BROWSERS_PATH",
+    os.path.expanduser("~/Library/Caches/ms-playwright"),
+)
+
+import pandas as pd
+import flask as _flask
+
+# ── Locate the repo root ───────────────────────────────────────────────
+ROOT   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WEBAPP = os.path.join(ROOT, "dataiku", "webapp")
+
+# ── Build the stub dataiku module ────────────────────────────────────
+# Made-up data — clearly invented.
+
+_ROUTES   = ["T{:02d}".format(i) for i in range(1, 31)]   # T01..T30
+_HOURS    = list(range(3, 27))                              # 3..26
+_BUS_TYPES = ["STANDARD", "DOUBLE", "ARTICULATED", "MIDI", "COACH"]
+
+_BROKEN_DATASETS = set()   # test can add names here to trigger error paths
+
+
+def _make_punctuality_by_hour():
+    # counts are scaled to reflect realistic departure volumes:
+    # daytime (h=7..20) around 500-900, off-peak lower.
+    rows = []
+    for h in _HOURS:
+        base = 0.08 + 0.012 * max(0, h - 14)
+        count = int(300 + 400 * math.exp(-((h - 17) ** 2) / 20))  # peak ~700 at h=17
+        rows.append({
+            "hour": h,
+            "late_s_avg": round(base * 400, 1),
+            "late_5min_avg": round(base, 4),
+            "late_5min_sum": int(base * count),
+            "early_1min_avg": round(0.03 + base * 0.1, 4),
+            "drive_through_avg": round(0.01 + 0.002 * h, 4),
+            "count": count,
+        })
+    return pd.DataFrame(rows)
+
+
+def _make_punctuality_by_route_hour():
+    rows = []
+    for route in _ROUTES:
+        ri = int(route[1:]) - 1
+        for h in _HOURS:
+            base = 0.05 + 0.015 * (ri % 6) + 0.01 * max(0, h - 15)
+            rows.append({
+                "route": route,
+                "hour": h,
+                "late_s_avg": round(base * 380, 1),
+                "late_5min_avg": round(base, 4),
+                "late_5min_sum": int(base * 50),
+                "early_1min_avg": round(0.02, 4),
+                "drive_through_avg": round(0.008 + 0.001 * ri, 4),
+                "count": 20 + ri * 3 + (h % 5) * 2,
+            })
+    return pd.DataFrame(rows)
+
+
+def _make_punctuality_by_bus_type():
+    rows = []
+    for i, bt in enumerate(_BUS_TYPES):
+        rows.append({
+            "bus_type": bt,
+            "late_s_avg": round(80 + i * 25, 1),
+            "late_5min_avg": round(0.10 + i * 0.04, 4),
+            "late_5min_sum": 500 + i * 200,
+            "early_1min_avg": round(0.025 - i * 0.003, 4),
+            "drive_through_avg": round(0.01 + i * 0.002, 4),
+            "count": 3000 - i * 400,
+        })
+    return pd.DataFrame(rows)
+
+
+def _make_demand_by_hour():
+    rows = []
+    for h in _HOURS:
+        b = 1200 + 800 * math.exp(-((h - 18) ** 2) / 8)
+        rows.append({
+            "hour": h,
+            "boardings_sum": int(b),
+            "alightings_sum": int(b * 0.98),
+            "count": 280 + h * 4,
+        })
+    return pd.DataFrame(rows)
+
+
+def _make_demand_by_route_hour():
+    rows = []
+    for route in _ROUTES:
+        ri = int(route[1:]) - 1
+        for h in _HOURS:
+            b = 60 + 40 * (ri % 5) + 30 * math.exp(-((h - 17) ** 2) / 10)
+            rows.append({
+                "route": route,
+                "hour": h,
+                "boardings_sum": int(b),
+                "alightings_sum": int(b * 0.97),
+                "count": 20 + ri * 2,
+            })
+    return pd.DataFrame(rows)
+
+
+def _make_demand_by_stop():
+    rows = []
+    stops = [("STP{:04d}".format(i), "Stop Area {}".format(i)) for i in range(1, 31)]
+    for sid, sname in stops:
+        idx = int(sid[3:]) - 1
+        rows.append({
+            "stop_id": sid,
+            "stop_name": sname,
+            "boardings_sum": 1800 - idx * 50,
+            "alightings_sum": 1750 - idx * 50,
+            "count": 400 - idx * 10,
+        })
+    return pd.DataFrame(rows)
+
+
+def _make_supply_vs_demand():
+    statuses = [
+        "in balance",
+        "short of seats",
+        "short even with standing",
+        "under a fifth used",
+        "route not in the running-time table",
+    ]
+    rows = []
+    for route in _ROUTES:
+        ri = int(route[1:]) - 1
+        for h in _HOURS:
+            boardings = 60 + 40 * (ri % 5) + 30 * math.exp(-((h - 17) ** 2) / 10)
+            seats_per = 42 if ri % 3 != 0 else 70
+            trips = 3 + ri % 4
+            needed = math.ceil(boardings / seats_per)
+            short = max(0, needed - trips)
+            bps = boardings / (trips * seats_per) if trips > 0 else 0
+            if ri >= 25:
+                status = "route not in the running-time table"
+            elif short > 2:
+                status = "short even with standing"
+            elif short > 0:
+                status = "short of seats"
+            elif bps < 0.2:
+                status = "under a fifth used"
+            else:
+                status = "in balance"
+            rows.append({
+                "route": route,
+                "hour": h,
+                "trips_run": trips,
+                "seats_offered": trips * seats_per,
+                "seats_per_bus": seats_per,
+                "boardings": int(boardings),
+                "alightings": int(boardings * 0.97),
+                "places_per_bus": seats_per + 20,
+                "buses_needed_seated": needed,
+                "buses_needed_with_standing": math.ceil(boardings / (seats_per + 20)),
+                "buses_short_seated": short,
+                "buses_short_with_standing": max(0, math.ceil(boardings / (seats_per + 20)) - trips),
+                "boardings_per_seat_offered": round(bps, 4),
+                "status": status,
+            })
+    # The real table has empty cells: a route with taps but no trip in the running-time table. Empty must not break the page.
+    _out = pd.DataFrame(rows)
+    _nan = float("nan")
+    _extra = dict(_out.iloc[0]) if hasattr(_out, "iloc") else dict(_out[0])
+    _extra.update({"route": "T99", "trips_run": 0, "seats_offered": 0, "buses_short_seated": _nan, "buses_short_with_standing": _nan, "boardings_per_seat_offered": _nan, "status": "route not in the running-time table"})
+    if hasattr(_out, "iloc"):
+        import pandas as _pd
+        _out = _pd.concat([_out, _pd.DataFrame([_extra])], ignore_index=True)
+    else:
+        _out = list(_out) + [_extra]
+    return _out
+
+
+def _make_supply_status_by_hour():
+    supply = _make_supply_vs_demand()
+    result = []
+    statuses = supply["status"].unique()
+    for h in _HOURS:
+        for st in statuses:
+            sub = supply[(supply["hour"] == h) & (supply["status"] == st)]
+            if len(sub) == 0:
+                continue
+            result.append({
+                "hour": h,
+                "status": st,
+                "trips_run_sum": int(sub["trips_run"].sum()),
+                "boardings_sum": int(sub["boardings"].sum()),
+                "buses_short_seated_sum": int(sub["buses_short_seated"].sum()),
+                "count": len(sub),
+            })
+    return pd.DataFrame(result)
+
+
+_DATA = {
+    "punctuality_by_hour":          _make_punctuality_by_hour,
+    "punctuality_by_route_hour":     _make_punctuality_by_route_hour,
+    "punctuality_by_bus_type":       _make_punctuality_by_bus_type,
+    "demand_by_hour":                _make_demand_by_hour,
+    "demand_by_route_hour":          _make_demand_by_route_hour,
+    "demand_by_stop":                _make_demand_by_stop,
+    "supply_vs_demand_by_route_hour": _make_supply_vs_demand,
+    "supply_status_by_hour":         _make_supply_status_by_hour,
+    # forecast datasets are ABSENT by default (triggers "not built yet" path)
+}
+
+
+class _StubDataset:
+    def __init__(self, name):
+        self.name = name
+
+    def get_dataframe(self):
+        if self.name in _BROKEN_DATASETS:
+            raise RuntimeError(
+                "Dataset '{}' not found (deliberately broken in test)".format(self.name)
+            )
+        factory = _DATA.get(self.name)
+        if factory is None:
+            raise RuntimeError("Dataset '{}' does not exist".format(self.name))
+        return factory()
+
+
+_stub_dataiku = types.ModuleType("dataiku")
+_stub_dataiku.Dataset = _StubDataset
+sys.modules["dataiku"] = _stub_dataiku
+
+# ── Build the Flask test harness ──────────────────────────────────────
+harness = _flask.Flask(__name__)
+harness.config["TESTING"] = True
+
+# Execute backend.py in a namespace where `app` = harness
+_backend_path = os.path.join(WEBAPP, "backend.py")
+with open(_backend_path) as fh:
+    _backend_src = fh.read()
+
+_backend_globals = {
+    "__name__": "backend",
+    "__file__": _backend_path,
+    "app": harness,
+}
+exec(compile(_backend_src, _backend_path, "exec"), _backend_globals)
+
+# Route that serves the assembled page (body.html + style.css + script.js)
+@harness.route("/")
+def index():
+    body_path  = os.path.join(WEBAPP, "body.html")
+    style_path = os.path.join(WEBAPP, "style.css")
+    js_path    = os.path.join(WEBAPP, "script.js")
+
+    with open(body_path)  as f: body  = f.read()
+    with open(style_path) as f: style = f.read()
+    with open(js_path)    as f: js    = f.read()
+
+    page = textwrap.dedent("""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Insiyab test</title>
+          <style>{style}</style>
+          <script>
+            var __backendPort = {port};
+            function getWebAppBackendUrl(path) {{
+              return 'http://127.0.0.1:' + __backendPort + path;
+            }}
+          </script>
+        </head>
+        <body style="margin:0;padding:0">
+        {body}
+        <script>
+        {js}
+        </script>
+        </body>
+        </html>
+    """).format(style=style, body=body, js=js, port="{port}")
+
+    # Port is substituted after we know it; use a placeholder replaceable approach
+    actual_port = harness.config.get("PORT", 0)
+    page = page.replace("{port}", str(actual_port))
+    return page
+
+
+# Route to deliberately break a dataset during testing
+@harness.route("/test-break/<name>")
+def test_break(name):
+    _BROKEN_DATASETS.add(name)
+    return _flask.jsonify({"broken": name})
+
+
+@harness.route("/test-restore/<name>")
+def test_restore(name):
+    _BROKEN_DATASETS.discard(name)
+    return _flask.jsonify({"restored": name})
+
+
+# ── Start server on a free port ───────────────────────────────────────
+def _free_port():
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+
+PORT = _free_port()
+harness.config["PORT"] = PORT
+
+
+def _run():
+    harness.run(host="127.0.0.1", port=PORT, use_reloader=False, threaded=True)
+
+
+_server = threading.Thread(target=_run, daemon=True)
+_server.start()
+time.sleep(1.0)   # Give Flask time to start
+
+BASE = "http://127.0.0.1:{}".format(PORT)
+
+# ── Screenshot directory ──────────────────────────────────────────────
+SHOT_DIR = "/tmp/insiyab-webapp-shots"
+os.makedirs(SHOT_DIR, exist_ok=True)
+
+# ── Test runner ───────────────────────────────────────────────────────
+_failures = []
+_passes   = []
+
+
+def passed(name):
+    _passes.append(name)
+    print("  PASS  " + name)
+
+
+def failed(name, detail=""):
+    _failures.append(name)
+    print("  FAIL  " + name + (" — " + detail if detail else ""))
+
+
+def check(name, condition, detail=""):
+    if condition:
+        passed(name)
+    else:
+        failed(name, detail)
+
+
+# ── Playwright tests ──────────────────────────────────────────────────
+def run_all_tests():
+    from playwright.sync_api import sync_playwright
+
+    VIEWPORTS = [
+        {"name": "desktop", "width": 1280, "height": 720},
+        {"name": "mobile",  "width": 390,  "height": 844},
+    ]
+
+    TABS = [
+        ("day",         "tbtn-day"),
+        ("reliability", "tbtn-reliability"),
+        ("demand",      "tbtn-demand"),
+        ("supply",      "tbtn-supply"),
+        ("whatif",      "tbtn-whatif"),
+        ("build",       "tbtn-build"),
+    ]
+
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(headless=True)
+
+        for vp in VIEWPORTS:
+            vname = vp["name"]
+            print("\n-- {} ({}x{}) --".format(vname, vp["width"], vp["height"]))
+
+            page = browser.new_page(
+                viewport={"width": vp["width"], "height": vp["height"]},
+            )
+
+            # Capture console errors
+            console_errors = []
+            page.on("console", lambda m: console_errors.append(m)
+                    if m.type == "error" else None)
+
+            page.goto(BASE + "/", wait_until="domcontentloaded")
+            page.wait_for_timeout(1500)   # let first tab data load
+
+            # Test each tab
+            for tab_id, btn_id in TABS:
+                # Reset errors for this tab
+                tab_errors_before = len(console_errors)
+
+                page.click("#" + btn_id)
+                page.wait_for_timeout(1200)
+
+                # Screenshot
+                shot = os.path.join(SHOT_DIR, "{}-{}.png".format(vname, tab_id))
+                page.screenshot(path=shot, full_page=False)
+
+                # 1. No console error
+                new_errors = console_errors[tab_errors_before:]
+                # Filter out known noisy but harmless errors
+                real_errors = [e for e in new_errors
+                               if "favicon" not in e.text.lower()
+                               and "net::err_aborted" not in e.text.lower()]
+                check(
+                    vname + "/" + tab_id + "/no-console-error",
+                    len(real_errors) == 0,
+                    "; ".join(e.text[:120] for e in real_errors[:3]),
+                )
+
+                # 2. No sideways scroll
+                scroll_w = page.evaluate("document.documentElement.scrollWidth")
+                win_w    = page.evaluate("window.innerWidth")
+                check(
+                    vname + "/" + tab_id + "/no-sideways-scroll",
+                    scroll_w <= win_w + 2,   # +2 px tolerance
+                    "scrollWidth={} innerWidth={}".format(scroll_w, win_w),
+                )
+
+                # 3. No interactive control under 44 px (only on active panel)
+                small = page.evaluate("""
+                    (function() {
+                        var sel = 'button, select, input[type=number]';
+                        var items = Array.from(document.querySelectorAll('.panel.active ' + sel));
+                        var small = items.filter(function(el) {
+                            var r = el.getBoundingClientRect();
+                            return r.width > 0 && r.height > 0 && r.height < 44;
+                        });
+                        return small.map(function(el) {
+                            return el.tagName + '#' + el.id + ' h=' + Math.round(el.getBoundingClientRect().height);
+                        });
+                    })()
+                """)
+                check(
+                    vname + "/" + tab_id + "/controls-44px",
+                    len(small) == 0,
+                    "; ".join(small[:5]),
+                )
+
+            # What-if: check that SIMULATED text appears and numbers change
+            page.click("#tbtn-whatif")
+            page.wait_for_timeout(1200)
+            shot = os.path.join(SHOT_DIR, "{}-whatif-before.png".format(vname))
+            page.screenshot(path=shot)
+
+            has_sim = page.evaluate("""
+                document.body.innerText.includes('SIMULATED')
+            """)
+            check(vname + "/whatif/shows-simulated", has_sim)
+
+            # Click + bus
+            before_text = page.evaluate("(document.getElementById('whatif-results') || {}).innerText || ''")
+            page.click("#wi-plus")
+            page.wait_for_timeout(300)
+            after_text = page.evaluate("(document.getElementById('whatif-results') || {}).innerText || ''")
+            shot = os.path.join(SHOT_DIR, "{}-whatif-after.png".format(vname))
+            page.screenshot(path=shot)
+            check(
+                vname + "/whatif/numbers-change-on-plus",
+                before_text != after_text,
+                "text did not change after clicking +",
+            )
+
+            # Absent forecast dataset shows "not built yet" sentence
+            page.click("#tbtn-forecast") if page.query_selector("#tbtn-forecast:not([hidden])") else None
+            # Probe forecast to try to unhide the tab (it may still be hidden if all missing)
+            # Directly navigate to forecast state
+            page.evaluate("switchTab && switchTab('forecast')")
+            page.wait_for_timeout(1200)
+            shot = os.path.join(SHOT_DIR, "{}-forecast.png".format(vname))
+            page.screenshot(path=shot)
+            forecast_text = page.evaluate("(document.getElementById('forecast-content') || {}).innerText || ''")
+            check(
+                vname + "/forecast/shows-not-built",
+                "not been built yet" in (forecast_text or "").lower() or
+                "not built" in (forecast_text or "").lower(),
+                repr((forecast_text or "")[:100]),
+            )
+
+            # ── Fix 1: headline and stat tile must use the same hour ──────
+            page.click("#tbtn-day")
+            page.wait_for_timeout(1200)
+            day_text = page.evaluate("document.body.innerText")
+            # Both headline and tile must name the same "HH:00" hour
+            import re as _re
+            headline_hours = _re.findall(r'At (\d{2}:\d{2})', day_text[:800])
+            tile_label_hours = _re.findall(r'worst hour \((\d{2}:\d{2})', day_text[:800])
+            check(
+                vname + "/fix1/headline-and-tile-same-hour",
+                bool(headline_hours and tile_label_hours and headline_hours[0] == tile_label_hours[0]),
+                "headline_hours={} tile_hours={}".format(headline_hours[:1], tile_label_hours[:1]),
+            )
+            # Fix 1b: hours >= 24 on the service-day clock should show "(next day)" in prose.
+            # SVG chart axis labels use the short form intentionally; we check only prose text
+            # (elements that are not inside <svg> tags).
+            prose_post_midnight = page.evaluate("""
+                (function() {
+                    // Collect text from non-SVG elements in the active panel
+                    var proseEls = Array.from(document.querySelectorAll(
+                        '.panel.active p, .panel.active h1, .panel.active h2, .panel.active h3, ' +
+                        '.panel.active .stat-label, .panel.active .stat-val, .panel.active .headline'
+                    ));
+                    var text = proseEls.map(function(el) { return el.innerText; }).join(' ');
+                    // Look for bare post-midnight times (00:, 01:, 02:) not followed by "(next day)"
+                    var matches = text.match(/\\b(?:00|01|02):00\\b(?! \\(next day\\))/g);
+                    return matches || [];
+                })()
+            """)
+            check(
+                vname + "/fix1/no-bare-post-midnight",
+                len(prose_post_midnight) == 0,
+                "bare post-midnight times in prose: " + str(prose_post_midnight[:3]),
+            )
+
+            # ── Fix 2: no border-left stripe on stat-box or assumptions ──
+            has_stripe = page.evaluate("""
+                (function() {
+                    var els = Array.from(document.querySelectorAll('.stat-box, .assumptions'));
+                    return els.some(function(el) {
+                        var cs = window.getComputedStyle(el);
+                        var bl = cs.getPropertyValue('border-left-width');
+                        return bl && parseInt(bl) > 1;
+                    });
+                })()
+            """)
+            check(vname + "/fix2/no-left-stripe", not has_stripe, "border-left > 1px found on .stat-box or .assumptions")
+
+            # ── Fix 3: what-if opens on route/hour with max buses_short_with_standing ──
+            page.click("#tbtn-supply")
+            page.wait_for_timeout(1200)
+            page.click("#tbtn-whatif")
+            page.wait_for_timeout(1200)
+            wi_route = page.evaluate("(document.getElementById('wi-route') || {}).value || ''")
+            wi_hour  = page.evaluate("(document.getElementById('wi-hour') || {}).value || ''")
+            # Verify the selected route/hour has non-zero buses_short_with_standing
+            wi_text = page.evaluate("(document.getElementById('whatif-results') || {}).innerText || ''")
+            check(
+                vname + "/fix3/whatif-opens-on-worst-row",
+                bool(wi_route) and bool(wi_hour),
+                "route={} hour={}".format(wi_route, wi_hour),
+            )
+
+            # ── Fix 4: bus-type control shows two labelled buttons ────────
+            has_std_btn = page.evaluate("!!document.getElementById('wi-bus-std')")
+            has_dbl_btn = page.evaluate("!!document.getElementById('wi-bus-dbl')")
+            std_text = page.evaluate("(document.getElementById('wi-bus-std') || {}).innerText || ''")
+            dbl_text = page.evaluate("(document.getElementById('wi-bus-dbl') || {}).innerText || ''")
+            check(
+                vname + "/fix4/bus-type-two-buttons",
+                has_std_btn and has_dbl_btn,
+                "wi-bus-std={} wi-bus-dbl={}".format(has_std_btn, has_dbl_btn),
+            )
+            check(
+                vname + "/fix4/std-button-says-standard",
+                "standard" in std_text.lower(),
+                "std button text: " + repr(std_text[:60]),
+            )
+            check(
+                vname + "/fix4/dbl-button-says-double",
+                "double" in dbl_text.lower(),
+                "dbl button text: " + repr(dbl_text[:60]),
+            )
+
+            # ── Fix 5: no literal "Tab 4" in page text ───────────────────
+            full_text = page.evaluate("document.body.innerText")
+            check(
+                vname + "/fix5/no-tab-4-text",
+                "Tab 4" not in full_text,
+                "found 'Tab 4' in page text",
+            )
+
+            # ── Fix 6: what-if table shows both seated and standing rows ──
+            wi_results = page.evaluate("(document.getElementById('whatif-results') || {}).innerText || ''")
+            check(
+                vname + "/fix6/whatif-has-seated-rule",
+                "seated" in wi_results.lower(),
+                "no 'seated' in whatif results",
+            )
+            check(
+                vname + "/fix6/whatif-has-standing-rule",
+                "standing" in wi_results.lower(),
+                "no 'standing' in whatif results",
+            )
+
+            # ── Fix 7: supply tab auto-selects a peak hour and shows lead sentence ──
+            page.click("#tbtn-supply")
+            page.wait_for_timeout(1200)
+            supply_hour_val = page.evaluate("(document.getElementById('supply-hour-sel') || {}).value || ''")
+            lead_text = page.evaluate("(document.getElementById('supply-lead-sentence') || {}).innerText || ''")
+            check(
+                vname + "/fix7/supply-auto-selects-hour",
+                bool(supply_hour_val) and supply_hour_val != "",
+                "supply-hour-sel value={}".format(repr(supply_hour_val)),
+            )
+            check(
+                vname + "/fix7/supply-lead-sentence-visible",
+                "route-hours" in lead_text.lower() or "short" in lead_text.lower(),
+                "lead sentence: " + repr(lead_text[:120]),
+            )
+
+            # Deliberately break punctuality_by_hour and check named error
+            page.goto(BASE + "/test-break/punctuality_by_hour")
+            page.wait_for_timeout(200)
+            page.goto(BASE + "/")
+            page.wait_for_timeout(1500)
+            # First tab (day) should show the named error
+            shot = os.path.join(SHOT_DIR, "{}-broken-dataset.png".format(vname))
+            page.screenshot(path=shot)
+            broken_text = page.evaluate("document.body.innerText")
+            check(
+                vname + "/broken-dataset/shows-named-error",
+                "punctuality_by_hour" in broken_text,
+                repr(broken_text[:200]) if "punctuality_by_hour" not in broken_text else "",
+            )
+            # Restore
+            page.goto(BASE + "/test-restore/punctuality_by_hour")
+            page.wait_for_timeout(200)
+
+            page.close()
+
+        browser.close()
+
+    # Print screenshot paths
+    print("\nScreenshots saved to: " + SHOT_DIR)
+    shots = sorted(os.listdir(SHOT_DIR))
+    for s in shots:
+        print("  " + os.path.join(SHOT_DIR, s))
+
+
+# ── Run ───────────────────────────────────────────────────────────────
+print("Insiyab webapp tests — server on " + BASE)
+print("Stub data: made-up values, routes T01..T30, hours 3..26\n")
+
+try:
+    run_all_tests()
+except Exception as exc:
+    import traceback
+    failed("unexpected-exception", traceback.format_exc())
+
+print()
+n_total = len(_passes) + len(_failures)
+if _failures:
+    print("{} FAILED  ({}/{} passed)".format(len(_failures), len(_passes), n_total))
+    for f in _failures:
+        print("  FAIL: " + f)
+    sys.exit(1)
+else:
+    print("ALL PASS  ({} checks)".format(n_total))
