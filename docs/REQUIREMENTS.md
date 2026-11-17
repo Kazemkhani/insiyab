@@ -104,8 +104,8 @@ A person writes each answer in `docs/team/MENTOR-ANSWERS.md`, with who said it a
 
 | Answer | Who said it, and when |
 |---|---|
-| (none yet) | |
+| Yes: totals worked out from the data may be shown publicly. Raw rows still never leave Dataiku, and nothing about one card, device or driver is shown. | Amir, 17 November about 18:30, answering lane 1 directly before the pitch page was deployed. He said someone had said so; the person and the time were not named, and `docs/team/MENTOR-ANSWERS.md` has no entry. Name them here when known. |
 
 The deploy script reads the next line, and shows real totals only when it says YES and the real bundle exists. Lane 1 changes it, and only from an answer recorded in `docs/team/MENTOR-ANSWERS.md`.
 
-TOTALS MAY LEAVE DATAIKU: NOT ANSWERED
+TOTALS MAY LEAVE DATAIKU: YES
