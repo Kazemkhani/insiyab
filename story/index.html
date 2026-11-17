@@ -107,20 +107,48 @@ nav .links{display:none}
 section{padding:100px 20px}
 }
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.bar .fill{transition:none}html{scroll-behavior:auto}}
+#film{min-height:100vh;background:#0A4558;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:84px 24px 36px;gap:22px;text-align:center}
+#film .ey2{font-size:13px;font-weight:600;color:var(--gold);letter-spacing:.02em}
+#film video{width:min(1120px,100%);aspect-ratio:16/9;background:#000;border-radius:10px;display:block}
+#film .row{display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:14px;color:#CFE1E6}
+#film .gone{max-width:560px;font-size:17px;color:#CFE1E6}
+.btn{display:inline-block;background:var(--gold);color:#1B1A17;font-weight:600;font-size:16px;padding:14px 24px;border-radius:999px}
+.btn:hover,.btn:focus-visible{filter:brightness(1.08)}
+.btn.ghost{background:none;border:1px solid rgba(255,255,255,.45);color:#fff;font-size:14px;padding:10px 18px}
+nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;padding:5px 12px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;margin-top:56px;border-top:2px solid var(--ink)}
+.steps div{padding:22px 22px 8px 0;border-right:1px solid var(--line)}
+.steps div:last-child{border-right:none}
+.steps div+div{padding-left:22px}
+.steps .k{font-size:13px;font-weight:600;color:var(--sea)}
+.steps b{display:block;font-size:clamp(34px,4vw,54px);font-weight:700;letter-spacing:-.04em;line-height:1;margin:10px 0 8px;font-variant-numeric:tabular-nums}
+.steps h3{font-size:17px;font-weight:600;line-height:1.25}
+.steps p{font-size:14px;color:var(--muted);margin-top:6px}
+.question{margin-top:72px;font-size:clamp(26px,3.2vw,42px);font-weight:700;letter-spacing:-.03em;line-height:1.15;max-width:22em}
+.question span{color:var(--sea)}
+@media(max-width:720px){.steps div,.steps div+div{padding:18px 0 6px;border-right:none;border-bottom:1px solid var(--line)}}
 </style>
 </head>
 <body>
 
 <nav>
-  <a class="brand" href="#top">Insiyab<span>.</span></a>
+  <a class="brand" href="#film">Insiyab<span>.</span></a>
   <div class="links">
+    <a href="#film">Film</a>
     <a href="#descent">The day</a>
-    <a href="#clock">Why</a>
-    <a href="#worklist">The worklist</a>
-    <a href="#forecast">Forecast</a>
+    <a href="#problem">The problem</a>
+    <a href="#answer">Our answer</a>
     <a href="#built">How it's built</a>
+    <a class="live" href="https://dss-8a0eac1b-a0da2b15-dku.eu-west-2.app.dataiku.io/projects/INSIYAB/webapps/kvDViy2_insiyab/view" target="_blank" rel="noopener">Live in Dataiku</a>
   </div>
 </nav>
+
+<header id="film">
+  <p class="ey2">RTA Future Move Hackathon, with Dataiku</p>
+  <video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="The Insiyab film, one minute"></video>
+  <p class="gone" id="fgone" hidden>The film is played from the presenter's laptop. The day itself starts below.</p>
+  <div class="row"><span>One minute. Then the real day, in six numbers.</span><a class="btn ghost" href="#descent">Skip to the day</a></div>
+</header>
 
 <div id="descent">
   <div class="sticky" id="top">
@@ -187,6 +215,22 @@ section{padding:100px 20px}
   </div>
 </div>
 
+<section id="problem" class="alt">
+  <div class="wrap">
+    <p class="ey reveal">The problem</p>
+    <h2 class="big reveal">One timetable.<br><span>A whole day.</span></h2>
+    <p class="lede reveal">RTA gives each bus route one running time and one layover of about 16 minutes for the whole day. Evening trips take longer than that plan allows, <b>so the lateness is passed from each trip to the same bus's next one.</b></p>
+    <div class="steps reveal">
+      <div><p class="k">1 · It is not the crowd</p><b>48,724 <span style="color:var(--muted);font-size:.5em">vs</span> 49,707</b><h3>The same boardings at 08:00 and at 18:00.</h3><p>Lateness goes from 19% to 45%.</p></div>
+      <div><p class="k">2 · It is the running time</p><b class="r">67 → 96</b><h3>Minutes planned, minutes taken.</h3><p>Route 310 at 18:00, the middle trip.</p></div>
+      <div><p class="k">3 · The layover cannot absorb it</p><b>16</b><h3>Minutes of layover, at every hour.</h3><p>Not enough for a trip that runs 29 long.</p></div>
+      <div><p class="k">4 · So lateness is inherited</p><b class="r">870 <span style="color:var(--muted);font-size:.5em">of 936</span></b><h3>Late starts that followed the same bus arriving late.</h3><p>Nobody is doing anything wrong.</p></div>
+    </div>
+    <p class="question reveal">Which routes, at which hours, need more running time, <span>and how many minutes?</span></p>
+    <span class="chip cm reveal" style="margin-top:28px">Measured on the real day</span>
+  </div>
+</section>
+
 <section id="clock">
   <div class="wrap">
     <p class="ey reveal">Why it is not the crowd</p>
@@ -213,6 +257,18 @@ section{padding:100px 20px}
     <div class="chart reveal" id="ch-ledger" role="img" aria-label="Extra bus hours needed by hour of the day. The three evening hours from 16:00 stand far above the rest."></div>
     <p class="src reveal">Read from the Dataiku flow: running_time_ledger_by_hour. A second analysis by a teammate, with other code, finds 569 bus hours for the day.</p>
     <span class="chip cm reveal">Measured on the real day</span>
+  </div>
+</section>
+
+<section id="answer">
+  <div class="wrap">
+    <p class="ey reveal">Our answer</p>
+    <h2 class="big reveal">Forecast the real evening.<br><span>Tell the planner where to give it time.</span></h2>
+    <div class="steps reveal">
+      <div><p class="k">A forecast</p><b class="s">30 min</b><h3>before each trip: how long will it really take?</h3><p>15% closer than the timetable on an evening it never saw.</p></div>
+      <div><p class="k">A worklist</p><b>244</b><h3>bus hours, turned into minutes per route and hour.</h3><p>The planner accepts or sets aside each row.</p></div>
+      <div><p class="k">A second ranking</p><b>695</b><h3>boardings in one hour on route C01 at 18:00, with 85% of departures late.</h3><p>Where lateness reaches the most passengers.</p></div>
+    </div>
   </div>
 </section>
 
@@ -267,12 +323,13 @@ section{padding:100px 20px}
   <div class="wrap">
     <p class="ey reveal">How it's built</p>
     <h2 class="big reveal">Inside Dataiku.<br><span>Where RTA can run it.</span></h2>
-    <p class="lede reveal">Fourteen steps in four zones: eight visual Group recipes and six short Python recipes. One rebuild from RTA's raw tables takes <b>131 seconds</b>. The web app's tabs carry the same names as the zones.</p>
+    <p class="lede reveal">Seventeen steps in five zones: eleven visual recipes and six short Python recipes. One rebuild from RTA's raw tables takes <b>131 seconds</b>. The web app's tabs carry the same names as the zones.</p>
     <div class="grid reveal">
       <div class="card"><p class="k">Zone 1</p><h3>Passenger demand</h3><p>Who boards, where, and when.</p><ul><li>count_taps</li><li>demand_by_hour</li><li>demand_by_route_hour</li><li>demand_by_stop</li></ul></div>
       <div class="card"><p class="k">Zone 2</p><h3>Service reliability</h3><p>Does the bus leave on time?</p><ul><li>clean_running_time</li><li>punctuality_by_hour</li><li>punctuality_by_route_hour</li><li>punctuality_by_bus_type</li></ul></div>
       <div class="card"><p class="k">Zone 3</p><h3>Supply and capacity</h3><p>Were enough buses sent?</p><ul><li>buses_needed_rule</li><li>supply_status_by_hour</li></ul></div>
       <div class="card"><p class="k">Zone 4</p><h3>Forecast</h3><p>How long will each trip take?</p><ul><li>build_trip_table</li><li>forecast_running_time</li><li>running_time_bands</li><li>running_time_ledger_by_hour</li></ul></div>
+      <div class="card"><p class="k">Zone 5</p><h3>Priorities</h3><p>Where does lateness reach the most passengers?</p><ul><li>passenger_impact_by_route_hour</li><li>passenger_impact_scored</li><li>passenger_impact_top25</li></ul></div>
     </div>
   </div>
 </section>
@@ -289,6 +346,8 @@ section{padding:100px 20px}
   <div class="wrap">
     <h2 class="big reveal">Give the evening<br>its time.</h2>
     <p class="lede reveal">About <b>244 bus hours</b> of extra running time from 16:00 to 18:59 would cover 85 trips in 100. About 630 across the whole day.</p>
+    <p class="reveal" style="margin-top:40px"><a class="btn" id="live" href="https://dss-8a0eac1b-a0da2b15-dku.eu-west-2.app.dataiku.io/projects/INSIYAB/webapps/kvDViy2_insiyab/view" target="_blank" rel="noopener">Now see it live in Dataiku</a></p>
+    <p class="reveal" style="margin-top:14px;font-size:13px;opacity:.75">Opens the planner's web app on the real day. It asks for a Dataiku sign-in.</p>
   </div>
 </section>
 
@@ -471,6 +530,7 @@ const sm=(a,b,x)=>{const t=cl((x-a)/(b-a));return t*t*(3-2*t)};
 let p=0,ps=0,on=true;
 function readScroll(){const r=descent.getBoundingClientRect();p=cl(-r.top/(r.height-innerHeight))}
 addEventListener('scroll',readScroll,{passive:true});readScroll();
+(function(){const v=document.getElementById('fv');if(!v)return;v.addEventListener('ended',()=>descent.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}));v.addEventListener('error',()=>{v.hidden=true;document.getElementById('fgone').hidden=false})})();
 new IntersectionObserver(e=>{on=e[0].isIntersecting}).observe(descent);
 
 const look=new THREE.Vector3(0,-5,0),fol=new THREE.Vector3(),fl=new THREE.Vector3(),hp=new THREE.Vector3(0,16,15),hl=new THREE.Vector3(0,-6,0),tp=new THREE.Vector3(),tl=new THREE.Vector3(),pv=new THREE.Vector3();

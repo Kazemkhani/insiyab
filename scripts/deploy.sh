@@ -57,6 +57,17 @@ if [ -d "$WORK/src/live/api" ]; then
   [ -e "$UP/api" ] && stop "a build wrote something under api/: that address belongs to the room relay"
   cp -R "$WORK/src/live/api" "$UP/api"; RELAY=1
 fi
+# The pitch page (story/): the film, then the real day in figures, then the link into Dataiku. Its figures are totals worked out
+# from RTA's data, so it goes up only on the same recorded yes as the real bundle. The film is kept outside git and is copied in if it is there.
+if [ -f "$WORK/src/story/index.html" ]; then
+  if [ "$YES" = "1" ]; then
+    [ -e "$UP/pitch" ] && stop "a build wrote something under pitch/: that address belongs to the pitch page"
+    mkdir "$UP/pitch"; cp "$WORK/src/story/index.html" "$UP/pitch/index.html"
+    FILM="${INSIYAB_FILM:-$HOME/work/insiyab-run/film/comic/Insiyab-comic.mp4}"
+    if [ -f "$FILM" ]; then cp "$FILM" "$UP/pitch/film.mp4"; echo "NOTE the pitch page is in this deploy at /pitch/, with the film"
+    else echo "NOTE the pitch page is in this deploy at /pitch/, WITHOUT the film: $FILM does not exist"; fi
+  else echo "NOTE the pitch page is NOT in this deploy: its figures are real totals and no yes is recorded in docs/REQUIREMENTS.md"; fi
+fi
 # The deployer's own files: the page asks not to be indexed whatever the builds contain, and says which commit it is.
 [ -f "$UP/vercel.json" ] || cat > "$UP/vercel.json" <<'JSON'
 {"headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"}, {"key": "X-Content-Type-Options", "value": "nosniff"}]}]}
