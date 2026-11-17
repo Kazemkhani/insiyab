@@ -27,3 +27,44 @@ The geographic merge was reviewed independently by council's Codex reviewer. Its
 Visual inspection caught forecast endpoint labels in the wrong order and standing figures too close for the larger stand-in load. Labels now follow their values in both orders, and the 3D test measures nonintersecting figure bounds. The new upstream briefing is retained as a disclosure below the map. Its claims distinguish boardings from waiting passengers, zero boarding/alighting from an empty stop, and fractional expected responses from whole passengers.
 
 The final council follow-up found only the briefing's waiting-queue wording; that phrase is corrected to “How many passengers will board?” and checked in the rendered page. The council did not execute browser journeys or certify production. The parent executed the browser tests.
+
+## Final validation and delivery
+
+Source revision `f44fe6f` was pushed to main at 05:14 Dubai time on 17 November, before the 06:00 target. Cuts 1–4 were already pushed and announced individually the previous evening; this revision replaces the old schematic and static scenes while retaining those workflows. Deployment belongs to lane 1 and was not performed by lane 2.
+
+Commands and actual final output:
+
+```text
+node web/build.mjs --bundle fixtures --out /tmp/insiyab-site
+BUILT /tmp/insiyab-site: 20 bundle files; fixture=true; local fonts, deck.gl and QR. Open index.html directly, including offline.
+
+INSIYAB_SHOTS="$HOME/work/insiyab-run/review/merged" bash web/tests/run.sh
+  basemap: 8 passed, 0 failed
+  ALL PASS
+ALL PASS
+
+bash scripts/gates.sh
+PASS tests/test_engine.py (36 checks)
+PASS tests/test_notebook.py (6 checks)
+PASS live/tests/run.sh (34 checks)
+PASS web/tests/run.sh (885 checks)
+PASS the gates changed no tracked file
+ALL GATES PASS
+
+INSIYAB_SHOTS="$HOME/work/insiyab-run/review/merged" bash web/tests/engine.sh
+ALL PASS
+ENGINE TO BROWSER PASS
+
+bash web/film/render.sh /tmp/insiyab-site "$HOME/work/insiyab-run/film/rebuild"
+FILM BUILT
+```
+
+Build, standalone web tests, repository gates and film ran on `f44fe6f`. The explicit engine-to-browser command ran before the last map-label and film-timing polish; the final repository gate also regenerated the engine bundle and ran the web suite. Full logs are outside git at `~/work/insiyab-run/review/logs/twin-final-{web,gates,engine,film,twin}.log`.
+
+The browser journeys open the built folder directly with network access disabled and reject remote requests. A separate test exercises same-origin PMTiles byte ranges. Removing the map file deliberately proves the network-only fallback. Geometry and label negative controls prove the assertions reject incorrect positions and overlap. Final visual review also checked actual bus pointer selection, keyboard focus after the swap, readable route labels and the before/after count changes.
+
+Thirty-seven screenshots at 1280×720 or 390×844 are in `~/work/insiyab-run/review/merged/`, all opened. They cover the overview, forecast, gap, model, route selection, exchange, briefing, four roles before and after, overhead seats, room and Khutwa. `manifest.json` records dimensions and SHA-256 hashes. Two additional HTTP basemap screenshots at both sizes are in the parent review folder and were opened.
+
+The 38-second H.264 opening film is `~/work/insiyab-run/film/rebuild/Insiyab-opening.mp4` at 1280×720. Nine sampled scene-boundary/end frames were opened. Recording startup varies by scene; the capture now measures each clip's start offset instead of applying a fixed one-second trim. The final role captions match their scenes.
+
+These checks are local evidence. The room test uses the actual relay handler and passenger page with simulated shared-store status; it does not prove public-store durability. No depot message or operational instruction was sent. The archive is historical, and operational counts are stand-ins. Broader real-data route loading remains a future scaling task if approved totals become available.
