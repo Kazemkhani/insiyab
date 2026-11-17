@@ -744,7 +744,7 @@ def run_all_tests():
             if vp["width"] == 1280:
                 focal_in_view = page.evaluate("""
                     (function() {
-                        var el = document.getElementById('wl-focal-number');
+                        var el = document.getElementById('wl-hl-num');
                         if (!el) return false;
                         var r = el.getBoundingClientRect();
                         return r.top >= 0 && r.bottom <= window.innerHeight;
@@ -753,11 +753,11 @@ def run_all_tests():
                 check(
                     vname + "/worklist/focal-number-in-first-screenful",
                     focal_in_view,
-                    "wl-focal-number not in first screenful at 1280x720",
+                    "the worklist's headline figure is not in the first screenful at 1280x720",
                 )
 
             # Focal number has content
-            focal_text = page.evaluate("(document.getElementById('wl-focal-number') || {}).innerText || ''")
+            focal_text = page.evaluate("(document.getElementById('wl-hl-num') || {}).parentElement ? document.getElementById('wl-hl-num').parentElement.innerText : ''")
             check(
                 vname + "/worklist/focal-number-not-empty",
                 "bus hours" in focal_text,

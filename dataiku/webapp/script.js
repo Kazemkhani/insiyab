@@ -1795,7 +1795,6 @@ function _wlFocalHtml(bands, all) {
 
   return '<div class="wl-focal-wrap">' +
     '<div>' +
-      '<div class="wl-focal-main" id="wl-focal-number">' + fmtNum(Math.round(eveningHours)) + ' bus hours</div>' +
       '<div class="wl-focal-label">more running time the 16:00 to 18:59 band needs, to cover 85 trips in 100<br>' +
         'The list below holds the ' + fmtNum(listedEvening.length) + ' route, direction and hour rows with 5 or more trips: ' +
         fmtNum(Math.round(listedEveningHours)) + ' of those bus hours.</div>' +
