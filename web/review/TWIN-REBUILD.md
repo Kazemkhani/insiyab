@@ -68,3 +68,24 @@ Thirty-seven screenshots at 1280×720 or 390×844 are in `~/work/insiyab-run/rev
 The 38-second H.264 opening film is `~/work/insiyab-run/film/rebuild/Insiyab-opening.mp4` at 1280×720. Nine sampled scene-boundary/end frames were opened. Recording startup varies by scene; the capture now measures each clip's start offset instead of applying a fixed one-second trim. The final role captions match their scenes.
 
 These checks are local evidence. The room test uses the actual relay handler and passenger page with simulated shared-store status; it does not prove public-store durability. No depot message or operational instruction was sent. The archive is historical, and operational counts are stand-ins. Broader real-data route loading remains a future scaling task if approved totals become available.
+
+## Evidence journey follow-up, 05:44 Dubai
+
+Pushed runtime revision `17619a2` after a documentation-only rebase. The executive now selects all eleven supplied swap pairs, labels each count as the trip peak and each time as its start, and opens the exact original peak record on the map. Other pairs do not link to the first pair's worker story. The planning miniatures also label separate peaks. Network attribution and invented-operation wording now come from `network.source`; lane 1 corrected the stale metadata note in `8e68b23`.
+
+A selected map stop opens its own forecast, including an explicit unavailable state. The map and evidence panel use the same stop, route, direction, origin, quarter-hour and value. Both hide the actual until reveal. A forecast keeps the nearest supplied origin when the stop changes; the route filter and map extent follow the selected series.
+
+Independent read-only council reviews caught the mismatched map/panel forecast, misleading peak/departure presentation and a stale route filter hiding the forecast off-map. All three were fixed. Final source review returned `VERDICT: SHIP`; it did not run browser tests. The local browser test switches from an unrelated route, measures the selected stop inside the viewport, compares the actual layer data with the selected forecast and deliberately mutates the layer to prove the assertion fails.
+
+Actual final output before committing the unchanged runtime tree:
+
+```text
+bash web/tests/run.sh
+ALL PASS
+bash scripts/gates.sh
+PASS web/tests/run.sh (1084 checks)
+PASS the gates changed no tracked file
+ALL GATES PASS
+```
+
+The 35 screenshots under `~/work/insiyab-run/review/continuation/` were opened; their dimensions and hashes are in manifest.json. Two additional HTTP basemap screenshots were opened. The refreshed 38-second film is `~/work/insiyab-run/film/continuation/Insiyab-opening.mp4`; nine scene-boundary/end frames were opened. Logs are `~/work/insiyab-run/review/logs/continuation-*.log`. The public deploy marker returned `8e68b23` at 05:44; this follow-up is handed to lane 1 for deployment.
