@@ -48,6 +48,26 @@ def _normalise(tables):
 # stage 1: prepare
 # ---------------------------------------------------------------------------
 
+def communities_from_map_export(c):
+    """RTA's communities table in Dataiku is a map export: the names sit inside ExtendedData and the outline inside Polygon,
+    both as text. This returns the four columns the engine reads (comm_num, cname_e, cname_a, shape), with the outline as
+    'POLYGON ((lon lat, ...))'. A table that already has those columns is returned as it is."""
+    import json
+    if "ExtendedData" not in c.columns or "Polygon" not in c.columns:
+        return c
+    rows = []
+    for ext, poly in zip(c["ExtendedData"], c["Polygon"]):
+        try:
+            fields = {f.get("name", "").upper(): f.get("xml_text") for f in json.loads(ext)[0]["SchemaData"][0]["SimpleData"]}
+            text = json.loads(poly)[0]["outerBoundaryIs"][0]["LinearRing"][0]["coordinates"]
+            ring = ", ".join(" ".join(pt.split(",")[:2]) for pt in text.split())
+        except (ValueError, KeyError, IndexError, TypeError, AttributeError):
+            continue
+        if fields.get("COMM_NUM") and ring:
+            rows.append({"comm_num": fields["COMM_NUM"], "cname_e": fields.get("CNAME_E"), "cname_a": fields.get("CNAME_A"), "shape": f"POLYGON (({ring}))"})
+    return pd.DataFrame(rows, columns=["comm_num", "cname_e", "cname_a", "shape"])
+
+
 def prepare(tables):
     """Clean raw tables, resolve taps to trips, build binned boardings.
 
@@ -58,6 +78,7 @@ def prepare(tables):
     from model.prepare import prepare as _prepare, BIN
 
     t = _normalise(tables)
+    t["communities"] = communities_from_map_export(t["communities"])
     day = _prepare(t)
 
     # --- stop_visits (no PII: vehicle is already v1/v2..., body/card/driver gone) ---

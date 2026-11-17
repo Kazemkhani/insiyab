@@ -82,6 +82,12 @@ def _inside(lon, lat, ring):
     return inside
 
 
+def iso_dates(s):
+    """Dates as YYYY-MM-DD whatever way they were written (2025-12-15, 15-Dec-2025, 15DEC2025), so that they compare in order. What cannot be read is kept as written."""
+    read = pd.to_datetime(s.astype("string").str.strip(), errors="coerce", format="mixed", dayfirst=True).dt.strftime("%Y-%m-%d")
+    return read.where(read.notna(), s.astype("string").str.strip()).astype(object)
+
+
 def prepare(tables, service_date=None):
     log = []
     def note(stage, text, **counts):
@@ -91,7 +97,8 @@ def prepare(tables, service_date=None):
     raw = tables["avl"]
     v = cols(raw, "Date", "Body", "Trip_ID", "Route", "Direction", "Stop_Seq", "Stop_ID", "Sched_Arr", "Act_Arr", "Sched_Dep", "Act_Dep", "Door_Status")
     v.columns = ["date", "body", "trip_id", "route_raw", "direction", "seq", "stop_id", "sched_arr", "act_arr", "sched_dep", "act_dep", "door"]
-    service_date = service_date or v["date"].mode().iat[0]
+    v["date"] = iso_dates(v["date"])
+    service_date = iso_dates(pd.Series([service_date])).iat[0] if service_date else v["date"].mode().iat[0]
     v["route_id"] = route_name(v["route_raw"]); v["stop_id"] = v["stop_id"].str.strip()
     v["direction"] = pd.to_numeric(v["direction"], errors="coerce").fillna(0).astype(int).clip(0, 1)
     v["seq"] = pd.to_numeric(v["seq"], errors="coerce")
@@ -149,6 +156,7 @@ def prepare(tables, service_date=None):
     t = cols(raw, "Transaction_date", "Transaction_Time", "Body_EVD_ID", "NOL_ID", "CKI", "CKO", "Stop_Id")
     t.columns = ["date", "clock", "body", "card", "cki", "cko", "stop_tapped"]
     dup = t.duplicated(keep="first"); t = t[~dup].copy()
+    t["date"] = iso_dates(t["date"])
     t["time"] = seconds(t["clock"]) + np.where(t["date"].str.strip() > service_date, 86400, 0)
     t["on"] = pd.to_numeric(t["cki"], errors="coerce").fillna(0).eq(1); t["off"] = pd.to_numeric(t["cko"], errors="coerce").fillna(0).eq(1)
     early = int(((seconds(t["clock"]) < DAY_START) & (t["date"].str.strip() == service_date)).sum())
@@ -220,6 +228,9 @@ def prepare(tables, service_date=None):
     tr = cols(tables["gtfs_trips"], "route_id", "service_id", "trip_id", "shape_id", "direction_id"); tr.columns = ["gtfs_route", "service_id", "gtfs_trip", "shape_id", "direction"]
     tr["direction"] = pd.to_numeric(tr["direction"], errors="coerce").fillna(0).astype(int).clip(0, 1)
     active = _services_on(tables, service_date)
+    if active is not None and not active:            # the plan is for another season: no service is dated for this day, so the same weekday's services stand for it
+        active = _services_on(tables, service_date, weekday_only=True)
+        note("timetable season", "the timetable feed does not cover the service day, so its services for the same day of the week are used: scheduled times from it are a plan for another season, not this day's plan", services_used=len(active))
     if active is not None:
         tr = tr[tr["service_id"].isin(active)]
     st = cols(tables["gtfs_stop_times"], "trip_id", "departure_time", "stop_id", "stop_sequence"); st.columns = ["gtfs_trip", "dep", "stop_id", "seq"]
@@ -277,15 +288,15 @@ def prepare(tables, service_date=None):
             "fleet_types": f.groupby("bus_type")["seats"].median().dropna().astype(int).reset_index().to_dict("records"), "log": log}
 
 
-def _services_on(tables, service_date):
+def _services_on(tables, service_date, weekday_only=False):
     """The service ids that run on the service day, from calendar and calendar_dates. None if the feed has neither."""
     day = service_date.replace("-", ""); cal = tables.get("gtfs_calendar"); out = None
     if cal is not None and len(cal):
         weekday = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"][pd.Timestamp(service_date).weekday()]
         c = cols(cal, "service_id", weekday, "start_date", "end_date")
-        out = set(c.loc[(c[weekday] == "1") & (c["start_date"] <= day) & (c["end_date"] >= day), "service_id"])
+        out = set(c.loc[(c[weekday] == "1") & (weekday_only | ((c["start_date"] <= day) & (c["end_date"] >= day))), "service_id"])
     cd = tables.get("gtfs_calendar_dates")
-    if cd is not None and len(cd):
+    if cd is not None and len(cd) and not weekday_only:
         c = cols(cd, "service_id", "date", "exception_type"); c = c[c["date"] == day]; out = out or set()
         out |= set(c.loc[c["exception_type"] == "1", "service_id"]); out -= set(c.loc[c["exception_type"] == "2", "service_id"])
     return out
