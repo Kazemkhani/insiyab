@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insiyab: on the day itself</title>
+<style>
+:root{--paper:#F6F5F1;--ink:#12263A;--flow:#0E5A5A;--over:#B23A2E;--spare:#2F6690;--sim:#8A5A00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:980px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:44px;line-height:1.1;margin:8px 0 12px}
+h2{font-size:26px;margin:48px 0 12px}
+.kicker{font:600 13px/1 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--flow)}
+.drill{border:2px solid var(--sim);color:var(--sim);padding:10px 14px;font:600 15px/1.4 system-ui,sans-serif;margin:16px 0 28px}
+.lead{font-size:21px;max-width:760px}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:20px 0}
+.num{border-top:3px solid var(--ink);padding-top:10px}
+.num b{display:block;font:700 44px/1 system-ui,sans-serif}
+.num.over b{color:var(--over)}
+.num span{font:15px/1.35 system-ui,sans-serif}
+.chart{display:flex;align-items:flex-end;gap:4px;height:200px;margin:18px 0 4px;border-bottom:1px solid var(--ink)}
+.bar{flex:1;background:var(--spare);position:relative;min-height:1px}
+.bar.hot{background:var(--over)}
+.bar i{position:absolute;top:-20px;left:0;right:0;text-align:center;font:600 12px/1 system-ui,sans-serif;font-style:normal}
+.axis{display:flex;gap:4px;font:12px/1 system-ui,sans-serif}
+.axis span{flex:1;text-align:center}
+.note{font:14px/1.45 system-ui,sans-serif;color:#44505c}
+.msg{background:#fff;border:1px solid var(--ink);border-left:8px solid var(--over);padding:18px 20px;max-width:640px;font:16px/1.5 system-ui,sans-serif}
+.msg h3{margin:0 0 6px;font-size:18px}
+.msg .to{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#44505c}
+.opts{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+button{font:600 15px/1 system-ui,sans-serif;padding:12px 14px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+button[aria-pressed=true]{background:var(--flow);border-color:var(--flow);color:#fff}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px}
+.step{background:#fff;border:1px solid #c9c7bf;padding:16px}
+.step h3{margin:0 0 8px;font:700 20px/1.2 system-ui,sans-serif;color:var(--flow)}
+.step p,.step li{font:15px/1.45 system-ui,sans-serif;margin:6px 0}
+.step ul{padding-left:18px;margin:0}
+#relay{min-height:3em;font-weight:600}
+table{border-collapse:collapse;font:15px/1.4 system-ui,sans-serif;margin:12px 0}
+td,th{border-bottom:1px solid #c9c7bf;padding:7px 12px;text-align:right}
+td:first-child,th:first-child{text-align:left}
+ul.limits li{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<div class="kicker">Insiyab · the second clock</div>
+<h1>And on the day itself.</h1>
+<p class="lead">A planner can give the evening its time before the day. On the day, one thing can still be seen coming: a bus that is not back yet when its next trip is due to leave.</p>
+<div class="drill">This page describes a drill on the team's own phones. No RTA system was contacted, and no call is placed from this page. The figures are totals from one real day, Monday 15 December 2025.</div>
+
+<h2>The signal: the bus is still out</h2>
+<div class="nums">
+  <div class="num over"><b>696</b><span>departures where the bus was still on its previous trip at the time it was due to leave</span></div>
+  <div class="num over"><b>85%</b><span>of those then left more than 5 minutes late; the middle one left 13 minutes late</span></div>
+  <div class="num"><b>110</b><span>routes and 377 buses had this happen at least once</span></div>
+  <div class="num"><b>62%</b><span>of all departures more than 5 minutes late (589 of 945) had the bus back after the due time</span></div>
+</div>
+<p class="note">Counted over the 9,787 trips whose bus ran an earlier trip that day with a planned break of up to two hours.</p>
+
+<h2>It is an evening signal</h2>
+<div class="chart" id="chart" role="img" aria-label="Departures with the bus still out, by hour of the day. It rises from 32 at 16:00 to 140 at 19:00 and falls to 22 at 22:00."></div>
+<div class="axis" id="axis"></div>
+<p class="note">Departures per hour with the bus still out. At 19:00 it is 140 of 651 departures, about one in five. Before 16:00 it is about one in thirty.</p>
+
+<h2>How early can the control room know?</h2>
+<table>
+<tr><th>Rule: the bus is overdue on its trip and not back</th><th>Flags in the day</th><th>Go on to leave over 5 minutes late</th><th>Share of all such late departures caught</th></tr>
+<tr><td>5 minutes before the departure</td><td>1,317</td><td>58%</td><td>81%</td></tr>
+<tr><td>10 minutes before</td><td>2,337</td><td>34%</td><td>84%</td></tr>
+<tr><td>15 minutes before</td><td>2,242</td><td>20%</td><td>47%</td></tr>
+<tr><td>At the due time (the 696 above)</td><td>696</td><td>85%</td><td>62%</td></tr>
+</table>
+<p class="note">Earlier warning means more false flags. Five minutes before is the useful point: about three flags in five turn into a late departure. This rule is measured, not forecast: the running-time model adds nothing to it at 15 to 60 minutes ahead, and we say so.</p>
+
+<h2>One message to the control room</h2>
+<div class="msg">
+  <div class="to">To: duty manager, operations control centre · drill</div>
+  <h3>Route 310: the 19:23 departure will leave late</h3>
+  <p>The bus for this trip is still on its previous trip and is overdue. Expected to leave about 13 minutes late. The planned break was 16 minutes and is used up.</p>
+  <p><b>Choose one:</b></p>
+  <div class="opts">
+    <button data-o="hold">Hold the next bus 6 minutes to even the gap</button>
+    <button data-o="spare">Send a spare bus from the depot</button>
+    <button data-o="run">Let it run late and tell the station</button>
+  </div>
+</div>
+
+<h2>Report. Decide. Relay.</h2>
+<div class="steps">
+  <div class="step"><h3>1. Report</h3><p>Three phones ring at once. Each person gives one line.</p><ul><li><b>Driver:</b> where the bus is and when it will be back.</li><li><b>Depot:</b> whether a spare bus and driver are ready.</li><li><b>Station:</b> how many people are waiting.</li></ul></div>
+  <div class="step"><h3>2. Decide</h3><p>The duty manager's phone rings with the three reports and the three options. A person chooses. The tool does not.</p></div>
+  <div class="step"><h3>3. Relay</h3><p>The same three people are rung back with the decision, and it is logged with the time.</p><p id="relay" aria-live="polite">Choose an option in the message above to see what is passed on.</p></div>
+</div>
+
+<h2>What this is not</h2>
+<ul class="limits">
+<li>It is not emergency or incident handling. The day's data has no record of breakdowns, closures or their causes; it shows delay carried from one trip to the next.</li>
+<li>It is one day, a Monday in the school holidays.</li>
+<li>The example wording, the 6 minute hold and the three options are illustrations for the drill, not RTA procedure.</li>
+<li>The phone calls are a demonstration to the team's own phones.</li>
+</ul>
+<p class="note">Source: RTA running-time data for 15 December 2025, read inside Dataiku; only totals leave it. Method: trips linked to the previous trip of the same bus; a departure counts as "bus still out" when that previous trip arrived after the departure was due.</p>
+</main>
+<script>
+var H=[[5,2],[6,7],[7,15],[8,23],[9,20],[10,12],[11,11],[12,18],[13,10],[14,17],[15,19],[16,32],[17,63],[18,109],[19,140],[20,104],[21,62],[22,22],[23,4]];
+var c=document.getElementById('chart'),a=document.getElementById('axis');
+H.forEach(function(h){var b=document.createElement('div');b.className='bar'+(h[0]>=17&&h[0]<=21?' hot':'');b.style.height=(h[1]/140*100)+'%';var i=document.createElement('i');i.textContent=h[1];b.appendChild(i);c.appendChild(b);var s=document.createElement('span');s.textContent=h[0];a.appendChild(s);});
+var T={hold:'Passed on: "Next bus on 310, hold 6 minutes at the stand." Driver, depot and station each confirm.',spare:'Passed on: "Depot, send the spare bus to cover the 19:23 on 310." Driver and station are told it is coming.',run:'Passed on: "The 19:23 on 310 runs about 13 minutes late." The station tells the people waiting.'};
+document.querySelectorAll('button[data-o]').forEach(function(b){b.setAttribute('aria-pressed','false');b.onclick=function(){document.querySelectorAll('button[data-o]').forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');document.getElementById('relay').textContent=T[b.dataset.o];};});
+</script>
+</body>
+</html>
