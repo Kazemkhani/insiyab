@@ -1773,10 +1773,10 @@ body.guide-open header nav,body.guide-open #documentation{display:none}
 #guide-steps li span{margin-right:8px}
 .guide-layout{display:grid;grid-template-columns:minmax(360px,.85fr) minmax(0,1.3fr);gap:38px;align-items:center}
 .guide-kicker{font:500 11px Plex;text-transform:uppercase;letter-spacing:1.6px;margin:0 0 14px}
-#guide h1{font:600 clamp(32px,4vw,56px)/1.05 Overpass;letter-spacing:-1.5px;margin:0 0 20px;max-width:13ch;outline:none}
+#guide h1{font:600 52px/1.05 Overpass;letter-spacing:-1.5px;margin:0 0 20px;max-width:13ch;outline:none}
 .guide-lead{font:400 20px/1.45 Plex;margin:0 0 24px;max-width:42ch}
 .guide-stats{display:flex;gap:24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin:18px 0}
-.guide-stats>div{flex:1;min-width:0}.guide-stats strong{display:block;font:600 48px/1.1 Overpass;letter-spacing:-1px}.guide-stats span{display:block;font:400 13px/1.35 Plex;margin-top:4px}
+.guide-stats>div{flex:1;min-width:0}.guide-stats strong{display:block;font:600 52px/1.1 Overpass;letter-spacing:-1px}.guide-stats span{display:block;font:400 13px/1.35 Plex;margin-top:4px}
 #guide-note{font:400 13px/1.45 Plex;color:var(--muted);margin:16px 0}
 .guide-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.guide-actions button,.guide-actions a{min-height:48px;font-size:16px;padding:12px 16px}.guide-actions .primary{min-width:240px}
 #guide-scene{position:relative;height:470px;min-width:0;background:var(--paper);overflow:hidden}
@@ -1789,9 +1789,9 @@ body.guide-open header nav,body.guide-open #documentation{display:none}
  #guide{padding:8px 0 20px}.guide-top{gap:10px}#guide-progress{font-size:11px}#guide-explore{font-size:11px;max-width:130px;text-align:right}
  #guide-steps{margin:0 0 18px;gap:6px}#guide-steps li{font-size:0;padding:5px 0}#guide-steps li span{font-size:11px;margin:0}
  .guide-layout{display:flex;flex-direction:column;gap:0;align-items:stretch}#guide-copy,.guide-art{display:contents}
- .guide-kicker{order:0;margin:0 0 8px;font-size:11px}#guide h1{order:1;font-size:36px;line-height:1.05;letter-spacing:-.7px;max-width:18ch;margin-bottom:12px}
+ .guide-kicker{order:0;margin:0 0 8px;font-size:11px}#guide h1{order:1;font-size:32px;line-height:1.05;letter-spacing:-.7px;max-width:18ch;margin-bottom:12px}
  .guide-lead{order:2;font-size:16px;line-height:1.4;margin:0 0 8px}#guide-scene{order:3;height:250px}
- .guide-stats{order:4;margin:8px 0;padding:10px 0;gap:15px}.guide-stats strong{font-size:36px}.guide-stats span{font-size:11px}
+ .guide-stats{order:4;margin:8px 0;padding:10px 0;gap:15px}.guide-stats strong{font-size:32px}.guide-stats span{font-size:11px}
  .guide-actions{order:5;display:flex;flex-direction:column;margin:10px 0;gap:8px}.guide-actions .primary{width:100%}
  #guide-note{order:6;margin:8px 0;font-size:13px}#guide-scene-note{order:7;margin:8px 0}#guide-back{margin-top:0}
  #guide-scene .scene-tools{bottom:4px;left:4px;right:4px}#guide-scene .scene-tools button{font-size:11px;padding:8px;min-height:44px}
@@ -1802,3 +1802,17 @@ body.guide-open header nav,body.guide-open #documentation{display:none}
 
 #gap-totals.gap-start{grid-template-columns:1fr}#gap-totals.gap-start>div:first-child strong{font-size:52px}#gap-totals.gap-start>div:first-child{border:0}#model-inputs{margin:12px 0;min-height:44px}#model-features{scroll-margin-top:36px}header .brand{display:inline-flex;align-items:center;min-height:44px}.map-credit a{display:inline-flex;align-items:center;min-height:44px}
 @media(max-width:600px){#gap-controls .gap-action{flex-direction:column;align-items:stretch}#close-gaps{width:100%;font-size:16px}}
+
+/* Build steps use the same six type sizes as the guide, without brand artwork. */
+#guide-build{width:100%}#guide-build ol{margin:0;padding:0;list-style:none;counter-reset:flow}
+#guide-build li{position:relative;padding:12px 0 12px 38px;border-top:1px solid var(--line);counter-increment:flow}
+#guide-build li::before{content:counter(flow);position:absolute;left:0;top:16px;font:500 13px Plex}
+#guide-build h2{font:600 20px Overpass;margin:0 0 4px}#guide-build p{font:400 16px/1.4 Plex;margin:0}
+.guide-insight dl{display:flex;gap:24px}.guide-insight dd{font:600 52px Overpass;margin:0}
+@media(max-width:800px){#guide-build{order:3;margin:14px 0}#guide-build li{padding-top:10px;padding-bottom:10px}#guide-build p{font-size:13px}.guide-insight dd{font-size:32px}}
+
+#guide-timetable table{width:100%;border-collapse:collapse}#guide-timetable caption{text-align:left;font:600 20px Overpass;margin-bottom:16px}
+#guide-timetable th,#guide-timetable td{padding:18px 8px;text-align:left;border-bottom:1px solid var(--line);font:400 20px Plex}#guide-timetable thead th{font-size:13px}
+#guide-timetable th span{display:block;font:400 13px Plex;margin-top:8px;max-width:24ch}
+@media(max-width:800px){#guide-timetable{order:3;margin:18px 0}#guide-timetable th,#guide-timetable td{padding:14px 6px;font-size:16px}}
+@media(max-width:800px){#guide[data-step="4"] #guide-note{order:2}}

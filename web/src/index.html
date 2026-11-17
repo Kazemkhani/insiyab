@@ -7,7 +7,12 @@
 <section id="guide" hidden aria-labelledby="guide-title">
 <div class="guide-top"><p id="guide-progress"></p><button id="guide-explore">Explore the full dashboard</button></div>
 <ol id="guide-steps" aria-label="Demo chapters"></ol>
-<div class="guide-layout"><div id="guide-copy"></div><div class="guide-art"><div id="guide-scene"></div><p id="guide-scene-note"></p></div></div>
+<!-- Reserved insight layout: deliberately inert until lane 1 publishes the
+     insights contract and provenance marker. No speculative field names. -->
+<template id="guide-insight-placeholder" data-status="awaiting-lane-1-contract">
+<section class="guide-insight" aria-label="Morning and evening evidence"><h2>The buses hold up in the morning and fall apart in the evening.</h2><p>The timetable is why.</p><dl><div><dt>Morning</dt><dd data-insight-morning></dd></div><div><dt>Evening</dt><dd data-insight-evening></dd></div></dl><p data-insight-source></p></section>
+</template>
+<div class="guide-layout"><div id="guide-copy"></div><div class="guide-art"><div id="guide-scene"></div><div id="guide-build" hidden></div><div id="guide-timetable" hidden></div><p id="guide-scene-note"></p></div></div>
 <button id="guide-back">Back</button>
 </section>
 <section id="replay" class="view">

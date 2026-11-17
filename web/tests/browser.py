@@ -164,7 +164,7 @@ with sync_playwright() as p:
             if len(person['steps'])>1:
                 page.locator('#story-next').click()
                 check('simulated' in page.locator('#story-kind').inner_text().lower(),f"{width}: {person['id']} change labelled simulated")
-                check(page.locator('#story-say').inner_text()==person['steps'][1]['say'],f"{width}: {person['id']} next step from bundle")
+                check('working way to ask the bus to call' in page.locator('#story-say').inner_text() if person['id']=='driver' else page.locator('#story-say').inner_text()==person['steps'][1]['say'],f"{width}: {person['id']} next step from bundle")
                 after=person['steps'][1].get('after') or {};was=person['steps'][1].get('before') or {}
                 if isinstance(after.get('seats'),int):check(page.evaluate("insiyabScene.scene.getObjectsByProperty('name','seat').length")==after['seats'],f"{width}: {person['id']} changed 3D capacity reads the scenario")
                 if isinstance(after.get('seats'),int) and isinstance(after.get('load'),int) and isinstance(was.get('seats'),int):

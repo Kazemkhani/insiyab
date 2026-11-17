@@ -8,7 +8,7 @@ def check(ok,label):
 try:
  port=server.stdout.readline().strip();assert port.isdigit(),'test relay failed to start'
  url='http://127.0.0.1:'+port
- subprocess.run(['node','live/khutwa/build.mjs','--bundle',sys.argv[2] if len(sys.argv)>2 else 'fixtures','--out',str(pathlib.Path(sys.argv[1])/'khutwa')],check=True,capture_output=True)
+ subprocess.run(['node','rider/build.mjs','--bundle',sys.argv[2] if len(sys.argv)>2 else 'fixtures','--out',str(pathlib.Path(sys.argv[1])/'khutwa')],check=True,capture_output=True)
  with sync_playwright() as p:
   b=p.chromium.launch(args=['--use-angle=metal']);c=b.new_context();page=c.new_page();errors=[];writes=[]
   page.on('pageerror',lambda e:errors.append(str(e)))

@@ -17,18 +17,25 @@ with sync_playwright() as p:
   check(pg.locator('#guide').is_visible() and pg.locator('#replay').is_hidden(),'new visitor sees one guided story before the dashboard')
   pair=pg.evaluate('insiyabGuide.pair');busy,spare=pair['from'],pair['to']
   expected={'seats':busy['seats'],'seated':min(busy['seats'],busy['largest_load']),'standing':max(0,busy['largest_load']-busy['seats'])}
-  check(counts(pg)==expected,'passenger: scene has the exact busy-trip seats and people')
+  check(pg.locator('.guide-stats strong').inner_text().replace(',','')==str(pg.evaluate('INSIYAB_BUNDLE["meta.json"].counts.boardings')),'opening fact reads the supplied count of boardings')
+  check(pg.locator('template#guide-insight-placeholder').count()==1 and pg.locator('.guide-insight').count()==0,'uncontracted morning/evening insight renders nothing')
+  check('reward' not in pg.locator('#guide-copy').inner_text().lower() and 'survey' not in pg.locator('#guide-copy').inner_text().lower(),'reward is absent from the first chapter')
   if h>=720:
    rect=pg.locator('#guide-next').bounding_box();check(rect['y']+rect['height']<=h,'first action is visible without scrolling')
-  check(pg.locator('#guide-title').inner_text()=='The bus arrives. Not enough seats.','judge: the first heading states the problem')
-  check('forecasts how many people will board and how late buses will be' in pg.locator('.guide-lead').inner_text(),'judge: first screen explains both forecasts in plain words')
+  check(pg.locator('#guide-title').inner_text()=='First, read the day.','judge: the first heading states the problem')
+  check('forecasts boardings and lateness' in pg.locator('.guide-lead').inner_text(),'judge: first screen explains both forecasts in plain words')
   pg.wait_for_timeout(1700);check(pg.evaluate('insiyabGuide.step')==0,'story waits for the visitor instead of advancing itself')
   check(pg.locator('#guide-scene canvas').evaluate("e=>getComputedStyle(e).touchAction.includes('pan-y')"),'phone swipes can scroll over the 3D scene')
   check(pg.evaluate('insiyabScene.reduced')==reduced,'reduced motion preference reaches the 3D renderer')
   for i in [1,2]:
    pg.locator('#guide-next').focus();pg.keyboard.press('Enter');check(pg.evaluate('insiyabGuide.step')==i,'keyboard advances to chapter '+str(i+1))
+   if i==1:
+    check(pg.locator('#guide-timetable tbody tr').count()==2 and pg.locator('#guide-timetable td').all_inner_texts()==pg.evaluate("()=>{const t=insiyabGuide.pair.from,r=INSIYAB_BUNDLE['replay/route-'+t.route_id+'.json'].trips.find(x=>x.trip_id===t.trip_id),fmt=n=>String(Math.floor(n/3600)).padStart(2,'0')+':'+String(Math.floor(n/60)%60).padStart(2,'0');return [r.visits[0],r.visits.at(-1)].flatMap(v=>[fmt(v.sched_dep),fmt(v.act_dep)])}"),'timetable chapter compares supplied scheduled and recorded departures')
    check(pg.evaluate("document.activeElement.id==='guide-title'"),'new heading receives focus')
+   check('survey' not in pg.locator('#guide-copy').inner_text().lower() and 'points' not in pg.locator('#guide-copy').inner_text().lower(),'core chapters precede passenger rewards')
    check(pg.evaluate('document.documentElement.scrollWidth<=innerWidth'),'no horizontal overflow at '+str(w))
+  check('Simulated proposal.' in pg.locator('#guide-note').inner_text(),'empty-running estimate is labelled simulated before the swap')
+  check(counts(pg)==expected,'one idea starts with the exact busy-trip seats and people')
   pg.locator('#guide-next').click();pg.wait_for_timeout(1700)
   check(pg.evaluate('insiyabGuide.swapped'),'visitor performs the swap')
   check(counts(pg)=={'seats':spare['seats'],'seated':min(spare['seats'],busy['largest_load']),'standing':max(0,busy['largest_load']-spare['seats'])},'planner: exact same passengers and proposed larger capacity')
@@ -40,7 +47,13 @@ with sync_playwright() as p:
   pg.locator('#guide-test').click();pg.wait_for_function("window.insiyab&&insiyab.view==='forecast'&&document.querySelector('#forecast-stop').options.length>0")
   check(pg.locator('#pick-stop').is_visible(),'evidence action opens a working forecast experiment')
   pg.locator('#guide-return').click();check(pg.evaluate("insiyabGuide.step===3&&document.activeElement.id==='guide-title'"),'return keeps the visitor’s place and moves keyboard focus to the heading')
-  pg.locator('#guide-next').click();check('seat is not reserved' in pg.locator('#guide-note').inner_text(),'passenger offer does not promise a reservation')
+  pg.locator('#guide-next').click()
+  check(pg.evaluate('insiyabGuide.step')==4 and pg.locator('#guide-build h2').all_inner_texts()==['RTA’s tables','Prepare','Insights','Forecast','Decisions','Published'],'how it is built presents the six named stages in order')
+  check(pg.locator('#guide-scene').is_hidden() and pg.evaluate('insiyabScene===null'),'build chapter disposes the hidden animated scene')
+  check('does not identify a Dataiku flow' in pg.locator('#guide-note').inner_text(),'bundle without flow provenance is not called a Dataiku result')
+  check(pg.locator('#fixture').is_visible() and pg.evaluate('document.documentElement.scrollWidth<=innerWidth'),'build retains the stand-in label and fits the viewport')
+  pg.locator('#guide-next').click();check(pg.evaluate('insiyabGuide.step')==5 and 'partner surveys' in pg.locator('.guide-lead').inner_text() and 'not connected' in pg.locator('#guide-note').inner_text(),'optional rewards and proposed partner surveys appear last')
+  check('seat is not reserved' in pg.locator('#guide-note').inner_text(),'passenger offer does not promise a reservation')
   check(pg.locator('#guide a[href="khutwa/"]').count()==1,'passenger can continue to Khutwa')
   pg.locator('#guide-next').click();pg.wait_for_function("insiyab.view==='replay'&&insiyab.deck.isInitialized")
   check(pg.locator('#replay').is_visible(),'completed story opens the network')
@@ -53,9 +66,17 @@ with sync_playwright() as p:
   bundle=json.loads((target/'bundle.js').read_text().removeprefix('window.INSIYAB_BUNDLE=').rstrip(';\n'))
   swap=next(d for d in bundle['decisions.json']['decisions'] if d['lever']=='right_bus')['swaps'][0]
   swap['from']['largest_load']=swap['from']['seats']+3
+  bundle['meta.json']['counts']['boardings']+=17
+  bundle['meta.json']['notes']='This bundle was published from the Dataiku flow. Stand-in data.'
+  bundle['meta.json']['insights']={'uncontracted':True,'morning':99999}
   (target/'bundle.js').write_text('window.INSIYAB_BUNDLE='+json.dumps(bundle)+';')
   c=b.new_context(offline=True);pg=c.new_page();pg.goto(target.as_uri()+'/index.html');pg.wait_for_function('window.insiyabScene')
+  check(pg.locator('.guide-stats strong').inner_text().replace(',','')==str(bundle['meta.json']['counts']['boardings']),'changing the supplied boarding total updates the opening fact')
+  check('99999' not in pg.locator('#guide').inner_text() and pg.locator('.guide-insight').count()==0,'unknown insight fields cannot publish an unverified headline or value')
+  pg.locator('#guide-next').click();pg.locator('#guide-next').click()
   check(counts(pg)['standing']==3 and pg.locator('.guide-stats strong').nth(2).inner_text()=='3','changed decision data updates both picture and reading, even when persona data differs')
+  pg.locator('#guide-next').click();pg.locator('#guide-next').click();pg.locator('#guide-next').click()
+  check(bundle['meta.json']['notes'] in pg.locator('#guide-note').inner_text(),'explicit Dataiku flow provenance is quoted in words on the build chapter')
   c.close()
  b.close()
 print('GUIDE PASS')

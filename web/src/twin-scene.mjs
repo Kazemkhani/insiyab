@@ -5,6 +5,7 @@ import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js'
 // One local, inspectable scene. Geometry is illustrative; capacity comes only
 // from the story. The animation changes presentation, never the story's data.
 let active,graphics;
+export function clearTwin(){active?.dispose();active=null;window.insiyabScene=null;}
 export function showTwin(host,person,step,model,decision){
   active?.dispose();
   const css=getComputedStyle(document.documentElement),hex=n=>css.getPropertyValue('--'+n).trim();
