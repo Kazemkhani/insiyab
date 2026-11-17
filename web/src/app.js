@@ -21,12 +21,27 @@ const _rCoords=M.network.routes.flatMap(r=>r.directions.flatMap(d=>d.shape));
 const _cLon=_rCoords.reduce((a,p)=>a+p[0],0)/_rCoords.length,_cLat=_rCoords.reduce((a,p)=>a+p[1],0)/_rCoords.length,_cosLat=Math.cos(_cLat*Math.PI/180)*10000;
 const unproject=([cx,cy])=>[cx/_cosLat+_cLon,-cy/10000+_cLat];
 function mapUnit(){if(!mapGL)return{lat:1e-5,lon:1e-5,cart:1};const z=mapGL.getZoom(),lat=mapGL.getCenter().lat,mpp=78271.52*Math.cos(lat*Math.PI/180)/Math.pow(2,z),ld=mpp/111320;return{lat:ld,lon:ld/Math.cos(lat*Math.PI/180),cart:mpp/11.132};}   // MapLibre's tiles are 512 pixels across
+// Place names in screen space, so zooming reveals detail without overlapping type.
+const labelContext=document.createElement('canvas').getContext('2d');
+function mapLabels(candidates){
+  labelContext.font='11px Plex';const width=$('map').clientWidth,height=$('map').clientHeight,placed=[];
+  for(const item of candidates){
+    const point=mapGL.project(item.labelPosition);let labelText=item.labelText;
+    const maxWidth=Math.min(180,width*.48);while(labelContext.measureText(labelText).width>maxWidth&&labelText.length>4)labelText=labelText.slice(0,-2)+'…';
+    const bounds={x:point.x+5,y:point.y-9,width:labelContext.measureText(labelText).width+8,height:18};
+    if(bounds.x<8||bounds.y<8||bounds.x+bounds.width>width-12||bounds.y+bounds.height>height-38)continue;
+    if(bounds.x+bounds.width>width-100&&(bounds.y<75||bounds.y+bounds.height>height-180))continue;
+    if(placed.some(p=>{const b=p.labelBounds;return bounds.x<b.x+b.width&&bounds.x+bounds.width>b.x&&bounds.y<b.y+b.height&&bounds.y+bounds.height>b.y;}))continue;
+    placed.push({...item,labelText,labelBounds:bounds});
+  }
+  return placed;
+}
 const busState=b=>b.load>b.seats?'Above seats':b.load===b.seats?'Full':'Has room';
 const busColour=b=>b.load>b.seats?C.over:b.load===b.seats?C.ink:C.flow;
 const busShape=b=>b.load>b.seats?[[0,9],[8,-7],[-8,-7]]:b.load===b.seats?[[-6,-6],[6,-6],[6,6],[-6,6]]:Array.from({length:16},(_,i)=>[5*Math.cos(i*Math.PI/8),5*Math.sin(i*Math.PI/8)]);
 $('fixture').hidden=!M.meta.fixture;
 $('service-date').textContent=M.meta.service_date+' · Dubai time';
-$('provenance').textContent=`${M.meta.fixture?'Stand-in operational data; not evidence of actual passenger demand.':escape(M.meta.notes)} ${M.meta.generated_at?'Source bundle generated '+M.meta.generated_at+'.':''} Service day ${M.meta.service_date}. ${M.meta.fixture?'Operational counts are invented. The bundled routes and stops use an archived RTA public network; see the map source note.':'Measured values are supplied aggregate records.'}`;
+$('provenance').textContent=`${M.meta.fixture?'Stand-in operational data; not evidence of actual passenger demand.':M.meta.notes} ${M.meta.generated_at?'Source bundle generated '+M.meta.generated_at+'.':''} Service day ${M.meta.service_date}. ${M.meta.fixture?'Operational counts are invented. The bundled routes and stops use an archived RTA public network; see the map source note.':'Measured values are supplied aggregate records.'}`;
 const headline=B['summary.json'].headline[0];
 $('headline').innerHTML=`<span class="big-number" data-headline>${number(headline.value)}</span><span class="headline-label">${escape(headline.label)}</span><span class="source">${escape(headline.kind)} · ${escape(headline.unit)}<br>${escape(headline.source)} · ${M.meta.service_date}</span>`;
 $('time').min=M.min;$('time').max=M.max;
@@ -34,11 +49,17 @@ $('play').textContent=playing?'Pause':'Play';
 $('map').append($('map-credit'));
 $('map-credit').innerHTML='<a href="https://www.dubaipulse.gov.ae/data/rta-public-transports/rta_gtfs-open" target="_blank" rel="noopener">RTA public network · 2021 archive</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>';
 function inspectPublicStop(id){
-  publicStop=id;const stop=M.stops.get(id);if(!stop)return;focusRoute='';$('public-route').value='';
+  publicStop=id;const stop=M.stops.get(id);if(!stop)return;if(focusRoute&&!M.paths.some(p=>p.route_id===focusRoute&&p.stops.includes(id)))focusRoute='';$('public-route').value=focusRoute;
   const routes=M.paths.filter(r=>r.stops.includes(id));
   $('public-selection').hidden=false;
   $('public-selection').innerHTML=`<strong>${escape(stop.name)}</strong><span>${[...new Set(routes.map(r=>r.label))].map(escape).join(' · ')}</span><p>${M.meta.fixture?'Published stop location. Passenger counts in this example are invented, not RTA observations.':'Passenger counts come from the supplied service records.'}</p>`;
   $('public-search-results').replaceChildren();pick('stop',id);
+}
+function inspectMapBus(bus){
+  if(view!=='replay'){pick('bus',bus.trip_id);return;}
+  playing=false;$('play').textContent='Play';publicStop='';pick('bus',bus.trip_id);
+  $('public-selection').hidden=false;
+  $('public-selection').innerHTML=`<strong>Route ${escape(M.routes.get(bus.route_id)?.short_name??bus.route_id)} · ${clock(time)}</strong><span>${bus.load} passengers · ${bus.seats} seats</span><p>${escape(busState(bus))}. ${M.meta.fixture?'Invented service records.':'Supplied service records.'} Clock paused for inspection.</p>`;
 }
 function syncMapMode(){
   $('public-controls').hidden=view!=='replay';$('public-selection').hidden=view!=='replay'||!publicStop;
@@ -99,18 +120,21 @@ function render() {
   const paths=M.paths.filter(p=>!focusRoute||p.route_id===focusRoute),stopIds=new Set(paths.flatMap(p=>p.stops)),shownStops=stopData.filter(s=>stopIds.has(s.stop_id));
   if(geoMode){
     const u=mapUnit();
+    const stopLabels=shownStops.filter(s=>focusRoute||s.stop_id===publicStop).sort((a,b)=>Number(b.stop_id===publicStop)-Number(a.stop_id===publicStop)).map(s=>({...s,labelPosition:[s.lon,s.lat],labelText:s.name,labelKind:'stop'}));
+    const routeLabels=focusRoute?[]:paths.filter(p=>p.direction===0).map(p=>({...p,labelPosition:p.shape[0],labelText:p.label,labelKind:'route'}));
+    const labels=mapLabels([...stopLabels,...routeLabels]);
     decklike.setProps({layers:[
       ...forecastLayers({},u),
       ...gapLayers({},u),
       new PathLayer({id:'routes',data:paths,getPath:d=>d.shape,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
       new PathLayer({id:'boardings',data:shownStops,getPath:s=>[[s.lon,s.lat],[s.lon,s.lat+Math.sqrt(s.on)*3.5*u.lat]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
-      new ScatterplotLayer({id:'stops',data:shownStops,getPosition:s=>[s.lon,s.lat],getRadius:focusRoute?4:2.5,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.muted,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
-      new TextLayer({id:'stop-labels',data:focusRoute?shownStops:[],getPosition:s=>[s.lon,s.lat],getText:s=>s.name,getPixelOffset:[7,0],getTextAnchor:'start',getSize:11,getColor:C.ink,fontFamily:'Plex',background:true,getBackgroundColor:[...C.paper,235],backgroundPadding:[2,1]}),
+      new ScatterplotLayer({id:'stops',data:shownStops,getPosition:s=>[s.lon,s.lat],getRadius:focusRoute?4:2.5,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.muted,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&(view==='replay'?inspectPublicStop(object.stop_id):pick('stop',object.stop_id))}),
+      new TextLayer({id:'stop-labels',data:labels.filter(s=>s.labelKind==='stop'),getPosition:s=>s.labelPosition,getText:s=>s.labelText,getPixelOffset:[7,0],getTextAnchor:'start',getSize:11,getColor:C.ink,fontFamily:'Plex',background:true,getBackgroundColor:[...C.paper,235],backgroundPadding:[2,1]}),
       new PathLayer({id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[unproject(pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*u.cart))),unproject(b.position)],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
-      new PolygonLayer({id:'buses',data:buses,getPolygon:b=>{const [x,y]=unproject(b.position),points=busShape(b);return points.map(([dx,dy])=>[x+dx*u.lon,y+dy*u.lat]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
+      new PolygonLayer({id:'buses',data:buses,getPolygon:b=>{const [x,y]=unproject(b.position),points=busShape(b);return points.map(([dx,dy])=>[x+dx*u.lon,y+dy*u.lat]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1.5,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&inspectMapBus(object)}),
       new ScatterplotLayer({id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>unproject(b.position),getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
       new TextLayer({id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>unproject(b.position),getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),
-      new TextLayer({id:'route-labels',data:paths.filter(p=>p.direction===0),getPosition:d=>d.shape[0],getText:d=>d.label,getPixelOffset:[-15,15],getSize:14,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
+      new TextLayer({id:'route-labels',data:labels.filter(s=>s.labelKind==='route'),getPosition:d=>d.labelPosition,getText:d=>d.labelText,getPixelOffset:[7,0],getTextAnchor:'start',getSize:11,getColor:C.ink,fontFamily:'Plex',fontWeight:500}),
       new TextLayer({id:'communities',data:view==='replay'&&$('entity-type').value==='community'?M.network.communities.filter(c=>c.community_id===selected):[],getPosition:c=>c.centroid,getText:c=>c.name_en,getPixelOffset:[0,-18],getSize:10,getColor:C.ink,fontFamily:'Plex',pickable:true,onClick:({object})=>object&&pick('community',object.community_id)})
     ]});
   }else{
@@ -121,9 +145,9 @@ function render() {
       ...gapLayers(shared,unit),
       new PathLayer({...shared,id:'routes',data:paths,getPath:d=>d.points,getColor:view==='gap'?[...C.muted,50]:C.muted,getWidth:2,widthUnits:'pixels'}),
       new PathLayer({...shared,id:'boardings',data:shownStops,getPath:s=>[s.position,[s.position[0],s.position[1]-Math.sqrt(s.on)*3.5*unit]],getColor:[...C.ink,110],getWidth:2,widthUnits:'pixels'}),
-      new ScatterplotLayer({...shared,id:'stops',data:shownStops,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&pick('stop',object.stop_id)}),
+      new ScatterplotLayer({...shared,id:'stops',data:shownStops,getPosition:s=>s.position,getRadius:4,radiusUnits:'pixels',getFillColor:C.paper,getLineColor:C.ink,lineWidthUnits:'pixels',getLineWidth:1,stroked:true,pickable:true,onClick:({object})=>object&&(view==='replay'?inspectPublicStop(object.stop_id):pick('stop',object.stop_id))}),
       new PathLayer({...shared,id:'delay',data:buses.filter(b=>b.delay>0),getPath:b=>[pointAlong(b.path,Math.max(0,b.distance-b.delay*.13*unit)),b.position],getColor:C.over,getWidth:2,widthUnits:'pixels'}),
-      new PolygonLayer({...shared,id:'buses',data:buses,getPolygon:b=>{const [x,y]=b.position;return busShape(b).map(([dx,dy])=>[x+dx*unit,y-dy*unit]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&pick('bus',object.trip_id)}),
+      new PolygonLayer({...shared,id:'buses',data:buses,getPolygon:b=>{const [x,y]=b.position;return busShape(b).map(([dx,dy])=>[x+dx*unit,y-dy*unit]);},getFillColor:busColour,getLineColor:C.paper,getLineWidth:1,lineWidthUnits:'pixels',stroked:true,pickable:true,onClick:({object})=>object&&inspectMapBus(object)}),
       new PathLayer({...shared,id:'load-bars',data:buses,getPath:b=>{const [x,y]=b.position;return [[x-7*unit,y+11*unit],[x+(-7+14*Math.min(1.5,b.load/b.seats))*unit,y+11*unit]];},getColor:busColour,getWidth:3,widthUnits:'pixels'}),
       new ScatterplotLayer({...shared,id:'selected-bus',data:$('entity-type').value==='bus'?buses.filter(b=>b.trip_id===selected):[],getPosition:b=>b.position,getRadius:16,radiusUnits:'pixels',filled:false,stroked:true,getLineColor:C.ink,getLineWidth:2,lineWidthUnits:'pixels'}),
       new TextLayer({...shared,id:'over-seat-labels',data:buses.filter(b=>b.load>b.seats),getPosition:b=>b.position,getText:b=>`${b.load}/${b.seats}`,getPixelOffset:[14,-10],getTextAnchor:'start',getSize:11,getColor:C.over,fontFamily:'Mono',background:true,getBackgroundColor:C.paper,backgroundPadding:[3,2]}),

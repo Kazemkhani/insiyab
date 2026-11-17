@@ -7,6 +7,7 @@ for name in ['qr.svg','fonts']:
  if src.is_dir():shutil.copytree(src,out/name,dirs_exist_ok=True)
  else:shutil.copyfile(src,out/name)
 meta=json.loads((site/'data/meta.json').read_text());(out/'manifest.json').write_text(json.dumps({'fixture':meta['fixture'],'service_date':meta['service_date'],'bundle_commit':meta['commit'],'frontend_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'app_sha256':hashlib.sha256((site/'app.js').read_bytes()).hexdigest(),'bundle_sha256':hashlib.sha256((site/'bundle.js').read_bytes()).hexdigest(),'captions':True,'audio':False},indent=2))
+clips={}
 with sync_playwright() as p:
  b=p.chromium.launch(args=['--use-angle=metal'])
  for name,view,duration in [('replay','replay',8),('forecast','forecast',6),('gap','gap',6),('planner','stories',3),('site_worker','stories',3),('office_worker','stories',3),('driver','stories',3)]:
@@ -20,6 +21,7 @@ with sync_playwright() as p:
    page.wait_for_timeout(1200);page.locator('#close-gaps' if view=='gap' else '#reveal').click();page.evaluate('window.scrollTo(0,0)');page.wait_for_timeout((duration-1.2)*1000)
   else:page.wait_for_timeout(duration*1000)
   assert not errors, errors
-  video=page.video;c.close();video.save_as(str(out/f'{name}.webm'));print('CAPTURED',name,flush=True)
+  video=page.video;c.close();video.save_as(str(out/f'{name}.webm'));length=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','default=noprint_wrappers=1:nokey=1',str(out/f'{name}.webm')],text=True));clips[name]={'start_frame':max(0,round((length-duration)*30)),'duration_seconds':duration};print('CAPTURED',name,'start frame',clips[name]['start_frame'],flush=True)
  b.close()
+manifest=json.loads((out/'manifest.json').read_text());manifest['clips']=clips;(out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print('CAPTURE PASS')
