@@ -26,9 +26,31 @@ def ok(msg):
 
 
 def serve(root):
+    """A local server that answers a request for part of a file, as the public address does. The street map is one large file read a
+    piece at a time: a server that cannot do that makes the map fail on the built folder when it would work once deployed."""
     class Quiet(http.server.SimpleHTTPRequestHandler):
         def log_message(self, *a):
             pass
+
+        def do_GET(self):
+            asked = self.headers.get("Range")
+            path = self.translate_path(self.path)
+            if not asked or not os.path.isfile(path) or not asked.startswith("bytes="):
+                try:
+                    return super().do_GET()
+                except (BrokenPipeError, ConnectionResetError):
+                    return
+            size = os.path.getsize(path); first, _, last = asked[6:].partition("-")
+            first = int(first) if first else max(0, size - int(last)); last = min(int(last), size - 1) if last and asked[6:].partition("-")[0] else size - 1
+            if first > last or first >= size:
+                self.send_error(416); return
+            self.send_response(206); self.send_header("Content-Type", self.guess_type(path)); self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Content-Range", f"bytes {first}-{last}/{size}"); self.send_header("Content-Length", str(last - first + 1)); self.end_headers()
+            try:
+                with open(path, "rb") as f:
+                    f.seek(first); self.wfile.write(f.read(last - first + 1))
+            except (BrokenPipeError, ConnectionResetError):
+                pass
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=root))
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv
