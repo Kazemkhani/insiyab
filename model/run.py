@@ -194,7 +194,7 @@ def build(day, fixture=True, generated_at=None, commit=None):
     origins = sorted(int(x) for x in shown_stop["origin"].unique())
     meta = {"contract_version": 1, "service_date": day["service_date"], "generated_at": generated_at, "commit": commit, "bin_seconds": BIN, "origins": origins, "horizons_seconds": F.HORIZONS,
             "counts": {"routes": len(net["routes"]), "stops": len(net["stops"]), "trips": int(sum(len(r["trips"]) for r in replay.values())), "stop_visits": len(v), "boardings": boardings},
-            "notes": ("Stand-in data. Invented network, invented numbers. " if fixture else "") + "Seat counts only: standing capacity is marked not verified in the supplied data. One day: nothing here was tested on another day.",
+            "notes": (("Stand-in data. The network is real and public (" + day["network_source"]["credit"] + "); every passenger, vehicle and lateness on it is invented. " if day.get("network_source") else "Stand-in data. Invented network, invented numbers. ") if fixture else "") + "Seat counts only: standing capacity is marked not verified in the supplied data. One day: nothing here was tested on another day.",
             "engine": {"boosted_trees": F.boosted_trees_library(), "chosen": chosen, "origins_with_too_little_to_learn_from": [int(x) for x in thin], "trips_left_out_of_the_replay": int(left_out)},
             "stages": day["log"]}
     files = {"meta.json": meta, "network.json": net, "metrics.json": {"targets": [t_route, t_stop]}, "decisions.json": {"decisions": decisions}, "personas.json": {"personas": people},

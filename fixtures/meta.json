@@ -25,7 +25,7 @@
   3600,
   7200
  ],
- "notes": "Stand-in data. Invented network, invented numbers. Seat counts only: standing capacity is marked not verified in the supplied data. One day: nothing here was tested on another day.",
+ "notes": "Stand-in data. The network is real and public (Network: RTA public timetable feed, 2021 edition); every passenger, vehicle and lateness on it is invented. Seat counts only: standing capacity is marked not verified in the supplied data. One day: nothing here was tested on another day.",
  "origins": [
   23400,
   25200,
