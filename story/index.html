@@ -182,6 +182,15 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 .note{bottom:4px}.hint{bottom:105px}.bars{grid-template-columns:repeat(4,minmax(0,1fr));height:420px}
 .drill-steps{margin:32px 0;padding-left:24px;max-width:800px}.drill-steps li{padding:12px 0;font-size:20px}
 .actions{display:flex;gap:16px;flex-wrap:wrap;margin:28px 0}
+/* Six watchers */
+.wlist{margin-top:48px;border-top:2px solid var(--ink)}
+.wrow{padding:18px 0;border-bottom:1px solid var(--line);display:grid;gap:5px}
+.wrow-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.wrow-name{font-size:19px;font-weight:600;font-family:var(--head)}
+.wlabel{font-size:12px;font-weight:600;color:var(--muted)}
+.wrow-say{font-size:16px;line-height:1.5;max-width:65ch;margin:0}
+.wrow-src{font-size:12px;color:#8A7C66;margin:0}
+.wgold{color:var(--goldtext)}
 @media(max-width:760px){.cap{bottom:110px;max-height:calc(100svh - 210px)}.cap .num{font-size:clamp(36px,17cqi,64px)}.cap [data-fit-number]{font-size:13.6cqi}.cap .so{font-size:13px;line-height:1.4}.cap.hero{top:17%;bottom:auto}.cap.hero h1{font-size:64px}.cap.hero p{font-size:20px}.chapter-controls{left:12px;right:12px;bottom:24px;padding:6px;gap:6px}.chapter-controls button{padding:8px;font-size:13px}#chapter-current{font-size:12px;max-width:130px}.hint{display:none}.bars{height:auto;grid-template-columns:1fr 1fr}.bar{height:290px}.bar span{min-height:64px}.note{font-size:10px;left:12px;right:auto}#film .opening{font-size:18px}}
 .static-story#descent{height:auto}.static-story .sticky{position:static;height:auto;overflow:visible;padding:64px 16px}.static-story .cap{position:static;opacity:1!important;transform:none!important;margin:28px auto;max-height:none;width:min(650px,100%)}.static-story .cap.hero{background:var(--card);text-align:left}.static-story #cv,.static-story #lbls,.static-story .hint,.static-story .chapter-controls,.static-story .progress,.static-story .note{display:none}
 
@@ -199,6 +208,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
     <a href="#answer">Our answer</a>
     <a href="#built">How it's built</a>
     <a href="deck/">Executive deck</a>
+    <a class="nav-ops" href="/ops/">Insiyab Live, the console</a>
     <a class="live" href="https://dss-8a0eac1b-a0da2b15-dku.eu-west-2.app.dataiku.io/projects/INSIYAB/webapps/kvDViy2_insiyab/view" target="_blank" rel="noopener">Live in Dataiku</a>
   </div>
 </nav>
@@ -209,7 +219,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   <p style="position:absolute;right:16px;bottom:10px;font-size:11px;color:rgba(247,245,240,.55);z-index:1;text-align:right" aria-label="Photo credit">Sheikh Zayed Road at night. Photo: Irshad Ahmad, Pexels</p>
   <p class="ey2">Student prototype · RTA Future Move Hackathon · One service day</p>
   <h1>Six controllers.<br>1,400 buses.</h1>
-  <p class="opening">19:23 on route 310. The next bus should leave, but it is still out finishing its last trip: the timetable gave that trip 67 minutes and it took 96 (an illustration built from measured times). In the control centre, six controllers watching about 1,400 buses (RTA's figure) start phoning the driver, the depot, the station. Insiyab works on both ends of that late bus: before the evening, it shows planners where the timetable is short; during the evening, it makes the calls and gives the controller one briefing to decide on. <b>A person always decides.</b></p>
+  <p class="opening"><b>Insiyab sees it coming. The controller decides.</b> The signal is in the data before 19:23: the bus on route 310 is still out on its previous trip, which took 96 minutes when the timetable gave it 67. When this happens, the next departure leaves late 85 times in 100. Insiyab reads that signal up to 20 stops ahead, predicts which routes will overflow, which stops are in the heat, and suggests a fix early. When a critical alert is not acknowledged, it calls driver, depot, station and planning at once and gives the controller one briefing with three options. <b>A person always decides.</b></p>
   <div class="row"><a class="btn" href="#film-player">Watch the film</a><a class="btn" href="#descent">Explore the animated bus journey</a></div>
   <section class="film-player" id="film-player" aria-label="The film"><p><strong>The film · two and a half minutes</strong><br>The evening problem on RTA's recorded day, the planner's tool in Dataiku, and how Insiyab supports the control centre when a bus runs late. Figures from 15 December 2025; the 19:23 departure and the control-centre incident are labelled illustrations.</p><video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="Insiyab film: the evening problem, the planner tool and the control-centre co-pilot"></video><p id="fgone" hidden>The film could not load. You can still explore the bus journey below.</p><a class="btn" href="#descent">Continue into the bus journey</a></section>
 </header>
@@ -335,11 +345,44 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 <section id="answer">
   <div class="wrap">
     <p class="ey reveal">Our answer</p>
-    <h2 class="big reveal">A co-pilot for the control centre.<br><span>It makes the calls. A person decides.</span></h2>
-    <div class="steps reveal">
+    <h2 class="big reveal">Insiyab sees it coming.<br><span>The controller decides.</span></h2>
+    <p class="lede reveal">Insiyab watches the evening before it happens. It predicts which buses will run late, which will overflow, which stops are in the heat, and suggests a fix early. When a critical alert is not acknowledged, it makes the calls and gives the controller one short briefing. A person always decides.</p>
+    <div class="wlist reveal" id="six-watchers" aria-label="The six things Insiyab watches">
+      <div class="wrow">
+        <div class="wrow-head"><span class="wrow-name">Running late</span><span class="wlabel">measured model</span></div>
+        <p class="wrow-say">Insiyab forecasts how late a bus will be, up to 20 stops ahead. When the bus is still out on its previous trip, the next departure starts <span class="r">late 85 in 100 times</span>. At 5 stops ahead the lateness forecast is 46 in 100 closer than the best simple rule; at 10 and 20 stops, 43 in 100 closer.</p>
+        <p class="wrow-src">Source: MODEL-CARD.md, lines 216 to 219</p>
+      </div>
+      <div class="wrow">
+        <div class="wrow-head"><span class="wrow-name">Overflow</span><span class="wlabel">estimate, range shown</span></div>
+        <p class="wrow-say">When a bus is predicted to arrive at a stop with more riders than seats, Insiyab flags the route and hour early. The boarding estimate is close to the best simple rule; the range includes zero.</p>
+        <p class="wrow-src">Source: MODEL-CARD.md, lines 49 to 51</p>
+      </div>
+      <div class="wrow">
+        <div class="wrow-head"><span class="wrow-name">Heat</span><span class="wlabel">priority rule</span></div>
+        <p class="wrow-say">The same delay matters more at a bare pole in the sun. Among the 1,600 stops whose kind is published, there are <span class="r">993 bare poles</span> and 553 air-conditioned shelters. Insiyab ranks delay higher at poles, especially at midday and in summer.</p>
+        <p class="wrow-src">RTA 2020 to 2022 reports; opendata/public/bus-stops.csv</p>
+      </div>
+      <div class="wrow">
+        <div class="wrow-head"><span class="wrow-name">Lanes and roads</span><span class="wlabel">rule</span></div>
+        <p class="wrow-say">Bus lanes can cut peak journey times by <span class="r">up to 59%</span> on routes that use them. When a route gains a bus lane, Insiyab flags its forecast for review: a model trained before the change is wrong after it.</p>
+        <p class="wrow-src">Khaleej Times, 21 June 2026</p>
+      </div>
+      <div class="wrow">
+        <div class="wrow-head"><span class="wrow-name">Events</span><span class="wlabel">rule</span></div>
+        <p class="wrow-say">When a public event ends near a bus route, Insiyab checks the calendar and flags the affected routes ahead of the crowd, so the controller can decide before the surge arrives.</p>
+        <p class="wrow-src">RTA event services; list and rule, not a model</p>
+      </div>
+      <div class="wrow">
+        <div class="wrow-head"><span class="wrow-name">Connections and last mile</span><span class="wlabel">proposal</span></div>
+        <p class="wrow-say">When a bus is predicted late, Insiyab can flag the connection its riders are heading for and suggest a hold or a Bus On Demand minibus. Bus On Demand carried <span class="r">984,929 riders in 2025</span>, up 136%, across 17 areas.</p>
+        <p class="wrow-src">Dubai Media Office, 11 May 2026 · a proposal, not yet built into the pilot</p>
+      </div>
+    </div>
+    <div class="steps reveal" style="margin-top:56px">
       <div><p class="k">A forecast</p><b class="s">30 min</b><h3>before each trip: how long will it really take?</h3><p>15% closer than the timetable, 16:00 to 19:00, on an evening it never saw.</p></div>
       <div><p class="k">A worklist</p><b>244</b><h3>hours of missing driving time, as minutes per route and hour.</h3><p>Measured from the day, not predicted. The planner accepts or sets aside each row.</p></div>
-      <div><p class="k">The calls</p><b class="s">1 brief</b><h3>for the controller: driver, depot and station asked at once, three options, no ranking.</h3><p>The controller chooses; Insiyab relays the choice and records who received it. <a href="#onday">See how the calls work</a></p></div>
+      <div><p class="k">The calls</p><b class="s">1 brief</b><h3>for the controller: driver, depot and station asked at once, three options, no ranking.</h3><p>When an alert is not acknowledged, Insiyab calls driver, depot, station and planning at once and prepares a briefing. The controller chooses. Insiyab relays the decision and records who confirms it. <a href="#onday">See how the calls work</a></p></div>
       <div><p class="k">Small events</p><b class="s">This week</b><h3>which spare buses to use for crowds of hundreds to a few thousand.</h3><p>Taken from the least-busy route-hours, never below one bus per route. Only as good as the attendance figure it is given.</p></div>
     </div>
   </div>
@@ -372,7 +415,10 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 <section id="forecast" class="alt">
   <div class="wrap">
     <p class="ey reveal">The forecast</p>
-    <h2 class="big reveal">Test the forecast<br><span>against the timetable.</span></h2>
+    <h2 class="big reveal">Up to 20 stops ahead,<br><span>43 to 46 in 100 closer than the best simple rule.</span></h2>
+    <p class="lede reveal">The lateness forecast predicts how late a bus will be at each stop it has not yet reached, using the bus's current delay and the route's history. At 5 stops ahead it is <b>46 in 100 closer</b> than "the bus stays as late as it is now"; at 10 and 20 stops ahead, <b>43 in 100 closer</b>. At 1 stop ahead there is no real gain. These numbers feed the Running late watcher.</p>
+    <p class="src reveal">Source: MODEL-CARD.md, lines 216 to 219</p>
+    <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:72px">Trip-time forecast against the timetable.</h3>
     <p class="lede reveal">The pitch test learns from trips before 16:00 and scores 2,043 trips from 16:00 to 19:00 on the same day. Average miss in minutes; lower is better. This is not a test on another day.</p>
     <div class="bars reveal">
       <div class="bar"><b>8.25<small> min</small></b><div class="fill" data-h="100"></div><span>RTA's timetable</span></div>
@@ -459,7 +505,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 
 <section class="ask" id="close">
   <div class="wrap">
-    <h2 class="big reveal">The controller decides.<br>Insiyab does the calling.</h2>
+    <h2 class="big reveal">Insiyab sees it coming.<br>The controller decides.</h2>
     <p class="lede reveal">Next step: a pilot with one control-centre shift on selected routes, with more days of records and Dubai's open data, measuring the controller's time on calls rather than assuming it. Today's evidence is one day: about <b>244 bus hours</b> of trip time the evening timetable does not hold (16:00 to 18:59, measured, not a saving).</p>
     <p class="reveal" style="margin-top:40px"><a class="btn" id="live" href="https://dss-8a0eac1b-a0da2b15-dku.eu-west-2.app.dataiku.io/projects/INSIYAB/webapps/kvDViy2_insiyab/view" target="_blank" rel="noopener">Now see it live in Dataiku</a></p>
     <p class="reveal" style="margin-top:14px;font-size:13px;opacity:.75">Opens the planner's web app on the real day. It asks for a Dataiku sign-in.</p>
