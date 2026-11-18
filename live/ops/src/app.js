@@ -1,3 +1,4 @@
+import {mountJudge} from './judge.mjs';
 import {mountBuses} from './buses.mjs';
 import {mountControl} from './control.mjs';
 import {renderAlerts} from './alerts.mjs';
@@ -9,5 +10,6 @@ replay.setBusRenderer(mountBuses(replay.map, document.querySelector('#map')));
 const alert = renderAlerts(window.INSIYAB_OPS_DATA.alerts, window.INSIYAB_OPS_DATA.bundle);
 replay.setAlerts(window.INSIYAB_OPS_DATA.alerts.alerts);
 if (alert) mountControl(alert, replay);
+mountJudge(window.INSIYAB_OPS_DATA.judge);
 }
 start().catch(error => {document.querySelector('#map-note').textContent = 'Replay unavailable: ' + error.message;});

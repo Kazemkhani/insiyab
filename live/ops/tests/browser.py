@@ -45,6 +45,15 @@ with sync_playwright() as p:
         assert page.locator('#replay-clock').inner_text() == '18:53'
         page.locator('#time').fill('57600')
         assert page.locator('#fixture-banner').is_visible()
+        assert page.get_by_text('Stand-in forecasts · STAND-IN DATA, NOT A RESULT').is_visible()
+        page.locator('#judge-route').select_option('8')
+        page.locator('#judge-hour').select_option('18:00')
+        assert 'simple rule was closer' in page.locator('.judge-result').inner_text()
+        assert page.locator('tbody td').all_text_contents() == ['9 min','5 min','4 min','18']
+        page.locator('#judge-hour').select_option('20:00')
+        assert 'No held-out row' in page.locator('.judge-result').inner_text()
+        page.locator('#judge-route').select_option('310')
+        page.locator('#judge-hour').select_option('19:00')
         assert page.locator('#now h3').inner_text() == 'Route 310 · 19:23'
         assert page.locator('[data-option]').count() == 3
         assert page.get_by_text("Simulated pick: RTA's system is not connected").is_visible()

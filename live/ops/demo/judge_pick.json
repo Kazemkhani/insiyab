@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "fixture": true,
+  "service_day": "2025-12-15",
+  "unit": "min",
+  "target": "departure lateness",
+  "source": "Invented console rehearsal, 18 Nov 2026",
+  "tested_on": "Stand-in rows, not a model result. Real evaluation is limited to held-out hours of one day.",
+  "rows": [
+    {"route": "310", "hour": "19:00", "forecast": 13, "baseline": 8, "actual": 14, "n": 12},
+    {"route": "8", "hour": "18:00", "forecast": 9, "baseline": 5, "actual": 4, "n": 18},
+    {"route": "27", "hour": "16:00", "forecast": 3, "baseline": 3, "actual": 5, "n": 9}
+  ]
+}

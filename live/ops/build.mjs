@@ -2,6 +2,7 @@
 import {mkdir, readFile, writeFile, copyFile} from 'node:fs/promises';
 import {resolve, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {validateJudge} from './src/judge.mjs';
 import {createRequire} from 'node:module';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../..');
@@ -34,7 +35,8 @@ async function optionalJSON(primary, fallback) {
 }
 const alerts = await optionalJSON('fixtures/watchers/alerts.json', 'demo/alerts.json');
 if (typeof alerts.fixture !== 'boolean' || !Array.isArray(alerts.alerts)) throw Error('Invalid alerts file');
-await writeFile(resolve(out, 'data.js'), 'window.INSIYAB_OPS_DATA=' + JSON.stringify({bundle, alerts}).replace(/</g, '\\u003c') + ';');
+const judge = validateJudge(await optionalJSON('artifacts/forecast/judge_pick.json', 'demo/judge_pick.json'));
+await writeFile(resolve(out, 'data.js'), 'window.INSIYAB_OPS_DATA=' + JSON.stringify({bundle, alerts, judge}).replace(/</g, '\\u003c') + ';');
 await mkdir(resolve(out, 'map'), {recursive:true});
 const mapBytes = await readFile(resolve(root, 'web/assets/map/dubai.pmtiles'));
 await writeFile(resolve(out, 'map/dubai.pmtiles'), mapBytes);
