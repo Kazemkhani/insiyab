@@ -156,7 +156,7 @@ def make_model_chart():
     # model value labels >= 24px; naive value labels >= 24px (muted)
     vlabels = []
     model_offsets = [(-16, -16), (0, -16), (0, -16), (0, -16)]
-    naive_offsets = [( 16,  14), (0,  18), (0,  18), (0,  18)]
+    naive_offsets = [( 16,  14), (0,  18), (0,  18), (-46,  10)]
     for i in range(4):
         dx, dy = model_offsets[i]
         vlabels.append(f'<text x="{cx(i)+dx:.1f}" y="{cy(model[i])+dy:.1f}" text-anchor="middle" font-family="{FONT}" font-size="24" fill="#15181D" font-weight="700">{model[i]:.0f}s</text>')
@@ -310,14 +310,15 @@ slides.append("""<!-- 7 THE MODEL -->
   <div class="credit">Insiyab analysis on RTA records, 15 December 2025. Cross-validated by route and community. docs/MODEL-CARD.md</div>
 </section>""")
 
-# 8 LIVE CONSOLE PLACEHOLDER
-slides.append("""<!-- 8 INSIYAB LIVE (console placeholder) -->
-<!-- TODO: replace this slide's content with a screenshot of /ops/ once stream A deploys it -->
-<section class="slide" data-notes="Amir · 90 s (console live moment). Switch to the console tab on stage. Say: This is Insiyab Live. Map on the left, decisions on the right. At 18:53 it flags route 310. It suggests three options with their likely effect. Nobody acknowledges. Insiyab counts down. Then a phone rings. The controller answers. Insiyab calls driver, depot, station and planning at once. Each confirms. Teal 'Received' one by one. Fallback: Demo mode plays the identical sequence.">
-  <div class="pad" style="top:50%;transform:translateY(-50%)">
-    <h2 style="font-size:120px;color:var(--ivory)">Insiyab Live</h2>
-    <p class="lede" style="margin-top:40px;font-size:48px;color:var(--mute-on-ink)">Live demo</p>
+# 8 INSIYAB LIVE (console)
+slides.append("""<!-- 8 INSIYAB LIVE -->
+<section class="slide" data-notes="Amir talks, Mustafo clicks · 90 s. Switch to the console tab (insiyab.amirkazemkhani.com/ops/). Say: This is Insiyab Live. Map on the left, decisions on the right. At 18:53 it flags route 310: likely 13 minutes late, its bus is still out. It suggests a fix, with the likely effect of each option. Nobody acknowledges. Insiyab does not wait. It asks the driver, depot, station and planning at once, then phones the duty controller with one briefing. The phone on our table rings: the duty controller decides, by phone. Insiyab relays the decision and each person confirms; Received turns teal one by one. Fallback: Demo mode plays the identical sequence with no calls. If the console tab fails, stay on this slide and narrate it.">
+  <div class="pad" style="top:88px">
+    <h2 style="font-size:72px;color:var(--ivory)">Insiyab Live</h2>
+    <p class="lede" style="margin-top:14px;font-size:30px;color:var(--mute-on-ink)">The control-room console. Map on the left, the decision on the right.</p>
   </div>
+  <img src="assets/console-live.jpg" alt="The Insiyab Live console: a bus network map on the left; on the right, route 310 likely 13 minutes late, a suggested fix with three options and their likely effect, and the four calls waiting" style="position:absolute;left:140px;top:300px;width:1640px;height:auto;max-height:690px;object-fit:contain;object-position:left top">
+  <div class="credit">Demo mode: stand-in alerts and simulated calls, labelled on screen.</div>
 </section>""")
 
 # 9 REAL CALL (drill proof)

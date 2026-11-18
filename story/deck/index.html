@@ -213,7 +213,7 @@ h2{font-size:96px}
 <text x="565.0" y="298.0" text-anchor="middle" font-family="'IBM Plex Sans','Helvetica Neue',Arial,sans-serif" font-size="24" fill="#15181D" font-weight="700">64s</text>
 <text x="565.0" y="259.8" text-anchor="middle" font-family="'IBM Plex Sans','Helvetica Neue',Arial,sans-serif" font-size="24" fill="#15181D" fill-opacity="0.38">112s</text>
 <text x="1040.0" y="203.1" text-anchor="middle" font-family="'IBM Plex Sans','Helvetica Neue',Arial,sans-serif" font-size="24" fill="#15181D" font-weight="700">127s</text>
-<text x="1040.0" y="93.5" text-anchor="middle" font-family="'IBM Plex Sans','Helvetica Neue',Arial,sans-serif" font-size="24" fill="#15181D" fill-opacity="0.38">223s</text>
+<text x="994.0" y="85.5" text-anchor="middle" font-family="'IBM Plex Sans','Helvetica Neue',Arial,sans-serif" font-size="24" fill="#15181D" fill-opacity="0.38">223s</text>
 <line x1="90" y1="440" x2="134" y2="440" stroke="#15181D" stroke-width="4.5"/>
 <text x="146" y="446" font-family="'IBM Plex Sans','Helvetica Neue',Arial,sans-serif" font-size="22" fill="#15181D">Insiyab</text>
 <line x1="264" y1="440" x2="308" y2="440" stroke="#15181D" stroke-width="2.5" stroke-opacity="0.35" stroke-dasharray="9 6"/>
@@ -227,13 +227,14 @@ h2{font-size:96px}
   </div>
   <div class="credit">Insiyab analysis on RTA records, 15 December 2025. Cross-validated by route and community. docs/MODEL-CARD.md</div>
 </section>
-<!-- 8 INSIYAB LIVE (console placeholder) -->
-<!-- TODO: replace this slide's content with a screenshot of /ops/ once stream A deploys it -->
-<section class="slide" data-notes="Amir · 90 s (console live moment). Switch to the console tab on stage. Say: This is Insiyab Live. Map on the left, decisions on the right. At 18:53 it flags route 310. It suggests three options with their likely effect. Nobody acknowledges. Insiyab counts down. Then a phone rings. The controller answers. Insiyab calls driver, depot, station and planning at once. Each confirms. Teal 'Received' one by one. Fallback: Demo mode plays the identical sequence.">
-  <div class="pad" style="top:50%;transform:translateY(-50%)">
-    <h2 style="font-size:120px;color:var(--ivory)">Insiyab Live</h2>
-    <p class="lede" style="margin-top:40px;font-size:48px;color:var(--mute-on-ink)">Live demo</p>
+<!-- 8 INSIYAB LIVE -->
+<section class="slide" data-notes="Amir talks, Mustafo clicks · 90 s. Switch to the console tab (insiyab.amirkazemkhani.com/ops/). Say: This is Insiyab Live. Map on the left, decisions on the right. At 18:53 it flags route 310: likely 13 minutes late, its bus is still out. It suggests a fix, with the likely effect of each option. Nobody acknowledges. Insiyab does not wait. It asks the driver, depot, station and planning at once, then phones the duty controller with one briefing. The phone on our table rings: the duty controller decides, by phone. Insiyab relays the decision and each person confirms; Received turns teal one by one. Fallback: Demo mode plays the identical sequence with no calls. If the console tab fails, stay on this slide and narrate it.">
+  <div class="pad" style="top:88px">
+    <h2 style="font-size:72px;color:var(--ivory)">Insiyab Live</h2>
+    <p class="lede" style="margin-top:14px;font-size:30px;color:var(--mute-on-ink)">The control-room console. Map on the left, the decision on the right.</p>
   </div>
+  <img src="assets/console-live.jpg" alt="The Insiyab Live console: a bus network map on the left; on the right, route 310 likely 13 minutes late, a suggested fix with three options and their likely effect, and the four calls waiting" style="position:absolute;left:140px;top:300px;width:1640px;height:auto;max-height:690px;object-fit:contain;object-position:left top">
+  <div class="credit">Demo mode: stand-in alerts and simulated calls, labelled on screen.</div>
 </section>
 <!-- 9 THE DRILL PROOF -->
 <section class="slide light" data-notes="Mustafo · 40 s. This is the real screen from our drill on 18 November, on our own phones. These are the words four people said on the call: the driver, the depot, the planner, the station. Four reports, one human decision, four confirmations. It is a drill, not an RTA system, and every condition on it is labelled simulated.">
