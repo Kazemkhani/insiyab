@@ -46,5 +46,6 @@ await mkdir(resolve(out, 'sounds'), {recursive:true});
 await copyFile(resolve(here, 'sounds/ring.mp3'), resolve(out, 'sounds/ring.mp3'));
 await mkdir(resolve(out, 'icons'), {recursive:true});
 for (const role of ['driver','depot','station','planning']) await copyFile(resolve(root, `brand/assets/icons/${role}.svg`), resolve(out, `icons/${role}.svg`));
+await copyFile(resolve(root, 'web/node_modules/three/LICENSE'), resolve(out, 'THREE-LICENSE.txt'));
 await build({entryPoints: [resolve(here, 'src/app.js')], outfile: resolve(out, 'app.js'), nodePaths: [resolve(root, 'web/node_modules')], bundle: true, format: 'iife', target: 'es2022', minify: true, legalComments: 'linked'});
 console.log(`BUILT Insiyab Live demo: ${out}`);

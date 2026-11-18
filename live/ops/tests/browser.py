@@ -38,6 +38,9 @@ with sync_playwright() as p:
         page.wait_for_timeout(600)
         assert 'unavailable' not in page.locator('#map-note').inner_text().lower()
         assert int(page.locator('#map').get_attribute('data-buses')) > 0
+        assert int(page.locator('.bus3d').get_attribute('data-count')) > 0
+        assert int(page.locator('.bus3d').get_attribute('data-late')) > 0
+        assert page.locator('.bus3d').evaluate('(e)=>getComputedStyle(e).pointerEvents') == 'none'
         page.locator('#time').fill('67980')
         assert page.locator('#replay-clock').inner_text() == '18:53'
         page.locator('#time').fill('57600')
@@ -57,6 +60,7 @@ with sync_playwright() as p:
         page.locator('#next summary').click()
         if width == 390:
             assert page.locator('aside').bounding_box()['y'] >= page.locator('.map-column').bounding_box()['y'] + page.locator('.map-column').bounding_box()['height'] - 1
+        page.clock.pause_at('2027-01-01T00:00:00Z')
         page.locator('#demo').click()
         page.clock.fast_forward(2000)
         assert page.locator('#calls').get_attribute('data-phase') == 'unacknowledged'
@@ -97,6 +101,7 @@ with sync_playwright() as p:
     page.clock.install()
     page.goto(url)
     page.wait_for_selector('#map[data-ready=true]')
+    page.clock.pause_at('2027-01-01T00:00:00Z')
     page.locator('#demo').click()
     page.clock.fast_forward(12000)
     assert page.locator('#calls').get_attribute('data-phase') == 'calling_duty'

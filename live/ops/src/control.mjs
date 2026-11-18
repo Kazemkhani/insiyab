@@ -12,7 +12,7 @@ export function mountControl(alert, replay) {
     row.append(icon,label,value);calls.append(row);rows.set(role,value);
   }
   const ring=new Audio('sounds/ring.mp3');ring.preload='auto';
-  const audioNote=element('p','Demo audio is ready after pressing Demo mode.','source-note');calls.append(audioNote);
+  const audioNote=element('p','Demo audio is ready after pressing Demo mode.','source-note');audioNote.hidden=true;calls.append(audioNote);
   let lastPhase, previousRun;
   const stamp=(at,state)=>state.mode==='demo'?new Date((67980+(at-state.started_at)/1000)*1000).toISOString().slice(11,19):new Date(at).toLocaleTimeString('en-GB',{timeZone:'Asia/Dubai'});
   const names={predicted:'Forecast alert raised',suggested:'Options ready for the controller',unacknowledged:'Awaiting the controller',calling_duty:'Calling the duty controller',calling_supervisor:'Calling the shift supervisor',decided:"Controller's decision",relaying:'Relaying the decision',sent:'Decision sent; awaiting acknowledgements',received:'All four roles received the decision'};
@@ -48,7 +48,7 @@ export function mountControl(alert, replay) {
     confirmation.dataset.selection=state.selected||'';
     if (previousRun!==state.run_id) {ring.pause();ring.currentTime=0;lastPhase=null;previousRun=state.run_id;}
     if (demo && state.phase!==lastPhase && ['calling_duty','calling_supervisor'].includes(state.phase)) {
-      ring.currentTime=0;ring.play().then(()=>{audioNote.textContent='Neutral ring played locally. No phone call.';}).catch(()=>{audioNote.textContent='Audio unavailable. Simulated calling state remains visible.';});
+      ring.currentTime=0;ring.play().then(()=>{audioNote.textContent='Neutral ring played locally. No phone call.';}).catch(()=>{audioNote.hidden=false;audioNote.textContent='Audio unavailable. Simulated calling state remains visible.';});
     }
     if (!demo || state.decision) {ring.pause();ring.currentTime=0;}
     lastPhase=state.phase;

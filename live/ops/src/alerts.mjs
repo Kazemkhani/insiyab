@@ -21,7 +21,6 @@ export function renderAlerts(data, bundle) {
     now.append(element('p', `Range ${evidence.range_low_min} to ${evidence.range_high_min} min · ${evidence.promise}`, 'range-note'));
   }
   now.append(element('p', `${data.fixture?'Stand-in · ':''}${evidence.kind.replaceAll('_',' ')} · ${data.service_day}`, 'source-note'));
-  now.append(element('p','One recorded day only. No other day has been tested.', 'source-note'));
   suggested.append(element('p', alert.suggestion.text, 'suggestion-title'));
   const options = element('div', undefined, 'options'); options.id='options';
   for (const option of alert.suggestion.options) {
@@ -34,7 +33,7 @@ export function renderAlerts(data, bundle) {
   if (alert.suggestion.dss_pick_is_simulated) {
     suggested.append(element('p', "Simulated pick: RTA's system is not connected", 'source-note'));
     const pick = alert.suggestion.options.find(o=>o.id===alert.suggestion.dss_pick);
-    if (pick) suggested.append(element('p', `Simulated pick: ${pick.label}`, 'source-note'));
+    if (pick) options.querySelector(`[data-option="${CSS.escape(pick.id)}"] .option-label`).append(element('span', ' · simulated pick', 'pick-label'));
   }
   const confirmation = element('div');confirmation.id='confirmation';suggested.append(confirmation);
   for (const upcoming of data.alerts.slice(1)) {
@@ -44,7 +43,7 @@ export function renderAlerts(data, bundle) {
   }
   const sources=element('details',undefined,'sources');sources.append(element('summary','Sources and limits'),element('p',data.sources.join(' · '),'source-note'));now.append(sources);
   if (!bundle['network.json'].routes.some(r=>r.route_id===alert.route)) {
-    now.append(element('p',`Route ${alert.route}: alert location only; no trajectory in this replay.`, 'source-note'));
+    document.querySelector('#map-note').append(element('span',`Route ${alert.route}: alert location only; no trajectory in this replay.`, 'trajectory-note'));
   }
   return alert;
 }
