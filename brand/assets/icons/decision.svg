@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-labelledby="title desc">
+<title id="title">Decision</title><desc id="desc">A deliberate branch with one approved option.</desc>
+<g fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 12H8C10 12 10 6 12 6H14M8 12C10 12 10 18 12 18H19"/>
+<path d="M16 5.5L18 7.5L21 3.5M17 16L19 18L17 20"/></g>
+</svg>

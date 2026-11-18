@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="320" viewBox="0 0 960 320" role="img" aria-labelledby="title desc">
+<title id="title">Insiyab flow motif</title><desc id="desc">An illustrative continuous line moves through decreasing disturbances and resolves to a calm horizontal. This decorative motif is not a graph.</desc>
+<rect width="960" height="320" fill="#F7F5F0"/>
+<text x="40" y="45" font-family="IBM Plex Sans, sans-serif" font-size="15" letter-spacing="1.8" fill="#15181D">THE FLOW MOTIF</text>
+<path d="M40 165H105C130 165 130 85 160 85C190 85 190 245 220 245C250 245 250 115 280 115C310 115 310 210 340 210C370 210 370 145 400 145C430 145 430 175 460 175C490 175 490 165 520 165H920" fill="none" stroke="#9C7B3E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="40" y="290" font-family="IBM Plex Sans, sans-serif" font-size="14" fill="#15181D">A visual metaphor for coordination · not a measured recovery curve · keep out of operational plots</text>
+</svg>

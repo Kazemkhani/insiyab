@@ -1,0 +1,101 @@
+{
+  "date": "2026-11-18",
+  "sources": [
+    {
+      "id": "instrument",
+      "title": "Instrument Serif official repository",
+      "url": "https://github.com/Instrument/instrument-serif",
+      "ref": "turn383351353view0",
+      "claim": "Large-size condensed display serif; OFL 1.1.",
+      "short_quote": "Instrument Serif is designed for large sizes"
+    },
+    {
+      "id": "ibm",
+      "title": "IBM Plex official repository",
+      "url": "https://github.com/IBM/plex/",
+      "ref": "turn383351353view1",
+      "claim": "UI-oriented typeface; OFL; separate Arabic package.",
+      "short_quote": "Plex has been designed to work well in user interface (UI) environments and other mediums."
+    },
+    {
+      "id": "noto",
+      "title": "Noto Kufi Arabic official description",
+      "url": "https://github.com/notofonts/noto-docs/blob/main/docs/descriptions/NotoKufiArabic.md",
+      "ref": "turn383351353view2",
+      "claim": "Kufi face mainly for larger sizes.",
+      "short_quote": "mainly for texts in larger font sizes in the Middle Eastern Arabic script."
+    },
+    {
+      "id": "noto_license",
+      "title": "Noto Arabic OFL",
+      "url": "https://github.com/notofonts/arabic/blob/main/OFL.txt",
+      "ref": "turn996378875view1",
+      "claim": "OFL 1.1 and redistribution conditions.",
+      "short_quote": "This Font Software is licensed under the SIL Open Font License, Version 1.1."
+    },
+    {
+      "id": "contrast",
+      "title": "WCAG 2.2 Understanding SC 1.4.3",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+      "ref": "turn585835475view0",
+      "claim": "Normal text 4.5:1; large text 3:1; logo exception.",
+      "short_quote": "The visual presentation of text and images of text has a contrast ratio of at least 4.5:1"
+    },
+    {
+      "id": "nontext",
+      "title": "WCAG 2.2 Understanding SC 1.4.11",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+      "ref": "turn585835475view1",
+      "claim": "Essential graphics and active controls 3:1; threshold uses unrounded values.",
+      "short_quote": "Ensure meaningful visual cues achieve 3:1 against the background."
+    },
+    {
+      "id": "color",
+      "title": "WCAG 2.2 Understanding SC 1.4.1",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html",
+      "ref": "turn585835475view2",
+      "claim": "Do not rely on color alone.",
+      "short_quote": "Color is not the only way of distinguishing information."
+    },
+    {
+      "id": "motion",
+      "title": "WCAG 2.2 Understanding SC 2.3.3",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions",
+      "ref": "turn383351353view3",
+      "claim": "AAA interaction animation can be disabled unless essential.",
+      "short_quote": "Motion animation triggered by interaction can be disabled, unless the animation is essential to the functionality or the information being conveyed."
+    },
+    {
+      "id": "rtl",
+      "title": "Arabic and Persian Layout Requirements",
+      "url": "https://www.w3.org/TR/alreq/",
+      "ref": "turn383351353search0",
+      "claim": "Arabic RTL; numerals LTR; contextual shaping.",
+      "short_quote": "Arabic script is written from right to left."
+    },
+    {
+      "id": "spacing",
+      "title": "Arabic and Persian Layout Requirements current editors draft",
+      "url": "https://www.w3.org/International/alreq/",
+      "ref": "turn383351353search1",
+      "claim": "Do not emulate Latin tracking in Arabic; allow ascenders/descenders.",
+      "short_quote": "These instances do not correspond to letter-spacing in non-cursive scripts, however."
+    },
+    {
+      "id": "bidi",
+      "title": "Unicode Bidi Algorithm basics",
+      "url": "https://www.w3.org/International/articles/inline-bidi-markup/uba-basics.en.html",
+      "ref": "turn383351353search2",
+      "claim": "Isolate mixed-direction text.",
+      "short_quote": "Numbers following RTL text in a LTR context need to be isolated from the preceding text."
+    },
+    {
+      "id": "dir",
+      "title": "Structural markup and RTL in HTML",
+      "url": "https://www.w3.org/International/questions/qa-html-dir.en",
+      "ref": "turn383351353search4",
+      "claim": "HTML dir attribute; logical CSS properties.",
+      "short_quote": "Never use CSS to apply the base direction."
+    }
+  ]
+}

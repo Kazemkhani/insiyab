@@ -1,5 +1,7 @@
 # Lanes: who owns what, and how four workers share one branch
 
+> **From 18 November 2026 22:30 the v2 streams in `docs/v2/PLAN.md` decide who owns which folder.** The push rules below still apply to everyone. Lane 1 (Amir, stream A) still integrates and is still the only one who deploys.
+
 Everyone works on `main` and pushes often. That only works because each lane owns its own folders and the lanes meet through the files in `docs/CONTRACT.md`.
 
 | Lane | Worker | Where it runs | Owns | Does |

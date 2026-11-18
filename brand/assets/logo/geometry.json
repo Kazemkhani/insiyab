@@ -1,0 +1,41 @@
+{
+  "version": "2.0",
+  "master_viewbox": [
+    0,
+    0,
+    120,
+    120
+  ],
+  "visible_symbol_bounds": [
+    10,
+    10,
+    110,
+    110
+  ],
+  "upper_mass": "M10 10 H93 L110 27 V38 H71 C56 38 46 48 40 64 C36 74 32 76 22 76 H10 Z",
+  "lower_mass": "M10 94 H32 C45 94 52 86 58 74 C63 63 68 60 78 60 H110 V110 H10 Z",
+  "motion_guide": "M10 85 H27 C44 85 46 49 74 49 H110",
+  "construction": "Two filled masses; negative space is transparent. No logo stroke.",
+  "small_sizes": [
+    16,
+    24,
+    32,
+    40
+  ],
+  "clear_space": 20,
+  "lockup_width": 620,
+  "lockup_height": 240,
+  "wordmark_optical_width": 325,
+  "wordmark_gap": 22,
+  "fonts": {
+    "latin": "IBM Plex Sans Medium",
+    "arabic": "Noto Kufi Arabic Medium"
+  },
+  "layers": [
+    "symbol-upper",
+    "symbol-lower",
+    "arabic-wordmark",
+    "latin-wordmark"
+  ],
+  "optional_animation_layer": "line-path"
+}

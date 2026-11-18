@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="730" viewBox="0 0 1080 730" role="img" aria-labelledby="title desc">
+<title id="title">Insiyab iconography</title><desc id="desc">Nine original operational icons shown enlarged and at their 24 pixel reference size.</desc>
+<rect width="1080" height="730" fill="#F7F5F0"/>
+<text x="60" y="65" font-family="IBM Plex Sans, sans-serif" font-size="14" letter-spacing="2" fill="#15181D">INSIYAB / ICONOGRAPHY</text>
+<text x="60" y="110" font-family="Instrument Serif, serif" font-size="40" fill="#15181D">A clear role for every mark.</text>
+<text x="60" y="143" font-family="IBM Plex Sans, sans-serif" font-size="16" fill="#15181D">24 × 24 grid · 1.5 unit stroke · rounded caps and joins</text>
+<g transform="translate(60 190) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="5.5" r="2.25"/>
+<path d="M6.5 11.5C7.5 9.5 16.5 9.5 17.5 11.5"/>
+<circle cx="12" cy="16" r="5"/>
+<path d="M7.5 14H16.5M12 14V21"/></g>
+<text x="144" y="216" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Driver</text>
+<g transform="translate(144 236)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="5.5" r="2.25"/>
+<path d="M6.5 11.5C7.5 9.5 16.5 9.5 17.5 11.5"/>
+<circle cx="12" cy="16" r="5"/>
+<path d="M7.5 14H16.5M12 14V21"/></g>
+<text x="181" y="253" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(390 190) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 21V7.5L12 3L21 7.5V21Z"/>
+<path d="M6.5 21V12H10V21M14 21V12H17.5V21M7 8.5H17"/></g>
+<text x="474" y="216" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Depot</text>
+<g transform="translate(474 236)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 21V7.5L12 3L21 7.5V21Z"/>
+<path d="M6.5 21V12H10V21M14 21V12H17.5V21M7 8.5H17"/></g>
+<text x="511" y="253" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(720 190) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 9L6 4.5H18L21 9ZM5 9V21M19 9V21"/>
+<path d="M8 14H16M8 17H16M9 14V20M15 14V20M3 21H21"/></g>
+<text x="804" y="216" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Station</text>
+<g transform="translate(804 236)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 9L6 4.5H18L21 9ZM5 9V21M19 9V21"/>
+<path d="M8 14H16M8 17H16M9 14V20M15 14V20M3 21H21"/></g>
+<text x="841" y="253" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(60 350) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<rect x="3" y="5" width="18" height="16" rx="2"/>
+<path d="M7 3V7M17 3V7M3 9H21M7 17H10C13 17 11 13 14 13H17"/>
+<path d="M7 15.5V18.5M17 11.5V14.5"/></g>
+<text x="144" y="376" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Planning</text>
+<g transform="translate(144 396)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<rect x="3" y="5" width="18" height="16" rx="2"/>
+<path d="M7 3V7M17 3V7M3 9H21M7 17H10C13 17 11 13 14 13H17"/>
+<path d="M7 15.5V18.5M17 11.5V14.5"/></g>
+<text x="181" y="413" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(390 350) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="5.5" r="2.25"/>
+<path d="M7.5 12V11C7.5 8.5 16.5 8.5 16.5 11V12"/>
+<path d="M3 14H21L19.5 19H4.5ZM6 19V21M18 19V21M8 16.5H10.5M14 16.5H16"/></g>
+<text x="474" y="376" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Controller</text>
+<g transform="translate(474 396)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="12" cy="5.5" r="2.25"/>
+<path d="M7.5 12V11C7.5 8.5 16.5 8.5 16.5 11V12"/>
+<path d="M3 14H21L19.5 19H4.5ZM6 19V21M18 19V21M8 16.5H10.5M14 16.5H16"/></g>
+<text x="511" y="413" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(720 350) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M7 3L10 7.5L7.8 9.8C9.2 12.7 11.3 14.8 14.2 16.2L16.5 14L21 17C20.5 19.5 19 21 17 21C10 20 4 14 3 7C3 5 4.5 3.5 7 3Z"/>
+<path d="M14 3C18 3 21 6 21 10M14 7C15.8 7 17 8.2 17 10"/></g>
+<text x="804" y="376" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Phone call</text>
+<g transform="translate(804 396)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M7 3L10 7.5L7.8 9.8C9.2 12.7 11.3 14.8 14.2 16.2L16.5 14L21 17C20.5 19.5 19 21 17 21C10 20 4 14 3 7C3 5 4.5 3.5 7 3Z"/>
+<path d="M14 3C18 3 21 6 21 10M14 7C15.8 7 17 8.2 17 10"/></g>
+<text x="841" y="413" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(60 510) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M6 3H15L19 7V21H6ZM15 3V7H19M9 11H16M9 14.5H16M9 18H13"/></g>
+<text x="144" y="536" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Briefing</text>
+<g transform="translate(144 556)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M6 3H15L19 7V21H6ZM15 3V7H19M9 11H16M9 14.5H16M9 18H13"/></g>
+<text x="181" y="573" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(390 510) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 12H8C10 12 10 6 12 6H14M8 12C10 12 10 18 12 18H19"/>
+<path d="M16 5.5L18 7.5L21 3.5M17 16L19 18L17 20"/></g>
+<text x="474" y="536" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Decision</text>
+<g transform="translate(474 556)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M3 12H8C10 12 10 6 12 6H14M8 12C10 12 10 18 12 18H19"/>
+<path d="M16 5.5L18 7.5L21 3.5M17 16L19 18L17 20"/></g>
+<text x="511" y="573" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<g transform="translate(720 510) scale(2.5)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M5 4H19C20.1 4 21 4.9 21 6V16C21 17.1 20.1 18 19 18H9L4 21V18C3.4 17.7 3 16.9 3 16V6C3 4.9 3.9 4 5 4Z"/>
+<path d="M8 11L11 14L16 8.5"/></g>
+<text x="804" y="536" font-family="IBM Plex Sans, sans-serif" font-size="18" fill="#15181D">Message received</text>
+<g transform="translate(804 556)" fill="none" stroke="#15181D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M5 4H19C20.1 4 21 4.9 21 6V16C21 17.1 20.1 18 19 18H9L4 21V18C3.4 17.7 3 16.9 3 16V6C3 4.9 3.9 4 5 4Z"/>
+<path d="M8 11L11 14L16 8.5"/></g>
+<text x="841" y="573" font-family="IBM Plex Sans, sans-serif" font-size="12" fill="#15181D">24 px reference</text>
+<text x="60" y="700" font-family="IBM Plex Sans, sans-serif" font-size="13" fill="#15181D">Use visible text labels in operational screens. Meaning never depends on colour alone.</text>
+</svg>

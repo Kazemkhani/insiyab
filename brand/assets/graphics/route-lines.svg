@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+<title id="title">Schematic route lines</title><desc id="desc">Two illustrative route lines with rounded turns and station dots. This is not a map of Dubai.</desc>
+<rect width="960" height="360" fill="#F7F5F0"/>
+<text x="40" y="45" font-family="IBM Plex Sans, sans-serif" font-size="15" letter-spacing="1.8" fill="#15181D">ROUTE LINES</text>
+<g fill="none" stroke="#15181D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M40 140H250Q280 140 280 170V220Q280 250 310 250H650Q680 250 680 220V170Q680 140 710 140H920"/></g>
+<g fill="none" stroke="#9C7B3E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M40 250H175Q205 250 205 220V170Q205 140 235 140H510Q540 140 540 170V220Q540 250 570 250H920"/></g>
+<circle cx="100" cy="140" r="5" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/>
+<circle cx="250" cy="140" r="5" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/>
+<circle cx="390" cy="250" r="5" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/>
+<circle cx="570" cy="250" r="5" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/>
+<circle cx="760" cy="140" r="5" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/>
+<circle cx="860" cy="140" r="5" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/>
+<circle cx="100" cy="250" r="5" fill="#F7F5F0" stroke="#9C7B3E" stroke-width="2"/>
+<circle cx="360" cy="140" r="5" fill="#F7F5F0" stroke="#9C7B3E" stroke-width="2"/>
+<circle cx="480" cy="140" r="5" fill="#F7F5F0" stroke="#9C7B3E" stroke-width="2"/>
+<circle cx="760" cy="250" r="5" fill="#F7F5F0" stroke="#9C7B3E" stroke-width="2"/>
+<circle cx="860" cy="250" r="5" fill="#F7F5F0" stroke="#9C7B3E" stroke-width="2"/>
+<circle cx="570" cy="250" r="9" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/><circle cx="570" cy="250" r="4" fill="#F7F5F0" stroke="#15181D" stroke-width="2"/>
+<text x="40" y="327" font-family="IBM Plex Sans, sans-serif" font-size="14" fill="#15181D">Schematic network · illustrative · not Dubai route geography</text>
+</svg>

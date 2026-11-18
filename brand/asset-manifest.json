@@ -1,0 +1,682 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "c88a1303ff85b173a9dfd632d39ab816bd104251ed34610f7da957e52ea1b3db",
+    "bytes": 3987
+  },
+  {
+    "path": "assets/tokens.json",
+    "sha256": "16264961a822a70c7873ff980ff0242456ba976d63b4e46420c94a5bb3bb051f",
+    "bytes": 2646
+  },
+  {
+    "path": "assets/tokens.css",
+    "sha256": "62886c9d306494235eda329887ede19127b796c8001590d18f0831c8c7a12964",
+    "bytes": 1188
+  },
+  {
+    "path": "assets/graphics/route-lines.png",
+    "sha256": "6abe6ee0141b8410845fd781b611f39def16e5314aeffafb66cf474a54f85593",
+    "bytes": 20098
+  },
+  {
+    "path": "assets/graphics/timetable-planned-actual.svg",
+    "sha256": "612bd965161708e175e4c0000a2c7999c5dc65e9e3bfd4a4cdc875c527cd519c",
+    "bytes": 2598
+  },
+  {
+    "path": "assets/graphics/timetable-planned-actual.png",
+    "sha256": "ee893f6d655a94bcd9fdaa43a9a5b3a8b481bff8242989068a5acdd5a2c09f87",
+    "bytes": 31417
+  },
+  {
+    "path": "assets/graphics/flow-motif.png",
+    "sha256": "2c33988d764c2b22904398e2ae13c86b1e3db9a01501fec6af4659d8cf7f8b18",
+    "bytes": 26480
+  },
+  {
+    "path": "assets/graphics/flow-motif.svg",
+    "sha256": "0cd3f0cf4cd0bbd595aea1f767d0d1f43de6b246f73220315f73ef4ad9a7e17c",
+    "bytes": 1011
+  },
+  {
+    "path": "assets/graphics/route-lines.svg",
+    "sha256": "6eb802d11bc4a1fe630cc91f43f1f54a4df4d5d1c6657d6e3d4e5311abbd3fcc",
+    "bytes": 2124
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-small-black.svg",
+    "sha256": "deb98cd5d4e3c41c8a5dba283010491d2070cdeea487a397282f25640995d8dc",
+    "bytes": 726
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-16-ivory.svg",
+    "sha256": "ea86907da21292bb4683b194b8b0cb7d0298ce1add9da5a904f641f41a8bdb99",
+    "bytes": 712
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-production-outlined.svg",
+    "sha256": "f3a85632c39230850e49168a2abf5808ae1b37dfe9734324a683bc55d17554ae",
+    "bytes": 4818
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-ink.svg",
+    "sha256": "5dcde00b8722fa9e79fb32c69f61086a1e32c3a08cb769f481298f14ac4b3a0a",
+    "bytes": 4816
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-arabic-ink.svg",
+    "sha256": "b8b9b421adeebda7f09194e639cb877f589e7b953df9d7bee53528fb388b1f5e",
+    "bytes": 1939
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-small-ivory.svg",
+    "sha256": "34a2f7e4a49c6fc61a860fa264b762684bbc40b920a244c88a25cd74273b3fb0",
+    "bytes": 726
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-32-black.svg",
+    "sha256": "08a1e4790d35516452caf618803054e4dc87c978e6110337e1c115bdfc0a10a1",
+    "bytes": 711
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-small-ink.svg",
+    "sha256": "30012e95abfea8d7809da2f716e1d86da6d6ed9833b5b1d9b93b2001c46fe392",
+    "bytes": 722
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-small-gold.svg",
+    "sha256": "575b05ba4511f014797d2d228d226a838f476f054796592770a330f2b07807cc",
+    "bytes": 724
+  },
+  {
+    "path": "assets/logo/geometry.json",
+    "sha256": "eb5d398524984938b2e45ceb9ea12831f424bc654ff6deeef980d02c5a7d650e",
+    "bytes": 883
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-40-ivory.svg",
+    "sha256": "402219a109cb23a0ff8f081d1e0995ff64925c3326f383aac2e613d6c13fbb4f",
+    "bytes": 712
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-latin-ivory.svg",
+    "sha256": "19800b3cf5327e8eba779459bc28d333ec615b86213c693a7de75087e63881f5",
+    "bytes": 2699
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-latin-gold.svg",
+    "sha256": "c7a630d37e18656c27c88b2d93e179f74df15a796ab24cab7e427d8978f4a76b",
+    "bytes": 2699
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-16-ink.svg",
+    "sha256": "06788652f449272e1800f1b2c05e9d588b4ebd328753abc66493f66e2c65d996",
+    "bytes": 708
+  },
+  {
+    "path": "assets/logo/insiyab-variations-board.svg",
+    "sha256": "659de333cdf9eb7cfc13edd48994683a80c9ba24f8afaba7f61d1fd13dda67a4",
+    "bytes": 9018
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-on-ink.svg",
+    "sha256": "51f6637edf33828c54f0ee8d87f215fdee2e1c8ff881cbdf626e32c75b80cda3",
+    "bytes": 4833
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-champagne.svg",
+    "sha256": "3e5fb6cbe8dfac1dc977efcdebe15497e92ab17b872a3693f75310445b4abc26",
+    "bytes": 4838
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-40-black.svg",
+    "sha256": "b18c341876e9559853ccef2003cd1a9090970345b2f3c09460ca199099a6de04",
+    "bytes": 712
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-24-gold.svg",
+    "sha256": "521c8c4e0d473ba1391bb974797f0ac1a7fd94726ba29bfd6a27c9064b2208e1",
+    "bytes": 740
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-stacked-black.svg",
+    "sha256": "e907b1f532a300358dce611662d7351c35fe1edded331ecd205a7d224d2d95db",
+    "bytes": 4806
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-gold.svg",
+    "sha256": "017bfc5382e8d0a4c66a21b47527c373a7b9c1ff7e18ba0d086ad8d9eed8739b",
+    "bytes": 658
+  },
+  {
+    "path": "assets/logo/insiyab-motion-guide.svg",
+    "sha256": "d816fec6a005367f5231be8b69f57476aa27b9297aa2145bf68ad7ebb908146c",
+    "bytes": 384
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-arabic-gold.svg",
+    "sha256": "a64e3cceb3ccb19b911d66f1fb135e3fb58f5cfb38b38e83297d00bc52473c8b",
+    "bytes": 1939
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-black.svg",
+    "sha256": "d9d74c04f96042fc8e51db53f4e7860428c0e4af05ec22b0f5aaaf649480fc70",
+    "bytes": 4820
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-ivory.svg",
+    "sha256": "61fbdbc90c8e5591a105e8b9a83d0d85080b951a26a0a454fd156793a5e8a45d",
+    "bytes": 4820
+  },
+  {
+    "path": "assets/logo/README.md",
+    "sha256": "ba368d037f2a4bc9d29dde2a5b97462798f3483025d8ed80abf75c2c6a5af4a4",
+    "bytes": 3573
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-16-gold.svg",
+    "sha256": "4b33355e68ba1b7403857621e2098298997a8ae4db328a47c999c64bf027c78e",
+    "bytes": 710
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-40-gold.svg",
+    "sha256": "c7cea836ff1f5a34bf3ca56199564f35035b95fd429a3c506ee5bd9c3c2366d8",
+    "bytes": 710
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-animation.svg",
+    "sha256": "091eaadbe4a4c5d66e59ab8bda221bf876d62dd53f43727a3fe4d7faacef8b6d",
+    "bytes": 5107
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-stacked-gold.svg",
+    "sha256": "723b43794e345d2bc127182fb2c7b5d2297b4829d5a0551da2742b9fcd62f385",
+    "bytes": 4804
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-24-ink.svg",
+    "sha256": "c28409a04875fd1c36f8ef7d976aa1dab62655708e7fda63f0c42cd6d910f436",
+    "bytes": 738
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-latin-black.svg",
+    "sha256": "30e11b184f44275c5d50ebcfda04715ee9b7397f787156a4dde81dad5b379a25",
+    "bytes": 2699
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-16-black.svg",
+    "sha256": "46a1d9a7f4d10e65e120c19e5887ab631127dd0251a2509024faef6f09dfc171",
+    "bytes": 712
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-40-ink.svg",
+    "sha256": "9874b1b5e896a9348040f6b0e0d80fc4a1678c6559641ca0437846e2cd877e10",
+    "bytes": 708
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-stacked-ink.svg",
+    "sha256": "3ef3bc68f020557a078c1b9d2bb6068d28f6955f4791f0f7f54ad999717ed45f",
+    "bytes": 4802
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-latin-ink.svg",
+    "sha256": "0afe67e287dd49823bcbec62ce37950993a6d2aa46919f030730c6f3c3186f09",
+    "bytes": 2699
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-black.svg",
+    "sha256": "1bb089f9d227bb1f68343c8f1941079d07cd45171441f3f02e38ca75f51dc9a8",
+    "bytes": 660
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-on-ivory.svg",
+    "sha256": "191836c29d580f1f2046d427447231441ac2b0c35d08b20ec4816891db8fe900",
+    "bytes": 4837
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-stacked-ivory.svg",
+    "sha256": "c150cda6bacbc96ff6e911eaf07de0649eacb92363234cbfeeeb556019d217fa",
+    "bytes": 4806
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-on-gold.svg",
+    "sha256": "f4f941a8c76e9dbaaaf8fb0966879f48de07a489b5075412edfa58aa3f806a62",
+    "bytes": 4835
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-arabic-black.svg",
+    "sha256": "05fbdd9acb8c5c53e1fe17f51acadd567b020be2db3a2e271cc5c97529580301",
+    "bytes": 1939
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-32-ink.svg",
+    "sha256": "35686a072dea0250a7cd06718cccbffeb86a548aef4bf139c1bb180fdac5bae1",
+    "bytes": 707
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-32-gold.svg",
+    "sha256": "5d56f4bacebf2ce06451410046413037226c03f2da2694ee530887a61f1e3be4",
+    "bytes": 709
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-gold.svg",
+    "sha256": "665fa434f38ab7b17b979dd19cabe1d1f90c67f7c8696a914aba90981a992d92",
+    "bytes": 4818
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-ivory.svg",
+    "sha256": "2145e41bc9ea5ad0464385407031d41a2ef8fa40ffed239be029eec4c43a14c4",
+    "bytes": 660
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-ink.svg",
+    "sha256": "542c8f78fc0422a52e78faf980ac11622fa381262fb6434389ee1c6311845bcd",
+    "bytes": 656
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-production-outlined.svg",
+    "sha256": "7e4d279bf0ea8d459e1a6e42ef7f305f2392d4dffc088fbaa1b677da0fcdfc21",
+    "bytes": 662
+  },
+  {
+    "path": "assets/logo/insiyab-wordmark-arabic-ivory.svg",
+    "sha256": "d06e54763cf02ab10addb0a93a8cfabd5fcfe5c4ac5981df1b2c5063d558a499",
+    "bytes": 1939
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-stacked.svg",
+    "sha256": "186d5c5e39ad462f726bec19d28de8c9556791495e000bbb8d763114d1b499d8",
+    "bytes": 4818
+  },
+  {
+    "path": "assets/logo/insiyab-lockup-layered.svg",
+    "sha256": "1690e89475cf6c928f5eaf387643c0a8d481de1c24d50f4cf45b912d82e1a294",
+    "bytes": 4822
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-24-black.svg",
+    "sha256": "bfcc44e06fdc4610b64eec470a6296d4b877dd8c9739cd4d4654e29af40910c9",
+    "bytes": 742
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-32-ivory.svg",
+    "sha256": "bcacf10b15f083b19639488d7aab7832c4a9dadebfb0a34c76053fc813c64bc7",
+    "bytes": 711
+  },
+  {
+    "path": "assets/logo/insiyab-app-icon.svg",
+    "sha256": "20464d8fa89b7481930d8289a3d9bd0e879059edd4dfd82ce1303f3ad7923868",
+    "bytes": 730
+  },
+  {
+    "path": "assets/logo/insiyab-symbol-24-ivory.svg",
+    "sha256": "dbf78cdae761214d704646679a094e9f4f132ab78c6c1a3d2556a867676fe0a4",
+    "bytes": 742
+  },
+  {
+    "path": "assets/fonts/NotoKufiArabic-Regular.ttf",
+    "sha256": "befb9d07506942ba2a7e0e85c65a24a76792c937d812bc80f1095d0f660cf330",
+    "bytes": 176740
+  },
+  {
+    "path": "assets/fonts/InstrumentSerif-OFL.txt",
+    "sha256": "129ed7618959716959f2941fdd5b49e0ad6e6c1d78726761786a00253d865521",
+    "bytes": 4405
+  },
+  {
+    "path": "assets/fonts/NotoKufiArabic-Medium.ttf",
+    "sha256": "3104998b8a4a77c6611952ee1828f7d9c1cdd5a9f47509a1769f61baeaadc9af",
+    "bytes": 180740
+  },
+  {
+    "path": "assets/fonts/README.md",
+    "sha256": "4e8ea9be175a277b61271a564e0ce666e8619e2d4395ac28ec750fa7ac94ea63",
+    "bytes": 1073
+  },
+  {
+    "path": "assets/fonts/NotoKufiArabic-OFL.txt",
+    "sha256": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96",
+    "bytes": 4382
+  },
+  {
+    "path": "assets/fonts/NotoKufiArabic-Bold.ttf",
+    "sha256": "11c1608fb7c70135ab4cfd126f2300c81c7ca08c9bcffaff61b947edba234e65",
+    "bytes": 180552
+  },
+  {
+    "path": "assets/fonts/InstrumentSerif-Regular.ttf",
+    "sha256": "498efd461f6ddfcb7a111bf9a565709d2085d48201d501ead960d93e84ffbb88",
+    "bytes": 70012
+  },
+  {
+    "path": "assets/fonts/IBMPlexSans-OFL.txt",
+    "sha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da",
+    "bytes": 4456
+  },
+  {
+    "path": "assets/fonts/InstrumentSerif-Italic.ttf",
+    "sha256": "08939b8bdf534afec24ae0ef5e03f948940cd9a8fe08e7fecbad040e62327385",
+    "bytes": 71592
+  },
+  {
+    "path": "assets/fonts/IBMPlexSans-SemiBold.ttf",
+    "sha256": "c51119b25f4a296da2b66edf3201b9aa1735091ed7efc1fca0313346f3851a4d",
+    "bytes": 209768
+  },
+  {
+    "path": "assets/fonts/IBMPlexSans-Medium.ttf",
+    "sha256": "a494d5a69fa094f7071a9ffbc98e86c85337d1a29f3fc1ff7c2e1c46161ddf27",
+    "bytes": 209592
+  },
+  {
+    "path": "assets/fonts/IBMPlexSans-Regular.ttf",
+    "sha256": "b47ebd72b5ce53b60f909033ff84d6fc12358cc147e2981f8c321ad3f36246b6",
+    "bytes": 207768
+  },
+  {
+    "path": "assets/icons/icon-contact-sheet.svg",
+    "sha256": "2d243d0c1ba0c7b51c9264de168f26515c2c9d27f8bc89ba6314e0bbc144c5ab",
+    "bytes": 7811
+  },
+  {
+    "path": "assets/icons/phone-call.svg",
+    "sha256": "76e5d2ac2137f4816d5bc3282c6f990f7a98b5ce892818946dce82384830ed52",
+    "bytes": 528
+  },
+  {
+    "path": "assets/icons/station.svg",
+    "sha256": "886379cdff8ce2dc037a71622a17026ed20f5970389290b0876499d0b5f3d985",
+    "bytes": 441
+  },
+  {
+    "path": "assets/icons/controller.svg",
+    "sha256": "31a9b8279c48711299353265a2df04b36bf4099b70ec8ee4a2d56a888f87d069",
+    "bytes": 490
+  },
+  {
+    "path": "assets/icons/icon-contact-sheet.png",
+    "sha256": "6e0d57ed35af98ca0439123bb3deed57c201cf421cf0aa7c2e10bcb508731dac",
+    "bytes": 75972
+  },
+  {
+    "path": "assets/icons/README.md",
+    "sha256": "15d8968cfd89e01a86cf7ba37c9da70e8e2ba3b928165959ca015cb961a5ed40",
+    "bytes": 2238
+  },
+  {
+    "path": "assets/icons/decision.svg",
+    "sha256": "e0810bb8dc9c14c479e371b0d270712a932a093f9c2057f3bdf3e04cd3dab001",
+    "bytes": 454
+  },
+  {
+    "path": "assets/icons/icons-sprite.svg",
+    "sha256": "72233ed82be910c2d681a3620626f554c6a2aefb563cc30847adc0fefca84800",
+    "bytes": 2871
+  },
+  {
+    "path": "assets/icons/briefing.svg",
+    "sha256": "4e2a3ac080fd9e4149d570d5a67696b8164d9f396aecb256aa0d645f81d0d6d5",
+    "bytes": 402
+  },
+  {
+    "path": "assets/icons/message-received.svg",
+    "sha256": "e080aef55f69b35347557764a2db8d50d06683cb469019f6b2ef6c9f05d5c083",
+    "bytes": 495
+  },
+  {
+    "path": "assets/icons/depot.svg",
+    "sha256": "ce4a70cc9b0435e67bb808236fd631a537b4f831d2b4d8a4674d850c383d4cd1",
+    "bytes": 428
+  },
+  {
+    "path": "assets/icons/driver.svg",
+    "sha256": "391233091ec3c10bbdf0372545ac9c0dcfd93e78558d6f86ab10a3646460adb5",
+    "bytes": 485
+  },
+  {
+    "path": "assets/icons/planning.svg",
+    "sha256": "975a95ae138c0e5b563009579802f2e19dd1b786b95e7ebf91d532e442897b7d",
+    "bytes": 474
+  },
+  {
+    "path": "assets/applications/identity-overview.svg",
+    "sha256": "50dca55b8a6d98f595aadf23b0ce1f79e895b69cb71c4dc2e4e48a41ac47ef97",
+    "bytes": 12353
+  },
+  {
+    "path": "assets/applications/business-card-front.svg",
+    "sha256": "b0a18b47b02647a0973c7d71ec50cd036713967b07090e100a4f743e4fd0c4f0",
+    "bytes": 5412
+  },
+  {
+    "path": "assets/applications/business-card-print-template.pdf",
+    "sha256": "7d6122be4f80c8c3487dd0d9349ea2e5ddbbebad2d9e1b48b71efc2eae6b1d25",
+    "bytes": 49808
+  },
+  {
+    "path": "assets/applications/application-specimens.pdf",
+    "sha256": "ac148885ea87bee32b8de84b4123ba95dd68b96021bc861ff81dc2435aebef01",
+    "bytes": 86199
+  },
+  {
+    "path": "assets/applications/facade-specimen.svg",
+    "sha256": "130b48534bff3e8f2ef1aa2eaea9035b14d5de37929bfeb1fb9ab52d2464c2ef",
+    "bytes": 6840
+  },
+  {
+    "path": "assets/applications/mobile-notification.svg",
+    "sha256": "c3f15003fdd1e392305bb318a01a1bf1c12c5d678f4597c8c292a00c155761c0",
+    "bytes": 8105
+  },
+  {
+    "path": "assets/applications/control-room.svg",
+    "sha256": "f92623265fd32a937495048d4451c48174106d60f41c5400a79c1351d010c76f",
+    "bytes": 16299
+  },
+  {
+    "path": "assets/applications/business-card-back.svg",
+    "sha256": "c310b7510e13b74a90e59f60a20069e11e769302267f52ca753c2b20fe51b91a",
+    "bytes": 3784
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-16-ivory.png",
+    "sha256": "c2278def23c5d540212d46419d7ea8eb3bbf124f8a3dc9231e74a5f1e394479a",
+    "bytes": 354
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-32-ink.png",
+    "sha256": "db24cf8af8a4ae0deb4dc10a6374390487780f2c208cd5a9c3c3eecf419a19ed",
+    "bytes": 550
+  },
+  {
+    "path": "assets/logo/png/insiyab-variations-board.png",
+    "sha256": "ac1964bdc2707a9c6e1d5a9161a1f3f8c92b5fa2525311a9ff0afd9a023448fd",
+    "bytes": 72319
+  },
+  {
+    "path": "assets/logo/png/insiyab-lockup-stacked-ivory.png",
+    "sha256": "9b2683fca9c6a578f5767f041f20a3b7aa4f261033a3f63827149f577bf39193",
+    "bytes": 61201
+  },
+  {
+    "path": "assets/logo/png/insiyab-lockup-champagne.png",
+    "sha256": "54dae0e10302080408aa8400f9648760e9169cb3291838dc0cf1ed9c3bcfe21f",
+    "bytes": 63700
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-ivory.png",
+    "sha256": "37957d4f393fea139d18e1da48dab62959218ddb9c1994e8e041cd349489bd2b",
+    "bytes": 27766
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-40-ink.png",
+    "sha256": "10348cc7e4b857fa3bcc48a9dfaee9fa55461ec4cedec8e54e02a121e78ad8a5",
+    "bytes": 679
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-gold.png",
+    "sha256": "dcb258bf51fe5038e4ff3f427ba9911c14c64b1ab1f74ee04b062df181a9922d",
+    "bytes": 28397
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-24-ivory.png",
+    "sha256": "a347586eee1c2793fb7295d8466877695a2fd55f9e81361d836e28689f56a119",
+    "bytes": 443
+  },
+  {
+    "path": "assets/logo/png/insiyab-app-icon.png",
+    "sha256": "b1d235ef062b14b1f868b7d516f059414aece359235e4f570054630437a74e0c",
+    "bytes": 20107
+  },
+  {
+    "path": "assets/logo/png/insiyab-lockup-stacked-ink.png",
+    "sha256": "b5fc477e03bece8f7330b3278d8fcc9af3cf32c8ef7d5180c8c4336224097cb0",
+    "bytes": 62482
+  },
+  {
+    "path": "assets/logo/png/insiyab-lockup-ivory.png",
+    "sha256": "2d5636e0d0781368b8324cb6fa8b32a1e17a8e9af1ff81129b8142cd9b00abae",
+    "bytes": 60937
+  },
+  {
+    "path": "assets/logo/png/insiyab-lockup-black.png",
+    "sha256": "4976a7b3f6b2d329b102dade7c79abe9e89b4478925ed26a53d89070b2ae81f5",
+    "bytes": 50335
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-ink.png",
+    "sha256": "d8789872c2ee38432ffdce0d3389665e90c6c386f1254575db34d46e9f0be670",
+    "bytes": 28137
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-32-ivory.png",
+    "sha256": "8681a89a9690f24890102513076ae92f5e27eb58ce38cee5cf45ac96b024f301",
+    "bytes": 540
+  },
+  {
+    "path": "assets/logo/png/insiyab-lockup-ink.png",
+    "sha256": "372806aacd23b323e8f1e792cd816bb2442c74b771d6e5d969c291296617a3e8",
+    "bytes": 62693
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-16-ink.png",
+    "sha256": "e2c09b8f27f3ccbaa6ea4ec1345f3695d49670759f0b284e4bae101de92eeedc",
+    "bytes": 365
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-40-ivory.png",
+    "sha256": "943951865a33db62854265daca666e772e8eebda27aa428d3bf824f4dc233496",
+    "bytes": 654
+  },
+  {
+    "path": "assets/logo/png/insiyab-lockup-gold.png",
+    "sha256": "943a1f750b400cd55ac278e3f0f25782219bc7df759688f2e0e6b8a3db441dc4",
+    "bytes": 64296
+  },
+  {
+    "path": "assets/logo/png/insiyab-symbol-24-ink.png",
+    "sha256": "153c0ff3cb190c4949157ab85ed82d992aa1cd74a169543c7e0406c2cfef7c4e",
+    "bytes": 446
+  },
+  {
+    "path": "guidelines/Insiyab_Brand_Guidelines.pdf",
+    "sha256": "997508340d07dcb896539d136d09bd49ae98d513291c045dbe9a7aa084daa6af",
+    "bytes": 160584
+  },
+  {
+    "path": "guidelines/Insiyab_Logo_Variations.pdf",
+    "sha256": "e00ed2f9150530ea543cdc0700bcc0cd99da6c01b2ffa51853151900ae89408f",
+    "bytes": 70307
+  },
+  {
+    "path": "guidelines/imagery-prompts.md",
+    "sha256": "f1e63049223e18f7afb75db1999f2fe16587a32993687b8dd593eecffdce6d42",
+    "bytes": 13241
+  },
+  {
+    "path": "guidelines/motion-spec.md",
+    "sha256": "89e622b5c047568ef11583deb3296f1a8c4be065fb8da7c45a50b9064ebdb824",
+    "bytes": 17098
+  },
+  {
+    "path": "presentation/Insiyab_Executive_Slide_Master.pptx",
+    "sha256": "4ff7d1a5d234b6250ce64d5effa48564b43e67ab311d9234ca87fe92f9093cd4",
+    "bytes": 65368
+  },
+  {
+    "path": "presentation/Insiyab_Executive_Slide_Master.potx",
+    "sha256": "d42e28be4d837ad0dd741dc304b58b1ff83a5ca17f876a3e92ba580fbf79fbc4",
+    "bytes": 65371
+  },
+  {
+    "path": "presentation/Insiyab_Executive_Slide_Master_Preview.pdf",
+    "sha256": "a1463dbe32efa9570f23dc1101bcf9b64d94fb09062c2ac9f199d5afc61825f6",
+    "bytes": 861824
+  },
+  {
+    "path": "presentation/README.md",
+    "sha256": "a5ac0957ff0f0e302048ba8eabc7ebdfd70e403c4866964f0be6ee487cf1df34",
+    "bytes": 4055
+  },
+  {
+    "path": "source/design_core.py",
+    "sha256": "00621c6cf6e7acc34566a289aa7780f956fa5fc724a74757bf650d4f03888917",
+    "bytes": 9100
+  },
+  {
+    "path": "source/layout.py",
+    "sha256": "50055a786de2ce21941bf974c49ce7ad608d368e967f4e981bbb60cc5cadfd46",
+    "bytes": 8190
+  },
+  {
+    "path": "source/build_logo_variations.py",
+    "sha256": "98c8c35125b917acf97dcd68316871992d17ce0822f679669e1f54a95d51b065",
+    "bytes": 6707
+  },
+  {
+    "path": "source/build_icons.py",
+    "sha256": "97665646314c857df46578f62cdb5fe475945480527721ef51791aa4fe026a6f",
+    "bytes": 11965
+  },
+  {
+    "path": "source/build_applications.py",
+    "sha256": "c14fe7198175626b1bc6ce2d368e52e026c0bae036f12d9910c8e83ceda2b91b",
+    "bytes": 8447
+  },
+  {
+    "path": "source/build_guidelines.py",
+    "sha256": "f9f74cffffe51e84442a7cdcc3e2693986d89a204140a7abfa9869e2f2d74760",
+    "bytes": 30551
+  },
+  {
+    "path": "source/build_slides.mjs",
+    "sha256": "ab2ac8483c77270e216ec61ac7e34fc608cf708bf3ef8c87dfcf01a042fdffe5",
+    "bytes": 17764
+  },
+  {
+    "path": "source/build_slides_finish.py",
+    "sha256": "728c1d8cfbac7f14ded8be787ac6b2d7e3e90f0e5a0deebb3abb241334f6dda3",
+    "bytes": 4555
+  },
+  {
+    "path": "source/package_identity.py",
+    "sha256": "f2d2d307d405ea7c3235b67cdd980b5dbc0cb4cf3166069974ad2ca31222e3c5",
+    "bytes": 14073
+  },
+  {
+    "path": "research/contrast.json",
+    "sha256": "919697350803431148154eb54f266c520f6a2f3302febf5aa3634c65142cd78f",
+    "bytes": 5057
+  },
+  {
+    "path": "research/sources.json",
+    "sha256": "3954be66d24777584298d1f2daef4a2a4bab9c30a5e3412fe6247463439a10c0",
+    "bytes": 4383
+  },
+  {
+    "path": "research/evidence.md",
+    "sha256": "715cec1fac4bbd30c6d8a6ebc89d27a836f6c897b3ae381328479e276aac9cd8",
+    "bytes": 7909
+  }
+]

@@ -1,0 +1,209 @@
+{
+  "colors": {
+    "ivory": "#F7F5F0",
+    "ink": "#15181D",
+    "gold": "#9C7B3E",
+    "red": "#C42B2B",
+    "teal": "#2E7D6B"
+  },
+  "luminance": {
+    "ivory": 0.9137024302594217,
+    "ink": 0.009014057455587516,
+    "gold": 0.21581637968565456,
+    "red": 0.13637934375140387,
+    "teal": 0.16309610246994835
+  },
+  "contrast_pairs": [
+    {
+      "color_1": "ivory",
+      "color_2": "ink",
+      "ratio": 16.330048666534744,
+      "display": "16.33:1",
+      "normal_text_AA": true,
+      "large_text_AA_and_essential_graphics": true,
+      "normal_text_AAA": true
+    },
+    {
+      "color_1": "ivory",
+      "color_2": "gold",
+      "ratio": 3.6254441182257597,
+      "display": "3.63:1",
+      "normal_text_AA": false,
+      "large_text_AA_and_essential_graphics": true,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "ivory",
+      "color_2": "red",
+      "ratio": 5.170650410406131,
+      "display": "5.17:1",
+      "normal_text_AA": true,
+      "large_text_AA_and_essential_graphics": true,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "ivory",
+      "color_2": "teal",
+      "ratio": 4.522384121949517,
+      "display": "4.52:1",
+      "normal_text_AA": true,
+      "large_text_AA_and_essential_graphics": true,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "ink",
+      "color_2": "gold",
+      "ratio": 4.504289166792187,
+      "display": "4.50:1",
+      "normal_text_AA": true,
+      "large_text_AA_and_essential_graphics": true,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "ink",
+      "color_2": "red",
+      "ratio": 3.1582194444377634,
+      "display": "3.16:1",
+      "normal_text_AA": false,
+      "large_text_AA_and_essential_graphics": true,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "ink",
+      "color_2": "teal",
+      "ratio": 3.610937997786698,
+      "display": "3.61:1",
+      "normal_text_AA": false,
+      "large_text_AA_and_essential_graphics": true,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "gold",
+      "color_2": "red",
+      "ratio": 1.4262115872679821,
+      "display": "1.43:1",
+      "normal_text_AA": false,
+      "large_text_AA_and_essential_graphics": false,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "gold",
+      "color_2": "teal",
+      "ratio": 1.2474014146886663,
+      "display": "1.25:1",
+      "normal_text_AA": false,
+      "large_text_AA_and_essential_graphics": false,
+      "normal_text_AAA": false
+    },
+    {
+      "color_1": "red",
+      "color_2": "teal",
+      "ratio": 1.1433461357937809,
+      "display": "1.14:1",
+      "normal_text_AA": false,
+      "large_text_AA_and_essential_graphics": false,
+      "normal_text_AAA": false
+    }
+  ],
+  "tints_over_ivory": {
+    "ivory": {
+      "10": "#F7F5F0",
+      "25": "#F7F5F0",
+      "50": "#F7F5F0"
+    },
+    "ink": {
+      "10": "#E0DFDB",
+      "25": "#BFBEBB",
+      "50": "#868787"
+    },
+    "gold": {
+      "10": "#EEE9DE",
+      "25": "#E0D7C4",
+      "50": "#CAB897"
+    },
+    "red": {
+      "10": "#F2E1DC",
+      "25": "#EAC3BF",
+      "50": "#DE908E"
+    },
+    "teal": {
+      "10": "#E3E9E3",
+      "25": "#C5D7CF",
+      "50": "#93B9AE"
+    }
+  },
+  "tint_method": "sRGB channel interpolation; round half up; percentages are amount of brand pigment, remainder ivory; no alpha/transparency in delivered tokens",
+  "tint_contrast": {
+    "ivory": {
+      "10": {
+        "ink": 16.330048666534744,
+        "base_color": 1.0
+      },
+      "25": {
+        "ink": 16.330048666534744,
+        "base_color": 1.0
+      },
+      "50": {
+        "ink": 16.330048666534744,
+        "base_color": 1.0
+      }
+    },
+    "ink": {
+      "10": {
+        "ink": 13.342095503317642,
+        "base_color": 13.342095503317642
+      },
+      "25": {
+        "ink": 9.572487636679897,
+        "base_color": 9.572487636679897
+      },
+      "50": {
+        "ink": 4.9387466747428554,
+        "base_color": 4.9387466747428554
+      }
+    },
+    "gold": {
+      "10": {
+        "ink": 14.696311349603285,
+        "base_color": 3.2627370946678216
+      },
+      "25": {
+        "ink": 12.443423890514303,
+        "base_color": 2.762572168379704
+      },
+      "50": {
+        "ink": 9.162546011473925,
+        "base_color": 2.03418245858296
+      }
+    },
+    "red": {
+      "10": {
+        "ink": 14.046649811536367,
+        "base_color": 4.447648448329087
+      },
+      "25": {
+        "ink": 11.062487391809558,
+        "base_color": 3.5027608392737695
+      },
+      "50": {
+        "ink": 7.189661063591128,
+        "base_color": 2.2764919253009843
+      }
+    },
+    "teal": {
+      "10": {
+        "ink": 14.429574103185479,
+        "base_color": 3.9960736274148143
+      },
+      "25": {
+        "ink": 11.857545669070417,
+        "base_color": 3.283785453070206
+      },
+      "50": {
+        "ink": 8.295813305511855,
+        "base_color": 2.297412281960178
+      }
+    }
+  },
+  "method": "WCAG 2.x relative luminance sRGB transfer at 0.04045. Contrast ratio=(Llighter+0.05)/(Ldarker+0.05). Evaluate unrounded values."
+}

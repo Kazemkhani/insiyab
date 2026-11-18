@@ -1,0 +1,30 @@
+/* Insiyab v2.0 - exact sRGB brand tokens. */
+:root {
+  --insiyab-ivory: #F7F5F0;
+  --insiyab-ink: #15181D;
+  --insiyab-gold: #9C7B3E;
+  --insiyab-red: #C42B2B;
+  --insiyab-teal: #2E7D6B;
+  --insiyab-ink-10: #E0DFDB;
+  --insiyab-ink-25: #BFBEBB;
+  --insiyab-ink-50: #868787;
+  --insiyab-gold-10: #EEE9DE;
+  --insiyab-gold-25: #E0D7C4;
+  --insiyab-gold-50: #CAB897;
+  --insiyab-red-10: #F2E1DC;
+  --insiyab-red-25: #EAC3BF;
+  --insiyab-red-50: #DE908E;
+  --insiyab-teal-10: #E3E9E3;
+  --insiyab-teal-25: #C5D7CF;
+  --insiyab-teal-50: #93B9AE;
+  --insiyab-font-display: "Instrument Serif", serif;
+  --insiyab-font-text: "IBM Plex Sans", sans-serif;
+  --insiyab-font-arabic: "Noto Kufi Arabic", sans-serif;
+  --insiyab-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* The emblem uses filled paths. Preserve its geometry at every size; do not apply an icon stroke rule. */
+.insiyab-arabic { font-family: var(--insiyab-font-arabic); letter-spacing: 0; line-height: 1.6; }
+/* Set dir="rtl" on Arabic containers. Isolate route IDs and timestamps with bdi/dir="ltr". */
+@media (prefers-reduced-motion: reduce) {
+  .insiyab-brand-motion { animation: none !important; transition: opacity 200ms linear; }
+}
