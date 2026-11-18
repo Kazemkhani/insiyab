@@ -19,7 +19,8 @@ await copyFile(resolve(root,'opendata/onday/FORECAST-RETEST.md'),resolve(out,'on
 await copyFile(resolve(root,'opendata/onday/HOW-IT-CONNECTS.md'),resolve(out,'onday/HOW-IT-CONNECTS.md'));
 await copyFile(resolve(root,'live/voice/console.html'),resolve(out,'voice/index.html'));
 // The executive deck (photo-led, 8 slides + backup) is served at /pitch/deck/.
-await cp(resolve(root,'story/deck'),resolve(out,'deck'),{recursive:true});
+// Its tools/ folder holds the scripts that build the deck; they are source, never part of the site.
+await cp(resolve(root,'story/deck'),resolve(out,'deck'),{recursive:true,filter:(src)=>!/[\\/]story[\\/]deck[\\/]tools([\\/]|$)/.test(src)});
 await build({stdin:{contents:"import * as THREE from 'three'; window.THREE=THREE;",resolveDir:resolve(root,'web')},bundle:true,minify:true,format:'iife',outfile:resolve(out,'three.js'),logLevel:'silent'});
 await writeFile(resolve(out,'THREE-LICENSE.txt'),await import('node:fs/promises').then(fs=>fs.readFile(resolve(root,'web/node_modules/three/LICENSE'),'utf8')));
 console.log('BUILT pitch with local 3D library, recorded-day page and rehearsal dashboard');
