@@ -77,7 +77,7 @@ h2{font-size:96px}
 /* model chart */
 .chart-area{position:absolute;left:140px;right:140px}
 /* arc rows */
-.arc-row{display:grid;grid-template-columns:140px 1fr;gap:48px;padding:32px 0;border-top:1px solid rgba(21,24,29,.12)}
+.arc-row{display:grid;grid-template-columns:220px 1fr;column-gap:40px;row-gap:0;padding:32px 0;border-top:1px solid rgba(21,24,29,.12)}
 .arc-row:first-child{border-top:none;padding-top:0}
 .arc-year{font-family:var(--head);font-weight:800;font-size:72px;line-height:1;color:var(--ink)}
 .arc-text{font-size:28px;line-height:1.5;color:var(--mute)}
@@ -107,11 +107,13 @@ LOGO_SVG = r"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://ww
 # naive MAE (s):   8.72, 54.26, 112.14, 223.03
 # ---------------------------------------------------------------------------
 def make_model_chart():
-    W, H = 1000, 440
-    PL, PR, PT, PB = 80, 60, 40, 80
+    # Chart occupies left ~60% of the 1640px content area → ~984px; use 1100 for crisp rendering
+    W, H = 1100, 500
+    PL, PR, PT, PB = 90, 60, 50, 90
     horizons = [1, 5, 10, 20]
     model   = [8.57, 29.55, 64.00, 127.27]
     naive   = [8.72, 54.26, 112.14, 223.03]
+    naive_labels = [8.72, 54.26, 112.14, 223.03]
 
     max_v = 240
     min_v = 0
@@ -127,43 +129,46 @@ def make_model_chart():
         pts = [(cx(i), cy(v)) for i, v in enumerate(vals)]
         return 'M ' + ' L '.join(f'{x:.1f},{y:.1f}' for x, y in pts)
 
-    # gridlines
+    FONT = "'IBM Plex Sans','Helvetica Neue',Arial,sans-serif"
+
+    # gridlines — axis labels >= 22px
     grid = []
     for gv in [0, 50, 100, 150, 200]:
         y = cy(gv)
         grid.append(f'<line x1="{PL}" y1="{y:.1f}" x2="{W-PR}" y2="{y:.1f}" stroke="#D5D2CC" stroke-width="1"/>')
-        grid.append(f'<text x="{PL-10}" y="{y+5:.1f}" text-anchor="end" font-family="\'IBM Plex Sans\',\'Helvetica Neue\',Arial,sans-serif" font-size="18" fill="#5A6068">{gv}s</text>')
+        grid.append(f'<text x="{PL-12}" y="{y+6:.1f}" text-anchor="end" font-family="{FONT}" font-size="22" fill="#5A6068">{gv}s</text>')
 
-    # x labels
+    # x labels — tick labels >= 22px
     xlabels = []
     for i, h in enumerate(horizons):
-        xlabels.append(f'<text x="{cx(i):.1f}" y="{H-10}" text-anchor="middle" font-family="\'IBM Plex Sans\',\'Helvetica Neue\',Arial,sans-serif" font-size="20" fill="#5A6068">{h} stop{"s" if h>1 else ""}</text>')
+        xlabels.append(f'<text x="{cx(i):.1f}" y="{H-12}" text-anchor="middle" font-family="{FONT}" font-size="22" fill="#5A6068">{h} stop{"s" if h>1 else ""}</text>')
 
     # paths
-    model_path = f'<path d="{path_d(model)}" fill="none" stroke="#15181D" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>'
-    naive_path = f'<path d="{path_d(naive)}" fill="none" stroke="#15181D" stroke-width="2.5" stroke-opacity="0.35" stroke-dasharray="8 5" stroke-linejoin="round" stroke-linecap="round"/>'
+    model_path = f'<path d="{path_d(model)}" fill="none" stroke="#15181D" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>'
+    naive_path = f'<path d="{path_d(naive)}" fill="none" stroke="#15181D" stroke-width="2.5" stroke-opacity="0.35" stroke-dasharray="9 6" stroke-linejoin="round" stroke-linecap="round"/>'
 
     # dots
     dots = []
     for i in range(4):
-        # model dot
-        dots.append(f'<circle cx="{cx(i):.1f}" cy="{cy(model[i]):.1f}" r="6" fill="#15181D"/>')
-        # naive dot
-        dots.append(f'<circle cx="{cx(i):.1f}" cy="{cy(naive[i]):.1f}" r="4" fill="#15181D" fill-opacity="0.35"/>')
+        dots.append(f'<circle cx="{cx(i):.1f}" cy="{cy(model[i]):.1f}" r="7" fill="#15181D"/>')
+        dots.append(f'<circle cx="{cx(i):.1f}" cy="{cy(naive[i]):.1f}" r="5" fill="#15181D" fill-opacity="0.35"/>')
 
-    # value labels (model only, to avoid clutter)
+    # model value labels >= 24px; naive value labels >= 24px (muted)
     vlabels = []
-    offsets = [(-14, -14), (0, -14), (0, -14), (0, -14)]
+    model_offsets = [(-16, -16), (0, -16), (0, -16), (0, -16)]
+    naive_offsets = [( 16,  14), (0,  18), (0,  18), (0,  18)]
     for i in range(4):
-        dx, dy = offsets[i]
-        vlabels.append(f'<text x="{cx(i)+dx:.1f}" y="{cy(model[i])+dy:.1f}" text-anchor="middle" font-family="\'IBM Plex Sans\',\'Helvetica Neue\',Arial,sans-serif" font-size="16" fill="#15181D" font-weight="600">{model[i]:.0f}s</text>')
+        dx, dy = model_offsets[i]
+        vlabels.append(f'<text x="{cx(i)+dx:.1f}" y="{cy(model[i])+dy:.1f}" text-anchor="middle" font-family="{FONT}" font-size="24" fill="#15181D" font-weight="700">{model[i]:.0f}s</text>')
+        ndx, ndy = naive_offsets[i]
+        vlabels.append(f'<text x="{cx(i)+ndx:.1f}" y="{cy(naive[i])+ndy:.1f}" text-anchor="middle" font-family="{FONT}" font-size="24" fill="#15181D" fill-opacity="0.38">{naive_labels[i]:.0f}s</text>')
 
-    # legend
+    # legend — legend labels >= 22px
     legend = [
-        f'<line x1="{PL}" y1="{H-54}" x2="{PL+40}" y2="{H-54}" stroke="#15181D" stroke-width="4"/>',
-        f'<text x="{PL+50}" y="{H-49}" font-family="\'IBM Plex Sans\',\'Helvetica Neue\',Arial,sans-serif" font-size="18" fill="#15181D">Insiyab</text>',
-        f'<line x1="{PL+160}" y1="{H-54}" x2="{PL+200}" y2="{H-54}" stroke="#15181D" stroke-width="2.5" stroke-opacity="0.35" stroke-dasharray="8 5"/>',
-        f'<text x="{PL+210}" y="{H-49}" font-family="\'IBM Plex Sans\',\'Helvetica Neue\',Arial,sans-serif" font-size="18" fill="#5A6068">The bus stays as late as it is now</text>',
+        f'<line x1="{PL}" y1="{H-60}" x2="{PL+44}" y2="{H-60}" stroke="#15181D" stroke-width="4.5"/>',
+        f'<text x="{PL+56}" y="{H-54}" font-family="{FONT}" font-size="22" fill="#15181D">Insiyab</text>',
+        f'<line x1="{PL+174}" y1="{H-60}" x2="{PL+218}" y2="{H-60}" stroke="#15181D" stroke-width="2.5" stroke-opacity="0.35" stroke-dasharray="9 6"/>',
+        f'<text x="{PL+230}" y="{H-54}" font-family="{FONT}" font-size="22" fill="#5A6068">The bus stays as late as it is now</text>',
     ]
 
     parts = (
@@ -266,7 +271,7 @@ watchers = [
     ('people',   'Overflow',             'Boarding forecast vs seats on the type in the fleet list.',                   'Estimate'),
     ('sun',      'Heat',                 'Stop kind (pole or shelter), temperature, and forecast wait time.',           'Priority rule'),
     ('road',     'Lanes and roads',      'Dedicated bus lane openings; average speed by route and hour.',              'Rule'),
-    ('calendar', 'Events',               'Public event calendar, venue capacity and nearest stops.',                   'Estimate'),
+    ('calendar', 'Events',               'Public event calendar, venue capacity and nearest stops.',                   'Rule'),
     ('link',     'Connections',          'Predicted-late bus, the connection its riders head for, on-demand zones.',   'Proposal'),
 ]
 
@@ -322,7 +327,7 @@ slides.append("""<!-- 9 THE DRILL PROOF -->
     <h2 style="font-size:76px;color:var(--ink)">It ran end to end, on real phones.</h2>
     <p class="lede" style="color:var(--mute);font-size:34px;margin-top:20px">18 November 2026 &nbsp;·&nbsp; 4 reports &nbsp;·&nbsp; 1 human decision &nbsp;·&nbsp; 4 confirmations</p>
   </div>
-  <img src="assets/call-live.jpg" alt="The rehearsal dashboard showing what the driver, depot, planner and station supervisor reported" style="position:absolute;left:140px;right:140px;top:360px;width:1640px;box-shadow:0 2px 0 rgba(21,24,29,.08),0 24px 60px rgba(21,24,29,.18)">
+  <img src="assets/call-live.jpg" alt="The rehearsal dashboard showing what the driver, depot, planner and station supervisor reported" style="position:absolute;left:140px;top:360px;max-width:1640px;max-height:600px;width:auto;height:auto;display:block;box-shadow:0 2px 0 rgba(21,24,29,.08),0 24px 60px rgba(21,24,29,.18)">
   <div class="credit">Our rehearsal dashboard during the drill. Conditions simulated and labelled on screen; not an RTA system.</div>
 </section>""")
 
@@ -333,10 +338,14 @@ slides.append("""<!-- 10 DUBAI HEAT -->
     <h2 style="font-size:80px;color:var(--ink)">Dubai is not Singapore.</h2>
     <p style="font-size:28px;line-height:1.4;color:var(--mute);margin-top:16px;max-width:1200px">Singapore built 200 km of covered walkways. Here, most stops are poles in the sun. The same delay matters more at a bare pole at 15:00 in July.</p>
   </div>
-  <div style="position:absolute;left:140px;top:360px;right:140px">
-    <img src="assets/stops-map.svg" alt="Dubai bus stop dot map: air-conditioned shelters (ink) and bare poles (red), from RTA published data" style="width:100%;display:block">
+  <div style="position:absolute;left:140px;top:290px;right:140px;bottom:72px;display:flex;flex-direction:column;gap:0">
+    <div style="position:relative;flex:1;min-height:0;overflow:hidden">
+      <img src="assets/stops-map.svg" alt="Dubai bus stop dot map: air-conditioned shelters (ink) and bare poles (red), from RTA published data" style="width:100%;height:100%;object-fit:contain;object-position:left top;display:block">
+      <div style="position:absolute;top:10px;right:10px;font-size:18px;font-weight:600;color:var(--red);background:rgba(247,245,240,.88);padding:6px 14px;border-radius:3px">Poles in red: July, 15:00 scenario</div>
+    </div>
+    <p style="font-size:20px;line-height:1.4;color:var(--mute);padding-top:10px;flex-shrink:0">553 air-conditioned shelters · 993 bare poles, among 1,600 stops of known kind</p>
   </div>
-  <div class="credit">Stop kinds as published by RTA, 2020 to 2022 reports; 553 air-conditioned shelters, 993 poles among 1,600 stops of known kind.</div>
+  <div class="credit">Stop kinds as published by RTA, 2020 to 2022 reports.</div>
 </section>""")
 
 # 11 LANES AND THE LAST MILE

@@ -97,9 +97,6 @@ lines.append(f'<text x="{LEG_X+22}" y="{LEG_Y+11}" font-family="\'IBM Plex Sans\
 lines.append(f'<circle cx="{LEG_X+248}" cy="{LEG_Y+6}" r="6" fill="{RED}"/>')
 lines.append(f'<text x="{LEG_X+262}" y="{LEG_Y+11}" font-family="\'IBM Plex Sans\',\'Helvetica Neue\',Arial,sans-serif" font-size="17" fill="{INK}">Bare pole</text>')
 
-# Count labels (right of legend)
-lines.append(f'<text x="{W - PAD_R}" y="{LEG_Y+11}" text-anchor="end" font-family="\'IBM Plex Sans\',\'Helvetica Neue\',Arial,sans-serif" font-size="17" fill="{INK}" font-weight="600">{len(ac_stops)} shelters · {len(pole_stops)} poles</text>')
-
 lines.append('</svg>')
 
 svg = '\n'.join(lines)
