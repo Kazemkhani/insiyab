@@ -58,6 +58,8 @@ Use the map stack the home page already ships (`web/src`, read it first: reuse i
 | 2 | no answer in 60 s, or the duty controller declines | **the shift supervisor** | a second decision-maker; Marsad's staff-then-duty-manager order |
 | 3 | no answer from either | nobody else; the alert stays red on every screen and in the log as "Not acknowledged" | Insiyab never decides or dispatches by itself |
 
+**How live mode does it today (no new relay code):** the console posts the incident to the existing guarded relay (`POST /voice/incident`). The relay asks driver, depot, station and planning for their reports in parallel, phones the **duty controller** (the roster's `manager` role) with one briefing so they decide by phone, relays the decision, and records each acknowledgement. Its phases `check`, `manager`, `callout`, `done` map to the console states; see `coordination/v2-A.md` (22:50). The shift-supervisor step is shown in demo mode only, labelled; the drill roster has one manager.
+
 The driver, depot, station and planning are called **only after a person has decided**, as part of the relay. A driver is never phoned about an undecided problem: they are driving, and they cannot act without a decision. In a real deployment the driver leg would go through RTA's in-vehicle messaging, not a phone call; the drill used phones because that is what a hackathon has.
 
 - Port Marsad's escalation timer (`live/adapter.js:340-405`): first-seen time, owner check, one escalation per incident.
