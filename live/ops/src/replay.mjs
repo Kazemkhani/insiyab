@@ -12,10 +12,12 @@ export async function mountReplay(bundle) {
   let map, overlay, seconds = 57600, playing = false, frame, last, busRenderer;
   const origin = model.project([0,0]), unit = model.project([1,1]);
   const lngLat = p => [(p[0]-origin[0])/(unit[0]-origin[0]), (p[1]-origin[1])/(unit[1]-origin[1])];
+  const pulse=document.createElement('div');pulse.className='alert-pulse';pulse.hidden=true;host.append(pulse);
   let lateRoutes = new Set(), alert = null, heat = [];
   const paths = model.network.routes.flatMap(r => r.directions.map(d => ({path: d.shape})));
   function draw() {
     if (!overlay) return;
+    if (alert) {const p=map.project([alert.lon,alert.lat]);pulse.style.left=`${p.x-13}px`;pulse.style.top=`${p.y-13}px`;}
     const buses = busesAt(model, seconds).map(b => ({position: lngLat(b.position), route: b.route_id}));
     host.dataset.buses = String(buses.length);
     host.dataset.time = String(seconds);
@@ -69,12 +71,13 @@ export async function mountReplay(bundle) {
     map=readyMap;overlay=readyOverlay;
     const points=paths.flatMap(p=>p.path), xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
     map.fitBounds([[Math.min(...xs),Math.min(...ys)],[Math.max(...xs),Math.max(...ys)]], {padding:45,duration:0});
+    map.on('move',draw);
     host.dataset.ready='true';draw();
   },()=>{note.textContent='Basemap unavailable. Route geometry remains visible. '+model.network.source.credit;});
   if (localProtocol) maplibregl.addProtocol('pmtiles', (params, abort) => localProtocol.tile(params, abort));
   map=result.map;
   return {setTime, stop, play,
-    setAlerts(alerts) {lateRoutes=new Set(alerts.filter(a=>a.watcher==='running_late').map(a=>a.route));alert=alerts[0]??null;draw();},
+    setAlerts(alerts) {lateRoutes=new Set(alerts.filter(a=>a.watcher==='running_late').map(a=>a.route));alert=alerts[0]??null;pulse.hidden=!alert;draw();},
     setHeat(stops) {heat=stops;draw();},
     setBusRenderer(renderer) {busRenderer=renderer;draw();},
     map,

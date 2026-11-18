@@ -42,5 +42,9 @@ await writeFile(resolve(out, 'map/offline.js'), 'window.INSIYAB_MAP_BYTES=' + JS
 await copyFile(resolve(root, 'opendata/public/basemap/PROVENANCE.md'), resolve(out, 'MAP-NOTICE.md'));
 await copyFile(resolve(root, 'opendata/public/rta-gtfs/PROVENANCE.md'), resolve(out, 'NETWORK-NOTICE.md'));
 await copyFile(resolve(root, 'web/node_modules/maplibre-gl/dist/maplibre-gl.css'), resolve(out, 'maplibre.css'));
+await mkdir(resolve(out, 'sounds'), {recursive:true});
+await copyFile(resolve(here, 'sounds/ring.mp3'), resolve(out, 'sounds/ring.mp3'));
+await mkdir(resolve(out, 'icons'), {recursive:true});
+for (const role of ['driver','depot','station','planning']) await copyFile(resolve(root, `brand/assets/icons/${role}.svg`), resolve(out, `icons/${role}.svg`));
 await build({entryPoints: [resolve(here, 'src/app.js')], outfile: resolve(out, 'app.js'), nodePaths: [resolve(root, 'web/node_modules')], bundle: true, format: 'iife', target: 'es2022', minify: true, legalComments: 'linked'});
 console.log(`BUILT Insiyab Live demo: ${out}`);
