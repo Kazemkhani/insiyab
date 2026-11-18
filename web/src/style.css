@@ -8,6 +8,11 @@
   font-weight: 600;
 }
 @font-face {
+  font-family: Overpass;
+  src: url(fonts/overpass-800.woff2);
+  font-weight: 800;
+}
+@font-face {
   font-family: Plex;
   src: url(fonts/ibm-plex-sans-400.woff2);
 }
@@ -25,8 +30,8 @@
   src: url(fonts/noto-kufi-arabic-400.woff2);
 }
 :root {
-  --paper: #F6F5F1;
-  --ink: #12263A;
+  --paper: #F7F5F0;
+  --ink: #15181D;
   --flow: #0E5A5A;
   --over: #B23A2E;
   --spare: #2F6690;
@@ -36,6 +41,8 @@
   --muted: #5A6672;
   --dark-grey: #33404D;
   --grey: #8C96A0;
+  --brand-gold: #9C7B3E;
+  --ease: cubic-bezier(0.4,0,0.2,1);
 }
 * {
   box-sizing: border-box;
@@ -87,6 +94,7 @@ h1,h2,h3,output,.big-number {
 }
 h1 {
   font-size: 32px;
+  font-weight: 800;
   line-height: 1.08;
   letter-spacing: -1.2px;
   margin: 5px 0 7px;
@@ -116,7 +124,7 @@ p {
   margin: 0;
 }
 .fixture {
-  background: var(--simulated);
+  background: #7A5F28;
   color: var(--paper);
   padding: 4px 24px;
   font: 500 11px/1.5 Plex;
@@ -124,6 +132,7 @@ p {
   position: sticky;
   top: 0;
   z-index: 20;
+  /* brand gold, contrast-safe: 5.5:1 with --paper */
 }
 header {
   display: flex;
@@ -133,13 +142,16 @@ header {
   border-bottom: 1px solid var(--line);
 }
 .brand {
-  font: 600 32px Overpass;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   text-decoration: none;
-  white-space: nowrap;
+  flex-shrink: 0;
 }
-.brand span {
-  font: 400 20px Kufi;
-  margin-left: 10px;
+.brand svg {
+  height: 44px;
+  width: auto;
+  display: block;
 }
 nav {
   display: flex;
@@ -1818,3 +1830,21 @@ body.guide-open header nav,body.guide-open #documentation{display:none}
 @media(max-width:800px){#guide[data-step="4"] #guide-note{order:2}}
 
 header .pitch-link{display:inline-flex;align-items:center;min-height:44px;margin-left:auto;padding:8px 12px;font-size:13px;text-decoration:underline}
+header .deck-link{margin-left:0}
+@media(max-width:960px){header .deck-link{display:none}}
+
+/* Logo reveal: plays once on page load */
+header .brand #symbol-upper,
+header .brand #symbol-lower{clip-path:inset(0 100% 0 0);animation:logo-reveal 800ms var(--ease) 0ms forwards}
+header .brand #symbol-lower{animation-delay:120ms}
+header .brand #arabic-wordmark,
+header .brand #latin-wordmark{opacity:0;animation:logo-fade 600ms var(--ease) 200ms forwards}
+@keyframes logo-reveal{to{clip-path:inset(0 0 0 0)}}
+@keyframes logo-fade{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){
+  header .brand #symbol-upper,
+  header .brand #symbol-lower{clip-path:none;opacity:0;animation:logo-fade 200ms linear 0ms forwards}
+  header .brand #symbol-lower{animation-delay:0ms}
+  header .brand #arabic-wordmark,
+  header .brand #latin-wordmark{animation:logo-fade 200ms linear 0ms forwards}
+}
