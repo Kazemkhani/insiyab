@@ -39,7 +39,7 @@ Sixty of the hundred points are about the forecasting model (criteria 3, 4, 5). 
 | Calling drill | 4 reports, 1 human decision, 4 confirmations, on real phones, 18 Nov 2026 | relay record |
 | The problem | 45% of evening departures 5+ min late vs 19% in the morning, same crowd (49,707 vs 48,724); route 310 19:23 left 19:36 | RTA records, 15 Dec 2025 |
 
-## 4. The five watchers (what "sees it coming" means)
+## 4. The six watchers (what "sees it coming" means)
 
 Each watcher reads one kind of signal, raises one kind of alert, and never decides. Built status is part of the name on screen.
 
@@ -50,6 +50,7 @@ Each watcher reads one kind of signal, raises one kind of alert, and never decid
 | **Heat** | stop kind (pole or air-conditioned shelter), hourly temperature and humidity (Open-Meteo), forecast wait | "Stop X, 14:30: bare pole, feels like 44°C, next bus 18 min late." | yes | priority rule, not a model |
 | **Lanes and roads** | dedicated bus lane openings (RTA), average speed by route and hour (Dubai open data) | "Route on Al Satwa Street gains a bus lane: trip times will change, forecast flagged for review." | rule + list | roadmap for the model |
 | **Events** | public event calendar, venue capacity, nearest stops | "Global Village, 22:00 close: 4 routes, expect a surge." | list + rule | simulated where no data |
+| **Connections and last mile** | a predicted-late bus, the connection its riders head for (metro, last Bus On Demand van), on-demand zones | "Route 310 riders will miss the 19:58 metro: hold the feeder 3 min, or send a Bus On Demand minibus to the stop." | rule | proposal; connection protection is proven practice elsewhere |
 
 Then the loop, as the brand's motion spec draws it: **suggest a fix with its likely effect → if a critical alert is not acknowledged, count down and phone the duty controller (Marsad pattern) → the controller decides → Insiyab calls driver, depot, station and planning in parallel → relays the decision → each person confirms ("Received" in teal only when they did).**
 
@@ -59,12 +60,14 @@ Then the loop, as the brand's motion spec draws it: **suggest a fix with its lik
 - **Bus lanes.** RTA expects 24 to 59% shorter peak journey times on routes that gain dedicated lanes; the network grows from 6.1 to 20.6 km (Khaleej Times, 21 Jun 2026, verified). A forecast trained before a lane opens is wrong after it: Insiyab flags those routes for retraining instead of trusting stale times.
 - **Events.** RTA publishes event services days ahead (Global Village routes, Dubai Run, Eid), but not demand-responsive changes as a crowd builds. RTA already predicts marine demand with AI (WAM, May 2026); buses are next.
 
+- **The last mile.** The most expensive part of moving people, as of moving parcels, is the last stretch: vehicles there run nearly empty. RTA already runs the pieces: Bus On Demand (984,929 riders in 2025, up 136%, 17 areas, 49 buses: Dubai Media Office, 11 May 2026), e-scooters and bikes, delivery robots on approved walkways (talabots 2023, noon 2025), robotaxi test permits (Sep 2025), and a target of 25% of all journeys autonomous by 2030. What nobody does is **protect the whole journey when the bus is late**. Insiyab can: a predicted delay triggers connection protection (hold the feeder, or send an on-demand minibus), a proven practice since Utah Transit in 2002 and a standard function in the US transit architecture. And for planners, the boarding forecast points at the route-hours that run nearly empty, which is exactly where on-demand is cheaper than a fixed bus (research finds it is cheaper only at low demand: TCRP). That is the challenge's own words: "improve cost-effectiveness".
+
 ## 6. The arc (bold, each step standing on the last)
 
 | | What Insiyab is |
 |---|---|
 | **Now, 2026** | Measured: a lateness forecast that sees 20 stops ahead, an early-warning signal, a calling agent that ran end to end. The ask: one control-centre shift, selected evening routes, eight weeks. |
-| **2030** | The forecast learns seasons, events, heat and new lanes from months of data. Its early warning feeds RTA's Decision Support System as a trigger. Riders get heat-aware arrival times and shaded walking routes. Bus, metro and marine share one anticipatory layer. |
+| **2030** | The forecast learns seasons, events, heat and new lanes from months of data. Its early warning feeds RTA's Decision Support System as a trigger. Riders get heat-aware arrival times and shaded walking routes. When a bus is late, Insiyab protects the connection and sends an on-demand or autonomous shuttle for the last mile (Dubai's target: 25% of journeys autonomous by 2030). Bus, metro, marine and on-demand share one anticipatory layer. |
 | **2040** | The Dubai 2040 Urban Master Plan puts people and public transport at the centre. Insiyab is the city's foresight for movement: the control room sees tomorrow's problems today and arranges the fix before anyone waits. |
 
 Line for the close: **"Dubai does not wait for the impossible. It schedules it. Insiyab sees it coming. The controller decides."**
@@ -77,6 +80,7 @@ Line for the close: **"Dubai does not wait for the impossible. It schedules it. 
 | "RTA improved punctuality by 50%" | nothing; one newspaper headline, no RTA source |
 | "Our boarding model beats the naive forecast" | "Our boarding forecast is close to the best simple rule; we show its range" |
 | "The warning comes 30 minutes / an hour ahead" | "The lateness forecast looks up to 20 stops ahead; the trip-time forecast is made 30 minutes before departure" |
+| "Robots cut last-mile delivery cost by X" | no published figure; say "RTA already approves delivery robots and robotaxi trials" |
 | "Every late bus was late an hour ago" | "Most late evening departures were visible before they left: 85 in 100 when the bus was still out" |
 | Any count of unshaded stops we did not compute | "553 air-conditioned shelters and 993 poles among the stops whose kind RTA published" |
 | "Insiyab is connected to RTA's DSS" | "Designed to sit beside the DSS; a proposal, not connected or tested" |

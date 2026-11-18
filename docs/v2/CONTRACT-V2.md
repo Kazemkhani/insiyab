@@ -44,7 +44,7 @@ A stand-in copy lives at `fixtures/watchers/alerts.json` with `"fixture": true`.
 
 | Field | Rule |
 |---|---|
-| `watcher` | one of `running_late`, `overflow`, `heat`, `lanes_roads`, `events` |
+| `watcher` | one of `running_late`, `overflow`, `heat`, `lanes_roads`, `events`, `connections` |
 | `severity` | `info`, `attention`, `critical`. Only `critical` starts the escalation countdown |
 | `evidence.kind` | `measured_model`, `estimate`, `priority_rule`, `simulated`. The console prints it next to the headline |
 | `likely_effect` | always marked `estimate: true`; never phrased as a measured result |

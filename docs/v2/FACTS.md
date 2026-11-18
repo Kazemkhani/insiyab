@@ -31,10 +31,19 @@
 | Dubai summer highs about 45°C; humid days feel above 60°C | Reported | Bloomberg, 30 Jul 2024; The National, 4 Aug 2025 |
 | RTA publishes event services in advance (Global Village 4 routes; Dubai Run; Eid) | Reported | RTA / Media Office, Khaleej Times |
 
+| Bus On Demand: 984,929 riders in 2025 (417,315 in 2024, about +136%); 17 areas, 49 buses (May 2026); AED 5 a trip | Verified | Dubai Media Office, 11 May 2026, https://www.mediaoffice.ae/en/news/2026/may/11-05/rta-adds-four-new-areas-to-bus-on-demand-network-following-136-percent--ridership-growth-in-2025 |
+| Dubai Smart Self-Driving Transport Strategy: 25% of all journeys autonomous by 2030; RTA test permits to Apollo Go, WeRide, Pony.ai, 26 Sep 2025 | Verified | Dubai Media Office, 26 Sep 2025, https://prod.mediaoffice.ae/en/news/2025/september/26-09/rta-grants-first-autonomous-driving-test-permits |
+| Delivery robots: talabots (RTA, DIEZ, talabat), Dubai Silicon Oasis, Feb 2023; noon with Yango, RTA-approved walkways, Dec 2025. No cost-saving figure published | Reported | Gulf Today 15 Feb 2023; MENA Startup Digest 10 Dec 2025 |
+| RTA last-mile plan (Jul 2026): 34 residential areas linked, 63 Metro and bus stations upgraded by 2030 | Reported | The National, 19 Jul 2026 |
+| 57.3 million bike rides and 39.6 million e-scooter trips in 2025 | Reported | Gulf News, Jul 2026 |
+
 ## Elsewhere (comparators)
 
 | Fact | Status | Source |
 |---|---|---|
+| Connection protection: Utah Transit Authority since 2002, about 8 buses held a day at 20 light-rail stations; US ITS service package PT17 | Reported | US DOT / Battelle evaluation 2004, https://rosap.ntl.bts.gov/view/dot/38877 |
+| Demand-responsive transit is cheaper per trip than fixed route only at low density or low demand | Reported | TCRP / National Academies report 25414 |
+| Last mile is 41% (2018) to 53% (2024) of parcel shipping cost | Reported, secondary only | attributed to Capgemini Research Institute |
 | Singapore LTA Walk2Ride: 200 km of sheltered walkways by Sep 2018; within 400 m of MRT stations | Reported | LTA walking page; LTA factsheet 2018 |
 | Rerouting about 10% of a hot desert city's fleet cut riders' heat exposure by 35% (simulation, Phoenix) | Reported | UCLA IoES summary; Sustainable and Resilient Infrastructure |
 | Hong Kong MTR crowd prediction for Kai Tak events, about 90% accuracy claimed | Reported | SCMP; RTHK Aug 2025 |
