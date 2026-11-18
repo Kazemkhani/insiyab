@@ -50,6 +50,16 @@ Use the map stack the home page already ships (`web/src`, read it first: reuse i
 
 ## Escalation and calls
 
+**Who Insiyab phones when nobody acknowledges (decided 18 Nov 2026):** a decision-maker, never the driver.
+
+| Step | After | Insiyab phones | Why |
+|---|---|---|---|
+| 1 | critical alert unacknowledged for 10 s (stage; configurable) | **the duty controller** on shift | the person whose job the decision is may be away from the console |
+| 2 | no answer in 60 s, or the duty controller declines | **the shift supervisor** | a second decision-maker; Marsad's staff-then-duty-manager order |
+| 3 | no answer from either | nobody else; the alert stays red on every screen and in the log as "Not acknowledged" | Insiyab never decides or dispatches by itself |
+
+The driver, depot, station and planning are called **only after a person has decided**, as part of the relay. A driver is never phoned about an undecided problem: they are driving, and they cannot act without a decision. In a real deployment the driver leg would go through RTA's in-vehicle messaging, not a phone call; the drill used phones because that is what a hackathon has.
+
 - Port Marsad's escalation timer (`live/adapter.js:340-405`): first-seen time, owner check, one escalation per incident.
 - The call goes through this repo's existing relay (`live/voice/relay.js`, which already ran the full drill), not a new one. Add one relay route for "call the duty controller" with the same guards: roster file, `INSIYAB_CALLS=armed`, `--live`, the `x-insiyab-key` header, a cooldown.
 - **Demo mode is the default and can never place a call**: it plays recorded state changes and the ring as audio. Live mode needs the presenter key in the URL fragment, read once and wiped (the pattern already in `live/voice/console.html`).
