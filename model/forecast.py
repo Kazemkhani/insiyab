@@ -8,7 +8,7 @@ One table of rows is built: a row is one series (a stop on a route) at one origi
 forecasts at origin o learns only from rows whose target bin had ended by o."""
 import numpy as np
 import pandas as pd
-from . import naive
+from . import naive, context
 from .prepare import BIN
 
 HORIZONS = [900, 1800, 3600, 7200]
@@ -17,10 +17,12 @@ DEVELOPMENT = (8 * 3600, 15 * 3600 + 1800)        # every choice is made on fore
 UNTOUCHED = (16 * 3600, 21 * 3600 + 1800)         # looked at once, at the end
 SEED = 20251215
 MIN_ROWS = 200                                    # with fewer rows to learn from, a model says what the timetable forecast says
-FEATURES = ["last1", "last2", "last4", "sum_so_far", "mean_so_far", "bins_seen", "per_departure_so_far", "sched_target", "sched_before", "sched_after", "sched_so_far",
+BASE = ["last1", "last2", "last4", "sum_so_far", "mean_so_far", "bins_seen", "per_departure_so_far", "sched_target", "sched_before", "sched_after", "sched_so_far",
             "sched_day", "route_last4", "route_per_departure", "network_last4", "network_per_departure", "naive_last", "naive_timetable",
             "hour_of_target", "horizon_minutes", "position", "routes_at_stop",
             "buses_on_the_way", "their_lateness", "their_boardings", "waiting_to_return", "alighted_nearby_so_far"]
+NEW = ["heat_index", "school_holiday", "public_holiday", "their_prev_trip_late", "headway_dev_here"]      # tried one at a time on the development part; see select()
+FEATURES = BASE + NEW
 FEATURE_WORDS = {"last1": "boardings here in the last quarter of an hour", "last2": "boardings here in the last half hour", "last4": "boardings here in the last hour", "sum_so_far": "boardings here so far today",
                  "mean_so_far": "this stop's average so far today", "bins_seen": "how long the stop has been in service today", "per_departure_so_far": "boardings for each bus here so far", "sched_target": "buses scheduled in that quarter of an hour",
                  "sched_before": "buses scheduled just before", "sched_after": "buses scheduled just after", "sched_so_far": "buses scheduled here so far", "sched_day": "buses scheduled here over the day",
@@ -28,7 +30,9 @@ FEATURE_WORDS = {"last1": "boardings here in the last quarter of an hour", "last
                  "network_per_departure": "the network's boardings for each bus so far", "naive_last": "the last quarter of an hour seen", "naive_timetable": "the timetable's share", "hour_of_target": "the time of day",
                  "horizon_minutes": "how far ahead the forecast looks", "position": "where the stop is along the route", "routes_at_stop": "how many routes call here",
                  "buses_on_the_way": "buses already on the road that should reach the stop then", "their_lateness": "how late those buses are running", "their_boardings": "how many have boarded those buses so far",
-                 "waiting_to_return": "passengers who got off near here today and have not travelled since", "alighted_nearby_so_far": "passengers who have got off near here today"}
+                 "waiting_to_return": "passengers who got off near here today and have not travelled since", "alighted_nearby_so_far": "passengers who have got off near here today",
+                 "heat_index": "how hot it feels (heat index, from the last full hour's temperature and humidity)", "school_holiday": "whether schools are on holiday", "public_holiday": "whether it is a public holiday",
+                 "their_prev_trip_late": "how late the buses on the way ended their previous trips", "headway_dev_here": "the last gap between buses seen here, against the gap the timetable gives"}
 NEAR = 300                                        # metres: a passenger who got off within this distance may board here on the way back
 MODELS = {"glm": "A plain count model (Poisson regression with a penalty)", "gbt": "Boosted trees with a loss made for counts, one model for every stop and every horizon"}
 
@@ -43,19 +47,21 @@ def _mean_last(part, n):
 def _on_the_way(visits, index, o, first_bin, shape):
     """The bus as a sensor. For buses that had left a stop by the origin: where the timetable, moved by each bus's lateness now,
     puts them in each later quarter of an hour. Returns, by series and bin: buses, their summed lateness, and boardings on them so far."""
-    buses = np.zeros(shape); late = np.zeros(shape); boarded = np.zeros(shape)
+    buses = np.zeros(shape); late = np.zeros(shape); boarded = np.zeros(shape); prev = np.zeros(shape); gap = np.zeros(shape[0])
     if visits is None:
-        return buses, late, boarded
+        return buses, late, boarded, prev, gap
     seen = visits[visits["act_dep"] < o]                                # strictly before the origin: a record stamped at the origin itself has not been seen
     if not len(seen):
-        return buses, late, boarded
-    last = seen.groupby("trip_id", sort=False).agg(at=("seq", "max"), act=("act_dep", "max"), sched=("sched_dep", "max"), on_so_far=("on_before", "max")).reset_index()
+        return buses, late, boarded, prev, gap
+    here = seen[seen["key"] >= 0].sort_values("act_dep", kind="stable").groupby("key", sort=False)["headway_dev"].last()      # the last gap between buses seen at each stop
+    gap[here.index.to_numpy()] = here.to_numpy()
+    last = seen.groupby("trip_id", sort=False).agg(at=("seq", "max"), act=("act_dep", "max"), sched=("sched_dep", "max"), on_so_far=("on_before", "max"), prev_late=("prev_trip_late", "first")).reset_index()
     last["late"] = last["act"] - last["sched"]
-    ahead = visits[["trip_id", "seq", "key", "sched_arr"]].merge(last[["trip_id", "at", "late", "on_so_far"]], on="trip_id")
+    ahead = visits[["trip_id", "seq", "key", "sched_arr"]].merge(last[["trip_id", "at", "late", "on_so_far", "prev_late"]], on="trip_id")
     ahead = ahead[(ahead["seq"] > ahead["at"]) & (ahead["key"] >= 0)]
     b = ((ahead["sched_arr"] + ahead["late"]) // BIN).to_numpy().astype(int) - first_bin; ok = (b >= 0) & (b < shape[1]); k = ahead["key"].to_numpy()[ok]; b = b[ok]
-    np.add.at(buses, (k, b), 1); np.add.at(late, (k, b), ahead["late"].to_numpy()[ok]); np.add.at(boarded, (k, b), ahead["on_so_far"].to_numpy()[ok])
-    return buses, late, boarded
+    np.add.at(buses, (k, b), 1); np.add.at(late, (k, b), ahead["late"].to_numpy()[ok]); np.add.at(boarded, (k, b), ahead["on_so_far"].to_numpy()[ok]); np.add.at(prev, (k, b), ahead["prev_late"].to_numpy()[ok])
+    return buses, late, boarded, prev, gap
 
 
 def _nearby(series, stops):
@@ -68,14 +74,15 @@ def _nearby(series, stops):
     return out, {n: i for i, n in enumerate(names)}
 
 
-def build_rows(Y, S, series, first_bin, origins=ORIGINS, horizons=HORIZONS, day=None):
+def build_rows(Y, S, series, first_bin, origins=ORIGINS, horizons=HORIZONS, day=None, ctx=None):
     """Every forecast that can be asked for: series x origin x horizon, with its features, the naive forecasts and what happened.
     With the day's records (day), the features from buses on the road and from passengers yet to return are filled; without, they are zero."""
     group = pd.factorize(series["route_id"])[0]; n_groups = group.max() + 1
     out = []; visits = None; near = None
+    ctx = ctx or (context.day_context(day["service_date"]) if day is not None else {"heat": {}, "school_holiday": 0.0, "public_holiday": 0.0})
     if day is not None:
         index = {k: i for i, k in enumerate(zip(series["route_id"], series["direction"], series["stop_id"]))}
-        visits = day["visits"][["trip_id", "seq", "route_id", "direction", "stop_id", "sched_arr", "sched_dep", "act_dep", "on"]].copy()
+        visits = context.enrich(day["visits"])[["trip_id", "seq", "route_id", "direction", "stop_id", "sched_arr", "sched_dep", "act_dep", "on", "prev_trip_late", "headway_dev"]].copy()
         visits["key"] = [index.get(k, -1) for k in zip(visits["route_id"], visits["direction"], visits["stop_id"])]
         visits["on_before"] = visits.groupby("trip_id", sort=False)["on"].cumsum() - visits["on"]      # boardings up to the stop before: taps at the stop a bus has just left may still be coming in
         near, stop_at = _nearby(series, day["stops"]); al = day["alightings"]
@@ -92,7 +99,9 @@ def build_rows(Y, S, series, first_bin, origins=ORIGINS, horizons=HORIZONS, day=
                  "bins_seen": bins_seen, "per_departure_so_far": total / np.maximum(deps, 1), "sched_so_far": deps,
                  "route_last4": r_l4[group], "route_per_departure": (r_tot / np.maximum(r_dep, 1))[group],
                  "network_last4": np.full(len(group), last4.sum()), "network_per_departure": np.full(len(group), total.sum() / max(deps.sum(), 1))}
-        buses, late, boarded = _on_the_way(visits, None, o, first_bin, Y.shape)
+        buses, late, boarded, prev, gap = _on_the_way(visits, None, o, first_bin, Y.shape)
+        feats["headway_dev_here"] = gap; feats["heat_index"] = np.full(len(group), context.heat_at(ctx, [o])[0])
+        feats["school_holiday"] = np.full(len(group), float(ctx["school_holiday"])); feats["public_holiday"] = np.full(len(group), float(ctx["public_holiday"]))
         if near is not None:
             came = (al_t < o) & (al_stop >= 0); waiting = came & (al_next >= o)
             feats["waiting_to_return"] = near @ np.bincount(al_stop[waiting], minlength=near.shape[1]); feats["alighted_nearby_so_far"] = near @ np.bincount(al_stop[came], minlength=near.shape[1])
@@ -110,7 +119,7 @@ def build_rows(Y, S, series, first_bin, origins=ORIGINS, horizons=HORIZONS, day=
             row["sched_target"] = S[here, b]; row["sched_before"] = S[here, b - 1] if b > 0 else 0; row["sched_after"] = S[here, b + 1] if b + 1 < S.shape[1] else 0
             for name, fn in naive.FUNCTIONS.items():
                 row[name] = fn(Y, S, seen, b)[here]
-            row["buses_on_the_way"] = buses[here, b]; row["their_lateness"] = late[here, b] / np.maximum(buses[here, b], 1); row["their_boardings"] = boarded[here, b]
+            row["buses_on_the_way"] = buses[here, b]; row["their_lateness"] = late[here, b] / np.maximum(buses[here, b], 1); row["their_boardings"] = boarded[here, b]; row["their_prev_trip_late"] = prev[here, b] / np.maximum(buses[here, b], 1)
             row["hour_of_target"] = (b + first_bin) * BIN / 3600; row["horizon_minutes"] = h / 60
             out.append(pd.DataFrame(row))
     rows = pd.concat(out, ignore_index=True)
@@ -160,35 +169,53 @@ def untouched(frame):
     return frame[frame["origin"].between(*UNTOUCHED)]
 
 
-def rolling(rows, learn_mask=None, test_mask=None, origins=None, watch=None):
+def rolling(rows, learn_mask=None, test_mask=None, origins=None, watch=None, features=None, kinds=None):
     """Rolling origin. At each origin, each model learns from rows whose target bin had ended by then, and forecasts that origin's rows.
     learn_mask and test_mask narrow who is learned from and who is forecast: that is how a route or a community is held out."""
-    X = rows[FEATURES].to_numpy(dtype=float); y = rows["y"].to_numpy(); o_all = rows["origin"].to_numpy(); ended = o_all + rows["horizon"].to_numpy()
+    X = rows[features or FEATURES].to_numpy(dtype=float); y = rows["y"].to_numpy(); o_all = rows["origin"].to_numpy(); ended = o_all + rows["horizon"].to_numpy(); kinds = kinds or list(MODELS)
     learn_mask = np.ones(len(rows), bool) if learn_mask is None else learn_mask; test_mask = np.ones(len(rows), bool) if test_mask is None else test_mask
-    pred = {k: np.full(len(rows), np.nan) for k in MODELS}; thin = []
+    pred = {k: np.full(len(rows), np.nan) for k in kinds}; thin = []
     for o in sorted(set(o_all) if origins is None else origins):
         test = (o_all == o) & test_mask; learn = (ended <= o) & learn_mask
         if not test.any():
             continue
         if watch:
             watch(o, learn, test)                                     # a test looks over the shoulder: who is learned from, who is forecast
-        for kind in MODELS:
+        for kind in kinds:
             if learn.sum() < MIN_ROWS or y[learn].sum() == 0:
                 pred[kind][test] = rows["naive_timetable"].to_numpy()[test]; thin.append(int(o)); continue
             pred[kind][test] = _predict(kind, _fit(kind, X[learn], y[learn]), X[test])
     return pred, sorted(set(thin))                                    # the origins at which there was too little to learn from: no model's forecast is shown for them
 
 
-def importance(rows, up_to):
+def select(rows):
+    """Which of the new features are kept. Each is added alone to the features the model had before and scored, with the boosted
+    trees, on the development part only: it is kept if the miss there falls. A feature with one value all day is not tried."""
+    origins = sorted(o for o in set(rows["origin"]) if DEVELOPMENT[0] <= o <= DEVELOPMENT[1]); dev = development(rows).index; y = rows["y"].to_numpy()[dev]
+    mae = lambda feats: float(np.mean(np.abs(y - rolling(rows, origins=origins, features=feats, kinds=["gbt"])[0]["gbt"][dev])))
+    before = mae(BASE); table = []; kept = []
+    for f in NEW:
+        if rows[f].nunique() <= 1:
+            table.append({"feature": f, "label": FEATURE_WORDS[f], "status": "one_value_all_day", "dev_mae_without": round(before, 4), "dev_mae_with": None}); continue
+        with_f = mae(BASE + [f]); keep = with_f < before
+        table.append({"feature": f, "label": FEATURE_WORDS[f], "status": "kept" if keep else "left_out", "dev_mae_without": round(before, 4), "dev_mae_with": round(with_f, 4)})
+        if keep:
+            kept.append(f)
+    return table, kept
+
+
+def importance(rows, up_to, features=None):
     """Which features the boosted trees lean on: one model learned from everything that had ended by up_to, and each feature's share of its gain."""
     learn = ((rows["origin"] + rows["horizon"]) <= up_to).to_numpy()
     if learn.sum() < MIN_ROWS:
         return []
-    m = _fit("gbt", rows[FEATURES].to_numpy(dtype=float)[learn], rows["y"].to_numpy()[learn])
+    features = features or FEATURES
+    m = _fit("gbt", rows[features].to_numpy(dtype=float)[learn], rows["y"].to_numpy()[learn])
     gain = m.booster_.feature_importance(importance_type="gain") if hasattr(m, "booster_") else None
     if gain is None or gain.sum() == 0:
         return []
-    return [{"feature": f, "label": FEATURE_WORDS[f], "share": round(float(g / gain.sum()), 4)} for g, f in sorted(zip(gain, FEATURES), key=lambda x: (-x[0], x[1]))]
+    share = dict(zip(features, gain / gain.sum()))                     # a new feature that was left out is listed with no share, so the table names every feature built
+    return [{"feature": f, "label": FEATURE_WORDS[f], "share": round(float(share.get(f, 0.0)), 4)} for f in sorted(FEATURES, key=lambda f: (-share.get(f, 0.0), FEATURES.index(f)))]
 
 
 def ranges(rows, forecast, keep=0.9, least=50):
@@ -214,11 +241,11 @@ def groups_of(labels, n=5):
     return np.array([place.get(x, -1) for x in labels])
 
 
-def held_out_groups(rows, group_of_row, origins, watch=None):
+def held_out_groups(rows, group_of_row, origins, watch=None, features=None):
     """Learn from four groups, forecast the fifth, at the same origins. Never the same group on both sides."""
     pred = {k: np.full(len(rows), np.nan) for k in MODELS}
     for g in sorted(set(group_of_row) - {-1}):
-        p, _ = rolling(rows, learn_mask=(group_of_row != g) & (group_of_row != -1), test_mask=group_of_row == g, origins=origins, watch=watch)
+        p, _ = rolling(rows, learn_mask=(group_of_row != g) & (group_of_row != -1), test_mask=group_of_row == g, origins=origins, watch=watch, features=features)
         for k in MODELS:
             pred[k] = np.where(group_of_row == g, p[k], pred[k])
     return pred

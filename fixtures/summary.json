@@ -71,7 +71,7 @@
    "label": "Forecast error one hour ahead, by route (WAPE)",
    "source": "metrics.json",
    "unit": "share",
-   "value": 0.4611
+   "value": 0.4577
   },
   {
    "key": "skill_60",
@@ -79,7 +79,7 @@
    "label": "Better than the best naive forecast, one hour ahead",
    "source": "metrics.json",
    "unit": "share of error removed",
-   "value": 0.119
+   "value": 0.1253
   },
   {
    "key": "range_kept",
@@ -87,7 +87,7 @@
    "label": "How often the truth fell inside the stated range",
    "source": "metrics.json",
    "unit": "share, nine in ten promised",
-   "value": 0.9795
+   "value": 0.9794
   },
   {
    "key": "late_mae_5",
@@ -95,7 +95,7 @@
    "label": "Average miss on lateness five stops ahead",
    "source": "metrics.json",
    "unit": "seconds",
-   "value": 29.5469
+   "value": 29.9478
   }
  ]
 }

@@ -7,7 +7,7 @@ The file carries each module of model/ as text and loads them as a package in me
 rewritten by hand. tests/test_notebook.py runs it on the invented tables and requires the same bundle, byte for byte."""
 import os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ORDER = ["measures", "naive", "prepare", "forecast", "delay", "evaluate", "bundle", "run", "card"]      # each after what it imports
+ORDER = ["measures", "naive", "prepare", "context", "forecast", "delay", "triptime", "evaluate", "bundle", "run", "card"]      # each after what it imports
 
 HEAD = '''# Insiyab: the engine as one file, for a Dataiku Python notebook. Built by tools/make_notebook.py: do not edit, rebuild.
 #

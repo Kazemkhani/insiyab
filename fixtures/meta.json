@@ -1,6 +1,18 @@
 {
  "bin_seconds": 900,
  "commit": null,
+ "context": {
+  "calendar_found": true,
+  "heat_index_c_highest": 29.23,
+  "heat_index_c_lowest": 17.6,
+  "public_holiday": false,
+  "school_holiday": true,
+  "sources": [
+   "opendata/public/weather-hourly.csv (Open-Meteo)",
+   "opendata/public/calendar.csv"
+  ],
+  "weather_found": true
+ },
  "contract_version": 1,
  "counts": {
   "boardings": 11637,

@@ -78,6 +78,18 @@ def pooled(frame, models, draws=400, naive_names=None, counts=True):
     return out, best
 
 
+def by_horizon(frame, models, chosen, naive_names=None, counts=True):
+    """One row for each horizon: the chosen model against the best naive forecast at that horizon, with the range of the gain
+    found by drawing whole origins again, on that horizon's rows alone."""
+    out = []
+    for h in sorted(frame["horizon"].unique()):
+        rows, best = pooled(frame[frame["horizon"] == h], models, naive_names=naive_names, counts=counts)
+        mine = next(r for r in rows if r["model"] == chosen); nv = next(r for r in rows if r["model"] == best)
+        out.append({"horizon": int(h), "n": mine["n"], "best_naive": best, "naive_mae": nv["mae"], "naive_rmse": nv["rmse"], "model_mae": mine["mae"], "model_rmse": mine["rmse"],
+                    "skill": mine["skill"], "skill_lo": mine["skill_lo"], "skill_hi": mine["skill_hi"]})
+    return out
+
+
 def choose(development_pooled):
     """Which model is shown first. It is given the development table and nothing else: it cannot see the untouched part."""
     candidates = [r for r in development_pooled if r["model"] in MODELS and r["wape"] is not None]
