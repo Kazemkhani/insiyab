@@ -15,7 +15,7 @@ class QuietHandler(SimpleHTTPRequestHandler):
 server = ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=sys.argv[1]))
 Thread(target=server.serve_forever, daemon=True).start()
 url = f'http://127.0.0.1:{server.server_port}/'
-shots = Path(__file__).parent / 'shots'
+shots = Path(__file__).parent / 'out'
 shots.mkdir(exist_ok=True)
 LAYOUT = """() => {
  const visible = e => {if(e.closest('details:not([open])') && !e.closest('summary'))return false; const r=e.getBoundingClientRect(); return r.width && r.height && getComputedStyle(e).visibility !== 'hidden'};

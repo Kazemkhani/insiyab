@@ -69,6 +69,28 @@ The final gate ran without editing tracked files. An earlier development run pas
 
 `node live/ops/build.mjs --out /tmp/ops` printed `BUILT Insiyab Live demo: /tmp/ops`. The build served through Python's simple HTTP server. A separate direct-file check printed `PASS direct file preview: Route 310 · 19:23 ; 58 bus glyphs`.
 
-Screenshots in `shots/` were generated from the built console and inspected at 1920×1080, 1440×900, 390×844 and 1280×720. The two primary desktop sizes fit the viewport; the phone stacks and scrolls vertically. The automated WebKit check also verifies all phone controls have 44-pixel hit targets.
+Screenshots in `shots/` were generated from the built console and inspected at 1920×1080, 1440×900, 390×844 and 1280×720. They are preserved evidence; subsequent test runs write to git-ignored `out/`. The two primary desktop sizes fit the viewport; the phone stacks and scrolls vertically. The automated WebKit check also verifies all phone controls have 44-pixel hit targets.
 
 No real phone or relay API was called, and A1 did not deploy. Live event input is deliberately disconnected. Native Safari foreground inspection was inconclusive because the computer-use server returned `noWindowsAvailable`; a physical phone and the venue browser remain for stream G. Council/Gemini returned no review because its prepaid credits were depleted; no independent-review approval is claimed.
+
+## Screenshot output isolation — 19 November 2026
+
+Routine test screenshots now go to ignored `out/`; the committed `shots/` evidence is preserved.
+
+```text
+bash live/ops/tests/run.sh
+PASS WebKit: local map and buses render; every phone control has a 44-pixel touch target
+ALL PASS
+
+Before/after SHA256 verification:
+PASS console tests changed no tracked file (486 file hashes checked)
+PASS generated 13 ignored screenshots
+
+bash scripts/gates.sh
+PASS web/tests/run.sh (1227 checks)
+PASS rider/tests/run.sh (76 checks)
+PASS the gates changed no tracked file
+ALL GATES PASS
+```
+
+Full local logs: `/tmp/insiyab-a1-screenshot-fix-tests.log` and `/tmp/insiyab-a1-screenshot-fix-gates.log`. This follow-up changes test output paths and documentation only.
