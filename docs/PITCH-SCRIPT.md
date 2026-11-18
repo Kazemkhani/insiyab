@@ -37,7 +37,7 @@ Times are when each part starts. Words in quotation marks are to be spoken; say 
 **0:00 · The film (60 seconds).** Say nothing. Let it play.
 
 **1:00 · The problem. Screen: the pitch page (insiyab.amirkazemkhani.com/pitch/), scrolled through its six numbers to "The timetable said 19:23"; then the web app, tab 1 "The day".**
-"The timetable said 19:23. The bus left at 19:36. Someone at that stop did nothing wrong, and neither did the driver. Let me show you why it happened, and why it happens every evening."
+"Let me show you why it happens every evening."
 "This is one real day of Dubai's buses. Monday 15 December 2025. One million card taps, eleven thousand trips.
 Look at the two peaks. At eight in the morning, forty-eight thousand people board. At six in the evening, forty-nine thousand. The same crowd.
 But in the morning, one departure in five leaves late. In the evening, it is nearly one in two.

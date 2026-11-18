@@ -1,0 +1,138 @@
+[
+  {
+    "id": "dep_1923",
+    "value": "19:23",
+    "unit": "time",
+    "source": "Arithmetic illustration: 18:00 + 67 min timetable + 16 min break = 19:23. Not one real passenger. 15 Dec 2025.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "dep_1936",
+    "value": "19:36",
+    "unit": "time",
+    "source": "Arithmetic illustration: 18:00 + 96 min actual trip = 19:36. Not one real passenger. 15 Dec 2025.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "gap_13min",
+    "value": 13,
+    "unit": "minutes",
+    "source": "Arithmetic: 19:36 minus 19:23. Illustration, not a measured departure pair.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "tm_67min",
+    "value": 67,
+    "unit": "minutes",
+    "source": "Timetable allowance for route 310 at 18:00, 15 Dec 2025. Measured from Running_time_15-Dec-2025 in Dataiku flow.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "actual_96min",
+    "value": 96,
+    "unit": "minutes",
+    "source": "Middle trip time for route 310 at 18:00, 15 Dec 2025. Measured from Running_time_15-Dec-2025 in Dataiku flow.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "break_16min",
+    "value": 16,
+    "unit": "minutes",
+    "source": "Planned break between trips at every hour, 15 Dec 2025. Measured from Dataiku flow.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "board_0800",
+    "value": 48724,
+    "unit": "boardings",
+    "source": "Total boardings at 08:00, 15 Dec 2025. Flow table demand_by_hour, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "board_1800",
+    "value": 49707,
+    "unit": "boardings",
+    "source": "Total boardings at 18:00, 15 Dec 2025. Flow table demand_by_hour, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "late_0800pct",
+    "value": 19,
+    "unit": "per cent",
+    "source": "Departures 5 or more minutes late at 08:00, 15 Dec 2025. Flow table punctuality_by_hour, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "late_1800pct",
+    "value": 45,
+    "unit": "per cent",
+    "source": "Departures 5 or more minutes late at 18:00, 15 Dec 2025. Flow table punctuality_by_hour, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "mae_timetable",
+    "value": 8.25,
+    "unit": "minutes per trip",
+    "source": "Mean absolute error of the timetable on 2,043 held-out evening-peak trips (16:00 to 18:59), 15 Dec 2025. model/ metrics, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "mae_model",
+    "value": 6.97,
+    "unit": "minutes per trip",
+    "source": "Mean absolute error of the Insiyab forecast on 2,043 held-out evening-peak trips (16:00 to 18:59), 15 Dec 2025. model/ metrics, Dataiku. Lane 1. Lane 3 independent retest: 6.96.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "gain_pct",
+    "value": 15,
+    "unit": "per cent",
+    "source": "Improvement of model MAE over timetable MAE on evening peak, 15 Dec 2025. (8.25 - 6.97) / 8.25. model/ metrics, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "gain_range_lo",
+    "value": 12,
+    "unit": "per cent",
+    "source": "Lower bound of improvement range (confidence interval or hour-by-hour range), 15 Dec 2025. model/ metrics, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "gain_range_hi",
+    "value": 19,
+    "unit": "per cent",
+    "source": "Upper bound of improvement range (confidence interval or hour-by-hour range), 15 Dec 2025. model/ metrics, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "holdout_trips",
+    "value": 2043,
+    "unit": "trips",
+    "source": "Evening-peak trips (16:00 to 18:59) the model never trained on, 15 Dec 2025. model/ metrics, Dataiku. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  },
+  {
+    "id": "bus_hours_eve",
+    "value": 244,
+    "unit": "bus hours",
+    "source": "Hours of running time the timetable does not hold, 16:00 to 18:59, 15 Dec 2025. Measured, not predicted. Dataiku flow. Lane 1.",
+    "checked_by": "lane-1 final push",
+    "date": "2026-11-18"
+  }
+]
