@@ -32,6 +32,13 @@ with sync_playwright() as p:
         page.on('pageerror', lambda error: errors.append(str(error)))
         page.goto(url)
         page.evaluate('document.fonts.ready')
+        page.wait_for_selector('#map[data-ready=true]')
+        page.wait_for_timeout(600)
+        assert 'unavailable' not in page.locator('#map-note').inner_text().lower()
+        assert int(page.locator('#map').get_attribute('data-buses')) > 0
+        page.locator('#time').fill('67980')
+        assert page.locator('#replay-clock').inner_text() == '18:53'
+        page.locator('#time').fill('57600')
         assert page.locator('h1').inner_text() == 'Insiyab Live'
         assert page.locator('.logo svg').count() == 1
         assert page.get_by_text('OpenStreetMap contributors').is_visible()
@@ -45,6 +52,13 @@ with sync_playwright() as p:
         page.screenshot(path=str(shots/f'{width}x{height}.png'), full_page=True)
         print(f'PASS {width}x{height}: inline logo, attribution, no overflow, no text overlap, zero voice requests')
         page.close()
+    page = browser.new_page(reduced_motion='reduce')
+    page.goto(url)
+    page.wait_for_selector('#map[data-ready=true]')
+    page.get_by_role('button', name='Replay', exact=True).click()
+    assert page.locator('#replay-clock').inner_text() == '20:00'
+    assert page.locator('#map').get_attribute('data-playing') == 'false'
+    print('PASS reduced motion: replay jumps to its final state without travel')
     browser.close()
 server.shutdown()
 print('ALL PASS')

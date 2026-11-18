@@ -22,5 +22,19 @@ for (const [font, weights] of [['overpass', [400, 600]], ['ibm-plex-sans', [400,
   for (const weight of weights) await copyFile(resolve(root, `web/node_modules/@fontsource/${font}/files/${font}-latin-${weight}-normal.woff2`), resolve(out, `fonts/${font}-${weight}.woff2`));
   await copyFile(resolve(root, `web/node_modules/@fontsource/${font}/LICENSE`), resolve(out, `fonts/LICENSE-${font}.txt`));
 }
+const bundle = {};
+for (const name of ['meta.json', 'network.json', 'replay/index.json']) bundle[name] = JSON.parse(await readFile(resolve(root, 'fixtures', name), 'utf8'));
+for (const route of bundle['replay/index.json'].routes) {
+  if (!/^replay\/[^/]+\.json$/.test(route.file)) throw Error('Unsafe replay path');
+  bundle[route.file] = JSON.parse(await readFile(resolve(root, 'fixtures', route.file), 'utf8'));
+}
+await writeFile(resolve(out, 'data.js'), 'window.INSIYAB_OPS_DATA=' + JSON.stringify({bundle}).replace(/</g, '\\u003c') + ';');
+await mkdir(resolve(out, 'map'), {recursive:true});
+const mapBytes = await readFile(resolve(root, 'web/assets/map/dubai.pmtiles'));
+await writeFile(resolve(out, 'map/dubai.pmtiles'), mapBytes);
+await writeFile(resolve(out, 'map/offline.js'), 'window.INSIYAB_MAP_BYTES=' + JSON.stringify(mapBytes.toString('base64')) + ';');
+await copyFile(resolve(root, 'opendata/public/basemap/PROVENANCE.md'), resolve(out, 'MAP-NOTICE.md'));
+await copyFile(resolve(root, 'opendata/public/rta-gtfs/PROVENANCE.md'), resolve(out, 'NETWORK-NOTICE.md'));
+await copyFile(resolve(root, 'web/node_modules/maplibre-gl/dist/maplibre-gl.css'), resolve(out, 'maplibre.css'));
 await build({entryPoints: [resolve(here, 'src/app.js')], outfile: resolve(out, 'app.js'), nodePaths: [resolve(root, 'web/node_modules')], bundle: true, format: 'iife', target: 'es2022', minify: true, legalComments: 'linked'});
 console.log(`BUILT Insiyab Live demo: ${out}`);
