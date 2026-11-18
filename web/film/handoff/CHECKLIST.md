@@ -4,27 +4,27 @@ A box is checked only with a command result, inspected artifact, or observed des
 
 ## Engineering
 
-- [ ] Pull main; read newest coordination entries; identify the current owners editing each file.
-- [ ] Pitch's full tap count fits its caption at 1280×720, 390×844, 320×568 and 768×1024.
-- [ ] Each chapter has one readable message and a working next/previous control.
-- [ ] Offline build loads its local 3D library, recorded-day page and dashboard; reduced motion gives a static readable story.
-- [ ] 589/945 is the sole late-return definition on the pitch. 696 uses its own denominator.
-- [ ] 15% scoped to 16:00–19:00; 244 labelled measured; linear comparison included; late-evening and next-hour limitations visible.
-- [ ] “And on the day itself” follows the planner output; its link works on the canonical public address.
-- [ ] Dashboard reports, manager decision and acknowledgements match the relay; simulated playback cannot be mistaken for connected calls.
-- [ ] All eight Dataiku tabs have nonempty, clear Say / Point at / Then click notes, checked live after saving.
-- [ ] Voice tests reject unauthorised, stale and wrong-role callbacks, unknown options, missing roster roles and extra runs.
-- [ ] Public relay state contains no free-text report; private viewing requires its own key.
-- [ ] Real rehearsal attempted only when all phones are ready; exact result recorded, including refusals/timeouts.
-- [ ] `bash web/tests/run.sh` ends ALL PASS.
-- [ ] `bash live/voice/tests/run.sh` ends ALL PASS.
-- [ ] `.venv/bin/python tests/test_dataiku_webapp.py` ends ALL PASS.
-- [ ] `python3 story/tests/browser.py <built-pitch> <screenshots>` ends ALL PITCH CHECKS PASS.
-- [ ] `bash scripts/gates.sh` ends ALL GATES PASS. Do not bypass it for a deploy.
-- [ ] Commit named source/test files, pull with rebase, push main, announce in lane-2 coordination.
-- [ ] Deploy the exact gated commit; fetch public deploy.json; compare served artifact hashes; inspect browser output.
-- [ ] Open final screenshots at desktop and phone sizes; no hidden overflow or clipped labels.
-- [ ] Package prompts, source pointers, score sheet, fact ledger and README into a secret-free zip.
+- [x] Pull main; read newest coordination entries; identify the current owners editing each file.
+- [x] Pitch's full tap count fits its caption at 1280×720, 390×844, 320×568 and 768×1024.
+- [x] Each chapter has one readable message and a working next/previous control.
+- [x] Offline build loads its local 3D library, recorded-day page and dashboard; reduced motion gives a static readable story.
+- [x] 589/945 is the sole late-return definition on the pitch. 696 uses its own denominator.
+- [x] 15% scoped to 16:00–19:00; 244 labelled measured; linear comparison included; late-evening and next-hour limitations visible.
+- [x] “And on the day itself” follows the planner output; its link works on the canonical public address.
+- [ ] Complete real phone reports, manager decision and all four acknowledgements observed together on the dashboard. Synthetic full-loop and dashboard separation tests pass; the real loop remains incomplete.
+- [x] All eight Dataiku tabs have nonempty, clear Say / Point at / Then click notes, checked live after saving.
+- [x] Voice tests reject unauthorised, stale and wrong-role callbacks, unknown options, missing roster roles and extra runs.
+- [x] Public relay state contains no free-text report; private viewing requires its own key.
+- [x] Real rehearsal attempted only when all phones are ready; exact result recorded, including refusals/timeouts.
+- [x] `bash web/tests/run.sh` ends ALL PASS.
+- [x] `bash live/voice/tests/run.sh` ends ALL PASS.
+- [x] `.venv/bin/python tests/test_dataiku_webapp.py` ends ALL PASS.
+- [x] `python3 story/tests/browser.py <built-pitch> <screenshots>` ends ALL PITCH CHECKS PASS.
+- [x] `bash scripts/gates.sh` ends ALL GATES PASS. Do not bypass it for a deploy.
+- [x] Commit named source/test files, pull with rebase, push main, announce in lane-2 coordination.
+- [x] Deploy the exact gated commit; fetch public deploy.json; compare served artifact hashes; inspect browser output.
+- [x] Open final screenshots at desktop and phone sizes; no hidden overflow or clipped labels.
+- [x] Package prompts, source pointers, score sheet, fact ledger and README into a secret-free zip.
 
 ## RTA operations reviewer
 
