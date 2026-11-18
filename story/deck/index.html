@@ -38,6 +38,7 @@ h2{font-size:96px}
 .step.shown{opacity:1;transform:none}
 .light{background:var(--ivory);color:var(--ink)}
 .light .credit{color:var(--mute);text-shadow:none}
+.own{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:10px}.st{font-family:var(--head);font-weight:800;font-size:32px;line-height:1.1;color:var(--ink)}.nt{font-size:21px;line-height:1.4;color:var(--mute);margin-top:10px}
 #hint{position:fixed;left:16px;bottom:12px;font:13px var(--text);color:#777;transition:opacity 600ms}
 #notes{position:fixed;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);color:#eee;font:20px/1.45 var(--text);padding:20px 32px;display:none;max-height:40vh;overflow:auto}
 #notes.on{display:block}
@@ -126,6 +127,24 @@ h2{font-size:96px}
   </div>
 </section>
 
+<!-- 5b WITH RTA'S DSS -->
+<section class="slide light" data-steps="2" data-notes="Maruf · 40 s. RTA already has a Decision Support System, live since 6 July 2026: it watches more than 1,100 buses, handles 26 scenarios and picks the right bus in under a minute instead of 30 to 60. [click] Insiyab works around it: it warns early, checks the pick with the people, puts everything on one briefing, and after the controller decides it tells everyone and collects the confirmations. [click] The DSS picks the bus. Insiyab handles the people. Say clearly: this is a proposal; we have not connected to or tested with RTA's system. If asked about 1,100 versus 1,400 buses: 1,100+ is what the DSS release says it monitors, 1,400 is what control-centre staff told us on 18 November. Say both and where each comes from; don't speculate why they differ.">
+  <div class="pad" style="top:120px">
+    <h2 style="font-size:76px;color:var(--ink)">RTA's Decision Support System<br>picks the bus in under a minute.</h2>
+    <p style="font-size:30px;line-height:1.45;margin-top:28px;color:var(--mute);max-width:1400px">Live since 6 July 2026: more than 1,100 buses, 26 scenarios, on RTA's Dataiku platform. It used to take 30 to 60 minutes. The calls to staff are still made by hand.</p>
+  </div>
+  <div class="pad step" data-step="1" style="top:520px;display:grid;grid-template-columns:repeat(6,1fr);column-gap:36px;border-top:2px solid rgba(21,24,29,.14);padding-top:30px">
+    <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">Warns early</p><p class="nt">trip forecast 30 minutes ahead</p></div>
+    <div><p class="own">RTA DSS</p><p class="st">Picks the bus</p><p class="nt">in under a minute</p></div>
+    <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">Checks with staff</p><p class="nt">driver, depot, station, planning, at once</p></div>
+    <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">One briefing</p><p class="nt">the DSS pick and every answer</p></div>
+    <div><p class="own" style="color:var(--red)">Controller</p><p class="st">Decides</p><p class="nt">always a person</p></div>
+    <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">Tells everyone</p><p class="nt">and collects each confirmation</p></div>
+  </div>
+  <div class="pad step" data-step="2" style="top:800px"><p style="font-family:var(--head);font-weight:800;font-size:56px;color:var(--ink)">The DSS picks the bus. Insiyab handles the people.</p></div>
+  <div class="credit">RTA press release, 6 July 2026; RTA control-centre staff, 18 November 2026. A proposal: Insiyab has not been connected to or tested with RTA's system.</div>
+</section>
+
 <!-- 6 REAL CALL -->
 <section class="slide light" data-notes="Mustafo · 40 s. This is the real screen from our drill on 18 November, on our own phones. These are the words four people said on the call: the driver, the depot, the planner, the station. Four reports, one human decision, four confirmations. It is a drill, not an RTA system, and every condition on it is labelled simulated.">
   <div class="pad" style="top:110px">
@@ -205,7 +224,7 @@ h2{font-size:96px}
       <p><b>RTA, bus passengers by route, monthly.</b> Dubai open data (dataset 459793): 15.28 million bus journeys in December 2025.</p>
       <p><b>Insiyab analysis.</b> Forecast tested on 2,043 evening trips not used in training; 244 bus hours 16:00 to 18:59; the calling drill on 18 November 2026. Code and method in the shared source package.</p>
       <p><b>Open-Meteo</b> historical weather; <b>UAE public holidays and school terms</b> (Khaleej Times, checked against u.ae).</p>
-      <p><b>Dubai Media Office,</b> 23 April 2026; UAE and Dubai government strategy portals.</p>
+      <p><b>RTA press release,</b> 6 July 2026: the Decision Support System (1,100+ buses, 26 scenarios, under one minute). <b>Dubai Media Office,</b> 23 April 2026; UAE and Dubai strategy portals.</p>
       <p style="grid-column:1/-1;color:var(--mute)"><b>Photographs.</b> Irshad Ahmad, Dwi Setyo, Nihongraphy (Pexels License); Noah Wulf, CC BY-SA 4.0; Rob Dammers, CC BY-SA 2.0 (Wikimedia Commons). Bus stop and control room are representative images, not RTA's.</p>
     </div>
   </div>
