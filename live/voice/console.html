@@ -290,7 +290,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
         if (tsEl) tsEl.textContent = fmt(noAnswerEv.at);
       } else {
         card.classList.remove('reported', 'no-answer');
-        if (repEl) repEl.textContent = s.phase === 'idle' ? '...' : 'Waiting...';
+        if (repEl) repEl.textContent = s.mode === 'manager_sample' ? 'Not called in this manager-only sample' : s.phase === 'idle' ? '...' : 'Waiting...';
         if (tsEl) tsEl.textContent = '';
       }
     });
@@ -318,7 +318,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
       const pill = document.getElementById('ack-' + role);
       if (!pill) return;
       const acked = s.acknowledgements && s.acknowledgements[role];
-      pill.classList.toggle('acked',!!acked);pill.textContent=role.charAt(0).toUpperCase()+role.slice(1)+(acked?' · acknowledged':' · not yet acknowledged');
+      pill.classList.toggle('acked',!!acked);pill.textContent=role.charAt(0).toUpperCase()+role.slice(1)+(s.mode==='manager_sample'?' · no callback in this sample':acked?' · acknowledged':' · not yet acknowledged');
     });
 
     // Last update
@@ -336,7 +336,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
     const version=connectionVersion,request=++requestSequence;
     fetch(STATE_URL, { cache: 'no-store',headers:{'x-insiyab-view':viewKey} })
       .then(function (r) { if(!r.ok)throw new Error('HTTP '+r.status);return r.json(); })
-      .then(function(s){if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;document.getElementById('mode').textContent='Connected to rehearsal relay. Simulated incident; human reports.';renderState(s)})
+      .then(function(s){if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;document.getElementById('mode').textContent=s.mode==='manager_sample'?'Manager-only phone sample. No staff calls or callbacks.':'Connected to rehearsal relay. Simulated incident; human reports.';renderState(s)})
       .catch(function (e) {
         if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;
         const lu = document.getElementById('last-update');

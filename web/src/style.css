@@ -1816,3 +1816,5 @@ body.guide-open header nav,body.guide-open #documentation{display:none}
 #guide-timetable th span{display:block;font:400 13px Plex;margin-top:8px;max-width:24ch}
 @media(max-width:800px){#guide-timetable{order:3;margin:18px 0}#guide-timetable th,#guide-timetable td{padding:14px 6px;font-size:16px}}
 @media(max-width:800px){#guide[data-step="4"] #guide-note{order:2}}
+
+header .pitch-link{display:inline-flex;align-items:center;min-height:44px;margin-left:auto;padding:8px 12px;font-size:13px;text-decoration:underline}

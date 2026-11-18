@@ -135,8 +135,9 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
 .cap .so{display:block}.cap.hero{max-height:none;overflow:visible;container-type:normal}
 #film h1{font-size:clamp(40px,5vw,72px);line-height:1.05;max-width:900px}
 #film .opening{max-width:780px;font-size:20px;line-height:1.5;text-align:left}
-#film .archive-film{max-width:780px;width:100%;text-align:left;font-size:14px}
-#film .archive-film video{margin-top:16px}.archive-film p{margin:12px 0}
+#film .film-player{max-width:1120px;width:100%;text-align:left;font-size:14px;scroll-margin-top:90px}
+#film .film-player video{margin-top:16px}.film-player p{margin:12px 0}
+#motion-fallback{padding:28px;max-width:780px;margin:auto}#motion-fallback button{min-height:44px;padding:12px 20px;cursor:pointer}
 summary{cursor:pointer;min-height:44px;padding:12px 0}details p{max-width:78ch;margin:14px 0}
 nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44px;border-radius:0}
 .chapter-controls{position:absolute;bottom:28px;left:24px;right:24px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border-top:2px solid var(--sea);padding:8px 12px;z-index:3}
@@ -155,8 +156,8 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 <nav>
   <a class="brand" href="#film">Insiyab<span>.</span></a>
   <div class="links">
-    <a href="#film">Film</a>
-    <a href="#descent">The day</a>
+    <a href="#film-player">Film</a>
+    <a href="#descent">Bus journey</a>
     <a href="#problem">The problem</a>
     <a href="#answer">Our answer</a>
     <a href="#built">How it's built</a>
@@ -168,11 +169,12 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   <p class="ey2">Student prototype · RTA Future Move Hackathon · One service day</p>
   <h1>Why does the evening<br>fall behind?</h1>
   <p class="opening">Dubai’s bus records show much more lateness in the evening. When a trip overruns its timetable and the break before the next trip, the delay carries forward. Insiyab tests a trip-time forecast and gives planners a measured list of routes and hours that need attention. A separate control-room drill shows how AI can gather updates for a human decision.</p>
-  <a class="btn" href="#descent">Follow the evidence</a>
-  <details class="archive-film"><summary>Earlier concept film · stand-in data</summary><p>This earlier passenger concept does not present the current evening findings.</p><video id="fv" src="film.mp4" controls playsinline preload="none" aria-label="Earlier concept film using stand-in data"></video><p id="fgone" hidden>The earlier film is not available in this copy.</p></details>
+  <div class="row"><a class="btn" href="#film-player">Watch the film</a><a class="btn" href="#descent">Explore the animated bus journey</a></div>
+  <section class="film-player" id="film-player" aria-label="Concept film"><p><strong>Concept film · stand-in data</strong><br>The film illustrates the earlier passenger concept. The bus journey below explains the recorded evening findings.</p><video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="Concept film using stand-in data"></video><p id="fgone" hidden>The film could not load. You can still explore the bus journey below.</p><a class="btn" href="#descent">Continue into the bus journey</a></section>
 </header>
 
 <div id="descent">
+  <div id="motion-fallback" hidden><p id="motion-message">Your device asks for less animation, so the chapters are shown without movement. You can choose to play the animated bus journey.</p><button id="enable-motion" type="button">Play the animated bus journey</button></div>
   <div class="sticky" id="top">
     <canvas id="cv" aria-hidden="true"></canvas>
     <div id="lbls"></div>
@@ -473,16 +475,20 @@ const txt=(svg,x,y,s,o)=>svg.appendChild(el('text',Object.assign({x,y,'font-size
 
 <script src="three.js"></script>
 <script>
-(function(){
-if(!window.THREE || matchMedia('(prefers-reduced-motion: reduce)').matches){document.getElementById('descent').classList.add('static-story');return}
+(function(){const v=document.getElementById('fv');v.addEventListener('ended',()=>document.getElementById('descent').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}));v.addEventListener('error',()=>{v.hidden=true;document.getElementById('fgone').hidden=false})})();
+function startJourney(forceMotion=false){
+const fallback=message=>{document.getElementById('descent').classList.add('static-story');document.getElementById('motion-fallback').hidden=false;if(message){document.getElementById('motion-message').textContent=message;document.getElementById('enable-motion').hidden=true}};
+if(!window.THREE){fallback('The 3D library could not load. All chapters remain available below.');return}
+if(matchMedia('(prefers-reduced-motion: reduce)').matches&&!forceMotion){fallback();document.getElementById('enable-motion').onclick=()=>startJourney(true);return}
+document.getElementById('descent').classList.remove('static-story');document.getElementById('motion-fallback').hidden=true;
 const PAL={red:0xE21F26,sea:0x0E5A73,gold:0xC8A24A,ink:0x1E1A16,sandGrey:0xD8CBB2,soft:0xE6DAC2,ghost:0x8DB3C0,sand:0xF5EFE3};
 const RED=PAL.red,SEA=PAL.sea,GOLD=PAL.gold,INK=PAL.ink,SANDG=PAL.sandGrey,SOFT=PAL.soft,GHOST=PAL.ghost;
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const Lam=c=>new THREE.MeshLambertMaterial({color:c});
 let seed=5;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
 
 const descent=document.getElementById('descent'),stage=document.querySelector('.sticky');
-let R3;try{R3=new THREE.WebGLRenderer({canvas:document.getElementById('cv'),antialias:true,alpha:true})}catch{descent.classList.add('static-story');return}
+let R3;try{R3=new THREE.WebGLRenderer({canvas:document.getElementById('cv'),antialias:true,alpha:true})}catch{fallback('This browser cannot draw the 3D journey. All chapters remain available below.');return}
+descent.dataset.animation='running';
 R3.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
 const S=new THREE.Scene();S.fog=new THREE.Fog(PAL.sand,14,40);
 S.add(new THREE.HemisphereLight(0xfffaf0,0xd9ccb3,0.8));
@@ -576,7 +582,6 @@ const jump=i=>{const target=Math.max(0,Math.min(stops.length-1,i));window.scroll
 document.getElementById('chapter-prev').onclick=()=>jump(activeChapter-1);document.getElementById('chapter-next').onclick=()=>{if(activeChapter===stops.length-1)document.getElementById('problem').scrollIntoView();else jump(activeChapter+1)};
 function readScroll(){const r=descent.getBoundingClientRect();p=cl(-r.top/(r.height-innerHeight))}
 addEventListener('scroll',readScroll,{passive:true});readScroll();
-(function(){const v=document.getElementById('fv');if(!v)return;v.addEventListener('ended',()=>descent.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}));v.addEventListener('error',()=>{v.hidden=true;document.getElementById('fgone').hidden=false})})();
 new IntersectionObserver(e=>{on=e[0].isIntersecting}).observe(descent);
 
 const look=new THREE.Vector3(0,-5,0),fol=new THREE.Vector3(),fl=new THREE.Vector3(),hp=new THREE.Vector3(0,16,15),hl=new THREE.Vector3(0,-6,0),tp=new THREE.Vector3(),tl=new THREE.Vector3(),pv=new THREE.Vector3();
@@ -584,13 +589,13 @@ cam.position.copy(hp);
 const clock=new THREE.Clock();let T=0;
 (function loop(){const dt=Math.min(clock.getDelta(),0.05);T+=dt;
  if(on){
-  ps+=(p-ps)*Math.min(1,dt*(reduce?20:5));
+  ps+=(p-ps)*Math.min(1,dt*5);
   prog.style.width=(ps*100).toFixed(2)+'%';
   hint.style.opacity=String(1-sm(0.01,0.05,ps));
   const hs=Math.max(0.0005,ps*0.985+0.003);onRoad(hb,hs,-0.35);
-  others.forEach(b=>{const u=b.userData;if(!reduce)u.s=(u.s+dt*0.006)%0.995;onRoad(b,u.s+0.003,u.lane)});
+  others.forEach(b=>{const u=b.userData;u.s=(u.s+dt*0.006)%0.995;onRoad(b,u.s+0.003,u.lane)});
   [hb,...others].forEach(b=>b.userData.wh.forEach(w=>{w.rotation.z-=dt*6}));
-  ex.forEach(e=>{const t=Math.abs(ps-e.c)<0.1?1:0;e.s+=(t-e.s)*Math.min(1,dt*4);e.g.visible=e.s>0.02;e.g.scale.setScalar(Math.max(0.001,e.s));e.g.rotation.y=reduce?0:T*0.12});
+  ex.forEach(e=>{const t=Math.abs(ps-e.c)<0.1?1:0;e.s+=(t-e.s)*Math.min(1,dt*4);e.g.visible=e.s>0.02;e.g.scale.setScalar(Math.max(0.001,e.s));e.g.rotation.y=T*0.12});
   const th=hs*TURNS*Math.PI*2,by=-hs*DROP,ang=th+0.55,cr=12.5+sm(0.88,1,ps)*2;
   fol.set(cr*Math.cos(ang),by+2.9,cr*Math.sin(ang));fl.set(0,by+0.7,0).lerp(hb.position,0.28);
   const k=sm(0,0.13,ps);tp.lerpVectors(hp,fol,k);tl.lerpVectors(hl,fl,k);
@@ -602,7 +607,8 @@ const clock=new THREE.Clock();let T=0;
   labels.forEach(o=>{const e=ex[o.e];if(e.s<0.75){o.d.style.opacity=0;return}pv.copy(o.v);e.g.localToWorld(pv);pv.project(cam);if(pv.z>1){o.d.style.opacity=0;return}o.d.style.left=((pv.x*0.5+0.5)*W)+'px';o.d.style.top=((-pv.y*0.5+0.5)*H)+'px';const cp=caps[activeChapter]?.getBoundingClientRect(),lp=o.d.getBoundingClientRect();o.d.style.opacity=cp&&lp.left<cp.right&&lp.right>cp.left&&lp.top<cp.bottom&&lp.bottom>cp.top?'0':String(cl((e.s-0.75)*4))});
  }
  requestAnimationFrame(loop)})();
-})();
+}
+startJourney();
 </script>
 <script>
 // reveals and bars below the descent (kept apart from the 3D so the page still reads if the 3D cannot load)

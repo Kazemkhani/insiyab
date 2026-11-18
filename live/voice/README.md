@@ -66,6 +66,12 @@ The name is used by the agent to address the person. It never appears in `GET /v
 
 ## Commands
 
+### A single-person sample
+
+`INSIYAB_CALLS=armed node live/voice/relay.js --live --sample-manager`
+
+This starts the dashboard and places exactly one call to the manager in the private roster. It uses the existing simulated incident, explicitly supplies no staff reports, records the manager's choice through the normal authenticated webhook, and makes no callbacks. Check that the configured public tunnel is reachable before starting. Stop the existing relay first so the port is available. The usual three guards still apply. A sample is never a completed five-person rehearsal.
+
 ### (a) Rehearsal mode
 
 Run without all three guards to see what the relay would say:

@@ -355,6 +355,7 @@ What to do:
 - Accept a clear option name, its number, or "the first/second/third option" as a choice. Record it immediately; do not ask a second confirmation of an unambiguous choice. If unclear, ask one short clarification. Do not infer consent from unrelated words or silence.
 - Call insiyab_decision with the option key (send_spare, hold, or none) and any additional words the manager said.
 - Then say "Recorded. I will brief the team." Say goodbye and call end_call.
+- If the supplied context says this is a single-person sample, say only "Your choice is recorded." Do not promise callbacks.
 - If the manager asks a question you cannot answer from the incident, say the system has no more detail on that.
 
 ${SAFETY_RULES}`,
@@ -440,6 +441,46 @@ const ENDED = new Set(['processing', 'done', 'failed']);
 async function allEnded(ids) {
   const statuses = await Promise.all(ids.map(convStatus));
   return statuses.every(s => ENDED.has(s));
+}
+
+// A presenter-only sound check. Reuses the same call, token and decision path;
+// it never synthesises staff reports or launches the four callbacks.
+async function sampleManager() {
+  if (!allGuards()) { log('Manager sample: not armed; no call placed.'); return; }
+  if (relayRunning || callCount) throw new Error('A call has already started in this process.');
+  const manager = numbers().filter(p => p.role === 'manager');
+  if (manager.length !== 1) throw new Error('Exactly one manager is required.');
+  if (!PUBLIC_URL) throw new Error('The public callback address is missing. No call placed.');
+  const reachable = await fetch(PUBLIC_URL + '/voice/state/authenticated', {
+    headers: {'x-insiyab-key': SHARED_KEY}, signal: AbortSignal.timeout(8000),
+  });
+  if (!reachable.ok) throw new Error('The public callback address is unavailable. No call placed.');
+  const remoteState = await reachable.json();
+  if (remoteState.phase !== state.phase || remoteState.since !== state.since)
+    throw new Error('The public callback address does not match this relay. No call placed.');
+  await loadAgents();
+  if (!AGENTS.manager) throw new Error('Manager agent is not configured.');
+  const incident = JSON.parse(fs.readFileSync(path.join(__dirname, 'incident-example.json'), 'utf8'));
+  resetState(incident);
+  state.mode = 'manager_sample';
+  state.phase = 'manager';
+  relayRunning = true;
+  try {
+    const calls = await placeAll(manager, () => ({...incidentVars(incident),
+      staff_reports: 'No staff reports have been collected for this single-person sample. Spare availability is unconfirmed.',
+      team_roster: numbers().map(p => p.role + ': ' + p.name).join('; '),
+      options_text: incident.options.map((o,i) => `${i+1}. ${o.say} (key: ${o.key})`).join('; ')
+    }), AGENTS.manager, 'manager sample');
+    const call = calls[0];
+    addTimeline({event: call.ok ? 'call_placed' : 'call_failed', role:'manager'});
+    if (!call.ok) { state.outcome = 'failed'; return; }
+    const end = Date.now() + 180000;
+    while (Date.now() < end) {
+      await sleep(1500);
+      if (call.conversation && await allEnded([call.conversation])) break;
+    }
+    state.outcome = state.decision ? 'sample_decision_recorded' : 'sample_no_decision';
+  } finally { state.phase = 'done'; relayRunning = false; }
 }
 
 /* ---------- relay flow ---------- */
@@ -908,7 +949,8 @@ if (process.argv.includes('--setup-agents')) {
     }
     server.listen(PORT, '127.0.0.1', () => {
       log('Insiyab voice relay on http://127.0.0.1:' + PORT + '/' + (allGuards() ? ' ARMED' : ' rehearsal mode'));
-      if (allGuards() && EL_KEY) loadAgents().catch(e => log('could not load agents:', scrub(e.message)));
+      if (process.argv.includes('--sample-manager')) sampleManager().catch(e => {state.outcome='sample_failed';state.phase='done';log('manager sample failed:', scrub(e.message));});
+      else if (allGuards() && EL_KEY) loadAgents().catch(e => log('could not load agents:', scrub(e.message)));
     });
   }
 }

@@ -12,14 +12,16 @@ with sync_playwright() as p:
   c=b.new_context(viewport={'width':w,'height':h},offline=True,reduced_motion='reduce' if reduced else 'no-preference')
   page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(site.as_uri()+'/index.html');page.wait_for_timeout(500)
-  check('Why does the evening' in page.locator('#film h1').inner_text(),f'{w}: clear opening problem before optional earlier film')
-  check(page.locator('#fv').is_hidden(),f'{w}: old film does not lead the story')
+  check('Why does the evening' in page.locator('#film h1').inner_text(),f'{w}: clear opening problem before concept film')
+  check(page.locator('#fv').is_visible(),f'{w}: film player is visible without expanding a hidden section')
   check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f'{w}: no page overflow')
   if reduced:
    check(page.locator('#descent').evaluate("e=>e.classList.contains('static-story')"),'reduced motion uses a readable static journey')
    check(page.locator('.cap').count()==7,'all seven chapters available without animation')
+   page.locator('#enable-motion').click();page.wait_for_timeout(600)
+   check(page.locator('#descent').get_attribute('data-animation')=='running','reduced-motion visitor can explicitly enable the bus animation')
   else:
-   page.locator('#film a[href="#descent"]').click();page.wait_for_timeout(1400)
+   page.locator('#film a[href="#descent"]').first.click();page.wait_for_timeout(1400)
    for i in range(1,7):
     page.locator('#chapter-next').click();page.wait_for_timeout(1600)
     cap=page.locator('.cap').nth(i)
