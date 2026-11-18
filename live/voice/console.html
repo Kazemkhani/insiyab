@@ -131,6 +131,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
 
 <header><p>Insiyab · Operations rehearsal</p><h1>One incident. One human decision.</h1><p>Collect the facts, brief the duty manager, relay the choice, and check who heard it.</p></header>
 <div class="connection"><label for="relay-url">Rehearsal relay address</label><input id="relay-url" type="url" placeholder="https://your-relay-address" autocomplete="off"><label for="view-key">Viewing key</label><input id="view-key" type="password" autocomplete="off" placeholder="Private viewing key"><button id="connect">Connect to rehearsal</button><button id="sample">Play an illustrated example</button><p id="mode" role="status">Not connected. No calls are placed by this dashboard.</p></div>
+<div class="connection" id="start-box"><label for="call-key">Call key (presenter only)</label><input id="call-key" type="password" autocomplete="off" placeholder="Private call key"><button id="start-call" type="button">Start the drill: call the team</button><span id="call-status" role="status"></span></div>
 <ol class="phases"><li id="step-check">1. Collect reports</li><li id="step-manager">2. Human decision</li><li id="step-callout">3. Relay and acknowledge</li></ol>
 <div id="main">
   <div id="incident">
@@ -344,6 +345,28 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
       });
   }
 
+  // Presenter-only start: rings the consenting team through the relay. The key is typed at the moment of use, sent once, never stored.
+  const DRILL_INCIDENT = {"id": "2025-12-15-310-18", "route": "310", "direction": "1", "hour": "18:00", "planned_minutes": 67, "expected_minutes": 96, "minutes_late_now": 22, "next_bus_in_minutes": 20, "boardings_this_hour": 640, "buses_running": 8, "buses_needed_by_rule": 17, "options": [{"key": "send_spare", "say": "send the standby bus to route 310"}, {"key": "hold", "say": "hold the next departure two minutes to even the gap"}, {"key": "none", "say": "take no action and watch"}], "source": "SIMULATED drill conditions. Rounded route 310 times are based on recorded-day medians, not a live forecast. Availability, current delay and service options are invented for rehearsal.", "drill": true};
+  const rp=params.get('relay');try{if(rp){const u=new URL(rp);if(u.protocol==='https:'&&!u.username&&!u.password)document.getElementById('relay-url').value=u.origin}}catch(e){}
+  // One-link setup for the presenter's own laptop: #relay=...&call=...&view=... in the fragment (never sent to any server), then wiped from the address bar.
+  try{if(location.hash.length>1){const h=new URLSearchParams(location.hash.slice(1));const hr=h.get('relay');if(hr){const u=new URL(hr);if(u.protocol==='https:')document.getElementById('relay-url').value=u.origin}
+    if(h.get('call'))document.getElementById('call-key').value=h.get('call');if(h.get('view'))document.getElementById('view-key').value=h.get('view');
+    history.replaceState(null,'',location.pathname+location.search);if(h.get('view'))setTimeout(()=>document.getElementById('connect').click(),300)}}catch(e){}
+  let armedUntil=0;
+  document.getElementById('start-call').onclick=async()=>{
+    const st=document.getElementById('call-status');const keyEl=document.getElementById('call-key');
+    let base='';try{const u=new URL(document.getElementById('relay-url').value);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost'].includes(u.hostname)))throw new Error();base=u.origin}catch(e){st.textContent='Enter the rehearsal relay address first.';return}
+    if(keyEl.value.length<24){st.textContent='Enter the private call key.';return}
+    if(Date.now()>armedUntil){armedUntil=Date.now()+10000;st.textContent='This rings five phones. Press again within 10 seconds to start.';return}
+    armedUntil=0;st.textContent='Starting the drill...';
+    try{const r=await fetch(base+'/voice/incident',{method:'POST',headers:{'Content-Type':'application/json','x-insiyab-key':keyEl.value},body:JSON.stringify(DRILL_INCIDENT)});
+      keyEl.value='';
+      if(r.status===403){st.textContent='Refused: the call key is wrong.';return}
+      const j=await r.json().catch(()=>({}));
+      if(!r.ok){st.textContent='Not started: '+(j.error||('status '+r.status));return}
+      st.textContent=j.error?('Not started: '+j.error):'Drill started. Calls are going out now. Connect with the viewing key to follow it.';
+    }catch(e){keyEl.value='';st.textContent='Could not reach the relay. Is it running and is the address right?'}
+  };
   document.getElementById('connect').onclick=()=>{
     sampleTimers.forEach(clearTimeout);sampleMode=false;connectionVersion++;renderState({phase:'idle',timeline:[],reports:{},acknowledgements:{}});viewKey=document.getElementById('view-key').value;
     try{const u=new URL(document.getElementById('relay-url').value);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost'].includes(u.hostname)))throw new Error();if(u.username||u.password||u.search||u.hash)throw new Error();if(viewKey.length<24)throw new Error();STATE_URL=u.origin+'/voice/state/authenticated';poll()}catch{STATE_URL='';document.getElementById('mode').textContent='Enter an HTTPS relay address (or localhost) and the private viewing key.'}

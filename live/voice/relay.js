@@ -879,17 +879,17 @@ const server = http.createServer(async (req, res) => {
       const got = Buffer.from(String(req.headers['x-insiyab-key'] || ''));
       const want = Buffer.from(SHARED_KEY);
       if (!SHARED_KEY || SHARED_KEY.length < 24 || got.length !== want.length || !crypto.timingSafeEqual(got, want)) {
-        return send(res, 403, 'application/json', '{"error":"forbidden"}');
+        return send(res, 403, 'application/json', '{"error":"forbidden"}', cors);
       }
       let body;
-      try { body = JSON.parse(await readBody(req, 8000)); } catch (e) { return send(res, 400, 'application/json', '{"error":"bad request"}'); }
-      if (!body || body.drill !== true || !body.route || !Array.isArray(body.options) || body.options.length < 1) return send(res, 400, 'application/json', '{"error":"incident must be a drill with a route and options"}');
+      try { body = JSON.parse(await readBody(req, 8000)); } catch (e) { return send(res, 400, 'application/json', '{"error":"bad request"}', cors); }
+      if (!body || body.drill !== true || !body.route || !Array.isArray(body.options) || body.options.length < 1) return send(res, 400, 'application/json', '{"error":"incident must be a drill with a route and options"}', cors);
       const result = await startRelay(body);
-      return send(res, 200, 'application/json', JSON.stringify(result));
+      return send(res, 200, 'application/json', JSON.stringify(result), cors);
     }
 
     // OPTIONS preflight for the console (CORS)
-    if (req.method === 'OPTIONS' && ['/voice/state','/voice/state/authenticated'].includes(p)) {
+    if (req.method === 'OPTIONS' && ['/voice/state','/voice/state/authenticated','/voice/incident'].includes(p)) {
       return send(res, 204, 'text/plain', '', cors);
     }
 
