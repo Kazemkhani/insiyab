@@ -167,8 +167,8 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 
 <header id="film">
   <p class="ey2">Student prototype · RTA Future Move Hackathon · One service day</p>
-  <h1>Why does the evening<br>fall behind?</h1>
-  <p class="opening">Dubai’s bus records show much more lateness in the evening. When a trip overruns its timetable and the break before the next trip, the delay carries forward. Insiyab tests a trip-time forecast and gives planners a measured list of routes and hours that need attention. A separate control-room drill shows how AI can gather updates for a human decision.</p>
+  <h1>Six controllers.<br>1,400 buses.</h1>
+  <p class="opening">RTA told us six controllers in the bus control centre oversee about 1,400 buses a shift, and coordinate staff, depots and events largely by phone. On one recorded day, late departures rose from 19 to 45 per cent in the evening at a similar crowd, and the delay was handed on from trip to trip. Insiyab is a co-pilot for that room: it flags the route-hours at risk, does the calling, and gives the controller one short briefing to decide on. <b>A person always decides.</b></p>
   <div class="row"><a class="btn" href="#film-player">Watch the film</a><a class="btn" href="#descent">Explore the animated bus journey</a></div>
   <section class="film-player" id="film-player" aria-label="The film"><p><strong>The film · two and a half minutes</strong><br>The evening problem on RTA's recorded day, the planner's tool in Dataiku, and how Insiyab supports the control centre when a bus runs late. Figures from 15 December 2025; the 19:23 departure and the control-centre incident are labelled illustrations.</p><video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="Insiyab film: the evening problem, the planner tool and the control-centre co-pilot"></video><p id="fgone" hidden>The film could not load. You can still explore the bus journey below.</p><a class="btn" href="#descent">Continue into the bus journey</a></section>
 </header>
@@ -289,11 +289,12 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 <section id="answer">
   <div class="wrap">
     <p class="ey reveal">Our answer</p>
-    <h2 class="big reveal">Forecast the real evening.<br><span>Tell the planner where to give it time.</span></h2>
+    <h2 class="big reveal">A co-pilot for the control centre.<br><span>It makes the calls. A person decides.</span></h2>
     <div class="steps reveal">
       <div><p class="k">A forecast</p><b class="s">30 min</b><h3>before each trip: how long will it really take?</h3><p>15% closer than the timetable, 16:00 to 19:00, on an evening it never saw.</p></div>
       <div><p class="k">A worklist</p><b>244</b><h3>hours of missing driving time, as minutes per route and hour.</h3><p>Measured from the day, not predicted. The planner accepts or sets aside each row.</p></div>
-      <div><p class="k">A second ranking</p><b>695</b><h3>boardings in one hour on route C01 at 18:00, with 85% of departures late.</h3><p>Where lateness reaches the most passengers.</p></div>
+      <div><p class="k">The calls</p><b class="s">1 brief</b><h3>for the controller: driver, depot and station asked at once, three options, no ranking.</h3><p>The controller chooses; Insiyab relays the choice and records who received it. Shown as a labelled drill.</p></div>
+      <div><p class="k">Small events</p><b class="s">This week</b><h3>which spare buses to use for crowds of hundreds to a few thousand.</h3><p>Taken from the least-busy route-hours, never below one bus per route. Only as good as the attendance figure it is given.</p></div>
     </div>
   </div>
 </section>
@@ -403,15 +404,15 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 <section>
   <div class="wrap">
     <p class="ey reveal">Who uses it</p>
-    <h2 class="big reveal">A planner.<br><span>Every timetable change.</span></h2>
-    <p class="lede reveal">RTA changes timetables every one to two months and routes four times a year. Each night adds a day of records. Before each change, a planner opens the worklist, sees where the evening runs long, and decides how much time to give it. <b>Boardings, never people "waiting".</b> Nothing about one card, one driver or one vehicle is shown.</p>
+    <h2 class="big reveal">The control centre.<br><span>And the planners behind it.</span></h2>
+    <p class="lede reveal"><b>On the day:</b> the duty controller gets one briefing instead of many phone calls, and decides. <b>This week:</b> the event team plans the small events nobody has time for today. <b>Each timetable change</b>, every one to two months: the planner opens the worklist and decides how much time each route and hour needs. <b>Boardings, never people "waiting".</b> Nothing about one card, one driver or one vehicle is shown.</p>
   </div>
 </section>
 
 <section class="ask">
   <div class="wrap">
-    <h2 class="big reveal">Give the evening<br>its time.</h2>
-    <p class="lede reveal">About <b>244 bus hours</b> of extra running time from 16:00 to 18:59 is the measured planning shortfall at the 85th percentile. It is not a model-produced saving or a guarantee for another day. About 630 bus hours across the whole day.</p>
+    <h2 class="big reveal">The controller decides.<br>Insiyab does the calling.</h2>
+    <p class="lede reveal">Next step: a pilot with one control-centre shift on selected routes, with more days of records and Dubai's open data, measuring the controller's time on calls rather than assuming it. Today's evidence is one day: about <b>244 bus hours</b> of trip time the evening timetable does not hold (16:00 to 18:59, measured, not a saving).</p>
     <p class="reveal" style="margin-top:40px"><a class="btn" id="live" href="https://dss-8a0eac1b-a0da2b15-dku.eu-west-2.app.dataiku.io/projects/INSIYAB/webapps/kvDViy2_insiyab/view" target="_blank" rel="noopener">Now see it live in Dataiku</a></p>
     <p class="reveal" style="margin-top:14px;font-size:13px;opacity:.75">Opens the planner's web app on the real day. It asks for a Dataiku sign-in.</p>
   </div>

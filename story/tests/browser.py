@@ -12,7 +12,7 @@ with sync_playwright() as p:
   c=b.new_context(viewport={'width':w,'height':h},offline=True,reduced_motion='reduce' if reduced else 'no-preference')
   page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   page.goto(site.as_uri()+'/index.html');page.wait_for_timeout(500)
-  check('Why does the evening' in page.locator('#film h1').inner_text(),f'{w}: clear opening problem before concept film')
+  check('Six controllers' in page.locator('#film h1').inner_text(),f'{w}: clear opening problem before the film')
   check(page.locator('#fv').is_visible(),f'{w}: film player is visible without expanding a hidden section')
   check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),f'{w}: no page overflow')
   if reduced:
