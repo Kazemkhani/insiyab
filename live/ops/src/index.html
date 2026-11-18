@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en-GB">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Insiyab Live | Operations console</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><script defer src="app.js"></script></head>
+<body>
+<header class="masthead"><div class="identity"><div class="logo"><!-- LOGO --></div><h1>Insiyab <strong>Live</strong></h1></div><p>Route network<br><span>15 Dec 2025 replay</span></p><div class="mode-label">Demo mode<br><span>Simulated calls. Nobody is connected.</span></div></header>
+<div id="fixture-banner" class="data-banner" hidden>Stand-in alerts · STAND-IN DATA, NOT A RESULT</div>
+<div id="escalation" role="status" hidden></div>
+<main class="workspace">
+<section class="map-column" aria-label="Network replay"><div class="map-heading"><h2>THE EVENING, AHEAD</h2><span id="replay-clock">16:00</span></div><div class="map-stage"><div id="map" aria-label="Dubai route network"></div><p id="map-note">Network replay loads here.</p><div class="map-credit">© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></div></div><div id="judge-pick"></div></section>
+<aside class="decision-panel" aria-label="Controller decisions"><section id="now"><h2>NOW</h2><p>Waiting for the alert file.</p></section><section id="suggested"><h2>Suggested</h2><p>The controller reviews the options.</p></section><section id="calls"><h2>CALLS</h2><p>No decision has been issued.</p></section><details id="next"><summary>NEXT</summary><p>No other alerts loaded.</p></details></aside>
+</main>
+<footer><div class="timeline"><span>16:00</span><input id="time" aria-label="Service-day time" type="range" min="57600" max="72000" value="57600" step="1"><span>20:00</span><button id="replay" disabled>Replay</button><button id="demo" disabled>Demo mode</button></div><p class="legal">Student prototype built for the RTA Future Move Hackathon. A controller decides. A driver drives.</p></footer>
+</body></html>
