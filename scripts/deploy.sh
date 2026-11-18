@@ -64,10 +64,10 @@ if [ -f "$WORK/src/story/index.html" ]; then
     [ -e "$UP/pitch" ] && stop "a build wrote something under pitch/: that address belongs to the pitch page"
     ln -s "$ROOT/web/node_modules" "$WORK/src/web/node_modules" || stop "could not link pinned build dependencies"
     node "$WORK/src/story/build.mjs" --out "$UP/pitch" || stop "pitch build failed"
-    FILM="${INSIYAB_FILM:-$HOME/work/insiyab-run/film/comic/Insiyab-comic.mp4}"
+    FILM="${INSIYAB_FILM:-$HOME/work/insiyab-run/film/Insiyab-pitch-film-v3.mp4}"
     if [ -f "$FILM" ]; then cp "$FILM" "$UP/pitch/film.mp4"; echo "NOTE the pitch page is in this deploy at /pitch/, with the film"
     else echo "NOTE the pitch page is in this deploy at /pitch/, WITHOUT the film: $FILM does not exist"; fi
-    FLOWFILM="${INSIYAB_FLOW_FILM:-$HOME/work/insiyab-run/film/flow/Insiyab-flow-v2.mp4}"
+    FLOWFILM="${INSIYAB_FLOW_FILM:-$HOME/work/insiyab-run/film/flow-hd2/Insiyab-flow-hd2.mp4}"
     if [ -f "$FLOWFILM" ]; then cp "$FLOWFILM" "$UP/pitch/film-flow.mp4"; echo "NOTE the Dataiku Flow film is in this deploy"
     else echo "NOTE the Dataiku Flow film is NOT in this deploy: $FLOWFILM does not exist"; fi
     CALLFILM="${INSIYAB_CALL_FILM:-$HOME/work/insiyab-run/film/insert/Insiyab-insert-v2.mp4}"
