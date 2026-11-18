@@ -75,6 +75,15 @@ if [ -f "$WORK/src/story/index.html" ]; then
     else echo "NOTE the calling drill film is NOT in this deploy: $CALLFILM does not exist"; fi
   else echo "NOTE the pitch page is NOT in this deploy: its figures are real totals and no yes is recorded in docs/REQUIREMENTS.md"; fi
 fi
+# The operations console (live/ops/, stream A1): built only once its build script exists. It ships in demo mode;
+# live mode needs the presenter key in the URL fragment and the guarded relay, so a visitor can never place a call.
+if [ -f "$WORK/src/live/ops/build.mjs" ]; then
+  [ -e "$UP/ops" ] && stop "a build wrote something under ops/: that address belongs to the console"
+  [ -e "$WORK/src/web/node_modules" ] || ln -s "$ROOT/web/node_modules" "$WORK/src/web/node_modules" || stop "could not link pinned build dependencies"
+  node "$WORK/src/live/ops/build.mjs" --out "$UP/ops" || stop "console build failed"
+  [ -s "$UP/ops/index.html" ] || stop "the console build has no index.html"
+  echo "NOTE the operations console is in this deploy at /ops/"
+else echo "NOTE this deploy has no operations console yet (live/ops/build.mjs does not exist)"; fi
 # The deployer's own files: the page asks not to be indexed whatever the builds contain, and says which commit it is.
 [ -f "$UP/vercel.json" ] || cat > "$UP/vercel.json" <<'JSON'
 {"headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"}, {"key": "X-Content-Type-Options", "value": "nosniff"}]}]}
