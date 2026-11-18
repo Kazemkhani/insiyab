@@ -11,10 +11,19 @@
   "buses_running": 8,
   "buses_needed_by_rule": 17,
   "options": [
-    {"key": "send_spare", "say": "send the standby bus to route 310"},
-    {"key": "hold", "say": "hold the next departure two minutes to even the gap"},
-    {"key": "none", "say": "take no action and watch"}
+    {
+      "key": "send_spare",
+      "say": "send the standby bus to route 310"
+    },
+    {
+      "key": "hold",
+      "say": "hold the next departure two minutes to even the gap"
+    },
+    {
+      "key": "none",
+      "say": "take no action and watch"
+    }
   ],
-  "source": "Insiyab forecast and RTA's planning rule, service day 15 December 2025",
+  "source": "SIMULATED drill conditions. Rounded route 310 times are based on recorded-day medians, not a live forecast. Availability, current delay and service options are invented for rehearsal.",
   "drill": true
 }

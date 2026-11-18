@@ -62,7 +62,8 @@ fi
 if [ -f "$WORK/src/story/index.html" ]; then
   if [ "$YES" = "1" ]; then
     [ -e "$UP/pitch" ] && stop "a build wrote something under pitch/: that address belongs to the pitch page"
-    mkdir "$UP/pitch"; cp "$WORK/src/story/index.html" "$UP/pitch/index.html"
+    ln -s "$ROOT/web/node_modules" "$WORK/src/web/node_modules" || stop "could not link pinned build dependencies"
+    node "$WORK/src/story/build.mjs" --out "$UP/pitch" || stop "pitch build failed"
     FILM="${INSIYAB_FILM:-$HOME/work/insiyab-run/film/comic/Insiyab-comic.mp4}"
     if [ -f "$FILM" ]; then cp "$FILM" "$UP/pitch/film.mp4"; echo "NOTE the pitch page is in this deploy at /pitch/, with the film"
     else echo "NOTE the pitch page is in this deploy at /pitch/, WITHOUT the film: $FILM does not exist"; fi
@@ -83,7 +84,7 @@ if grep -rElI "$PATTERNS" "$UP"; then stop "the upload matches a secret pattern 
 echo "PASS secret scan (self-tested with a planted fake)"
 
 # 7. Each private value on this machine, searched for by its real value and never printed.
-for envfile in "$HOME/.config/marsad/twilio.env" "$HOME/.config/insiyab/presenter.env"; do
+for envfile in "$HOME/.config/marsad/twilio.env" "$HOME/.config/insiyab/presenter.env" "$HOME/.config/insiyab/voice.env" "$HOME/.config/insiyab/elevenlabs.env"; do
   [ -f "$envfile" ] || continue
   while IFS='=' read -r _ v; do v="${v%\"}"; v="${v#\"}"; [ "${#v}" -gt 5 ] && grep -rqF -- "$v" "$UP" && stop "the upload contains a private value from this machine"; done < "$envfile"
 done

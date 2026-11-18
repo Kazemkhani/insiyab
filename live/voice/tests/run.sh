@@ -26,6 +26,8 @@ run_test "Full relay end to end"               "tests/voice-relay.test.js"
 run_test "No-answer handling"                  "tests/voice-noanswer.test.js"
 run_test "State sanitisation and folder scan"  "tests/voice-state.test.js"
 
+run_test "Five-person relay and call ceiling" "tests/voice-five.test.js"
+
 echo ""
 echo "Tests run: $((PASS + FAIL))  Passed: $PASS  Failed: $FAIL"
 if [ "$FAIL" -eq 0 ]; then

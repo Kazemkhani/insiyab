@@ -26,8 +26,8 @@
      node live/voice/relay.js --setup-agents             print and (if armed+live) create the ElevenLabs agents
      node live/voice/relay.js --import-number            check and (if armed+live) import the Twilio number
 
-   GET /voice/state  returns the timeline by ROLE: who was called, what was reported, the decision,
-                     timestamps. No phone number and no name from the numbers file appears in the response.
+   GET /voice/state returns event status by role only; no free-text reports or incident details.
+   GET /voice/state/authenticated requires the private viewing key for rehearsal details.
 */
 'use strict';
 const http = require('http');
@@ -62,6 +62,7 @@ const PHONE_ID = cfg('ELEVENLABS_PHONE_NUMBER_ID');
 const VOICE_ID = cfg('ELEVENLABS_VOICE_ID');
 const VOICE_MODEL = cfg('ELEVENLABS_VOICE_MODEL') || 'eleven_v4_turbo';
 const SHARED_KEY = cfg('VOICE_SHARED_KEY');
+const VIEW_KEY = cfg('VOICE_VIEW_KEY');
 let PUBLIC_URL = cfg('VOICE_PUBLIC_URL').replace(/\/+$/, '');
 
 /* ---------- guards ---------- */
@@ -84,7 +85,7 @@ function numbers() {
     const role = parts[0].trim().toLowerCase();
     const name = parts[1].trim();
     const number = parts[2].trim();
-    if (!['driver', 'depot', 'station', 'manager'].includes(role)) return null;
+    if (!['driver', 'depot', 'station', 'planner', 'manager'].includes(role)) return null;
     if (!/^\+\d{8,15}$/.test(number)) return null;
     return { role, name, number };
   }).filter(Boolean);
@@ -93,9 +94,9 @@ function numbers() {
 /* ---------- secrets and logging ---------- */
 
 function liveSecrets() {
-  return [EL_KEY, SHARED_KEY, cfg('TWILIO_LIVE_AUTH_TOKEN'), cfg('TWILIO_LIVE_ACCOUNT_SID')].filter(Boolean);
+  return [EL_KEY, SHARED_KEY, VIEW_KEY, cfg('TWILIO_LIVE_AUTH_TOKEN'), cfg('TWILIO_LIVE_ACCOUNT_SID')].filter(Boolean);
 }
-const scrub = s => liveSecrets().reduce((x, k) => x.split(k).join('[redacted]'), String(s));
+const scrub = s => [...liveSecrets(), ...numbers().flatMap(n => [n.name,n.number])].filter(Boolean).reduce((x, k) => x.split(k).join('[redacted]'), String(s)).replace(/\+\d[\d ()-]{7,}\d/g,'[phone redacted]');
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), scrub(a.join(' ')));
 
 /* ---------- ElevenLabs API ---------- */
@@ -134,13 +135,22 @@ function addTimeline(event) {
 }
 
 // Return state stripped of any name or number from the numbers file.
-function publicState() {
+function privateState() {
   const nums = numbers();
   const toRemove = new Set(nums.flatMap(n => [n.name, n.number]).filter(Boolean));
-  if (!toRemove.size) return state;
+  if (!toRemove.size) return JSON.parse(scrub(JSON.stringify(state)));
   let str = JSON.stringify(state);
   for (const val of toRemove) str = str.split(val).join('[redacted]');
-  return JSON.parse(str);
+  return JSON.parse(scrub(str));
+}
+
+// Public status deliberately contains no free text from people or posted incidents.
+function publicState() {
+  return {since:state.since,phase:state.phase,outcome:state.outcome||null,
+    reports:Object.fromEntries(Object.entries(state.reports).map(([role,r])=>[role,r?{received:true,at:r.at}:null])),
+    decision:state.decision?{recorded:true,at:state.decision.at}:null,
+    acknowledgements:Object.fromEntries(Object.entries(state.acknowledgements).map(([role,a])=>[role,{at:a.at}])),
+    timeline:state.timeline.map(e=>({event:e.event,role:e.role,at:e.at}))};
 }
 
 /* ---------- tool handling ---------- */
@@ -152,14 +162,23 @@ const TOOL_SECRET = (() => {
 
 const clean = (s, n) => String(s == null ? '' : s).replace(/[<>{}]/g, '').replace(/\s+/g, ' ').trim().slice(0, n);
 
+const callTokens = new Map();
+let callCount = 0;
 function handleTool(toolPath, body) {
+  const binding = callTokens.get(body.call_token);
+  const expectedPhase = {report:'check',decision:'manager',acknowledge:'callout'}[toolPath];
+  if (!binding || binding.run !== state.since || binding.phase !== expectedPhase || state.phase !== expectedPhase)
+    return {result:'This call is not authorised for the current step. No change was recorded.'};
+  if (toolPath !== 'decision' && body.role !== binding.role)
+    return {result:'The role does not match this call. No change was recorded.'};
   if (toolPath === 'report') {
     const role = clean(body.role, 20).toLowerCase();
     const report = clean(body.report, 300);
     if (!report) return { result: 'Please say what you see or confirm, then call insiyab_report again.' };
-    if (!['driver', 'depot', 'station'].includes(role)) return { result: 'Unexpected role. Pass driver, depot or station.' };
-    state.reports[role] = { report, at: new Date().toISOString() };
-    addTimeline({ event: 'report', role, report });
+    if (!['driver', 'depot', 'station', 'planner'].includes(role)) return { result: 'Unexpected role. Pass driver, depot, station or planner.' };
+    if (state.reports[role]) return {result:'This report is already recorded.'};
+    state.reports[role] = { report: scrub(report), at: new Date().toISOString() };
+    addTimeline({ event: 'report', role, report: scrub(report) });
     log('report from', role + ':', report);
     return { result: 'Logged. I am briefing the duty manager now. Say goodbye and call end_call.' };
   }
@@ -169,15 +188,17 @@ function handleTool(toolPath, body) {
     if (!option_key) return { result: 'Please say which option you choose, then call insiyab_decision again.' };
     const opts = (state.incident && state.incident.options) || [];
     const option = opts.find(o => o.key === option_key);
-    const say = option ? option.say : option_key;
-    state.decision = { option_key, say, words, at: new Date().toISOString() };
-    addTimeline({ event: 'decision', option_key, say, words });
+    if (!option) return {result:'Choose one of the offered option keys. No decision was recorded.'};
+    if (state.decision) return {result:'A decision is already recorded and cannot be replaced by this call.'};
+    const say = option.say;
+    state.decision = { option_key, say, words: scrub(words), at: new Date().toISOString() };
+    addTimeline({ event: 'decision', option_key, say, words: scrub(words) });
     log('decision:', option_key, '|', words);
     return { result: 'Recorded: ' + say + (words ? '. ' + words : '') + '. Say goodbye and call end_call.' };
   }
   if (toolPath === 'acknowledge') {
     const role = clean(body.role, 20).toLowerCase();
-    if (!['driver', 'depot', 'station'].includes(role)) return { result: 'Unexpected role.' };
+    if (!['driver', 'depot', 'station', 'planner'].includes(role)) return { result: 'Unexpected role.' };
     state.acknowledgements[role] = { at: new Date().toISOString() };
     addTimeline({ event: 'acknowledged', role });
     log('acknowledged:', role);
@@ -192,6 +213,7 @@ const AGENT_NAMES = {
   driver:  'Insiyab relay: driver check',
   depot:   'Insiyab relay: depot check',
   station: 'Insiyab relay: station check',
+  planner: 'Insiyab relay: planner check',
   manager: 'Insiyab relay: manager',
   back:    'Insiyab relay: call back',
 };
@@ -217,14 +239,16 @@ async function loadAgents() {
 
 /* ---------- tool definitions (for --setup-agents) ---------- */
 
-const DRILL_PREFIX = 'This is a drill by a student team for the RTA Future Move Hackathon. Nothing said will be acted on.';
-const STYLE = 'Style: calm, one short sentence per reply, under 20 words. Never invent details. Reply in the language the person speaks.';
+const CALL_INTRO = 'Hello {{person_name}}, this is Insiyab, the AI operations assistant.';
+const DEMO_CONTEXT = 'Internal context: consenting team members are presenting a simulated control-room scenario for the RTA Future Move Hackathon. Keep the conversation natural. Do not announce or repeat a drill disclaimer. If asked, answer honestly that this is a demonstration.';
+const STYLE = 'Use call_token {{call_token}} exactly in every tool call. Address the person as {{person_name}}. Style: calm, one short sentence per reply, under 20 words. Never speak stage directions or emotion tags. Never invent details. Reply in the language the person speaks.';
 const SAFETY_RULES = `Rules:
-- ${DRILL_PREFIX}
+- ${DEMO_CONTEXT}
 - The agent informs and records. It instructs nobody. It never claims to be RTA.
 - If the person reports a real emergency, tell them to call 999 and call end_call.
 - If the person is silent twice, say goodbye and call end_call.
-- Calls are capped at 90 seconds.`;
+- If they decline the drill, say goodbye and call end_call.
+- Keep the conversation concise; the system enforces the call duration limit.`;
 
 const INCIDENT_BLOCK = `Incident (from the system):
 Route {{route}}, direction {{direction}}, scheduled {{hour}}.
@@ -236,8 +260,8 @@ Source: {{source}}.`;
 const AGENT_SPECS = {
   driver: {
     max: 90,
-    first: `${DRILL_PREFIX} Route {{route}}, direction {{direction}}, scheduled {{hour}}: the forecast shows this trip taking {{expected_minutes}} minutes against {{planned_minutes}} planned. What is holding you right now?`,
-    prompt: `${DRILL_PREFIX}
+    first: `${CALL_INTRO} For route {{route}}, can the bus continue, and what return delay should the manager plan for?`,
+    prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the driver of route {{route}}.
 
@@ -256,8 +280,8 @@ ${SAFETY_RULES}`,
   },
   depot: {
     max: 90,
-    first: `${DRILL_PREFIX} Route {{route}} at {{hour}} is running {{minutes_late_now}} minutes late; {{buses_running}} buses are running and the rule calls for {{buses_needed_by_rule}}. Is a standby bus and driver free, and how soon could they be at the route?`,
-    prompt: `${DRILL_PREFIX}
+    first: `${CALL_INTRO} is a spare bus available for route {{route}}, and what checks or preparation would it need?`,
+    prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the depot or standby controller.
 
@@ -276,8 +300,8 @@ ${SAFETY_RULES}`,
   },
   station: {
     max: 90,
-    first: `${DRILL_PREFIX} Route {{route}}, direction {{direction}}, at {{hour}}: {{minutes_late_now}} minutes late, {{boardings_this_hour}} boardings this hour, next bus in {{next_bus_in_minutes}} minutes. How many passengers are waiting at the stop right now, roughly?`,
-    prompt: `${DRILL_PREFIX}
+    first: `${CALL_INTRO} what departure information should passengers receive while the manager considers route {{route}}?`,
+    prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the station supervisor.
 
@@ -286,27 +310,40 @@ ${INCIDENT_BLOCK}
 ${STYLE}
 
 What to do:
-- Your opening asked how many passengers are at the stop. Listen.
-- Ask at most one follow-up: whether the platform is crowded and passengers are asking about the delay.
+- Your opening asked what departure information passengers need. Listen. Do not infer a waiting-person count from boardings.
+- Ask at most one follow-up: whether the departure information needs updating.
 - Call insiyab_report with a one or two sentence summary in their own words and role "station".
 - Then say "Logged. I am briefing the duty manager now." Say goodbye and call end_call.
 - If they cannot say yet, report that with the reason.
 
 ${SAFETY_RULES}`,
   },
-  manager: {
+  planner: {
     max: 90,
-    first: `${DRILL_PREFIX} Route {{route}}, direction {{direction}}, {{hour}}: planned {{planned_minutes}} minutes, expected {{expected_minutes}}, running {{minutes_late_now}} late. {{staff_reports}} RTA's dispatch test: the next bus is in {{next_bus_in_minutes}} minutes and none follows within the route's frequency. Options: {{options_text}}. Which do you choose?`,
-    prompt: `${DRILL_PREFIX}
+    first: `${CALL_INTRO} What does the route {{route}} evidence support, and what still needs checking?`,
+    prompt: `${DEMO_CONTEXT}
+You are speaking to the planning analyst in a simulated control-room exercise.
+${INCIDENT_BLOCK}
+Ask for the evidence and its limits. The recorded-day running times are not a live forecast. Do not infer an available spare, seat capacity or passenger count from a timetable. Record what the person says using insiyab_report with role planner.
+${STYLE}
+${SAFETY_RULES}`,
+  },
+  manager: {
+    max: 150,
+    first: `${CALL_INTRO} Route {{route}} needs a decision. May I brief you on the staff reports and options?`,
+    prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the duty manager.
 
 ${INCIDENT_BLOCK}
 
+Private team roster (names and roles only):
+{{team_roster}}
+
 Staff reports received just before this call:
 {{staff_reports}}
 
-RTA's dispatch test: the next bus is in {{next_bus_in_minutes}} minutes. The next bus is at or near capacity and no further bus follows within the route's frequency.
+Do not assert a dispatch rule, spare availability or bus capacity unless a staff report confirms it. A manager may choose no action.
 
 Options available:
 {{options_text}}
@@ -314,8 +351,8 @@ Options available:
 ${STYLE}
 
 What to do:
-- Your opening gave the incident, the staff reports, the dispatch test and the options, and asked which to choose.
-- Listen for a choice. If the choice is unclear, name the options once more and ask again.
+- Your opening asked permission to brief them. If they agree, summarise the reports in at most 45 words, clearly naming missing reports. Explain the available options in plain words without reading option keys. Ask which option they choose. Do not choose for them.
+- Accept a clear option name, its number, or "the first/second/third option" as a choice. Record it immediately; do not ask a second confirmation of an unambiguous choice. If unclear, ask one short clarification. Do not infer consent from unrelated words or silence.
 - Call insiyab_decision with the option key (send_spare, hold, or none) and any additional words the manager said.
 - Then say "Recorded. I will brief the team." Say goodbye and call end_call.
 - If the manager asks a question you cannot answer from the incident, say the system has no more detail on that.
@@ -324,8 +361,8 @@ ${SAFETY_RULES}`,
   },
   back: {
     max: 90,
-    first: `${DRILL_PREFIX} Message from the duty manager about route {{route}}: {{decision_text}}. Can you confirm?`,
-    prompt: `${DRILL_PREFIX}
+    first: `${CALL_INTRO} The duty manager chose: {{decision_text}}. Can you confirm you received that?`,
+    prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are calling {{staff_role}} back with the duty manager's decision about route {{route}}.
 
@@ -339,7 +376,7 @@ What to do:
 - Your opening passed the decision and asked for confirmation. Listen.
 - When they confirm (okay, copy, will do, on it, understood): call insiyab_acknowledge with their role ({{staff_role}}), say "Logged", say goodbye and call end_call.
 - If they have a question, answer only from the decision text above.
-- If they give an update, note it and say the manager has been briefed.
+- If they give a new update or disagree, say it has not been relayed to the manager. Do not acknowledge on their behalf. Ask them to contact the duty manager directly.
 - If they say nothing, repeat the decision once; if still nothing, say goodbye and call end_call.
 
 ${SAFETY_RULES}`,
@@ -349,6 +386,7 @@ ${SAFETY_RULES}`,
 /* ---------- calls ---------- */
 
 async function callOne(to, variables, agentId) {
+  if (++callCount > 9) throw new Error('Rehearsal call limit reached; restart only for an approved new run.');
   const r = await EL('/v1/convai/twilio/outbound-call', {
     method: 'POST',
     body: JSON.stringify({
@@ -375,7 +413,9 @@ async function placeAll(people, varsFor, agentIdOf, step) {
       const p = people[i];
       const agentId = typeof agentIdOf === 'function' ? agentIdOf(p) : agentIdOf;
       try {
-        const c = await callOne(p.number, varsFor(p), agentId);
+        const call_token = crypto.randomBytes(24).toString('hex');
+        callTokens.set(call_token,{role:p.role,phase:state.phase,run:state.since});
+        const c = await callOne(p.number, {...varsFor(p),person_name:p.name,staff_role:p.role,call_token}, agentId);
         results[i] = { ok: true, person: p, ...c };
         log(step + ': call placed for', p.role, c.sid || '', c.conversation || '');
       } catch (e) {
@@ -409,7 +449,9 @@ let relayRunning = false;
 async function startRelay(incident) {
   if (relayRunning) return { skipped: 'A relay is already running.' };
   relayRunning = true;
+  if (allGuards() && callCount) { relayRunning=false; return {skipped:'One live rehearsal per process. Restart only when the team is ready for another.'}; }
   resetState(incident);
+  callTokens.clear();
   log('relay: incident', incident.id || '', 'route', incident.route, 'at', incident.hour);
 
   if (!allGuards()) {
@@ -420,10 +462,11 @@ async function startRelay(incident) {
 
   // Run asynchronously so the HTTP response returns immediately
   runLiveRelay(incident).catch(e => {
-    log('relay error:', scrub(e.message));
+    state.outcome='failed'; addTimeline({event:'relay_failed'}); log('relay error:', scrub(e.message));
   }).finally(() => {
     relayRunning = false;
     state.phase = 'done';
+    state.outcome ||= state.decision ? 'incomplete' : 'no_decision';
   });
 
   return { started: true };
@@ -432,12 +475,15 @@ async function startRelay(incident) {
 async function runLiveRelay(incident) {
   const nums = numbers();
   const staff = nums.filter(n => n.role !== 'manager');
+  const required = cfg('VOICE_ROSTER_SIZE')==='4' ? ['driver','depot','station','manager'] : ['driver','depot','station','planner','manager'];
+  if(required.some(role=>!nums.some(n=>n.role===role)) || nums.length!==required.length){state.outcome='configuration_error';log('relay: incomplete roster; no calls placed');return;}
   const manager = nums.find(n => n.role === 'manager');
 
+  if (nums.filter(n=>n.role==='manager').length !== 1 || new Set(nums.map(n=>n.role)).size !== nums.length || new Set(nums.map(n=>n.number)).size !== nums.length) { state.outcome='configuration_error'; log('relay: use one manager and one distinct person per role'); return; }
   if (!manager) { log('relay: no manager role in numbers file'); return; }
   if (!staff.length) { log('relay: no staff roles in numbers file'); return; }
 
-  const missing = ['driver', 'depot', 'station', 'manager', 'back'].filter(k => !AGENTS[k]);
+  const missing = [...new Set([...staff.map(p=>p.role),'manager','back'])].filter(k => !AGENTS[k]);
   if (missing.length) { log('relay: agents not ready (' + missing.join(', ') + '). Run --setup-agents first.'); return; }
 
   state.phase = 'check';
@@ -490,7 +536,7 @@ async function runLiveRelay(incident) {
   state.phase = 'manager';
   const step2 = await placeAll(
     [manager],
-    p => ({ ...incVars, staff_reports, options_text }),
+    p => ({ ...incVars, staff_reports, options_text, team_roster: nums.map(n=>n.role+": "+n.name).join("; ") }),
     p => AGENTS.manager,
     'manager',
   );
@@ -543,7 +589,8 @@ async function runLiveRelay(incident) {
   }
 
   state.phase = 'done';
-  log('relay: done');
+  state.outcome=calledBackRoles.every(r=>state.acknowledgements[r]) && staff.every(r=>state.reports[r.role]) ? 'complete' : 'incomplete';
+  log('relay:', state.outcome);
 }
 
 function incidentVars(incident) {
@@ -565,7 +612,7 @@ function incidentVars(incident) {
 /* ---------- rehearsal mode ---------- */
 
 function runRehearsal(incident) {
-  console.log('\nREHEARSAL - guards not all met. No calls will be made.');
+  console.log('\nREHEARSAL - RTA Future Move Hackathon. Guards not all met. No calls will be made.');
   const reasons = [
     !guardLive()    && 'process not started with --live',
     !guardArmed()   && 'INSIYAB_CALLS is not set to "armed"',
@@ -580,19 +627,9 @@ function runRehearsal(incident) {
   console.log('  Boardings: ' + v.boardings_this_hour + ', buses running: ' + v.buses_running + '/' + v.buses_needed_by_rule);
   console.log();
 
-  const roleMessages = {
-    driver:  AGENT_SPECS.driver.first.replace(/{{route}}/g, v.route).replace(/{{direction}}/g, v.direction).replace(/{{hour}}/g, v.hour).replace(/{{expected_minutes}}/g, v.expected_minutes).replace(/{{planned_minutes}}/g, v.planned_minutes),
-    depot:   AGENT_SPECS.depot.first.replace(/{{route}}/g, v.route).replace(/{{hour}}/g, v.hour).replace(/{{minutes_late_now}}/g, v.minutes_late_now).replace(/{{buses_running}}/g, v.buses_running).replace(/{{buses_needed_by_rule}}/g, v.buses_needed_by_rule),
-    station: AGENT_SPECS.station.first.replace(/{{route}}/g, v.route).replace(/{{direction}}/g, v.direction).replace(/{{hour}}/g, v.hour).replace(/{{minutes_late_now}}/g, v.minutes_late_now).replace(/{{boardings_this_hour}}/g, v.boardings_this_hour).replace(/{{next_bus_in_minutes}}/g, v.next_bus_in_minutes),
-  };
-
-  const opts = (incident.options || []).map(o => o.key + ': ' + o.say).join('; ');
-  const managerMsg = AGENT_SPECS.manager.first
-    .replace(/{{route}}/g, v.route).replace(/{{direction}}/g, v.direction).replace(/{{hour}}/g, v.hour)
-    .replace(/{{planned_minutes}}/g, v.planned_minutes).replace(/{{expected_minutes}}/g, v.expected_minutes)
-    .replace(/{{minutes_late_now}}/g, v.minutes_late_now).replace(/{{next_bus_in_minutes}}/g, v.next_bus_in_minutes)
-    .replace('{{staff_reports}}', '[staff reports would appear here]')
-    .replace('{{options_text}}', opts);
+  const renderFirst = (role,extra={}) => AGENT_SPECS[role].first.replace(/{{(\w+)}}/g,(_,key)=>String(({...v,person_name:role,...extra})[key] || '['+key+']'));
+  const roleMessages = Object.fromEntries(['driver','depot','station','planner'].map(role=>[role,renderFirst(role)]));
+  const managerMsg = renderFirst('manager');
 
   console.log('Step 1 - Would call each staff role at the same time:');
   for (const [role, msg] of Object.entries(roleMessages)) {
@@ -608,7 +645,7 @@ function runRehearsal(incident) {
     ? incident.options[0].say
     : 'the manager\'s decision';
   console.log('Step 3 - Would call back each staff role with the decision:');
-  console.log('  DRIVER/DEPOT/STATION: "' + DRILL_PREFIX + ' Message from the duty manager about route ' + v.route + ': ' + decisionExample + '. Can you confirm?"');
+  console.log('  ALL FOUR STAFF: ' + renderFirst('back',{decision_text:decisionExample}));
   console.log();
   console.log('END REHEARSAL');
 }
@@ -641,7 +678,7 @@ async function setupAgents() {
     const toolIds = await ensureTools();
 
     // Build conversation config
-    const toolNames = key === 'driver' || key === 'depot' || key === 'station'
+    const toolNames = ['driver','depot','station','planner'].includes(key)
       ? ['insiyab_report']
       : key === 'manager'
       ? ['insiyab_decision']
@@ -680,8 +717,8 @@ async function setupAgents() {
 async function ensureTools() {
   const toolDefs = [
     { name: 'insiyab_report', path: 'report',
-      description: 'Log a one or two sentence update from a staff member (driver, depot or station). Call this once you have their answer. Pass a summary in their own words and their role.',
-      props: { report: { type: 'string', description: 'One or two sentences: what they see or confirm, in their words' }, role: { type: 'string', description: 'Their role: driver, depot or station' } },
+      description: 'Log a one or two sentence update from a staff member (driver, depot, station or planner). Call this once you have their answer. Pass a summary in their own words and their role.',
+      props: { report: { type: 'string', description: 'One or two sentences: what they see or confirm, in their words' }, role: { type: 'string', description: 'Their role: driver, depot, station or planner' } },
       required: ['report', 'role'] },
     { name: 'insiyab_decision', path: 'decision',
       description: 'Log the duty manager\'s choice. Pass the option key (send_spare, hold, or none) and any additional words they said.',
@@ -689,7 +726,7 @@ async function ensureTools() {
       required: ['option_key'] },
     { name: 'insiyab_acknowledge', path: 'acknowledge',
       description: 'Log a staff acknowledgement of the call back. Pass their role.',
-      props: { role: { type: 'string', description: 'Their role: driver, depot or station' } },
+      props: { role: { type: 'string', description: 'Their role: driver, depot, station or planner' } },
       required: ['role'] },
   ];
 
@@ -708,7 +745,7 @@ async function ensureTools() {
         url: PUBLIC_URL + '/voice/tool/' + t.path,
         method: 'POST',
         request_headers: { 'x-insiyab-tool': TOOL_SECRET },
-        request_body_schema: { type: 'object', description: t.description, properties: t.props, required: t.required },
+        request_body_schema: { type: 'object', description: t.description, properties: {...t.props, call_token:{type:'string',description:'Use the exact call_token provided for this conversation.'}}, required: [...t.required,'call_token'] },
       },
     };
     const id = have.get(t.name);
@@ -780,28 +817,29 @@ const readBody = (req, max) => new Promise((ok, no) => {
   req.on('error', no);
 });
 const send = (res, status, type, body, extra) => { res.writeHead(status, Object.assign({ 'Content-Type': type, 'Cache-Control': 'no-store' }, extra || {})); res.end(body); };
-const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'x-insiyab-key, content-type' };
+const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'x-insiyab-key, x-insiyab-view, content-type' };
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const p = url.pathname;
   try {
+    if(req.method==='GET' && (p==='/' || p==='/voice/')) return send(res,200,'text/html; charset=utf-8',fs.readFileSync(path.join(__dirname,'console.html')));
     // POST /voice/incident - start the relay
     if (req.method === 'POST' && p === '/voice/incident') {
       const got = Buffer.from(String(req.headers['x-insiyab-key'] || ''));
       const want = Buffer.from(SHARED_KEY);
-      if (!SHARED_KEY || SHARED_KEY.length < 8 || got.length !== want.length || !crypto.timingSafeEqual(got, want)) {
+      if (!SHARED_KEY || SHARED_KEY.length < 24 || got.length !== want.length || !crypto.timingSafeEqual(got, want)) {
         return send(res, 403, 'application/json', '{"error":"forbidden"}');
       }
       let body;
       try { body = JSON.parse(await readBody(req, 8000)); } catch (e) { return send(res, 400, 'application/json', '{"error":"bad request"}'); }
-      if (!body || !body.route) return send(res, 400, 'application/json', '{"error":"incident must have a route"}');
+      if (!body || body.drill !== true || !body.route || !Array.isArray(body.options) || body.options.length < 1) return send(res, 400, 'application/json', '{"error":"incident must be a drill with a route and options"}');
       const result = await startRelay(body);
       return send(res, 200, 'application/json', JSON.stringify(result));
     }
 
     // OPTIONS preflight for the console (CORS)
-    if (req.method === 'OPTIONS' && p === '/voice/state') {
+    if (req.method === 'OPTIONS' && ['/voice/state','/voice/state/authenticated'].includes(p)) {
       return send(res, 204, 'text/plain', '', cors);
     }
 
@@ -810,14 +848,13 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, 'application/json', JSON.stringify(publicState()), cors);
     }
 
-    // GET /voice/state?key=... - key-authenticated version for internal tools
+    // Authenticated view; the viewing key cannot start calls.
     if (req.method === 'GET' && p === '/voice/state/authenticated') {
-      const got = Buffer.from(String(req.headers['x-insiyab-key'] || ''));
-      const want = Buffer.from(SHARED_KEY);
-      if (!SHARED_KEY || SHARED_KEY.length < 8 || got.length !== want.length || !crypto.timingSafeEqual(got, want)) {
-        return send(res, 403, 'text/plain', 'Forbidden.');
-      }
-      return send(res, 200, 'application/json', JSON.stringify(publicState()));
+      const view=String(req.headers['x-insiyab-view']||'');
+      const admin=String(req.headers['x-insiyab-key']||'');
+      const equal=(a,b)=>b.length>=24 && Buffer.byteLength(a)===Buffer.byteLength(b) && crypto.timingSafeEqual(Buffer.from(a),Buffer.from(b));
+      if (!equal(view,VIEW_KEY) && !equal(admin,SHARED_KEY)) return send(res,403,'application/json','{"error":"forbidden"}',cors);
+      return send(res,200,'application/json',JSON.stringify(privateState()),cors);
     }
 
     // POST /voice/tool/:name - ElevenLabs webhook tool calls

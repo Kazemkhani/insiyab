@@ -26,6 +26,7 @@ fs.writeFileSync(NUMS_FILE, [
 // Inject env and argv before requiring relay.js
 process.argv.push('--live');
 Object.assign(process.env, {
+  VOICE_ROSTER_SIZE: '4',
   VOICE_SHARED_KEY:        KEY,
   ELEVENLABS_API_KEY:      'fake-el-key',
   ELEVENLABS_PHONE_NUMBER_ID: 'phnum_test',
@@ -92,8 +93,8 @@ const local = (p, body, headers) => realFetch(
 ).then(r => r.json());
 
 const incident = (p, headers) => local('/voice/incident', p, Object.assign({ 'x-insiyab-key': KEY }, headers || {}));
-const tool = (name, b) => local('/voice/tool/' + name, b, { 'x-insiyab-tool': TOOL_SECRET });
-const state = () => local('/voice/state');
+const tool = (name, b) => { const call=[...calls].reverse().find(c=>c.conversation_initiation_client_data.dynamic_variables.staff_role===(b.role||'manager')); return local('/voice/tool/' + name, {...b,call_token:call?.conversation_initiation_client_data.dynamic_variables.call_token}, { 'x-insiyab-tool': TOOL_SECRET }); };
+const state = () => local('/voice/state/authenticated',undefined,{'x-insiyab-key':KEY});
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 (async () => {
@@ -133,9 +134,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok('incident variables include route and hour', driverVars && driverVars.route === '310' && driverVars.hour === '18:00', driverVars && JSON.stringify(driverVars));
 
   // A second incident while relay is running should be skipped
-  const r2 = await incident({ route: '310', direction: '1', hour: '18:00' });
+  const r2 = await incident({ route: '310', direction: '1', hour: '18:00',drill:true,options:[{key:'none',say:'observe'}] });
   ok('second incident while relay runs is skipped', r2.skipped, JSON.stringify(r2));
 
+  const wrongToken=await local('/voice/tool/report',{role:'driver',report:'untrusted',call_token:'wrong'},{'x-insiyab-tool':TOOL_SECRET});
+  ok('wrong token cannot inject a report', !(await state()).reports.driver,wrongToken.result);
+  const swappedRole=await local('/voice/tool/report',{role:'station',report:'wrong role',call_token:driverVars.call_token},{'x-insiyab-tool':TOOL_SECRET});
+  ok('a driver call cannot report as station', !(await state()).reports.station,swappedRole.result);
+  const earlyDecision=await tool('decision',{option_key:'send_spare'});
+  ok('no decision can be recorded during staff calls',!(await state()).decision,earlyDecision.result);
   // Reports come in via tool calls
   const rep1 = await tool('report', { report: 'Traffic blocked at the main junction, barely moving.', role: 'driver' });
   ok('driver report logged, agent told to hand over', /briefing the duty manager/.test(rep1.result), rep1.result);
@@ -159,6 +166,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok('manager hears staff reports', mgVars && /driver:/.test(mgVars.staff_reports) && /depot:/.test(mgVars.staff_reports) && /station:/.test(mgVars.staff_reports), mgVars && mgVars.staff_reports);
   ok('manager hears options text', mgVars && /send_spare/.test(mgVars.options_text), mgVars && mgVars.options_text);
 
+  const invalid=await tool('decision',{option_key:'unlisted'});
+  ok('manager must choose an offered option', !(await state()).decision,invalid.result);
+  const lateReport=await local('/voice/tool/report',{role:'driver',report:'stale overwrite',call_token:driverVars.call_token},{'x-insiyab-tool':TOOL_SECRET});
+  ok('late report cannot overwrite briefing',!(await state()).reports.driver.report.includes('stale'),lateReport.result);
   // Manager decides
   const dec = await tool('decision', { option_key: 'send_spare', words: 'Get the bus to route 310 junction stop.' });
   ok('decision logged', /Recorded/.test(dec.result) && /send the standby bus/.test(dec.result), dec.result);
@@ -198,15 +209,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     ok('state does not contain "' + val + '"', !stateStr.includes(val), 'found in: ' + (stateStr.includes(val) ? stateStr.slice(stateStr.indexOf(val) - 20, stateStr.indexOf(val) + 40) : 'ok'));
   }
 
-  // Prompts contain the drill statement via DRILL_PREFIX used in every agent spec
+  // The demo stays labelled in the dashboard; spoken openings are natural and identify the AI.
   const src = fs.readFileSync(RELAY, 'utf8');
-  const drillConst = 'drill by a student team for the RTA Future Move Hackathon';
-  ok('relay.js source defines DRILL_PREFIX with the drill statement', src.includes(drillConst), 'phrase not found');
-  ok('relay.js source says nothing said will be acted on', src.includes('Nothing said will be acted on'), 'phrase not found');
-  // Each agent spec must reference DRILL_PREFIX (guaranteed by the template literal interpolation)
-  for (const role of ['driver', 'depot', 'station', 'manager', 'back']) {
-    ok('AGENT_SPECS.' + role + ' references DRILL_PREFIX', src.includes(role + ':') && src.includes('DRILL_PREFIX'), role);
-  }
+  ok('voice identifies Insiyab as the AI operations assistant', src.includes('the AI operations assistant'), 'identity missing');
+  ok('spoken disclaimer removed at presenter request', !src.includes('Nothing said will be acted on'), 'old wording remains');
+  ok('internal demo context remains honest when asked', src.includes('answer honestly that this is a demonstration'), 'context missing');
 
   // No real-looking secrets in folder
   const folder = path.join(__dirname, '..');

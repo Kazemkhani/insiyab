@@ -26,6 +26,7 @@ fs.writeFileSync(NUMS_FILE, [
 
 process.argv.push('--live');
 Object.assign(process.env, {
+  VOICE_ROSTER_SIZE: '4',
   VOICE_SHARED_KEY:         KEY,
   ELEVENLABS_API_KEY:       'fake-el-key-state',
   ELEVENLABS_PHONE_NUMBER_ID: 'phnum_test3',
@@ -84,8 +85,8 @@ const local = (p, body, headers) => realFetch(
 ).then(r => r.json());
 
 const incident = (body, extraHeaders) => local('/voice/incident', body, Object.assign({ 'x-insiyab-key': KEY }, extraHeaders || {}));
-const tool = (name, b) => local('/voice/tool/' + name, b, { 'x-insiyab-tool': TOOL_SECRET });
-const state = () => local('/voice/state');
+const tool = (name, b) => { const call=[...calls].reverse().find(c=>c.conversation_initiation_client_data.dynamic_variables.staff_role===(b.role||'manager')); return local('/voice/tool/' + name, {...b,call_token:call?.conversation_initiation_client_data.dynamic_variables.call_token}, { 'x-insiyab-tool': TOOL_SECRET }); };
+const state = () => local('/voice/state/authenticated',undefined,{'x-insiyab-key':KEY});
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // Values that must NEVER appear in GET /voice/state
@@ -175,14 +176,11 @@ const FORBIDDEN = ['+10000000021', '+10000000022', '+10000000023', '+10000000024
     ok('no Twilio SID pattern in ' + path.basename(file), !/\bAC[0-9a-f]{32}\b/.test(content), file);
   }
 
-  // Prompts in relay.js source contain the drill statement via DRILL_PREFIX constant
+  // The demo stays labelled in the dashboard; spoken openings are natural and identify the AI.
   const src = fs.readFileSync(RELAY, 'utf8');
-  const drillPhrase = 'drill by a student team for the RTA Future Move Hackathon';
-  ok('relay.js source defines DRILL_PREFIX with drill statement', src.includes(drillPhrase), 'phrase not found');
-  ok('relay.js source says nothing said will be acted on', src.includes('Nothing said will be acted on'), 'not found');
-  for (const role of ['driver', 'depot', 'station', 'manager', 'back']) {
-    ok('AGENT_SPECS.' + role + ' references DRILL_PREFIX', src.includes(role + ':') && src.includes('DRILL_PREFIX'), role);
-  }
+  ok('voice identifies Insiyab as the AI operations assistant', src.includes('the AI operations assistant'), 'identity missing');
+  ok('spoken disclaimer removed at presenter request', !src.includes('Nothing said will be acted on'), 'old wording remains');
+  ok('internal demo context remains honest when asked', src.includes('answer honestly that this is a demonstration'), 'context missing');
 
   // No airport/marsad leftovers (word-boundary check to avoid false positives from e.g. PATCH containing ATC)
   const airportTerms = ['aircraft', 'runway', 'DXB', 'Marsad', 'airport', 'ATC', 'EK5', 'callsign', 'inbound to runway'];

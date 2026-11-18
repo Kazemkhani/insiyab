@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Insiyab: Dubai's bus day, replayed</title>
-<meta name="description" content="One real service day of Dubai's buses, replayed in 3D: why the evening breaks, and a forecast that knows 30 minutes early.">
+<meta name="description" content="One real service day of Dubai's buses, replayed in 3D: what the evening records reveal, a tested forecast, and decisions a planner can review.">
 <meta name="theme-color" content="#0E5A73">
 <style>
 :root{--sea:#0E5A73;--red:#E21F26;--gold:#C8A24A;--goldtext:#7E5F17;--sand:#F5EFE3;--card:#FFFCF6;--line:#E4D9C4;--ink:#1E1A16;--muted:#6F6350}
@@ -127,6 +127,27 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
 .question{margin-top:72px;font-size:clamp(26px,3.2vw,42px);font-weight:700;letter-spacing:-.03em;line-height:1.15;max-width:22em}
 .question span{color:var(--sea)}
 @media(max-width:720px){.steps div,.steps div+div{padding:18px 0 6px;border-right:none;border-bottom:1px solid var(--line)}}
+
+/* Captions are constrained by their panel, not by the width of the browser. */
+.cap{container-type:inline-size;background:var(--card);border-radius:0;box-shadow:none;max-height:calc(100svh - 170px);overflow:auto}
+.cap .num{font-size:clamp(40px,16cqi,72px);overflow-wrap:normal;letter-spacing:-.045em}
+.cap [data-fit-number]{font-size:clamp(36px,13.6cqi,64px);white-space:nowrap;display:block}
+.cap .so{display:block}.cap.hero{max-height:none;overflow:visible;container-type:normal}
+#film h1{font-size:clamp(40px,5vw,72px);line-height:1.05;max-width:900px}
+#film .opening{max-width:780px;font-size:20px;line-height:1.5;text-align:left}
+#film .archive-film{max-width:780px;width:100%;text-align:left;font-size:14px}
+#film .archive-film video{margin-top:16px}.archive-film p{margin:12px 0}
+summary{cursor:pointer;min-height:44px;padding:12px 0}details p{max-width:78ch;margin:14px 0}
+nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44px;border-radius:0}
+.chapter-controls{position:absolute;bottom:28px;left:24px;right:24px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border-top:2px solid var(--sea);padding:8px 12px;z-index:3}
+.chapter-controls button{font:inherit;min-height:44px;padding:8px 16px;background:var(--sea);color:white;border:0;cursor:pointer}
+.chapter-controls button:disabled{opacity:.45;cursor:default}#chapter-current{font-size:14px;font-weight:600}
+.note{bottom:4px}.hint{bottom:105px}.bars{grid-template-columns:repeat(4,minmax(0,1fr));height:420px}
+.drill-steps{margin:32px 0;padding-left:24px;max-width:800px}.drill-steps li{padding:12px 0;font-size:20px}
+.actions{display:flex;gap:16px;flex-wrap:wrap;margin:28px 0}
+@media(max-width:760px){.cap{bottom:110px;max-height:calc(100svh - 210px)}.cap .num{font-size:clamp(36px,17cqi,64px)}.cap [data-fit-number]{font-size:13.6cqi}.cap .so{font-size:13px;line-height:1.4}.cap.hero{top:17%;bottom:auto}.cap.hero h1{font-size:64px}.cap.hero p{font-size:20px}.chapter-controls{left:12px;right:12px;bottom:24px;padding:6px;gap:6px}.chapter-controls button{padding:8px;font-size:13px}#chapter-current{font-size:12px;max-width:130px}.hint{display:none}.bars{height:auto;grid-template-columns:1fr 1fr}.bar{height:290px}.bar span{min-height:64px}.note{font-size:10px;left:12px;right:auto}#film .opening{font-size:18px}}
+.static-story#descent{height:auto}.static-story .sticky{position:static;height:auto;overflow:visible;padding:64px 16px}.static-story .cap{position:static;opacity:1!important;transform:none!important;margin:28px auto;max-height:none;width:min(650px,100%)}.static-story .cap.hero{background:var(--card);text-align:left}.static-story #cv,.static-story #lbls,.static-story .hint,.static-story .chapter-controls,.static-story .progress,.static-story .note{display:none}
+
 </style>
 </head>
 <body>
@@ -144,10 +165,11 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
 </nav>
 
 <header id="film">
-  <p class="ey2">RTA Future Move Hackathon, with Dataiku</p>
-  <video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="The Insiyab film, one minute"></video>
-  <p class="gone" id="fgone" hidden>The film is played from the presenter's laptop. The day itself starts below.</p>
-  <div class="row"><span>One minute. Then the real day, in six numbers.</span><a class="btn ghost" href="#descent">Skip to the day</a></div>
+  <p class="ey2">Student prototype · RTA Future Move Hackathon · One service day</p>
+  <h1>Why does the evening<br>fall behind?</h1>
+  <p class="opening">Dubai’s bus records show much more lateness in the evening. When a trip overruns its timetable and the break before the next trip, the delay carries forward. Insiyab tests a trip-time forecast and gives planners a measured list of routes and hours that need attention. A separate control-room drill shows how AI can gather updates for a human decision.</p>
+  <a class="btn" href="#descent">Follow the evidence</a>
+  <details class="archive-film"><summary>Earlier concept film · stand-in data</summary><p>This earlier passenger concept does not present the current evening findings.</p><video id="fv" src="film.mp4" controls playsinline preload="none" aria-label="Earlier concept film using stand-in data"></video><p id="fgone" hidden>The earlier film is not available in this copy.</p></details>
 </header>
 
 <div id="descent">
@@ -162,18 +184,18 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
     </div>
     <div class="cap" data-c="0.19">
       <p class="n">01 · The day</p>
-      <div class="num">1,056,343</div>
+      <div class="num" data-fit-number>1,056,343</div>
       <p class="unit">card taps on Dubai's buses in one day</p>
       <div class="sub"><span><b>11,201</b> trips</span><span><b>1,071</b> buses</span><span><b>166</b> routes</span></div>
-      <p class="so">Every bus and every stop, on Monday 15 December 2025. This is the day we studied.</p>
+      <p class="so">The supplied records cover Monday 15 December 2025. Taps include getting on and getting off; they are not a count of people.</p>
       <span class="chip cm">Measured on the real day</span>
     </div>
     <div class="cap" data-c="0.34">
       <p class="n">02 · The gap</p>
       <div class="num"><span class="r">47%</span></div>
-      <p class="unit">of buses leave late at 7 in the evening</p>
+      <p class="unit">of recorded stop departures are late at 19:00</p>
       <div class="sub"><span><b>16%</b> at 7 in the morning</span><span><b class="r">3 times</b> more in the evening</span></div>
-      <p class="so">Same buses, same drivers, same timetable. Late means 5 minutes or more. Only the hour changed.</p>
+      <p class="so">Late means a stop departure at least five minutes behind schedule. This comparison describes one day; it does not isolate a cause.</p>
       <span class="chip cm">Measured on the real day</span>
     </div>
     <div class="cap" data-c="0.5">
@@ -186,10 +208,10 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
     </div>
     <div class="cap" data-c="0.65">
       <p class="n">04 · The delay travels</p>
-      <div class="num"><span class="r">870</span><small>of 936</small></div>
-      <p class="unit">late departures: the bus was late back from its last trip</p>
-      <div class="sub"><span><b>93%</b> came after a late arrival</span><span><b>62%</b> the bus was not back yet</span></div>
-      <p class="so">Of 936 late departures we could trace, 870 came after the same bus finished its last trip behind time. By a stricter count, in 589 of 945 the bus was still out when its next trip was due.</p>
+      <div class="num"><span class="r">589</span><small>of 945</small></div>
+      <p class="unit">late trip starts: the bus was still on its previous trip when due to leave</p>
+      <div class="sub"><span><b>62%</b> of linked trip starts over five minutes late</span></div>
+      <p class="so">Among 945 trip starts more than five minutes late with a previous trip on the same bus, 589 had returned after the next scheduled departure. Source: lane 3’s independent retest of this day.</p>
       <span class="chip cm">Measured on the real day</span>
     </div>
     <div class="cap" data-c="0.79">
@@ -209,8 +231,8 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
       <span class="chip cm">Measured on the real day</span>
     </div>
 
-    <div class="hint" id="hint">Scroll to ride down</div>
-    <span class="note">3D scene illustrative · figures measured</span>
+    <div class="hint" id="hint">Follow one bus through the evidence</div><div class="chapter-controls"><button id="chapter-prev" type="button">Previous</button><span id="chapter-current" aria-live="polite">Start · Follow the evidence</span><button id="chapter-next" type="button">Next finding</button></div>
+    <span class="note">Illustrative journey · not a real road or bus track</span>
     <div class="progress" id="prog"></div>
   </div>
 </div>
@@ -219,25 +241,25 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
   <div class="wrap">
     <p class="ey reveal">The problem</p>
     <h2 class="big reveal">The timetable said 19:23.<br><span>The bus left at 19:36.</span></h2>
-    <p class="lede reveal">Someone at the stop planned their evening around 19:23. The driver did nothing wrong. The bus was still finishing its last trip, because that trip took 96 minutes and the timetable gave it 67.</p>
-    <p class="lede reveal" style="margin-top:18px"><b>The timetable gives each route the same trip time all day. In the evening the trip takes longer, so buses fall behind, and stay behind.</b></p>
+    <p class="lede reveal">Someone at the stop planned their evening around 19:23. This illustration is about the plan, not a judgement about a driver. The bus was still finishing its last trip, because that trip took 96 minutes and the timetable gave it 67.</p>
+    <p class="lede reveal" style="margin-top:18px"><b>When a trip takes longer than its scheduled time and the break between trips, the same bus cannot start its next trip on time. Insiyab shows the planner where the records reveal this pressure.</b></p>
     <span class="chip ci reveal" style="margin-top:22px">Illustration: clock times worked out from route 310's measured figures at 18:00</span>
     <div class="steps reveal">
-      <div><p class="k">1 · It is not more passengers</p><b>48,724 <span style="color:var(--muted);font-size:.5em">vs</span> 49,707</b><h3>People boarding at 8 am and at 6 pm. The same.</h3><p>But late buses go from 19% to 45%.</p></div>
-      <div><p class="k">2 · The trip takes longer</p><b class="r">67 → 96</b><h3>Minutes in the timetable, minutes on the road.</h3><p>Route 310 at 6 pm, a typical trip.</p></div>
-      <div><p class="k">3 · The break is too short</p><b>16</b><h3>Minutes between trips, the same all day.</h3><p>Not enough to win back 29.</p></div>
-      <div><p class="k">4 · So the next trip starts late</p><b class="r">870 <span style="color:var(--muted);font-size:.5em">of 936</span></b><h3>Late departures that came after the bus finished its last trip behind time.</h3><p>In 589 of 945 it was still out when the next trip was due.</p></div>
+      <div><p class="k">1 · A clue in the records</p><b>48,724 <span style="color:var(--muted);font-size:.5em">vs</span> 49,707</b><h3>Boardings at 08:00 and 18:00 are similar.</h3><p>But late buses go from 19% to 45%.</p></div>
+      <div><p class="k">2 · The trip takes longer</p><b class="r">67 → 96</b><h3>Minutes in the timetable, minutes on the road.</h3><p>Route 310 at 18:00: rounded planned and median actual minutes.</p></div>
+      <div><p class="k">3 · The break is too short</p><b>16</b><h3>Minutes between trips in this illustration.</h3><p>Not enough to win back 29.</p></div>
+      <div><p class="k">4 · So the next trip starts late</p><b class="r">589 <span style="color:var(--muted);font-size:.5em">of 945</span></b><h3>Late trip starts with the bus still out when due to leave.</h3><p>62% of trip starts over five minutes late with a linked previous trip.</p></div>
     </div>
     <p class="question reveal">Which routes, at which hours, need more time, <span>and how many minutes?</span></p>
-    <span class="chip cm reveal" style="margin-top:28px">The four figures: measured on the real day</span>
+    <span class="chip cm reveal" style="margin-top:28px">Day-level measurements; the route 310 clock is an illustration</span>
   </div>
 </section>
 
 <section id="clock">
   <div class="wrap">
-    <p class="ey reveal">Why it is not the crowd</p>
-    <h2 class="big reveal">Same crowd.<br><span>Different clock.</span></h2>
-    <p class="lede reveal">The two peaks carry almost the same number of passengers. The morning copes. The evening does not. So the cause is not demand: it is how long the trips take against what the timetable allows.</p>
+    <p class="ey reveal">What made us investigate the timetable</p>
+    <h2 class="big reveal">Similar boardings.<br><span>More evening delay.</span></h2>
+    <p class="lede reveal">Boardings are similar in these two hours, but evening departures are much more often late. That led us to compare actual trip times with the timetable. Similar totals alone cannot rule out traffic, boarding patterns or other causes.</p>
     <div class="pair reveal">
       <div class="fig"><b id="f-b8"></b><span>boardings in the 08:00 hour</span></div>
       <div class="fig"><b id="f-l8"></b><span>of departures 5+ minutes late at 08:00</span></div>
@@ -257,7 +279,7 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
     <h2 class="big reveal"><span id="f-eve" class="r"></span> hours missing.<br><span>In three hours of the evening.</span></h2>
     <p class="lede reveal">For each route and hour we compare two numbers: the trip time in the timetable, and the trip time that would be enough for 85 trips out of 100. Add up the difference and you get the driving time the timetable is missing. Across the whole day it is <b id="f-day"></b> bus hours.</p>
     <div class="chart reveal" id="ch-ledger" role="img" aria-label="Extra bus hours needed by hour of the day. The three evening hours from 16:00 stand far above the rest."></div>
-    <p class="src reveal">Read from the Dataiku flow: running_time_ledger_by_hour. A second analysis by a teammate, with other code, finds 569 bus hours for the day.</p>
+    <p class="src reveal">Read from the Dataiku flow: running_time_ledger_by_hour. The evening total is a measured planning shortfall, not saved hours and not a forecast result.</p>
     <span class="chip cm reveal">Measured on the real day</span>
   </div>
 </section>
@@ -277,7 +299,7 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
 <section id="worklist">
   <div class="wrap">
     <p class="ey reveal">What a planner gets</p>
-    <h2 class="big reveal">A list.<br><span>Not a dashboard.</span></h2>
+    <h2 class="big reveal">Which route. Which hour.<br><span>How much more time.</span></h2>
     <p class="lede reveal">The routes and hours where the plan falls furthest short, and the minutes each one needs. The planner accepts or sets aside each row. <b>Nothing applies itself.</b></p>
     <div class="tscroll reveal"><table id="tb-work" aria-label="The eight route and hour rows needing the most extra running time"></table></div>
     <p class="src reveal">Read from the Dataiku flow: running_time_bands, rows with 5 or more trips, ranked by extra minutes times trips. In the Dataiku web app this is the "Planner's worklist" tab, with Accept and Set aside on each row.</p>
@@ -285,26 +307,39 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
   </div>
 </section>
 
+<section id="onday" class="alt"><div class="wrap">
+  <p class="ey">And on the day itself</p><h2 class="big">The bus is still out.<br><span>Who needs to know?</span></h2>
+  <p class="lede">On the recorded day, 696 linked departures were due before their bus returned from the previous trip. Of those, 85% then started more than five minutes late. The busiest hour for this flag was 19:00.</p>
+  <p class="src">Measured by lane 3 from the runtime records, 15 December 2025. This is a different denominator from the 589 of 945 late-start figure above.</p>
+  <p class="lede">In our drill, four team members provide the missing operational facts. The AI briefs Amir, acting as duty manager. He chooses an option; the AI relays his choice and records each acknowledgement.</p>
+  <ol class="drill-steps"><li><b>Report.</b> Driver: ability to continue. Depot: spare availability. Station: passenger information. Planner: what the evidence can support.</li><li><b>Decide.</b> The duty manager weighs the reports and chooses, or takes no action.</li><li><b>Relay.</b> Staff hear the manager’s decision and confirm receipt. Missing answers stay visible.</li></ol>
+  <div class="actions"><a class="btn" href="onday/index.html">Explore the recorded-day drill</a><a class="btn" href="voice/index.html">Open the rehearsal dashboard</a></div>
+  <p class="src">SIMULATED INCIDENT. These links place no call. Calls reach consenting team members only; no real bus operation changes.</p>
+  <details><summary>Why this use of AI agents is relevant</summary><p>The UAE announced a framework in April 2026 to deploy agentic AI across 50% of government sectors and operations within two years. Our prototype explores one bounded workflow: collecting reports, preparing a briefing and tracking a human decision. It is not an RTA deployment or a claim to fulfil that government target.</p><a href="https://www.mediaoffice.ae/en/news/2026/april/23-04/mohammed-bin-rashid-chairs-uae-cabinet-meeting" target="_blank" rel="noopener">Dubai Media Office, 23 April 2026</a></details>
+</div></section>
+
 <section id="forecast" class="alt">
   <div class="wrap">
     <p class="ey reveal">The forecast</p>
-    <h2 class="big reveal">Know the evening<br><span>30 minutes early.</span></h2>
-    <p class="lede reveal">Gradient-boosted trees, trained on the trips before 16:00 and tested on an evening they had never seen. Average miss in minutes; lower is better.</p>
+    <h2 class="big reveal">Test the forecast<br><span>against the timetable.</span></h2>
+    <p class="lede reveal">The pitch test learns from trips before 16:00 and scores 2,043 trips from 16:00 to 19:00 on the same day. Average miss in minutes; lower is better. This is not a test on another day.</p>
     <div class="bars reveal">
       <div class="bar"><b>8.25<small> min</small></b><div class="fill" data-h="100"></div><span>RTA's timetable</span></div>
       <div class="bar"><b>7.42<small> min</small></b><div class="fill" data-h="89.9" style="background:var(--gold)"></div><span>Best simple rule: this route earlier that day</span></div>
-      <div class="bar"><b class="s">6.97<small> min</small></b><div class="fill" data-h="84.5" style="background:var(--sea)"></div><span>The model: 15% better, range 12% to 19%</span></div>
+      <div class="bar"><b>7.31<small> min</small></b><div class="fill" data-h="88.6"></div><span>Linear model: independent retest</span></div>
+      <div class="bar"><b class="s">6.97<small> min</small></b><div class="fill" data-h="84.5" style="background:var(--sea)"></div><span>The model: 15% closer, 16:00–19:00; range 12% to 19%</span></div>
     </div>
-    <div class="tscroll reveal"><table id="tb-acc" aria-label="Three accuracy measures for three methods on 2,043 evening trips"></table></div>
-    <p class="src reveal">Read from the Dataiku flow: running_time_metrics, trips due from 16:00 to 18:59. MAE is the average miss; RMSE weights large misses more; MAPE is the miss as a share of the trip.</p>
+    <div class="tscroll reveal"><table id="tb-acc" aria-label="Three accuracy measures for four methods on 2,043 evening trips"></table></div>
+    <p class="src reveal">Read from the Dataiku flow: running_time_metrics, trips due from 16:00 to 18:59. The linear row is from lane 3’s independent retest in project John (FORECAST-RETEST.md). MAE is the average miss; RMSE weights large misses more; MAPE is the miss as a share of the trip.</p>
     <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:120px">Where it helps, hour by hour.</h3>
     <div class="chart reveal" id="ch-miss" role="img" aria-label="Average miss by hour from 16:00 for the timetable and the model. The model is closer in the evening peak and no better late at night."></div>
     <div class="key reveal"><span><i style="background:#D8CBB2"></i>RTA's timetable</span><span><i style="background:var(--sea)"></i>The model</span></div>
-    <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:120px">What it does not do.</h3>
+    <p class="lede reveal">The timetable’s time covers <b>29 in 100 evening-peak trips</b>; the planning standard is <b>85</b>. The worklist uses measured trip times to show this gap.</p><p class="src reveal">Independent retest, project John, 17 November 2026. In its strict next-hour test, trees miss by 7.61 minutes, the simple rule by 7.48, and the linear model by 7.37, against 8.25 for the timetable. The simpler methods win that test. Later figures reported by lane 3 are pending a committed source and are not substituted here.</p>
+    <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:72px">What the test cannot promise.</h3>
     <div class="grid reveal">
       <div class="card"><h3>Only 6% past the simple rule.</h3><p>Most of the gain comes from knowing how the route ran earlier that day.</p></div>
-      <div class="card"><h3>Live signals add nothing at 30 minutes.</h3><p>A bus's previous trip has not finished when the forecast is made.</p></div>
-      <div class="card"><h3>After 21:00, the timetable wins.</h3><p>It is an evening-peak tool, and we say so.</p></div>
+      <div class="card"><h3>Previous-trip signals did not help this test.</h3><p>Often the earlier trip was not finished when a forecast would be needed. That limits the available evidence.</p></div>
+      <div class="card"><h3>From 19:00, the timetable is closer.</h3><p>It is an evening-peak tool, and we say so.</p></div>
       <div class="card"><h3>One day of data.</h3><p>Every number comes from Monday 15 December 2025.</p></div>
     </div>
   </div>
@@ -347,7 +382,7 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
 <section class="ask">
   <div class="wrap">
     <h2 class="big reveal">Give the evening<br>its time.</h2>
-    <p class="lede reveal">About <b>244 bus hours</b> of extra running time from 16:00 to 18:59 would cover 85 trips in 100. About 630 across the whole day.</p>
+    <p class="lede reveal">About <b>244 bus hours</b> of extra running time from 16:00 to 18:59 is the measured planning shortfall at the 85th percentile. It is not a model-produced saving or a guarantee for another day. About 630 bus hours across the whole day.</p>
     <p class="reveal" style="margin-top:40px"><a class="btn" id="live" href="https://dss-8a0eac1b-a0da2b15-dku.eu-west-2.app.dataiku.io/projects/INSIYAB/webapps/kvDViy2_insiyab/view" target="_blank" rel="noopener">Now see it live in Dataiku</a></p>
     <p class="reveal" style="margin-top:14px;font-size:13px;opacity:.75">Opens the planner's web app on the real day. It asks for a Dataiku sign-in.</p>
   </div>
@@ -371,7 +406,7 @@ board:[[4,1845],[5,9875],[6,29223],[7,45131],[8,48724],[9,34524],[10,23149],[11,
 ledger:[[5,4.3],[6,48.6],[7,40.4],[8,36.8],[9,27.5],[10,20.8],[11,12.1],[12,12.1],[13,18.8],[14,21.4],[15,30.9],[16,76.8],[17,92.4],[18,74.8],[19,45.2],[20,29.1],[21,20.7],[22,9.1],[23,3.9],[24,1.9],[25,1.5],[26,0.8]],
 work:[["310",18,10,67.3,96.4,104.4,37.2],["F07",6,5,72,134.2,137.5,65.5],["320",17,5,87.5,142.8,152,64.5],["320",18,6,92,129.3,136.3,44.3],["320",16,5,78,101.3,120.4,42.4],["F19A",17,6,54.8,74.8,80.5,25.8],["X22",19,5,87,109.5,117.2,30.2],["310",16,7,70.5,68.8,92,21.5]],
 type:[["Double-decker",13.2,13096],["Standard",24.5,202976],["Articulated",25,18378],["Midi",27.5,18243],["Coach",29.4,4599]],
-acc:[["RTA's timetable",8.25,12.57,10.5],["Best simple rule",7.42,11.62,9.3],["The model",6.97,10.76,9.0]]
+acc:[["RTA's timetable",8.25,12.57,10.5],["Best simple rule",7.42,11.62,9.3],["Linear model (independent retest)",7.31,11.47,9.3],["The model",6.97,10.76,9.0]]
 };
 (function(){
 const NS='http://www.w3.org/2000/svg',RED='#E21F26',SEA='#0E5A73',SANDG='#D8CBB2',MUTED='#6F6350',LINE='#E4D9C4',INK='#1E1A16';
@@ -430,10 +465,10 @@ const txt=(svg,x,y,s,o)=>svg.appendChild(el('text',Object.assign({x,y,'font-size
 })();
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="three.js"></script>
 <script>
 (function(){
-if(!window.THREE){document.getElementById('hint').textContent='The 3D scene could not load. The story continues below.';document.querySelectorAll('.cap').forEach(c=>{c.style.position='static';c.style.opacity='1';c.style.transform='none';c.style.margin='16px auto'});document.getElementById('descent').style.height='auto';document.querySelector('.sticky').style.cssText='position:static;height:auto;overflow:visible;padding:80px 16px';document.getElementById('cv').style.display='none';return}
+if(!window.THREE || matchMedia('(prefers-reduced-motion: reduce)').matches){document.getElementById('descent').classList.add('static-story');return}
 const PAL={red:0xE21F26,sea:0x0E5A73,gold:0xC8A24A,ink:0x1E1A16,sandGrey:0xD8CBB2,soft:0xE6DAC2,ghost:0x8DB3C0,sand:0xF5EFE3};
 const RED=PAL.red,SEA=PAL.sea,GOLD=PAL.gold,INK=PAL.ink,SANDG=PAL.sandGrey,SOFT=PAL.soft,GHOST=PAL.ghost;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -441,7 +476,7 @@ const Lam=c=>new THREE.MeshLambertMaterial({color:c});
 let seed=5;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
 
 const descent=document.getElementById('descent'),stage=document.querySelector('.sticky');
-const R3=new THREE.WebGLRenderer({canvas:document.getElementById('cv'),antialias:true,alpha:true});
+let R3;try{R3=new THREE.WebGLRenderer({canvas:document.getElementById('cv'),antialias:true,alpha:true})}catch{descent.classList.add('static-story');return}
 R3.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
 const S=new THREE.Scene();S.fog=new THREE.Fog(PAL.sand,14,40);
 S.add(new THREE.HemisphereLight(0xfffaf0,0xd9ccb3,0.8));
@@ -499,10 +534,10 @@ const A=67;
 ramp(0,0,A,HT,-0.5,GHOST);ramp(A,HT,A+16,HT,-0.5,SEA,2.4,0.6);ramp(A+16,HT,2*A+16,0,-0.5,GHOST);
 ramp(0,0,96,HT,0.5,RED);ramp(A+16,HT+0.22,96,HT+0.22,0.5,RED,2.4);ramp(96,HT,192,0,0.5,RED);
 [-0.5,0.5].forEach(z=>[0,HT].forEach(y=>ramp(-4,y,214,y,z,SOFT,0.4)));
-// 04 field: 870 of 936
-const gm=new THREE.InstancedMesh(new THREE.BoxGeometry(0.09,0.09,0.09),Lam(0xffffff),936);
+// 04 field: 589 of 945
+const gm=new THREE.InstancedMesh(new THREE.BoxGeometry(0.09,0.09,0.09),Lam(0xffffff),945);
 const cR=new THREE.Color(RED),cG=new THREE.Color(SANDG);
-for(let i=0;i<936;i++){const c=i%36,r=Math.floor(i/36);dm.position.set((c-17.5)*0.12,0.13,(r-12.5)*0.12);dm.rotation.set(0,0,0);dm.scale.set(1,1,1);dm.updateMatrix();gm.setMatrixAt(i,dm.matrix);gm.setColorAt(i,i<870?cR:cG)}
+for(let i=0;i<945;i++){const c=i%36,r=Math.floor(i/36);dm.position.set((c-17.5)*0.12,0.13,(r-12.5)*0.12);dm.rotation.set(0,0,0);dm.scale.set(1,1,1);dm.updateMatrix();gm.setMatrixAt(i,dm.matrix);gm.setColorAt(i,i<589?cR:cG)}
 ex[3].g.add(gm);
 // 05 ring: 166 routes, 118 short, 2 with room (order arbitrary)
 const N=166,ord=[...Array(N).keys()];for(let i=N-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[ord[i],ord[j]]=[ord[j],ord[i]]}
@@ -521,7 +556,7 @@ function L(t,e,x,y,z){const d=document.createElement('div');d.className='lbl';d.
 L('One of 1,071 buses',0,0,1.75,0);
 L('<b>16%</b> · 07:00',1,-1.3,1.45,0);L('<b class="r">47%</b> · 19:00',1,1.3,1.45,0);
 L('<span class="s">Timetable: 67 min</span>',2,(30-106)*K,1.2,-0.5);L('<span class="r">Took 96 min</span>',2,(48-106)*K,0.55,0.5);L('<b class="r">13 min late</b>',2,(89-106)*K,HT+0.75,0.5);
-L('<b>870 of 936</b> late starts',3,0,0.6,-1.7);
+L('<b>589 of 945</b> late starts',3,0,0.6,-1.7);
 L('<b class="r">118 short</b> at 18:00 · <span class="s">2 with room</span>',4,0,2.1,0);
 L('8.25 min · timetable',5,-1.5,8.25*0.3+0.45,0);L('7.42 · simple rule',5,0,7.42*0.3+0.45,0);L('<b class="s">6.97 · the model</b>',5,1.5,6.97*0.3+0.45,0);
 
@@ -529,7 +564,10 @@ L('8.25 min · timetable',5,-1.5,8.25*0.3+0.45,0);L('7.42 · simple rule',5,0,7.
 const caps=[...document.querySelectorAll('.cap')],hint=document.getElementById('hint'),prog=document.getElementById('prog');
 const cl=v=>Math.min(1,Math.max(0,v));
 const sm=(a,b,x)=>{const t=cl((x-a)/(b-a));return t*t*(3-2*t)};
-let p=0,ps=0,on=true;
+let p=0,ps=0,on=true,activeChapter=-1;
+const stops=[0,...C],titles=['Start · Follow the evidence','01 · The recorded day','02 · The evening gap','03 · How delay carries over','04 · The linked trips','05 · The planning shortfall','06 · Test the forecast'];
+const jump=i=>{const target=Math.max(0,Math.min(stops.length-1,i));window.scrollTo({top:descent.offsetTop+stops[target]*(descent.offsetHeight-innerHeight),behavior:'smooth'})};
+document.getElementById('chapter-prev').onclick=()=>jump(activeChapter-1);document.getElementById('chapter-next').onclick=()=>{if(activeChapter===stops.length-1)document.getElementById('problem').scrollIntoView();else jump(activeChapter+1)};
 function readScroll(){const r=descent.getBoundingClientRect();p=cl(-r.top/(r.height-innerHeight))}
 addEventListener('scroll',readScroll,{passive:true});readScroll();
 (function(){const v=document.getElementById('fv');if(!v)return;v.addEventListener('ended',()=>descent.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}));v.addEventListener('error',()=>{v.hidden=true;document.getElementById('fgone').hidden=false})})();
@@ -551,10 +589,11 @@ const clock=new THREE.Clock();let T=0;
   fol.set(cr*Math.cos(ang),by+2.9,cr*Math.sin(ang));fl.set(0,by+0.7,0).lerp(hb.position,0.28);
   const k=sm(0,0.13,ps);tp.lerpVectors(hp,fol,k);tl.lerpVectors(hl,fl,k);
   cam.position.lerp(tp,Math.min(1,dt*5));look.lerp(tl,Math.min(1,dt*5));cam.lookAt(look);
-  caps.forEach(c=>{const cc=+c.dataset.c,w=+(c.dataset.w||0.065);c.style.opacity=cl(1-Math.abs(ps-cc)/w).toFixed(3);c.style.setProperty('--d',(reduce?0:(ps-cc)*-300).toFixed(1)+'px')});
+  const nearest=stops.reduce((best,c,i)=>Math.abs(ps-c)<Math.abs(ps-stops[best])?i:best,0);
+  if(nearest!==activeChapter){activeChapter=nearest;caps.forEach((c,i)=>{c.style.opacity=i===nearest?'1':'0';c.style.visibility=i===nearest?'visible':'hidden';c.style.pointerEvents=i===nearest?'auto':'none';c.setAttribute('aria-hidden',String(i!==nearest))});document.getElementById('chapter-current').textContent=titles[nearest];document.getElementById('chapter-prev').disabled=nearest===0;document.getElementById('chapter-next').textContent=nearest===stops.length-1?'See the problem':'Next finding'}
   R3.render(S,cam);
   const W=stage.clientWidth,H=stage.clientHeight;
-  labels.forEach(o=>{const e=ex[o.e];if(e.s<0.75){o.d.style.opacity=0;return}pv.copy(o.v);e.g.localToWorld(pv);pv.project(cam);if(pv.z>1){o.d.style.opacity=0;return}o.d.style.left=((pv.x*0.5+0.5)*W)+'px';o.d.style.top=((-pv.y*0.5+0.5)*H)+'px';o.d.style.opacity=String(cl((e.s-0.75)*4))});
+  labels.forEach(o=>{const e=ex[o.e];if(e.s<0.75){o.d.style.opacity=0;return}pv.copy(o.v);e.g.localToWorld(pv);pv.project(cam);if(pv.z>1){o.d.style.opacity=0;return}o.d.style.left=((pv.x*0.5+0.5)*W)+'px';o.d.style.top=((-pv.y*0.5+0.5)*H)+'px';const cp=caps[activeChapter]?.getBoundingClientRect(),lp=o.d.getBoundingClientRect();o.d.style.opacity=cp&&lp.left<cp.right&&lp.right>cp.left&&lp.top<cp.bottom&&lp.bottom>cp.top?'0':String(cl((e.s-0.75)*4))});
  }
  requestAnimationFrame(loop)})();
 })();

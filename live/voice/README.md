@@ -4,15 +4,15 @@ A phone relay for one bus incident. The team acts it out on their own phones as 
 
 ## What it does
 
-An incident (a bus running badly late on a known route) is posted to the relay. The relay calls the driver, depot controller and station supervisor at the same time, asks each one question fitted to their role, and logs a one-sentence report from each. It then calls the duty manager with the incident, the staff reports and the available options. The manager chooses one. The relay calls the staff back with the decision and logs their acknowledgements.
+An incident (a bus running badly late on a known route) is posted to the relay. The relay calls the driver, depot controller, station supervisor and planning analyst at the same time, asks each one question fitted to their role, and logs a one-sentence report from each. It then calls the duty manager with the incident, the staff reports and the available options. The manager hears names and roles from the private roster, may ask questions, and chooses one. Staff calls are capped at 90 seconds; the manager call at 150 seconds. The relay calls the staff back with the decision and logs their acknowledgements.
 
-Every agent prompt begins by saying this is a drill by a student team for the RTA Future Move Hackathon and that nothing said will be acted on. The agent informs and records; it instructs nobody; it never claims to be RTA. If a person reports a real emergency it tells them to call 999 and ends the call.
+At Amir’s request, spoken calls open naturally and identify Insiyab as an AI operations assistant. The demo context remains in the agent instructions and dashboard; if asked, the agent explains it honestly. The agent informs and records; it instructs nobody; it never claims to be RTA. If a person reports a real emergency it tells them to call 999 and ends the call.
 
 ## Three guards before any call is placed
 
 A real call is placed only when ALL of the following are true at run time:
 
-1. `~/.config/insiyab/voice-numbers.txt` exists and lists at least one valid entry.
+1. `~/.config/insiyab/voice-numbers.txt` exists and lists all five distinct consenting participants.
 2. The environment variable `INSIYAB_CALLS` is set to `armed`.
 3. The process was started with the `--live` flag.
 
@@ -31,6 +31,7 @@ Copy `live/voice/voice.env.example` to `~/.config/insiyab/voice.env` and fill in
 | `ELEVENLABS_VOICE_ID` | Voice ID for the agents (a calm British voice is recommended) |
 | `ELEVENLABS_VOICE_MODEL` | TTS model (default: `eleven_v4_turbo`) |
 | `VOICE_SHARED_KEY` | 24+ character key; protects `POST /voice/incident` |
+| `VOICE_VIEW_KEY` | Separate 24+ character key for detailed dashboard reports |
 | `VOICE_PUBLIC_URL` | Public HTTPS address of this process (needed for tool webhooks when running `--setup-agents`) |
 
 ### Optional
@@ -51,13 +52,14 @@ Create `~/.config/insiyab/voice-numbers.txt`. One entry per line in the format:
 role,name,+number
 ```
 
-Roles must be exactly: `driver`, `depot`, `station`, `manager`. Example (use real numbers, never commit this file):
+Roles must be exactly: `driver`, `depot`, `station`, `planner`, `manager`. Example (use real numbers, never commit this file):
 
 ```
 manager,Amir,+10000000001
 driver,Hassan,+10000000002
 depot,Fatima,+10000000003
 station,Omar,+10000000004
+planner,Alex,+10000000005
 ```
 
 The name is used by the agent to address the person. It never appears in `GET /voice/state` or the console.
@@ -90,10 +92,11 @@ Armed run (requires `INSIYAB_CALLS=armed` and `--live`; also requires `ELEVENLAB
 INSIYAB_CALLS=armed node live/voice/relay.js --setup-agents --live
 ```
 
-This creates five agents in ElevenLabs:
+This creates or updates six agents in ElevenLabs:
 - `Insiyab relay: driver check`
 - `Insiyab relay: depot check`
 - `Insiyab relay: station check`
+- `Insiyab relay: planner check`
 - `Insiyab relay: manager`
 - `Insiyab relay: call back`
 
@@ -177,3 +180,11 @@ The last line is `ALL PASS` or `N FAILED`. Tests use a fake ElevenLabs server on
 ## Console
 
 Open `live/voice/console.html` in a browser while the relay server is running. Pass `?port=7890` if using a non-default port. The page polls every 2.5 seconds and requires no authentication (the state has no personal data).
+
+## Rehearsal limits and status
+
+The default roster is five people, with four reports and acknowledgements. `VOICE_ROSTER_SIZE=4` explicitly supports the original four-person rehearsal. Roles and numbers must be unique. Each process permits one rehearsal and at most nine outgoing calls. Restart only for an approved fresh run.
+
+`GET /voice/state` exposes event status by role only. It never exposes free-text reports or incident details. The dashboard uses `GET /voice/state/authenticated` with the private `x-insiyab-view` header. Callback tools additionally require a per-call token bound to the current run, role and phase.
+
+Completion requires all four reports, the manager’s valid choice, and all four acknowledgements. Busy, unanswered or missing callbacks remain incomplete. The illustrated dashboard playback is scripted and never initiates a call.

@@ -563,6 +563,15 @@ def run_all_tests():
                 page.click("#" + btn_id)
                 page.wait_for_timeout(1200)
 
+                # Presenter guidance follows every tab and remains usable on phones.
+                page.locator('#presenter-btn').click()
+                check(vname + '/' + tab_id + '/spoken-presenter-notes',
+                      all(len(page.locator('#pn-' + part + '-text').inner_text()) > 25
+                          for part in ('say', 'point', 'next')))
+                check(vname + '/' + tab_id + '/notes-no-sideways-scroll',
+                      page.evaluate('document.documentElement.scrollWidth <= innerWidth + 2'))
+                page.locator('#presenter-btn').click()
+
                 # Screenshot
                 shot = os.path.join(SHOT_DIR, "{}-{}.png".format(vname, tab_id))
                 page.screenshot(path=shot, full_page=False)

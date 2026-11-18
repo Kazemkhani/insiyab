@@ -25,6 +25,7 @@ fs.writeFileSync(NUMS_FILE, [
 
 process.argv.push('--live');
 Object.assign(process.env, {
+  VOICE_ROSTER_SIZE: '4',
   VOICE_SHARED_KEY:         KEY,
   ELEVENLABS_API_KEY:       'fake-el-key-noanswer',
   ELEVENLABS_PHONE_NUMBER_ID: 'phnum_test2',
@@ -85,8 +86,8 @@ const local = (p, body, headers) => realFetch(
   { method: body !== undefined ? 'POST' : 'GET', headers: Object.assign({ 'Content-Type': 'application/json' }, headers || {}), body: body !== undefined ? JSON.stringify(body) : undefined }
 ).then(r => r.json());
 const incident = p => local('/voice/incident', p, { 'x-insiyab-key': KEY });
-const tool = (name, b) => local('/voice/tool/' + name, b, { 'x-insiyab-tool': TOOL_SECRET });
-const state = () => local('/voice/state');
+const tool = (name, b) => { const call=[...calls].reverse().find(c=>c.conversation_initiation_client_data.dynamic_variables.staff_role===(b.role||'manager')); return local('/voice/tool/' + name, {...b,call_token:call?.conversation_initiation_client_data.dynamic_variables.call_token}, { 'x-insiyab-tool': TOOL_SECRET }); };
+const state = () => local('/voice/state/authenticated',undefined,{'x-insiyab-key':KEY});
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 (async () => {
@@ -97,7 +98,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     if (s && s.phase !== undefined) break;
   }
 
-  const r = await incident({ route: '310', direction: '1', hour: '18:00', planned_minutes: 67, expected_minutes: 96, minutes_late_now: 22, next_bus_in_minutes: 20, boardings_this_hour: 640, buses_running: 8, buses_needed_by_rule: 17, options: [{ key: 'send_spare', say: 'send the standby bus to route 310' }], source: 'test' });
+  const r = await incident({ route: '310', direction: '1', hour: '18:00', planned_minutes: 67, expected_minutes: 96, minutes_late_now: 22, next_bus_in_minutes: 20, boardings_this_hour: 640, buses_running: 8, buses_needed_by_rule: 17, options: [{ key: 'send_spare', say: 'send the standby bus to route 310' }], source: 'test', drill: true });
   ok('relay starts', r.started === true, JSON.stringify(r));
 
   for (let i = 0; i < 40 && calls.length < 3; i++) await sleep(100);

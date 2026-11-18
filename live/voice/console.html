@@ -16,7 +16,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; background: var(--paper); color: var(--ink); font-family: system-ui, -apple-system, sans-serif; }
-body { display: flex; flex-direction: column; padding: var(--gap); min-height: 720px; min-width: 1280px; }
+body { display: flex; flex-direction: column; padding: var(--gap); min-height: 100svh; width:100%; }
 
 /* drill banner - always visible */
 #drill-banner {
@@ -45,12 +45,12 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
 #incident h1 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; color: #fff; }
 #incident .meta { font-size: 0.85rem; color: #aec; display: flex; flex-wrap: wrap; gap: 1rem; }
 #incident .meta span { opacity: 0.85; }
-#incident .source-label { font-size: 0.75rem; color: var(--sim); margin-top: 0.3rem; }
+#incident .source-label { font-size: 0.75rem; color: #E6E8EA; margin-top: 0.3rem; }
 
 /* three staff columns */
 #staff-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(4,minmax(0,1fr));
   gap: var(--gap);
   flex-shrink: 0;
 }
@@ -118,12 +118,20 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
 /* options list in idle state */
 #options-list { font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem; }
 #options-list span { display: block; }
+header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.15;margin:8px 0}header p{font-size:16px;color:var(--muted)}
+.connection{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:24px}.connection input{flex:1;min-width:200px}.connection input,.connection button{font:inherit;padding:10px 14px;min-height:44px;border:1px solid var(--ink)}.connection button{background:var(--flow);color:white;cursor:pointer}.connection p{flex-basis:100%;font-weight:600}.phases{display:flex;list-style:none;gap:20px;margin-bottom:24px;flex-wrap:wrap}.phases li{padding:10px 0;border-bottom:3px solid transparent}.phases .active{border-color:var(--flow);font-weight:700}.staff-card{min-width:0;overflow-wrap:anywhere}.staff-card h2{font-size:14px}.staff-card .report-text{font-size:18px}.ack-pill{border-radius:0;min-height:44px;padding:10px}.source-label{line-height:1.5}#status-bar{gap:20px;flex-wrap:wrap}#phase{font-size:16px;letter-spacing:0;text-transform:none}#phase.done{color:var(--ink)}#drill-banner{letter-spacing:.05em}
+@media(max-width:800px){body{--gap:16px}#staff-row{grid-template-columns:1fr 1fr}.connection label{flex-basis:100%}.phases{gap:8px;font-size:14px}#drill-banner{font-size:12px}#decision .decision-text{font-size:24px}}
+@media(max-width:450px){#staff-row{grid-template-columns:1fr}.connection input{width:100%}.connection button{width:100%}.phases{display:block}header h1{font-size:32px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 
 <div id="drill-banner">DRILL | RTA FUTURE MOVE HACKATHON | SIMULATED INCIDENT | NOT REAL OPERATIONS</div>
 
+<header><p>Insiyab · Operations rehearsal</p><h1>One incident. One human decision.</h1><p>Collect the facts, brief the duty manager, relay the choice, and check who heard it.</p></header>
+<div class="connection"><label for="relay-url">Rehearsal relay address</label><input id="relay-url" type="url" placeholder="https://your-relay-address" autocomplete="off"><label for="view-key">Viewing key</label><input id="view-key" type="password" autocomplete="off" placeholder="Private viewing key"><button id="connect">Connect to rehearsal</button><button id="sample">Play an illustrated example</button><p id="mode" role="status">Not connected. No calls are placed by this dashboard.</p></div>
+<ol class="phases"><li id="step-check">1. Collect reports</li><li id="step-manager">2. Human decision</li><li id="step-callout">3. Relay and acknowledge</li></ol>
 <div id="main">
   <div id="incident">
     <h1 id="inc-title">Waiting for incident&hellip;</h1>
@@ -151,6 +159,7 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
       <div class="report-text" id="report-depot">Waiting&hellip;</div>
       <div class="ts" id="ts-depot"></div>
     </div>
+    <div class="staff-card" id="card-planner"><div class="status-dot"></div><h2>Planning analyst</h2><div class="report-text" id="report-planner">Waiting…</div><div class="ts" id="ts-planner"></div></div>
     <div class="staff-card" id="card-station">
       <div class="status-dot"></div>
       <h2>Station supervisor</h2>
@@ -169,7 +178,7 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
   <div id="acks">
     <div class="ack-pill" id="ack-driver">Driver</div>
     <div class="ack-pill" id="ack-depot">Depot</div>
-    <div class="ack-pill" id="ack-station">Station</div>
+    <div class="ack-pill" id="ack-station">Station</div><div class="ack-pill" id="ack-planner">Planner</div>
   </div>
 </div>
 
@@ -185,7 +194,9 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
   // Read the relay server port from ?port=N or default
   const params = new URLSearchParams(location.search);
   const port = params.get('port') || '7890';
-  const STATE_URL = 'http://127.0.0.1:' + port + '/voice/state';
+  let STATE_URL = ''; let sampleMode=false; let sampleTimers=[];let viewKey='',connectionVersion=0;
+  const localRelay=location.port===port && /\/voice\/?$|^\/$/.test(location.pathname);
+  if(localRelay)document.getElementById('relay-url').value=location.origin;
   const POLL_MS = 2500;
 
   function fmt(iso) {
@@ -225,7 +236,8 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
       setText('inc-late', inc.minutes_late_now + ' min late now');
       setText('inc-boardings', inc.boardings_this_hour + ' boardings this hour');
       setText('inc-buses', inc.buses_running + ' buses running (rule: ' + inc.buses_needed_by_rule + ')');
-      if (inc.source) setText('inc-source', 'Source: ' + inc.source);
+      setText('inc-source', inc.source ? 'Source: ' + inc.source : '');
+      setText('options-list','');
       if (inc.options && inc.options.length) {
         const el = document.getElementById('options-list');
         if (el) {
@@ -236,16 +248,22 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
       }
     }
 
+    else {
+      setText('inc-title','Waiting for incident…');
+      ['inc-route','inc-time','inc-late','inc-boardings','inc-buses','inc-source','options-list'].forEach(id=>setText(id,''));
+    }
+
     // Phase
     const ph = s.phase || 'idle';
     const phEl = document.getElementById('phase');
     if (phEl) {
-      phEl.textContent = ph.toUpperCase().replace('CALLOUT', 'CALL BACK');
+      phEl.textContent = ph === 'done' ? ({complete:'All reports and acknowledgements received',incomplete:'Ended with missing reports or acknowledgements',failed:'Relay failed',no_decision:'Ended without a manager decision',configuration_error:'Configuration needs attention'}[s.outcome] || 'Ended; check the recorded outcome') : ({idle:'Ready for an incident',check:'Collecting staff reports',manager:'Human manager is deciding',callout:'Relaying the manager’s decision'}[ph]||ph);
+      ['check','manager','callout'].forEach(x=>document.getElementById('step-'+x).classList.toggle('active',ph===x));
       phEl.className = ph;
     }
 
     // Staff reports from timeline
-    const roles = ['driver', 'depot', 'station'];
+    const roles = ['driver', 'depot', 'station','planner'];
     roles.forEach(function (role) {
       const card = document.getElementById('card-' + role);
       const repEl = document.getElementById('report-' + role);
@@ -300,8 +318,7 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
       const pill = document.getElementById('ack-' + role);
       if (!pill) return;
       const acked = s.acknowledgements && s.acknowledgements[role];
-      if (acked) pill.classList.add('acked');
-      else pill.classList.remove('acked');
+      pill.classList.toggle('acked',!!acked);pill.textContent=role.charAt(0).toUpperCase()+role.slice(1)+(acked?' · acknowledged':' · not yet acknowledged');
     });
 
     // Last update
@@ -313,16 +330,35 @@ body { display: flex; flex-direction: column; padding: var(--gap); min-height: 7
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  let requestSequence=0,lastAppliedRequest=0;
   function poll() {
-    fetch(STATE_URL, { cache: 'no-store' })
-      .then(function (r) { return r.json(); })
-      .then(renderState)
+    if(!STATE_URL || sampleMode)return;
+    const version=connectionVersion,request=++requestSequence;
+    fetch(STATE_URL, { cache: 'no-store',headers:{'x-insiyab-view':viewKey} })
+      .then(function (r) { if(!r.ok)throw new Error('HTTP '+r.status);return r.json(); })
+      .then(function(s){if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;document.getElementById('mode').textContent='Connected to rehearsal relay. Simulated incident; human reports.';renderState(s)})
       .catch(function (e) {
+        if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;
         const lu = document.getElementById('last-update');
-        if (lu) lu.textContent = 'Connection error, retrying (' + new Date().toLocaleTimeString() + ')';
+        document.getElementById('mode').textContent='Disconnected. Displayed reports may be stale. No calls are placed by this dashboard.';if (lu) lu.textContent = 'Connection error, retrying (' + new Date().toLocaleTimeString() + ')';
       });
   }
 
+  document.getElementById('connect').onclick=()=>{
+    sampleTimers.forEach(clearTimeout);sampleMode=false;connectionVersion++;renderState({phase:'idle',timeline:[],reports:{},acknowledgements:{}});viewKey=document.getElementById('view-key').value;
+    try{const u=new URL(document.getElementById('relay-url').value);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost'].includes(u.hostname)))throw new Error();if(u.username||u.password||u.search||u.hash)throw new Error();if(viewKey.length<24)throw new Error();STATE_URL=u.origin+'/voice/state/authenticated';poll()}catch{STATE_URL='';document.getElementById('mode').textContent='Enter an HTTPS relay address (or localhost) and the private viewing key.'}
+  };
+  document.getElementById('sample').onclick=()=>{
+    sampleTimers.forEach(clearTimeout);sampleMode=true;connectionVersion++;
+    document.getElementById('mode').textContent='ILLUSTRATED EXAMPLE. Scripted reports and decision. No phones connected; no call placed.';
+    const s={phase:'check',incident:{route:'310',direction:'1',hour:'18:00',minutes_late_now:22,boardings_this_hour:640,buses_running:8,buses_needed_by_rule:17,source:'Invented operational conditions for this illustrated example.'},reports:{},timeline:[],acknowledgements:{}};
+    renderState(s);
+    const reports={driver:'In the drill, the bus can continue but will return late.',depot:'In the drill, a spare bus is available; duty and access checks are still required.',station:'In the drill, update the departure information for passengers.',planner:'The recorded day shows timetable pressure. This is not a live forecast or a guarantee.'};
+    Object.entries(reports).forEach(([role,report],i)=>sampleTimers.push(setTimeout(()=>{s.timeline.push({event:'report',role,report,at:new Date().toISOString()});s.reports[role]={report};renderState(s)},(i+1)*900)));
+    sampleTimers.push(setTimeout(()=>{s.phase='manager';renderState(s)},4600));
+    sampleTimers.push(setTimeout(()=>{s.phase='callout';s.decision={say:'Illustrated manager choice: prepare the spare, subject to duty and access checks.',words:'This is a scripted example, not a real dispatch.',at:new Date().toISOString()};renderState(s)},6800));
+    sampleTimers.push(setTimeout(()=>{for(const r of Object.keys(reports))s.acknowledgements[r]={at:new Date().toISOString()};s.phase='done';s.outcome='complete';renderState(s)},9000));
+  };
   poll();
   setInterval(poll, POLL_MS);
 })();
