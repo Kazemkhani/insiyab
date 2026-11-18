@@ -16,7 +16,7 @@ url = f'http://127.0.0.1:{server.server_port}/'
 shots = Path(__file__).parent / 'shots'
 shots.mkdir(exist_ok=True)
 LAYOUT = """() => {
- const visible = e => {const r=e.getBoundingClientRect(); return r.width && r.height && getComputedStyle(e).visibility !== 'hidden'};
+ const visible = e => {if(e.closest('details:not([open])') && !e.closest('summary'))return false; const r=e.getBoundingClientRect(); return r.width && r.height && getComputedStyle(e).visibility !== 'hidden'};
  const overflow = [...document.querySelectorAll('body *')].filter(visible).filter(e=>{const r=e.getBoundingClientRect();return r.left < -1 || r.right > innerWidth+1}).map(e=>e.tagName+'.'+e.className);
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT), boxes=[]; let n;
  while(n=walker.nextNode()) {if(!n.textContent.trim() || !visible(n.parentElement) || ['SCRIPT','STYLE','OPTION','TITLE'].includes(n.parentElement.tagName) || n.parentElement.closest('svg,canvas,[hidden]'))continue;const range=document.createRange();range.selectNodeContents(n);for(const r of range.getClientRects())if(r.width&&r.height)boxes.push({text:n.textContent.trim().slice(0,50),r});}
@@ -39,12 +39,20 @@ with sync_playwright() as p:
         page.locator('#time').fill('67980')
         assert page.locator('#replay-clock').inner_text() == '18:53'
         page.locator('#time').fill('57600')
+        assert page.locator('#fixture-banner').is_visible()
+        assert page.locator('#now h3').inner_text() == 'Route 310 · 19:23'
+        assert page.locator('[data-option]').count() == 3
+        assert page.get_by_text("Simulated pick: RTA's system is not connected").is_visible()
         assert page.locator('h1').inner_text() == 'Insiyab Live'
         assert page.locator('.logo svg').count() == 1
         assert page.get_by_text('OpenStreetMap contributors').is_visible()
         layout = page.evaluate(LAYOUT)
         assert not layout['overflow'], (width,layout)
         assert not layout['overlaps'], (width,layout)
+        page.locator('#next summary').click()
+        expanded = page.evaluate(LAYOUT)
+        assert not expanded['overflow'] and not expanded['overlaps'], (width,expanded)
+        page.locator('#next summary').click()
         if width == 390:
             assert page.locator('aside').bounding_box()['y'] >= page.locator('.map-column').bounding_box()['y'] + page.locator('.map-column').bounding_box()['height'] - 1
         assert not calls, calls

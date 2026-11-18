@@ -28,7 +28,13 @@ for (const route of bundle['replay/index.json'].routes) {
   if (!/^replay\/[^/]+\.json$/.test(route.file)) throw Error('Unsafe replay path');
   bundle[route.file] = JSON.parse(await readFile(resolve(root, 'fixtures', route.file), 'utf8'));
 }
-await writeFile(resolve(out, 'data.js'), 'window.INSIYAB_OPS_DATA=' + JSON.stringify({bundle}).replace(/</g, '\\u003c') + ';');
+async function optionalJSON(primary, fallback) {
+  try { return JSON.parse(await readFile(resolve(root, primary), 'utf8')); }
+  catch (error) {if (error.code !== 'ENOENT') throw error; return JSON.parse(await readFile(resolve(here, fallback), 'utf8'));}
+}
+const alerts = await optionalJSON('fixtures/watchers/alerts.json', 'demo/alerts.json');
+if (typeof alerts.fixture !== 'boolean' || !Array.isArray(alerts.alerts)) throw Error('Invalid alerts file');
+await writeFile(resolve(out, 'data.js'), 'window.INSIYAB_OPS_DATA=' + JSON.stringify({bundle, alerts}).replace(/</g, '\\u003c') + ';');
 await mkdir(resolve(out, 'map'), {recursive:true});
 const mapBytes = await readFile(resolve(root, 'web/assets/map/dubai.pmtiles'));
 await writeFile(resolve(out, 'map/dubai.pmtiles'), mapBytes);

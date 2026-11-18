@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "fixture": true,
+  "service_day": "2025-12-15",
+  "generated": "2026-11-18T23:00:00+04:00",
+  "sources": ["Invented console rehearsal, 18 Nov 2026; not a measured result"],
+  "alerts": [
+    {
+      "id": "late-310-1923", "watcher": "running_late", "severity": "critical",
+      "raised_at": "18:53", "route": "310", "trip_departure": "19:23", "stop_id": null,
+      "lat": 25.2048, "lon": 55.2708,
+      "headline": "Route 310, 19:23: likely 13 min late",
+      "why": "Its bus is still out on the previous trip.",
+      "evidence": {"kind": "simulated", "range_low_min": 8, "range_high_min": 17, "promise": "90 in 100"},
+      "suggestion": {"text": "Send the standby bus at 18:55", "options": [
+        {"id": "send_spare", "label": "Send the standby bus", "likely_effect": "Next departure close to on time", "estimate": true},
+        {"id": "hold", "label": "Hold the next departure 2 minutes", "likely_effect": "Gap evens out", "estimate": true},
+        {"id": "monitor", "label": "Monitor and request an update", "likely_effect": "Delay passes to the next trip", "estimate": true}
+      ], "dss_pick": "send_spare", "dss_pick_is_simulated": true},
+      "call_roles": ["driver", "depot", "station", "planning"]
+    },
+    {
+      "id": "late-8-1900", "watcher": "running_late", "severity": "attention", "raised_at": "18:50",
+      "route": "8", "trip_departure": "19:00", "stop_id": null, "lat": 25.194, "lon": 55.236,
+      "headline": "Route 8, 19:00: likely 6 min late", "why": "An earlier departure is running behind time.",
+      "evidence": {"kind": "simulated", "range_low_min": 3, "range_high_min": 9, "promise": "90 in 100"},
+      "suggestion": {"text": "Review the next departure", "options": [{"id": "monitor", "label": "Monitor and request an update", "likely_effect": "Controller can reassess the gap", "estimate": true}], "dss_pick": "monitor", "dss_pick_is_simulated": true},
+      "call_roles": ["driver", "depot", "station", "planning"]
+    },
+    {
+      "id": "overflow-27-1910", "watcher": "overflow", "severity": "attention", "raised_at": "18:52",
+      "route": "27", "trip_departure": "19:10", "stop_id": null, "lat": 25.254, "lon": 55.32,
+      "headline": "Route 27, 19:10: more passengers likely than seats", "why": "The stand-in boarding forecast exceeds seated capacity.",
+      "evidence": {"kind": "estimate"},
+      "suggestion": {"text": "Review a larger bus", "options": [{"id": "review", "label": "Check for a larger bus", "likely_effect": "More passengers may have a seat", "estimate": true}], "dss_pick": "review", "dss_pick_is_simulated": true},
+      "call_roles": ["driver", "depot", "station", "planning"]
+    }
+  ]
+}
