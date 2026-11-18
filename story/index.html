@@ -136,7 +136,7 @@ nav .links a.live{color:#fff;border:1px solid var(--gold);border-radius:999px;pa
 #film h1{font-size:clamp(40px,5vw,72px);line-height:1.05;max-width:900px}
 #film .opening{max-width:780px;font-size:20px;line-height:1.5;text-align:left}
 #film .film-player{max-width:1120px;width:100%;text-align:left;font-size:14px;scroll-margin-top:90px}
-#film .film-player video{margin-top:16px}.film-player p{margin:12px 0}
+#film .film-player video{margin-top:16px}#built video{width:min(1120px,100%);aspect-ratio:16/9;background:#000;border-radius:10px;display:block;margin:28px 0 8px}.srcs{width:100%;border-collapse:collapse;margin-top:28px;font-size:15px}.srcs th,.srcs td{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid rgba(127,127,127,.3);vertical-align:top}.srcs th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}.srcs-wrap{overflow-x:auto}.film-player p{margin:12px 0}
 #motion-fallback{padding:28px;max-width:780px;margin:auto}#motion-fallback button{min-height:44px;padding:12px 20px;cursor:pointer}
 summary{cursor:pointer;min-height:44px;padding:12px 0}details p{max-width:78ch;margin:14px 0}
 nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44px;border-radius:0}
@@ -170,7 +170,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   <h1>Why does the evening<br>fall behind?</h1>
   <p class="opening">Dubai’s bus records show much more lateness in the evening. When a trip overruns its timetable and the break before the next trip, the delay carries forward. Insiyab tests a trip-time forecast and gives planners a measured list of routes and hours that need attention. A separate control-room drill shows how AI can gather updates for a human decision.</p>
   <div class="row"><a class="btn" href="#film-player">Watch the film</a><a class="btn" href="#descent">Explore the animated bus journey</a></div>
-  <section class="film-player" id="film-player" aria-label="Concept film"><p><strong>Concept film · stand-in data</strong><br>The film illustrates the earlier passenger concept. The bus journey below explains the recorded evening findings.</p><video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="Concept film using stand-in data"></video><p id="fgone" hidden>The film could not load. You can still explore the bus journey below.</p><a class="btn" href="#descent">Continue into the bus journey</a></section>
+  <section class="film-player" id="film-player" aria-label="The film"><p><strong>The film · two and a half minutes</strong><br>The evening problem on RTA's recorded day, the planner's tool in Dataiku, and how Insiyab supports the control centre when a bus runs late. Figures from 15 December 2025; the 19:23 departure and the control-centre incident are labelled illustrations.</p><video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="Insiyab film: the evening problem, the planner tool and the control-centre co-pilot"></video><p id="fgone" hidden>The film could not load. You can still explore the bus journey below.</p><a class="btn" href="#descent">Continue into the bus journey</a></section>
 </header>
 
 <div id="descent">
@@ -369,6 +369,8 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
     <p class="ey reveal">How it's built</p>
     <h2 class="big reveal">Inside Dataiku.<br><span>Where RTA can run it.</span></h2>
     <p class="lede reveal">Eighteen steps in five zones: twelve visual recipes and six short Python recipes. One rebuild from RTA's raw tables takes <b>131 seconds</b>. The web app's tabs carry the same names as the zones.</p>
+    <video class="reveal" id="flowv" src="film-flow.mp4" controls playsinline preload="metadata" aria-label="One-minute walk through the Insiyab Flow in Dataiku, zone by zone"></video>
+    <p class="reveal" style="font-size:14px;opacity:.75">One minute through the Flow, zone by zone, on a real capture of the INSIYAB project. Captions only.</p>
     <div class="grid reveal">
       <div class="card"><p class="k">Zone 1</p><h3>Passenger demand</h3><p>Who boards, where, and when.</p><ul><li>count_taps</li><li>demand_by_hour</li><li>demand_by_route_hour</li><li>demand_by_stop</li></ul></div>
       <div class="card"><p class="k">Zone 2</p><h3>Service reliability</h3><p>Does the bus leave on time?</p><ul><li>clean_running_time</li><li>punctuality_by_hour</li><li>punctuality_by_route_hour</li><li>punctuality_by_bus_type</li></ul></div>
@@ -376,6 +378,25 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
       <div class="card"><p class="k">Zone 4</p><h3>Forecast</h3><p>How long will each trip take?</p><ul><li>build_trip_table</li><li>forecast_running_time</li><li>running_time_bands</li><li>running_time_ledger_by_hour</li><li>train_running_time_model</li></ul></div>
       <div class="card"><p class="k">Zone 5</p><h3>Priorities</h3><p>Where does lateness reach the most passengers?</p><ul><li>passenger_impact_by_route_hour</li><li>passenger_impact_scored</li><li>passenger_impact_top25</li></ul></div>
     </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="ey reveal">The data</p>
+    <h2 class="big reveal">RTA's two files.<br><span>Dubai's open data beside them.</span></h2>
+    <p class="lede reveal">The forecast, the planner's list and the control-room flag use only the two RTA files we were given. The public tables below are already in the project: the seasonal check uses the monthly ridership file today, and weather and calendar are ready for when there is more than one day.</p>
+    <div class="srcs-wrap reveal"><table class="srcs">
+      <tr><th>Data</th><th>Source</th><th>Where it is used</th></tr>
+      <tr><td>Trip times and card taps, 15 December 2025</td><td>RTA, supplied for the hackathon in Dataiku</td><td>Everything measured: the forecast, the planner's list, the control-room flag</td></tr>
+      <tr><td>Bus passengers by route, monthly</td><td>data.dubai, RTA: Bus Passengers Trips by Route, Monthly</td><td>Seasonal check: December is about 5% busier than an average month across the network</td></tr>
+      <tr><td>Bus stops, routes, stops in order; metro stations</td><td>data.dubai, RTA: Bus Stops Details, Routes Stops, Bus Routes, Dubai Metro Stations</td><td>Network and transfer context</td></tr>
+      <tr><td>Public timetable feed (routes, stops, shapes)</td><td>RTA's GTFS feed, MobilityData copy (feed mdb-904); valid late 2021, not today's timetable</td><td>The web app's map and replay, and the Khutwa passenger page</td></tr>
+      <tr><td>Street map</td><td>OpenStreetMap, as a Protomaps archive</td><td>The background map in the web app</td></tr>
+      <tr><td>Population by community, 2025</td><td>Dubai Data and Statistics Establishment</td><td>Prepared, for demand context</td></tr>
+      <tr><td>Hourly weather, 1 November to 15 December 2025</td><td>Open-Meteo historical weather API</td><td>Prepared, not in the forecast: one day gives nothing to vary against</td></tr>
+      <tr><td>Public holidays and school terms</td><td>Khaleej Times articles, checked against u.ae</td><td>Prepared calendar, for when there are more days</td></tr>
+    </table></div>
   </div>
 </section>
 

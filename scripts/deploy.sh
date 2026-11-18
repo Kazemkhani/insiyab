@@ -67,6 +67,9 @@ if [ -f "$WORK/src/story/index.html" ]; then
     FILM="${INSIYAB_FILM:-$HOME/work/insiyab-run/film/comic/Insiyab-comic.mp4}"
     if [ -f "$FILM" ]; then cp "$FILM" "$UP/pitch/film.mp4"; echo "NOTE the pitch page is in this deploy at /pitch/, with the film"
     else echo "NOTE the pitch page is in this deploy at /pitch/, WITHOUT the film: $FILM does not exist"; fi
+    FLOWFILM="${INSIYAB_FLOW_FILM:-$HOME/work/insiyab-run/film/flow/Insiyab-flow-v2.mp4}"
+    if [ -f "$FLOWFILM" ]; then cp "$FLOWFILM" "$UP/pitch/film-flow.mp4"; echo "NOTE the Dataiku Flow film is in this deploy"
+    else echo "NOTE the Dataiku Flow film is NOT in this deploy: $FLOWFILM does not exist"; fi
   else echo "NOTE the pitch page is NOT in this deploy: its figures are real totals and no yes is recorded in docs/REQUIREMENTS.md"; fi
 fi
 # The deployer's own files: the page asks not to be indexed whatever the builds contain, and says which commit it is.
