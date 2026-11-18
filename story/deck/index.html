@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insiyab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@300;600;800&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"IBM Plex Sans";src:url(brand/fonts/IBMPlexSans-Regular.ttf);font-weight:400}
+@font-face{font-family:"IBM Plex Sans";src:url(brand/fonts/IBMPlexSans-Medium.ttf);font-weight:500}
+@font-face{font-family:"IBM Plex Sans";src:url(brand/fonts/IBMPlexSans-SemiBold.ttf);font-weight:600}
+:root{
+  --ivory:#F7F5F0; --ink:#15181D; --gold:#9C7B3E; --red:#C42B2B; --red-on-ink:#E5544B; --teal:#2E7D6B;
+  --mute-on-ink:#A9AEB5; --mute:#5A6068;
+  --head:"Overpass","Helvetica Neue",Arial,sans-serif;
+  --text:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:var(--text);color:var(--ivory)}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;background:var(--ink)}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity 700ms var(--ease),visibility 0s 700ms}
+.slide.on{opacity:1;visibility:visible;transition:opacity 700ms var(--ease)}
+.photo{position:absolute;inset:0;background-size:cover;background-position:center;transform:scale(1.04);transition:transform 9s linear}
+.slide.on .photo{transform:scale(1)}
+/* legibility scrim: darkens only where text sits */
+.scrim-b{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,11,14,.88) 0%,rgba(10,11,14,.55) 38%,rgba(10,11,14,0) 70%)}
+.scrim-l{position:absolute;inset:0;background:linear-gradient(to right,rgba(10,11,14,.86) 0%,rgba(10,11,14,.55) 45%,rgba(10,11,14,0) 75%)}
+.pad{position:absolute;left:140px;right:140px}
+h1,h2,.num{font-family:var(--head);font-weight:800;letter-spacing:-0.02em;line-height:1.02}
+h2{font-size:96px}
+.lede{font-size:40px;line-height:1.3;color:var(--mute-on-ink);font-weight:400;max-width:1200px}
+.credit{text-shadow:0 1px 3px rgba(0,0,0,.85);position:absolute;right:48px;bottom:36px;font-size:18px;color:rgba(247,245,240,.62);text-align:right;max-width:900px;line-height:1.4}
+.step{opacity:0;transform:translateY(12px);transition:opacity 600ms var(--ease),transform 600ms var(--ease)}
+.step.shown{opacity:1;transform:none}
+.light{background:var(--ivory);color:var(--ink)}
+.light .credit{color:var(--mute);text-shadow:none}
+#hint{position:fixed;left:16px;bottom:12px;font:13px var(--text);color:#777;transition:opacity 600ms}
+#notes{position:fixed;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);color:#eee;font:20px/1.45 var(--text);padding:20px 32px;display:none;max-height:40vh;overflow:auto}
+#notes.on{display:block}
+.qr{background:#fff;padding:14px;width:176px;height:176px}
+.qr img{width:100%;height:100%;display:block}
+@media (prefers-reduced-motion:reduce){
+  .slide,.slide.on{transition:opacity 150ms linear}
+  .photo,.slide.on .photo{transform:none;transition:none}
+  .step{transform:none;transition:opacity 150ms linear}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1 TITLE -->
+<section class="slide" data-notes="Amir · 20 s. Don't introduce the team first. Let the picture sit for a breath, then: we are Insiyab, an AI co-pilot for the people who keep Dubai's buses on time.">
+  <div class="photo" style="background-image:url(photos/title-3.jpg)"></div>
+  <div class="scrim-b"></div>
+  <div class="pad" style="top:96px;font-size:22px;color:rgba(247,245,240,.75);letter-spacing:.02em">Team Visionary &nbsp;·&nbsp; University of Birmingham Dubai &nbsp;·&nbsp; RTA Future Move Hackathon</div>
+  <div class="pad" style="bottom:150px">
+    <img src="brand/logo/insiyab-lockup-on-photo.svg" alt="Insiyab انسياب" style="height:200px;display:block;margin-bottom:44px">
+    <p class="lede" style="color:var(--ivory);font-size:48px">An AI co-pilot for Dubai's bus control centre.</p>
+  </div>
+  <div style="position:absolute;right:140px;bottom:150px;text-align:right">
+    <div class="qr" style="margin-left:auto"><img src="qr-pitch.svg" alt="QR code to the live site"></div>
+    <div style="font-size:20px;margin-top:14px;color:rgba(247,245,240,.8)">insiyab.amirkazemkhani.com/pitch</div>
+  </div>
+  <div class="credit">Sheikh Zayed Road at night. Photo: Irshad Ahmad, Pexels</div>
+</section>
+
+<!-- 2 HER EVENING -->
+<section class="slide" data-steps="1" data-notes="Amir · 30 s. She planned her evening around 19:23. [click] The bus left at 19:36. The trip was planned at 67 minutes and took 96; the break was gone, so the next bus started late. Say once: this is an illustration built from route 310's measured times.">
+  <div class="photo" style="background-image:url(photos/waiting-1.jpg);background-position:center 40%"></div>
+  <div class="scrim-b"></div>
+  <div class="pad" style="bottom:150px">
+    <h2>She planned her evening<br>around 19:23.</h2>
+    <h2 class="step" data-step="1" style="color:var(--red-on-ink);margin-top:28px">The bus left at 19:36.</h2>
+  </div>
+  <div class="credit">Representative image. Times: route 310 at 18:00, RTA records, 15 December 2025.<br>Photo: Dwi Setyo, Pexels</div>
+</section>
+
+<!-- 3 SCALE -->
+<section class="slide" data-steps="1" data-notes="Sarah · 40 s. Same crowd at both peaks: 48,724 boardings at 08:00, 49,707 at 18:00. In the morning 19 in 100 departures leave five or more minutes late. In the evening, 45. [click] Across the evening rush that is about 244 bus hours of missing trip time, about 80 buses' worth. That last number is our arithmetic: 244 divided by 3. Never say traffic is the cause.">
+  <div class="photo" style="background-image:url(photos/scale-2.jpg)"></div>
+  <div class="scrim-l"></div>
+  <div class="pad" style="top:200px">
+    <div class="num" style="font-size:300px;color:var(--ivory)">45%</div>
+    <p class="lede" style="color:var(--ivory);font-size:48px;margin-top:20px;max-width:900px">of evening departures leave five or more minutes late.</p>
+    <p class="lede" style="margin-top:22px;max-width:900px">19% in the morning. The same crowd: 48,724 boardings at 08:00, 49,707 at 18:00.</p>
+    <p class="lede step" data-step="1" style="color:var(--ivory);margin-top:48px;max-width:900px">About 80 buses' worth of trip time goes missing every evening rush.</p>
+  </div>
+  <div class="credit">RTA records, 15 December 2025. 80 buses: 244 bus hours ÷ 3. Photo: Nihongraphy, Pexels</div>
+</section>
+
+<!-- 4 CONTROL ROOM -->
+<section class="slide" data-steps="1" data-notes="Sarah · 30 s. RTA told us: six controllers per shift, about 1,400 buses. [click] When one bus is late, a controller phones the driver, then the depot, then the station, one by one. Every call is time taken from the decision. Small events of a few hundred people are not planned at all.">
+  <div class="photo" style="background-image:url(photos/control-1.jpg)"></div>
+  <div class="scrim-b"></div>
+  <div class="pad" style="bottom:150px">
+    <h2>Six controllers. 1,400 buses.</h2>
+    <h2 class="step" data-step="1" style="color:var(--mute-on-ink);margin-top:20px">One phone call at a time.</h2>
+  </div>
+  <div class="credit">Representative image: a traffic dispatch centre in Nevada, not RTA's. Numbers: RTA staff, 18 November 2026.<br>Photo: Noah Wulf, CC BY-SA 4.0</div>
+</section>
+
+<!-- 5 INSIYAB -->
+<section class="slide" data-steps="3" data-notes="Amir · 60 s. Insiyab calls the four people a controller phones today, all at once. [click] Their answers become one short briefing with three options, none ranked. [click] A person decides. Every time. [click] Insiyab tells everyone, and each person confirms they heard it. The controller decides. Insiyab does the calling.">
+  <div class="pad" style="top:170px">
+    <img src="brand/logo/insiyab-symbol-ink.svg" alt="" style="height:64px;filter:invert(1);opacity:.9;margin-bottom:60px">
+    <h2 style="font-size:84px;font-weight:600;color:var(--mute-on-ink)">Insiyab phones the driver, depot,<br>station and planning, all at once.</h2>
+    <h2 class="step" data-step="1" style="font-size:84px;font-weight:600;color:var(--mute-on-ink);margin-top:36px">One briefing. Three options, none ranked.</h2>
+    <h2 class="step" data-step="2" style="font-size:84px;margin-top:36px;color:var(--ivory)">A person decides.</h2>
+    <h2 class="step" data-step="3" style="font-size:84px;font-weight:600;color:var(--gold);margin-top:36px">Everyone is told, and confirms.</h2>
+  </div>
+</section>
+
+<!-- 6 REAL CALL -->
+<section class="slide light" data-notes="Mustafo · 40 s. This is the real screen from our drill on 18 November, on our own phones. These are the words four people said on the call: the driver, the depot, the planner, the station. Four reports, one human decision, four confirmations. It is a drill, not an RTA system, and every condition on it is labelled simulated.">
+  <div class="pad" style="top:110px">
+    <h2 style="font-size:76px;color:var(--ink)">It ran end to end, on real phones.</h2>
+    <p class="lede" style="color:var(--mute);font-size:34px;margin-top:20px">18 November 2026 &nbsp;·&nbsp; 4 reports &nbsp;·&nbsp; 1 human decision &nbsp;·&nbsp; 4 confirmations</p>
+  </div>
+  <img src="assets/call-live.jpg" alt="The rehearsal dashboard showing what the driver, depot, planner and station supervisor reported" style="position:absolute;left:140px;right:140px;top:360px;width:1640px;box-shadow:0 2px 0 rgba(21,24,29,.08),0 24px 60px rgba(21,24,29,.18)">
+  <div class="credit">Our rehearsal dashboard during the drill. Conditions simulated and labelled on screen; not an RTA system.</div>
+</section>
+
+<!-- 7 PROOF -->
+<section class="slide light" data-steps="1" data-notes="Sara · 40 s. Two numbers. First: when a bus is still out on its last trip as its next one is due, that next departure leaves late 85 times in 100. 696 such departures on the day we measured. So we can see it coming. [click] Second: our trip-time forecast is 15% closer than the timetable, on 2,043 evening trips it had never seen: 6.97 minutes off against 8.25. One day of data; stricter tests give 8 to 10%. Never say delays fell by 15%.">
+  <div class="pad" style="top:330px;display:grid;grid-template-columns:1fr 1fr;column-gap:160px">
+    <div>
+      <div class="num" style="font-size:220px;color:var(--red)">85<span style="font-size:96px"> in 100</span></div>
+      <p style="font-size:36px;line-height:1.3;margin-top:34px;font-weight:500">We see it coming.</p>
+      <p style="font-size:28px;line-height:1.4;margin-top:16px;color:var(--mute)">When a bus is still out on its last trip as its next one is due, that departure leaves five or more minutes late 85 times in 100.</p>
+    </div>
+    <div class="step" data-step="1">
+      <div class="num" style="font-size:220px;color:var(--ink)">15%</div>
+      <p style="font-size:36px;line-height:1.3;margin-top:34px;font-weight:500">Closer than the timetable.</p>
+      <p style="font-size:28px;line-height:1.4;margin-top:16px;color:var(--mute)">Trip times forecast on 2,043 evening trips the model never saw: 6.97 minutes off, against 8.25.</p>
+    </div>
+  </div>
+  <div class="credit">Insiyab analysis on RTA records, 15 December 2025. One day of data; stricter tests give 8 to 10%.</div>
+</section>
+
+<!-- 8 THE ASK -->
+<section class="slide" data-notes="Amir · 30 s. Our ask: one control-centre shift, selected evening routes, eight weeks. We measure controller time on calls, departures leaving late, and small events planned. The controller decides. Insiyab does the calling. Thank you.">
+  <div class="photo" style="background-image:url(photos/close-1.jpg);left:760px;background-position:30% center"></div>
+  <div style="position:absolute;left:0;top:0;bottom:0;width:760px;background:var(--ink)"></div>
+  <div style="position:absolute;left:120px;top:150px;width:560px">
+    <h2 style="font-size:88px">One shift.<br>Selected routes.<br>Eight weeks.</h2>
+    <p style="font-size:30px;line-height:1.4;color:var(--mute-on-ink);margin-top:44px">We measure controller time on calls, departures leaving late, and small events planned.</p>
+    <p style="font-family:var(--head);font-weight:800;font-size:40px;line-height:1.15;margin-top:56px">The controller decides.<br><span style="color:var(--gold)">Insiyab does the calling.</span></p>
+  </div>
+  <div style="position:absolute;left:120px;bottom:80px;display:flex;align-items:center;gap:24px">
+    <div class="qr" style="width:132px;height:132px;padding:10px"><img src="qr-pitch.svg" alt="QR code to the live site"></div>
+    <div style="font-size:20px;color:var(--mute-on-ink)">insiyab.amirkazemkhani.com/pitch</div>
+  </div>
+  <div class="credit">Route X25 at Al Karama bus station. Photo: Rob Dammers, CC BY-SA 2.0</div>
+</section>
+
+<!-- BACKUP 1: WHY NOW -->
+<section class="slide light" data-notes="Backup, for Q&A. The UAE Cabinet set a target in April 2026: agentic AI across half of government operations within two years. Insiyab is one small, human-supervised step of that kind.">
+  <div class="pad" style="top:120px">
+    <p style="font-size:22px;color:var(--mute)">Backup</p>
+    <h2 style="font-size:76px;color:var(--ink);margin-top:12px">Why now</h2>
+    <p style="font-size:40px;line-height:1.35;margin-top:56px;max-width:1450px">In April 2026 the UAE Cabinet set a goal: agentic AI across 50% of government operations within two years.</p>
+    <p style="font-size:30px;line-height:1.5;margin-top:40px;color:var(--mute);max-width:1450px">Insiyab is one bounded step of that kind: an agent that gathers facts and relays a person's decision, for a service half a million people use every day. It also serves We the UAE 2031, the National AI Strategy 2031, the Dubai Economic Agenda D33 and the Dubai 2040 Urban Master Plan.</p>
+  </div>
+  <div class="credit">Dubai Media Office, 23 April 2026 (UAE Cabinet meeting chaired by His Highness Sheikh Mohammed bin Rashid Al Maktoum). Strategies: u.ae and Government of Dubai portals.</div>
+</section>
+
+<!-- BACKUP 2: REWARDS -->
+<section class="slide light" data-notes="Backup, for Q&A. A proposal only. Always opt-in, nobody asked to wait longer, aggregates only. No partnership with Google or any brand exists. Google Opinion Rewards figures are downloads, not active users.">
+  <div class="pad" style="top:120px">
+    <p style="font-size:22px;color:var(--mute)">Backup</p>
+    <h2 style="font-size:76px;color:var(--ink);margin-top:12px">Next: points for helping others</h2>
+    <p style="font-size:36px;line-height:1.4;margin-top:48px;max-width:1450px">Riders could earn nol Plus points for a short, opt-in survey. RTA already runs the points.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);column-gap:80px;margin-top:72px">
+      <div><div class="num" style="font-size:96px">100M+</div><p style="font-size:24px;line-height:1.45;margin-top:14px;color:var(--mute)">Play Store downloads of Google Opinion Rewards (Sept 2024). In the UAE since April 2020.</p></div>
+      <div><div class="num" style="font-size:96px">$153bn</div><p style="font-size:24px;line-height:1.45;margin-top:14px;color:var(--mute)">the global insights industry in 2024. Brands pay to learn what customers think.</p></div>
+      <div><div class="num" style="font-size:96px">nol Plus</div><p style="font-size:24px;line-height:1.45;margin-top:14px;color:var(--mute)">points on metro, bus, taxi and parking, redeemable as nol credit or partner discounts.</p></div>
+    </div>
+  </div>
+  <div class="credit">9to5Google, 2 Sep 2024; Android Police, 14 Apr 2020; ESOMAR Global Market Research 2025; RTA, 26 Feb 2019; Singer and Ye, 2013. A proposal only: no partnership exists.</div>
+</section>
+
+<!-- BACKUP 3: SOURCES -->
+<section class="slide light" data-notes="Backup. Every number traces to one of these.">
+  <div class="pad" style="top:110px">
+    <h2 style="font-size:64px;color:var(--ink)">Where every number comes from</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:80px;row-gap:26px;margin-top:56px;font-size:21px;line-height:1.45;color:#2a2e35">
+      <p><b>RTA records in Dataiku.</b> Running times, fleet list and nol card taps for Monday 15 December 2025: 1,056,343 taps, 544,583 check-ins, 11,201 trips. Not public; rows stay on RTA's platform.</p>
+      <p><b>RTA control-centre and planning staff,</b> in conversation with the team, 18 November 2026: six controllers per shift, about 1,400 buses, manual coordination.</p>
+      <p><b>RTA, bus passengers by route, monthly.</b> Dubai open data (dataset 459793): 15.28 million bus journeys in December 2025.</p>
+      <p><b>Insiyab analysis.</b> Forecast tested on 2,043 evening trips not used in training; 244 bus hours 16:00 to 18:59; the calling drill on 18 November 2026. Code and method in the shared source package.</p>
+      <p><b>Open-Meteo</b> historical weather; <b>UAE public holidays and school terms</b> (Khaleej Times, checked against u.ae).</p>
+      <p><b>Dubai Media Office,</b> 23 April 2026; UAE and Dubai government strategy portals.</p>
+      <p style="grid-column:1/-1;color:var(--mute)"><b>Photographs.</b> Irshad Ahmad, Dwi Setyo, Nihongraphy (Pexels License); Noah Wulf, CC BY-SA 4.0; Rob Dammers, CC BY-SA 2.0 (Wikimedia Commons). Bus stop and control room are representative images, not RTA's.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+<div id="hint">Arrow keys or click · F full screen · N notes</div>
+<div id="notes"></div>
+<script>
+const stage=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(-50%,-50%) scale(${s})`}
+addEventListener('resize',fit);fit();
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0,step=0;
+const notes=document.getElementById('notes');
+function render(){
+  slides.forEach((s,i)=>s.classList.toggle('on',i===cur));
+  slides[cur].querySelectorAll('.step').forEach(e=>e.classList.toggle('shown',+e.dataset.step<=step));
+  notes.textContent=`${cur+1}/${slides.length}  ${slides[cur].dataset.notes||''}`;
+  try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
+}
+function steps(){return +(slides[cur].dataset.steps||0)}
+function next(){if(step<steps()){step++;render()}else if(cur<slides.length-1){cur++;step=0;render()}}
+function prev(){if(step>0){step--;render()}else if(cur>0){cur--;step=steps();render()}}
+addEventListener('keydown',e=>{
+  hideHint();
+  if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(e.key)){e.preventDefault();next()}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev()}
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+  else if(e.key==='n'||e.key==='N'){notes.classList.toggle('on')}
+  else if(e.key==='Home'){cur=0;step=0;render()}
+});
+addEventListener('click',e=>{hideHint();(e.clientX<innerWidth*0.2?prev:next)()});
+const hint=document.getElementById('hint');
+function hideHint(){hint.style.opacity=0}
+setTimeout(hideHint,4000);
+const h=parseInt(new URLSearchParams(location.search).get('s')||location.hash.slice(1));
+if(h>0&&h<=slides.length){cur=h-1}
+const q=new URLSearchParams(location.search);
+if(q.has('all')){step=99;document.getElementById('hint').style.display='none'}
+render();
+</script>
+</body>
+</html>
