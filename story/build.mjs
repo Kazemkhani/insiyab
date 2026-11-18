@@ -13,6 +13,7 @@ const out=resolve(args[at+1]);
 await mkdir(resolve(out,'onday'),{recursive:true});
 await mkdir(resolve(out,'voice'),{recursive:true});
 await copyFile(resolve(root,'story/index.html'),resolve(out,'index.html'));
+await copyFile(resolve(root,'story/presenter.html'),resolve(out,'presenter.html'));
 await copyFile(resolve(root,'opendata/onday/index.html'),resolve(out,'onday/index.html'));
 await copyFile(resolve(root,'opendata/onday/FORECAST-RETEST.md'),resolve(out,'onday/FORECAST-RETEST.md'));
 await copyFile(resolve(root,'opendata/onday/HOW-IT-CONNECTS.md'),resolve(out,'onday/HOW-IT-CONNECTS.md'));

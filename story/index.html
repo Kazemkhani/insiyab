@@ -382,7 +382,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   </div>
 </section>
 
-<section>
+<section id="data">
   <div class="wrap">
     <p class="ey reveal">The data</p>
     <h2 class="big reveal">RTA's two files.<br><span>Dubai's open data beside them.</span></h2>
@@ -401,7 +401,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   </div>
 </section>
 
-<section>
+<section id="users">
   <div class="wrap">
     <p class="ey reveal">Who uses it</p>
     <h2 class="big reveal">The control centre.<br><span>And the planners behind it.</span></h2>
@@ -409,7 +409,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   </div>
 </section>
 
-<section class="ask">
+<section class="ask" id="close">
   <div class="wrap">
     <h2 class="big reveal">The controller decides.<br>Insiyab does the calling.</h2>
     <p class="lede reveal">Next step: a pilot with one control-centre shift on selected routes, with more days of records and Dubai's open data, measuring the controller's time on calls rather than assuming it. Today's evidence is one day: about <b>244 bus hours</b> of trip time the evening timetable does not hold (16:00 to 18:59, measured, not a saving).</p>
@@ -636,6 +636,31 @@ startJourney();
 // reveals and bars below the descent (kept apart from the 3D so the page still reads if the 3D cannot load)
 (function(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');e.target.querySelectorAll('.fill').forEach(f=>{f.style.height=f.dataset.h+'%'});io.unobserve(e.target)}),{threshold:0.15});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el))})();
+</script>
+<script>
+// Presenter link: tells /pitch/presenter.html (another window of the same browser) which section is in view. Sends nothing off this device.
+(function(){
+  let bc=null;try{bc=new BroadcastChannel('insiyab-presenter')}catch(e){}
+  const send=m=>{try{bc&&bc.postMessage(m)}catch(e){}try{localStorage.setItem('insiyab-presenter',JSON.stringify(Object.assign({n:Date.now()},m)))}catch(e){}};
+  const ids=['film','film-player','descent','problem','clock','short','answer','worklist','onday','forecast','fleet','built','data','users','close'];
+  const els=ids.map(i=>document.getElementById(i)).filter(Boolean);
+  let current=null,chapter=null;
+  function pick(){
+    const mid=innerHeight*0.45;let best=null;
+    for(const el of els){const r=el.getBoundingClientRect();if(r.top<=mid&&r.bottom>mid){best=el}}
+    if(!best)return;
+    let ch=null;
+    if(best.id==='descent'){const caps=[...best.querySelectorAll('.cap')];const i=caps.findIndex(c=>c.getAttribute('aria-hidden')==='false');ch=i>=0?i:null}
+    if(best.id!==current||ch!==chapter){current=best.id;chapter=ch;send({type:'section',key:current,chapter:ch})}
+  }
+  addEventListener('scroll',()=>requestAnimationFrame(pick),{passive:true});
+  setInterval(()=>{pick();send({type:'section',key:current,chapter:chapter})},3000);
+  if(bc)bc.onmessage=e=>{if(e.data&&e.data.type==='hello'){send({type:'section',key:current,chapter:chapter})}};
+  const v=document.getElementById('fv');
+  if(v){let lastT=-5;v.addEventListener('timeupdate',()=>{if(Math.abs(v.currentTime-lastT)>=1){lastT=v.currentTime;send({type:'film',t:v.currentTime,playing:!v.paused})}})}
+  addEventListener('keydown',e=>{if((e.key==='p'||e.key==='P')&&!e.metaKey&&!e.ctrlKey&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){window.open('presenter.html','insiyab-presenter')}});
+  pick();
+})();
 </script>
 </body>
 </html>

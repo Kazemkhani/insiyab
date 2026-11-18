@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Insiyab presenter notes</title>
+<style>
+/* Presenter screen: one reading column, the spoken line is the focal point, everything else is quieter */
+:root{--bg:#0F1A24;--fg:#EEF2F4;--muted:#93A3B0;--rule:#2A3A48;--accent:#E3B65C;--flow:#5FB8B0;--late:#E87A6E;--sim:#D9A647;
+--display:'Overpass',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:var(--body)}
+.wrap{max-width:1500px;margin:0 auto;padding:20px max(24px,env(safe-area-inset-left,0px)) 28px max(24px,env(safe-area-inset-right,0px));display:grid;grid-template-rows:auto auto 1fr auto;gap:18px;min-height:100%}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:15px;color:var(--muted)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--late);margin-right:8px;vertical-align:middle}
+.dot.on{background:var(--flow)}
+.clock{font-size:30px;color:var(--fg);font-variant-numeric:tabular-nums}
+button{font:inherit;font-size:14px;background:transparent;color:var(--muted);border:1px solid var(--rule);border-radius:6px;padding:8px 14px;cursor:pointer;min-height:40px}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.head{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:14px}
+.sec{font-family:var(--display);font-weight:700;font-size:30px;margin:0}
+.who{font-family:var(--mono);font-size:20px;color:var(--bg);background:var(--accent);padding:4px 12px;border-radius:4px;white-space:nowrap}
+.time{font-family:var(--mono);font-size:18px;color:var(--muted);white-space:nowrap}
+.say{font-size:clamp(26px,2.6vw,38px);line-height:1.45;margin:0;max-width:62ch;text-wrap:pretty}
+.say .film{color:var(--muted)}
+.rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;border-top:1px solid var(--rule);padding-top:14px}
+.rows h3{font-family:var(--mono);font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.rows p{margin:0;font-size:19px;line-height:1.45}
+.never{color:var(--late)}
+.wait{color:var(--muted);font-size:22px;line-height:1.5}
+.wait code{font-family:var(--mono);color:var(--fg)}
+@media (prefers-reduced-motion:no-preference){.say{transition:opacity .2s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span id="link"><span class="dot" id="dot"></span><span id="linktext">Waiting for the pitch page</span></span>
+    <span><span class="clock" id="clock">0:00</span> elapsed · 10:00 slot</span>
+    <span><button id="start" type="button">Start clock</button> <button id="reset" type="button">Reset</button></span>
+  </div>
+  <div class="head"><h1 class="sec" id="sec">Insiyab presenter notes</h1><span class="who" id="who" hidden></span><span class="time" id="time"></span></div>
+  <p class="say" id="say"><span class="wait">Open <code>insiyab.amirkazemkhani.com/pitch/</code> in another window of <b>this same browser</b> and drag it to the big screen. As you scroll it, the script for the section in view appears here. Press <code>P</code> on the pitch page to open this window from there.</span></p>
+  <div class="rows" id="rows" hidden>
+    <div><h3>Point at</h3><p id="point"></p></div>
+    <div><h3>Then</h3><p id="next"></p></div>
+    <div id="neverbox" hidden><h3>Do not say</h3><p class="never" id="never"></p></div>
+  </div>
+</div>
+<script>
+// Notes for each section of /pitch/. Speakers: Amir, Sara (Alrifai), Sarah (Maaty), Mustafo, Maruf.
+const NOTES = {
+  film: {sec:'Opening', who:'Amir', time:'0:15', say:'Good morning. We are Insiyab. Two and a half minutes of film, then we show you the real thing.', point:'Nothing yet.', next:'Press "Watch the film".'},
+  'film-player': {sec:'The film', who:'Nobody speaks', time:'2:15', say:'<span class="film">Let it play. 0:00 the evening problem · 0:55 the control-centre calling drill · 1:15 the walkthrough in Dataiku.</span>', point:'Stand aside from the screen.', next:'When it ends, the page scrolls into the bus journey.'},
+  descent: {sec:'The bus journey', who:'Amir', time:'0:45', say:'One real day, 15 December 2025. The same crowd morning and evening, but evening departures run late far more often. Route 310 at six: 67 minutes planned, 96 taken, a 16 minute break. The delay is handed on.', point:'The number in each panel. Read what is on screen: 47% at 19:00, 16% at 07:00.', next:'Scroll fast to "How it is built". Hand to Maruf.'},
+  problem: {sec:'The timetable said 19:23', who:'Amir', time:'only if you stop', say:'The timetable said 19:23. The bus left at 19:36. That is an illustration built from route 310\'s measured times, not one real passenger.', point:'The two clock times.', next:'Keep scrolling.', never:'Do not call it an observed trip.'},
+  clock: {sec:'Similar boardings', who:'Amir', time:'only if you stop', say:'48,724 boardings at eight, 49,707 at six. The same crowd. Late departures go from 19 to 45 per cent. December is only about five per cent busier than an average month, so this is not a tourist spike.', point:'The two boarding totals.', next:'Keep scrolling.'},
+  short: {sec:'Where the timetable is short', who:'Amir', time:'only if you stop', say:'244 bus hours of trip time the evening timetable does not hold, measured from the day, not predicted.', point:'The 244.', next:'Keep scrolling.', never:'Not a saving.'},
+  answer: {sec:'Our answer', who:'Amir', time:'0:20', say:'Six controllers run about 1,400 buses. Insiyab is their co-pilot: it flags the route-hours at risk, makes the calls, and gives the controller one briefing with three options. A person always decides.', point:'The four cards, left to right.', next:'Keep scrolling to the Flow film.'},
+  worklist: {sec:'What a planner gets', who:'Sarah', time:'only if you stop', say:'Each row is a route and an hour, what was planned and the minutes it needs. The planner accepts or sets it aside. Nothing applies itself.', point:'The first row.', next:'Keep scrolling.'},
+  onday: {sec:'On the day itself', who:'Amir', time:'0:45', say:'696 departures were due before their bus was back. When that happens, Insiyab asks the driver, depot and station, briefs the controller, the controller decides, and Insiyab records who received the decision. This is a drill on our own phones, not an RTA system.', point:'The three steps: report, decide, relay.', next:'Optional: "Open the rehearsal dashboard", then "Play an illustrated example". Never dial live.', never:'Do not say the full phone loop has completed. It has not.'},
+  forecast: {sec:'The forecast', who:'Mustafo', time:'only if you stop', say:'On 2,043 evening trips it never saw, the timetable misses by 8.25 minutes, the model by 6.97: about fifteen per cent closer between four and seven, one day. Stricter tests give eight to ten.', point:'The test window, then the comparison rows.', next:'Keep scrolling.', never:'Not "delays fell by 15%".'},
+  fleet: {sec:'The double-deckers', who:'Mustafo', time:'skip', say:'An association, not a cause: the routes each bus type runs are different.', point:'Skip unless asked.', next:'Keep scrolling.'},
+  built: {sec:'How it is built', who:'Maruf', time:'1:10', say:'Everything runs inside Dataiku, from RTA\'s two files. Here is the Flow in one minute, zone by zone. Eighteen steps, twelve visual and six Python, rebuilt in about two minutes.', point:'Play the Flow film.', next:'Scroll to "The data".'},
+  data: {sec:'The data', who:'Maruf', time:'0:30', say:'The forecast and the planner\'s list use only RTA\'s two files. Beside them we brought Dubai\'s open data: monthly ridership by route, which already normalises our load figures for the season, plus stops, routes, metro, population and weather, ready for more days. Average speed by route is our next signal.', point:'The first two rows of the table.', next:'Scroll to "Who uses it". Hand to Sarah.'},
+  users: {sec:'Who uses it', who:'Sarah', time:'0:30', say:'On the day, the duty controller gets one briefing instead of many calls. This week, the event team plans the small events nobody has time for today. At each timetable change, the planner opens the worklist.', point:'The three users in the paragraph.', next:'Scroll to the close. Hand to Amir.'},
+  close: {sec:'Close and live demo', who:'Amir', time:'0:20 then Dataiku', say:'The controller decides. Insiyab does the calling. Our next step is a pilot with one control-centre shift. Now, live in Dataiku.', point:'"Now see it live in Dataiku".', next:'Dataiku tabs: Sara 1, 4, 5 · Sarah 2, 3, 7 · Mustafo 6. Read the SAY panel on each tab.'}
+};
+// Journey chapters, in order of the .cap panels on the pitch page.
+const CHAPTERS = [
+  'One real day: 1,056,343 card taps, 11,201 trips.',
+  'The gap: late departures far more common in the evening, at a similar crowd. Read the numbers on screen.',
+  'One bus, one evening: route 310 at six, 67 minutes planned, 96 taken, a 16 minute break.',
+  'The delay travels: 589 of 945 linked late starts had the bus still out when the next trip was due.',
+  'The time that is missing: 244 bus hours from 16:00 to 18:59, measured.',
+  'The forecast: 8.25 against 6.97 minutes, about 15 per cent closer, one day.',
+  'Into the answer: the control-centre co-pilot. Keep scrolling.'
+];
+const $ = id => document.getElementById(id);
+let last = 0, t0 = null;
+function show(key, chapter){
+  const n = NOTES[key]; if (!n) return;
+  $('sec').textContent = n.sec;
+  $('who').textContent = n.who; $('who').hidden = false;
+  $('time').textContent = n.time;
+  let say = n.say;
+  if (key === 'descent' && Number.isInteger(chapter) && CHAPTERS[chapter]) say = CHAPTERS[chapter];
+  $('say').innerHTML = say;
+  $('point').textContent = n.point; $('next').textContent = n.next;
+  $('rows').hidden = false;
+  $('neverbox').hidden = !n.never; $('never').textContent = n.never || '';
+}
+function onMsg(m){
+  if (!m || typeof m !== 'object') return;
+  last = Date.now(); link(true);
+  if (m.type === 'section') show(m.key, m.chapter);
+  if (m.type === 'film') { if (t0 === null && m.playing) t0 = Date.now(); const s = Math.floor(m.t||0); $('time').textContent = 'film ' + Math.floor(s/60) + ':' + String(s%60).padStart(2,'0') + ' / 2:15'; }
+}
+function link(on){ $('dot').classList.toggle('on', on); $('linktext').textContent = on ? 'Following the pitch page' : 'Waiting for the pitch page'; }
+try { const bc = new BroadcastChannel('insiyab-presenter'); bc.onmessage = e => onMsg(e.data); bc.postMessage({type:'hello'}); } catch (e) {}
+window.addEventListener('storage', e => { if (e.key === 'insiyab-presenter') { try { onMsg(JSON.parse(e.newValue)); } catch (x) {} } });
+setInterval(() => { if (Date.now() - last > 6000) link(false); if (t0 !== null) { const s = Math.floor((Date.now()-t0)/1000); $('clock').textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); $('clock').style.color = s > 600 ? 'var(--late)' : s > 540 ? 'var(--sim)' : ''; } }, 500);
+$('start').onclick = () => { t0 = Date.now(); };
+$('reset').onclick = () => { t0 = null; $('clock').textContent = '0:00'; $('clock').style.color = ''; };
+</script>
+</body>
+</html>
