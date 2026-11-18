@@ -42,7 +42,12 @@ export function mountControl(alert, replay) {
     } else if (state.selected && confirmation.dataset.selection!==state.selected) {
       const chosen=alert.suggestion.options.find(o=>o.id===state.selected);
       const button=element('button',`Confirm decision: ${chosen.label}`);button.id='confirm';button.type='button';
-      button.addEventListener('click',e=>{if(e.isTrusted)controller.confirm();});
+      button.addEventListener('click',e=>{
+        if(e.isTrusted && controller.confirm()) {
+          const decision=controller.snapshot();
+          window.dispatchEvent(new CustomEvent('insiyab:decision',{detail:{...controller.context(),option:decision.decision,at:decision.decision_at}}));
+        }
+      });
       confirmation.replaceChildren(button,element('p','Nothing is relayed until you confirm.','source-note'));
     } else if (!state.selected) confirmation.replaceChildren(element('p','Choose an option, then confirm the decision.','source-note'));
     confirmation.dataset.selection=state.selected||'';

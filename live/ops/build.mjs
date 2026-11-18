@@ -2,6 +2,8 @@
 import {mkdir, readFile, writeFile, copyFile} from 'node:fs/promises';
 import {resolve, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {spawnSync} from 'node:child_process';
+import {validateHeat} from './src/heat.mjs';
 import {validateJudge} from './src/judge.mjs';
 import {createRequire} from 'node:module';
 const here = dirname(fileURLToPath(import.meta.url));
@@ -35,8 +37,13 @@ async function optionalJSON(primary, fallback) {
 }
 const alerts = await optionalJSON('fixtures/watchers/alerts.json', 'demo/alerts.json');
 if (typeof alerts.fixture !== 'boolean' || !Array.isArray(alerts.alerts)) throw Error('Invalid alerts file');
+const heat = validateHeat(await optionalJSON('artifacts/watchers/heat_stops.json', 'demo/heat_stops.json'));
+const stopKinds = spawnSync('python3', [resolve(here, 'stop-kinds.py'), resolve(root, 'opendata/public/bus-stops.csv')], {encoding:'utf8'});
+if (stopKinds.status !== 0) throw Error('Cannot read public stop kinds: ' + stopKinds.stderr);
+const kinds = JSON.parse(stopKinds.stdout);
+for (const stop of bundle['network.json'].stops) stop.stop_kind = kinds[stop.stop_id] || '';
 const judge = validateJudge(await optionalJSON('artifacts/forecast/judge_pick.json', 'demo/judge_pick.json'));
-await writeFile(resolve(out, 'data.js'), 'window.INSIYAB_OPS_DATA=' + JSON.stringify({bundle, alerts, judge}).replace(/</g, '\\u003c') + ';');
+await writeFile(resolve(out, 'data.js'), 'window.INSIYAB_OPS_DATA=' + JSON.stringify({bundle, alerts, judge, heat}).replace(/</g, '\\u003c') + ';');
 await mkdir(resolve(out, 'map'), {recursive:true});
 const mapBytes = await readFile(resolve(root, 'web/assets/map/dubai.pmtiles'));
 await writeFile(resolve(out, 'map/dubai.pmtiles'), mapBytes);

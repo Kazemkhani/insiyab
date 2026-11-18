@@ -5,6 +5,7 @@ from pathlib import Path
 from threading import Thread
 import sys
 import os
+import time
 from playwright.sync_api import sync_playwright
 
 class QuietHandler(SimpleHTTPRequestHandler):
@@ -45,6 +46,16 @@ with sync_playwright() as p:
         assert page.locator('#replay-clock').inner_text() == '18:53'
         page.locator('#time').fill('57600')
         assert page.locator('#fixture-banner').is_visible()
+        assert page.get_by_role('button',name='July scenario').is_visible()
+        page.locator('#heat').click()
+        assert 'Stand-in heat' in page.locator('#heat-info').inner_text()
+        assert page.locator('#map').get_attribute('data-heat') == '3'
+        heat_layout=page.evaluate(LAYOUT)
+        assert not heat_layout['overflow'] and not heat_layout['overlaps'],(width,heat_layout)
+        if width>=1440: assert page.evaluate('document.documentElement.scrollHeight <= innerHeight+1'), 'Desktop heat layout exceeds viewport'
+        page.screenshot(path=str(shots/f'{width}x{height}-heat.png'),full_page=True)
+        page.locator('#heat').click()
+        assert page.locator('#map').get_attribute('data-heat') == '0'
         assert page.get_by_text('Stand-in forecasts · STAND-IN DATA, NOT A RESULT').is_visible()
         page.locator('#judge-route').select_option('8')
         page.locator('#judge-hour').select_option('18:00')
@@ -76,11 +87,21 @@ with sync_playwright() as p:
         assert page.locator('#escalation').is_visible()
         layout = page.evaluate(LAYOUT)
         assert not layout['overflow'] and not layout['overlaps'], (width,layout)
+        if width>=1440: assert page.evaluate('document.documentElement.scrollHeight <= innerHeight+1'), 'Desktop countdown layout exceeds viewport'
         page.screenshot(path=str(shots/f'{width}x{height}-countdown.png'), full_page=True)
+        page.evaluate("window.decisionEvents=[];window.addEventListener('insiyab:decision', e=>window.decisionEvents.push(e.detail))")
+        page.locator('[data-option=hold]').evaluate('(e)=>e.click()')
+        assert not page.locator('#confirm').count()
         page.locator('[data-option=hold]').click()
         assert page.locator('#calls').get_attribute('data-phase') == 'unacknowledged'
+        page.locator('#confirm').evaluate('(e)=>e.click()')
+        assert page.locator('#calls').get_attribute('data-phase') == 'unacknowledged'
+        assert page.evaluate('window.decisionEvents.length') == 0
         page.get_by_role('button', name='Confirm decision:', exact=False).click()
+        assert page.evaluate('window.decisionEvents.length') == 1
+        assert page.evaluate('window.decisionEvents[0].option') == 'hold'
         assert page.locator('#calls').get_attribute('data-phase') == 'decided'
+        assert page.locator('[data-option=hold]').evaluate('(e)=>getComputedStyle(e).opacity') == '1'
         page.clock.fast_forward(1600)
         assert page.locator('[data-role=driver]').get_attribute('data-status') == 'sent'
         page.clock.fast_forward(2400)
@@ -99,6 +120,15 @@ with sync_playwright() as p:
           return false;
         }).map(e=>e.outerHTML.slice(0,100))''')
         assert not invalid, invalid
+        backgrounds=page.evaluate('''()=>[...document.querySelectorAll('body *')].filter(e=>{
+          const s=getComputedStyle(e);
+          if(s.fontFamily.includes('Instrument Serif'))return true;
+          if(s.backgroundColor==='rgb(196, 43, 43)')return e.id!=='escalation';
+          if(s.backgroundColor==='rgb(46, 125, 107)')return !e.closest('.received');
+          if(s.borderTopColor==='rgb(156, 123, 62)'&&s.borderTopWidth!=='0px')return e.id!=='suggested';
+          return false;
+        }).map(e=>e.tagName+'#'+e.id)''')
+        assert not backgrounds,backgrounds
         assert not calls, calls
         assert not errors, errors
         page.screenshot(path=str(shots/f'{width}x{height}.png'), full_page=True)
@@ -149,6 +179,59 @@ with sync_playwright() as p:
     assert page.locator('#replay-clock').inner_text() == '20:00'
     assert page.locator('#map').get_attribute('data-playing') == 'false'
     print('PASS reduced motion: replay jumps to its final state without travel')
+    assert page.locator('.alert-pulse').evaluate('(e)=>getComputedStyle(e).animationName') == 'none'
+    page.close()
+    # Verify the source flag governs the banner, independent of packaged fallback.
+    page=browser.new_page()
+    page.add_init_script('''let payload;Object.defineProperty(window,'INSIYAB_OPS_DATA',{get(){return payload},set(v){v.alerts.fixture=false;payload=v}});''')
+    page.goto(url)
+    page.wait_for_selector('#map[data-ready=true]')
+    assert not page.locator('#fixture-banner').is_visible()
+    print('PASS fixture=false removes the alerts banner; reduced-motion pulse is disabled')
+    page.close()
+    # Rehearse the actual 90-second stage sequence, without an accelerated clock.
+    if os.environ.get('OPS_REALTIME')=='1':
+        page=browser.new_page(viewport={'width':1440,'height':900})
+        requests=[]
+        page.route('**/*',lambda route:(requests.append(route.request.url),route.abort()) if '/voice/' in route.request.url else route.continue_())
+        page.goto(url)
+        page.wait_for_selector('#map[data-ready=true]')
+        start=time.monotonic()
+        page.locator('#demo').click()
+        page.wait_for_selector('#calls[data-phase=calling_duty]',timeout=20000)
+        assert not page.locator('.decision-stamp').count()
+        page.wait_for_selector('#calls[data-phase=calling_supervisor]',timeout=65000)
+        assert time.monotonic()-start>=71.5
+        page.locator('[data-option=send_spare]').click()
+        assert page.locator('#calls').get_attribute('data-phase') == 'calling_supervisor'
+        page.locator('#confirm').click()
+        page.wait_for_selector('[data-role=driver][data-status=received]',timeout=7000)
+        assert page.locator('[data-role=depot]').get_attribute('data-status')=='sent'
+        page.wait_for_function("document.querySelector('#lifecycle-status').textContent.includes('Demo complete')",timeout=25000)
+        elapsed=time.monotonic()-start
+        assert 89.5<=elapsed<=100,elapsed
+        assert page.locator('[data-status=received]').count()==4
+        assert not requests,requests
+        page.screenshot(path=str(shots/'90-second-demo.png'),full_page=True)
+        print(f'PASS real-time {elapsed:.1f}s demo: duty, supervisor, two clicks, four separate receipts, zero voice requests')
+        page.close()
+    browser.close()
+with sync_playwright() as p:
+    browser=p.webkit.launch()
+    page=browser.new_page(viewport={'width':1440,'height':900})
+    errors=[]
+    page.on('pageerror',lambda e:errors.append(str(e)))
+    page.goto(url)
+    page.wait_for_selector('#map[data-ready=true]')
+    page.wait_for_timeout(600)
+    assert 'unavailable' not in page.locator('#map-note').inner_text().lower()
+    assert int(page.locator('.bus3d').get_attribute('data-count'))>0
+    assert not errors,errors
+    page.screenshot(path=str(shots/'webkit-1440x900.png'),full_page=True)
+    page.set_viewport_size({'width':390,'height':844})
+    sizes=page.locator('button,select,input[type=range],summary').evaluate_all('(nodes)=>nodes.filter(e=>e.getBoundingClientRect().height).map(e=>({name:e.id||e.textContent.slice(0,30),height:e.getBoundingClientRect().height,width:e.getBoundingClientRect().width}))')
+    assert all(s['height']>=44 and s['width']>=44 for s in sizes),sizes
+    print('PASS WebKit: local map and buses render; every phone control has a 44-pixel touch target')
     browser.close()
 server.shutdown()
 print('ALL PASS')

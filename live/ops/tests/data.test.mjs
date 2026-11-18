@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {validateHeat} from '../src/heat.mjs';
+import {validateJudge} from '../src/judge.mjs';
+const read=name=>JSON.parse(readFileSync(new URL(`../demo/${name}.json`,import.meta.url)));
+const heat=read('heat_stops'), judge=read('judge_pick');
+assert.equal(validateHeat(heat),heat);assert.equal(validateJudge(judge),judge);
+assert.throws(()=>validateHeat({...heat,month:'December'}));
+assert.throws(()=>validateHeat({...heat,stops:[{...heat.stops[0],priority:-1}]}));
+assert.throws(()=>validateHeat({...heat,fixture:undefined}));
+assert.throws(()=>validateJudge({...judge,rows:[judge.rows[0],judge.rows[0]]}));
+assert.throws(()=>validateJudge({...judge,rows:[{...judge.rows[0],actual:undefined}]}));
+assert.equal(validateJudge({...judge,rows:[{...judge.rows[0],forecast:null}]}).rows[0].forecast,null);
+console.log('PASS heat refuses December and invalid priorities; forecast rows preserve missing data and reject duplicates');
+// Prove the decision test can catch a removed selection guard, without editing source.
+const original=readFileSync(new URL('../src/lifecycle.mjs',import.meta.url),'utf8');
+const mutated=original.replace(' || !state.selected || state.decision',' || state.decision');
+assert.notEqual(mutated,original);
+const {createLifecycle}=await import('data:text/javascript;base64,'+Buffer.from(mutated).toString('base64'));
+let now=1000;const c=createLifecycle({alert:read('alerts').alerts[0],now:()=>now});c.startDemo();now+=1000;c.tick();
+assert.throws(()=>assert.equal(c.confirm(),false),assert.AssertionError);
+console.log('PASS mutation check catches a decision made without selecting an option');
+console.log('ALL PASS');

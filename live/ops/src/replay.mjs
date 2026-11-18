@@ -1,3 +1,4 @@
+import {HEAT_THRESHOLD} from './heat.mjs';
 import {initMap} from '../../../web/src/map.mjs';
 import {createModel, busesAt, clock} from '../../../web/src/model.mjs';
 import maplibregl from 'maplibre-gl';
@@ -17,17 +18,17 @@ export async function mountReplay(bundle) {
   const paths = model.network.routes.flatMap(r => r.directions.map(d => ({path: d.shape})));
   function draw() {
     if (!overlay) return;
-    if (alert) {const p=map.project([alert.lon,alert.lat]);pulse.style.left=`${p.x-13}px`;pulse.style.top=`${p.y-13}px`;}
+    if (alert) {const p=map.project([alert.lon,alert.lat]);pulse.style.left=`${p.x-13}px`;pulse.style.top=`${p.y-13}px`;pulse.hidden=false;} else pulse.hidden=true;
     const buses = busesAt(model, seconds).map(b => ({position: lngLat(b.position), route: b.route_id}));
     host.dataset.buses = String(buses.length);
     host.dataset.time = String(seconds);
     const layers = [
       new PathLayer({id:'routes', data:paths, getPath:d=>d.path, getColor:[...ink,128], getWidth:1, widthUnits:'pixels'}),
-      new ScatterplotLayer({id:'stops', data:model.network.stops, getPosition:d=>[d.lon,d.lat], getRadius:2, radiusUnits:'pixels', getFillColor:ivory, getLineColor:muted, stroked:true, lineWidthMinPixels:1}),
+      new ScatterplotLayer({id:'stops', data:model.network.stops, getPosition:d=>[d.lon,d.lat], getRadius:2, radiusUnits:'pixels', getFillColor:d=>d.stop_kind==='ac_shelter'?ink:ivory, getLineColor:d=>d.stop_kind?muted:[191,190,187], stroked:true, lineWidthMinPixels:1}),
     ];
     if (!busRenderer) layers.push(new ScatterplotLayer({id:'buses', data:buses, getPosition:d=>d.position, getRadius:3, radiusUnits:'pixels', getFillColor:d=>lateRoutes.has(d.route)?[196,43,43]:ink}));
     if (alert) layers.push(new ScatterplotLayer({id:'alert-stop', data:[alert], getPosition:d=>[d.lon,d.lat], getRadius:9, radiusUnits:'pixels', getFillColor:ivory, getLineColor:[196,43,43], stroked:true,lineWidthMinPixels:2}));
-    if (heat.length) layers.push(new ScatterplotLayer({id:'heat-stops', data:heat, getPosition:d=>[d.lon,d.lat], getRadius:d=>Math.max(5,Math.min(24,Math.sqrt(d.priority)*1.3)), radiusUnits:'pixels', getFillColor:d=>d.stop_kind==='ac_shelter'?ink:ivory,getLineColor:d=>d.priority>160?[196,43,43]:ink,stroked:true,lineWidthMinPixels:2}));
+    if (heat.length) layers.push(new ScatterplotLayer({id:'heat-stops', data:heat, getPosition:d=>[d.lon,d.lat], getRadius:d=>Math.max(5,Math.min(24,Math.sqrt(d.priority)*1.3)), radiusUnits:'pixels', getFillColor:d=>d.stop_kind==='ac_shelter'?ink:ivory,getLineColor:d=>d.priority>HEAT_THRESHOLD?[196,43,43]:ink,stroked:true,lineWidthMinPixels:2}));
     overlay.setProps({layers});
     busRenderer?.draw(buses, lateRoutes);
   }
@@ -70,15 +71,17 @@ export async function mountReplay(bundle) {
   const result = await initMap(host, (readyMap, readyOverlay)=>{
     map=readyMap;overlay=readyOverlay;
     const points=paths.flatMap(p=>p.path), xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
-    map.fitBounds([[Math.min(...xs),Math.min(...ys)],[Math.max(...xs),Math.max(...ys)]], {padding:45,duration:0});
+    const fit=()=>map.fitBounds([[Math.min(...xs),Math.min(...ys)],[Math.max(...xs),Math.max(...ys)]], {padding:45,duration:0});
+    new ResizeObserver(()=>{map.resize();fit();draw();}).observe(host);
+    fit();
     map.on('move',draw);
     host.dataset.ready='true';draw();
   },()=>{note.textContent='Basemap unavailable. Route geometry remains visible. '+model.network.source.credit;});
   if (localProtocol) maplibregl.addProtocol('pmtiles', (params, abort) => localProtocol.tile(params, abort));
   map=result.map;
   return {setTime, stop, play,
-    setAlerts(alerts) {lateRoutes=new Set(alerts.filter(a=>a.watcher==='running_late').map(a=>a.route));alert=alerts[0]??null;pulse.hidden=!alert;draw();},
-    setHeat(stops) {heat=stops;draw();},
+    setAlerts(alerts) {lateRoutes=new Set(alerts.filter(a=>a.watcher==='running_late').map(a=>a.route));alert=alerts[0]??null;pulse.hidden=true;draw();},
+    setHeat(stops) {heat=stops;host.dataset.heat=String(stops.length);draw();},
     setBusRenderer(renderer) {busRenderer=renderer;draw();},
     map,
   };

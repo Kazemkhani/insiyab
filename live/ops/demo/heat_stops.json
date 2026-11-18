@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "fixture": true,
+  "hour": "14:00",
+  "month": "July",
+  "source": "Invented July rehearsal, 18 Nov 2026; locations are illustrative",
+  "method": "priority = forecast wait (min) x exposure (pole 1.0, ac_shelter 0.3, unknown 0.7) x max(0, feels_like - 32)",
+  "stops": [
+    {"stop_id": "demo-pole", "name": "Stand-in pole", "lat": 25.2048, "lon": 55.2708, "stop_kind": "pole", "feels_like_c": 44, "wait_min": 18, "priority": 216},
+    {"stop_id": "demo-shelter", "name": "Stand-in air-conditioned shelter", "lat": 25.2148, "lon": 55.2808, "stop_kind": "ac_shelter", "feels_like_c": 44, "wait_min": 18, "priority": 64.8},
+    {"stop_id": "demo-unknown", "name": "Stand-in unknown stop kind", "lat": 25.1948, "lon": 55.2608, "stop_kind": "", "feels_like_c": 44, "wait_min": 12, "priority": 100.8}
+  ]
+}

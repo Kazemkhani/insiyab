@@ -32,7 +32,7 @@ export function createLifecycle({alert, ack = 10, now = Date.now, changed = () =
   // a provider or initiate a call. An event can never substitute for two clicks.
   function accept(event, source) {
     if (!event || event.run_id!==state.run_id || event.alert_id!==state.alert_id || source!==state.mode) return false;
-    if (!Number.isFinite(event.at) || event.at<state.started_at || event.at>now()+5000) return false;
+    if (!Number.isFinite(event.at) || event.at<state.started_at || event.at>now()) return false;
     if (ROLES.includes(event.role)) {
       if (!state.decision || !['relaying','sent','received'].includes(state.phase)) return false;
       const role=state.roles[event.role];
