@@ -200,3 +200,24 @@ Completion requires all four reports, the manager’s valid choice, and all four
 Build `web/team/` and share `phone-cards.html` or `call-cards.pdf` before ringing the team. Each reporting role answers one concrete check; unconfirmed facts remain unconfirmed. All four reporting roles receive one callback attempt after a valid manager decision, even if a first call was missed. Completion still requires every report and acknowledgement. A duplicate acknowledgement changes nothing. An explicitly flagged real emergency stops the normal report-to-manager sequence.
 
 `AGENT_SPECS` in `relay.js` is the authoritative prompt source. `--setup-agents --live` updates all six agents and explicitly enables their `end_call` system tool; it does not dial. Restart the local relay to use changed orchestration code. The prepared phone cards describe fictional operating conditions, while any recorded-day statistics are separately identified.
+
+## Repeating the team call from the dashboard
+
+Open `/pitch/voice/`, enter the relay address, viewing key and call key once,
+and choose **Save and connect**. With **Remember on this browser** checked,
+the settings stay in this browser's local storage, including after a reload.
+Use this on your own device; **Forget saved settings** removes the saved keys.
+The site never includes these private values in its published files.
+
+**Start team calls** starts one incident. After the reports, manager decision,
+and callbacks, **Call the team again** becomes available once the provider
+confirms the previous calls have ended. Each run is limited to nine outbound
+attempts. Reloading or reconnecting never starts a call. An unconfirmed start
+can be retried with the same request ID without dialling a second team.
+The relay and public tunnel must remain running; a lost connection disables
+starting calls. Manager-only sample processes cannot start full-team runs.
+
+The dashboard posts `scenario: "default"` and a fresh `request_id`; the relay
+reads `incident-example.json` as the single source of that scenario. Direct
+incident clients can still post a complete incident; repeated live runs need
+a unique request ID. An unresolved provider call keeps the relay locked.

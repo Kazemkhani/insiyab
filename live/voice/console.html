@@ -5,133 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Insiyab Drill Console</title>
 <style>
-:root {
-  --paper: #F6F5F1;
-  --ink:   #12263A;
-  --flow:  #0E5A5A;
-  --over:  #B23A2E;
-  --sim:   #8A5A00;
-  --muted: #6B7F8F;
-  --gap:   1.5rem;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; background: var(--paper); color: var(--ink); font-family: system-ui, -apple-system, sans-serif; }
-body { display: flex; flex-direction: column; padding: var(--gap); min-height: 100svh; width:100%; }
-
-/* drill banner - always visible */
-#drill-banner {
-  background: var(--over);
-  color: #fff;
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-bottom: var(--gap);
-  flex-shrink: 0;
-}
-
-#main { display: flex; flex-direction: column; flex: 1; gap: var(--gap); }
-
-/* incident block */
-#incident {
-  background: var(--ink);
-  color: var(--paper);
-  border-radius: 6px;
-  padding: 1rem 1.5rem;
-  flex-shrink: 0;
-}
-#incident h1 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; color: #fff; }
-#incident .meta { font-size: 0.85rem; color: #aec; display: flex; flex-wrap: wrap; gap: 1rem; }
-#incident .meta span { opacity: 0.85; }
-#incident .source-label { font-size: 0.75rem; color: #E6E8EA; margin-top: 0.3rem; }
-
-/* three staff columns */
-#staff-row {
-  display: grid;
-  grid-template-columns: repeat(4,minmax(0,1fr));
-  gap: var(--gap);
-  flex-shrink: 0;
-}
-.staff-card {
-  border: 2px solid #d4d0c8;
-  border-radius: 6px;
-  padding: 1rem;
-  min-height: 110px;
-  position: relative;
-  transition: border-color 0.3s;
-}
-.staff-card.reported { border-color: var(--flow); }
-.staff-card.no-answer { border-color: var(--muted); opacity: 0.7; }
-.staff-card h2 { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
-.staff-card .report-text { font-size: 0.95rem; color: var(--ink); line-height: 1.4; }
-.staff-card .status-dot {
-  position: absolute; top: 1rem; right: 1rem;
-  width: 10px; height: 10px; border-radius: 50%;
-  background: #d4d0c8;
-}
-.staff-card.reported .status-dot { background: var(--flow); }
-.staff-card.no-answer .status-dot { background: var(--muted); }
-.staff-card .ts { font-size: 0.72rem; color: var(--muted); margin-top: 0.4rem; }
-
-/* decision block */
-#decision {
-  border-radius: 6px;
-  padding: 1.2rem 1.5rem;
-  border: 2px solid #d4d0c8;
-  flex-shrink: 0;
-  min-height: 90px;
-}
-#decision h2 { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
-#decision .decision-text { font-size: 1.5rem; font-weight: 700; color: var(--flow); line-height: 1.3; }
-#decision .decision-text.empty { color: #ccc; font-size: 1rem; font-weight: 400; }
-#decision .decision-words { font-size: 0.9rem; color: var(--ink); margin-top: 0.4rem; }
-#decision .ts { font-size: 0.72rem; color: var(--muted); margin-top: 0.4rem; }
-#decision.decided { border-color: var(--flow); }
-
-/* acknowledgements */
-#acks {
-  display: flex; gap: 1rem; flex-wrap: wrap; flex-shrink: 0;
-}
-.ack-pill {
-  font-size: 0.8rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  background: #d4d0c8;
-  color: var(--ink);
-  transition: background 0.3s;
-}
-.ack-pill.acked { background: var(--flow); color: #fff; }
-
-/* status bar */
-#status-bar { font-size: 0.75rem; color: var(--muted); margin-top: auto; padding-top: 0.5rem; display: flex; justify-content: space-between; }
-
-/* phase label */
-#phase { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
-#phase.idle { color: var(--muted); }
-#phase.check { color: var(--sim); }
-#phase.manager { color: var(--sim); }
-#phase.callout { color: var(--flow); }
-#phase.done { color: var(--flow); }
-
-/* options list in idle state */
-#options-list { font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem; }
-#options-list span { display: block; }
-header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.15;margin:8px 0}header p{font-size:16px;color:var(--muted)}
-.connection{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:24px}.connection input{flex:1;min-width:200px}.connection input,.connection button{font:inherit;padding:10px 14px;min-height:44px;border:1px solid var(--ink)}.connection button{background:var(--flow);color:white;cursor:pointer}.connection p{flex-basis:100%;font-weight:600}.phases{display:flex;list-style:none;gap:20px;margin-bottom:24px;flex-wrap:wrap}.phases li{padding:10px 0;border-bottom:3px solid transparent}.phases .active{border-color:var(--flow);font-weight:700}.staff-card{min-width:0;overflow-wrap:anywhere}.staff-card h2{font-size:14px}.staff-card .report-text{font-size:18px}.ack-pill{border-radius:0;min-height:44px;padding:10px}.source-label{line-height:1.5}#status-bar{gap:20px;flex-wrap:wrap}#phase{font-size:16px;letter-spacing:0;text-transform:none}#phase.done{color:var(--ink)}#drill-banner{letter-spacing:.05em}
-@media(max-width:800px){body{--gap:16px}#staff-row{grid-template-columns:1fr 1fr}.connection label{flex-basis:100%}.phases{gap:8px;font-size:14px}#drill-banner{font-size:12px}#decision .decision-text{font-size:24px}}
-@media(max-width:450px){#staff-row{grid-template-columns:1fr}.connection input{width:100%}.connection button{width:100%}.phases{display:block}header h1{font-size:32px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+:root{--paper:#F6F5F1;--ink:#12263A;--flow:#0E5A5A;--over:#B23A2E;--sim:#8A5A00;--muted:#526575;--line:#D5DBDC;--gap:20px;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif;padding:24px max(24px,calc((100vw - 1240px)/2));}h1,h2,p{margin:0}button,input,summary{font:inherit}button,summary{cursor:pointer}button,input{min-height:48px;border:1px solid var(--line);border-radius:8px;padding:10px 16px}button{background:white;color:var(--ink);font-weight:600}button:disabled{cursor:default;opacity:.55}button:hover:not(:disabled){border-color:var(--flow)}:focus-visible{outline:3px solid var(--sim);outline-offset:3px}a{color:inherit}#drill-banner{font-size:14px;color:var(--sim);padding-bottom:16px;border-bottom:1px solid var(--line)}header{display:flex;justify-content:space-between;gap:24px;align-items:end;margin:28px 0}header h1{font-size:40px;line-height:1.15;letter-spacing:-.035em;margin:8px 0 12px}header p{max-width:65ch;color:var(--muted)}.eyebrow{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.brand{color:var(--flow)!important}.action-panel{padding:24px;background:var(--ink);color:white;border-radius:12px;display:grid;grid-template-columns:1fr auto;gap:12px 24px;align-items:center;margin-bottom:16px}.action-panel h2{font-size:24px;line-height:1.3}.action-panel p{font-size:14px;color:#C5D2DC;margin-top:6px;max-width:70ch}#start-call{background:#DAEDEA;color:var(--flow);border:0;min-width:220px;font-size:18px;min-height:56px}#call-status{grid-column:1/-1;font-size:14px;min-height:21px}.connection{border:1px solid var(--line);border-radius:8px;margin:0 0 20px;background:#fff}summary{padding:12px 16px;min-height:48px;font-size:14px;font-weight:600}.fields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;padding:4px 16px 16px}.fields label{display:block;font-size:14px;color:var(--muted)}.fields input:not([type=checkbox]){width:100%;margin-top:6px;min-width:0}.settings-actions{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}.settings-actions label{display:flex;align-items:center;gap:8px}.settings-actions input{min-height:24px;width:20px}.settings-actions p{font-size:14px;color:var(--muted);width:100%}#mode{font-size:14px;color:var(--muted);margin-bottom:20px}.phases{display:grid;grid-template-columns:repeat(3,1fr);list-style:none;padding:0;margin:0 0 24px;gap:16px}.phases li{border-top:3px solid var(--line);padding-top:12px;color:var(--muted);font-size:14px}.phases li.active{border-color:var(--flow);color:var(--flow);font-weight:700}.phases li.complete{border-color:var(--flow)}#main{display:grid;gap:20px}#incident{padding:20px 0;border-top:1px solid var(--line)}#incident h1{font-size:24px}#incident .meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin:8px 0}.source-label{font-size:14px;color:var(--muted);margin-top:12px;max-width:90ch}#options-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}#options-list span{background:#E8ECEB;padding:8px 12px;border-radius:6px;font-size:14px;max-width:100%}.section-label{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:-8px}#staff-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.staff-card{position:relative;border:1px solid var(--line);border-top:3px solid var(--line);border-radius:8px;background:white;padding:20px;overflow-wrap:anywhere;min-height:170px}.staff-card.reported{border-top-color:var(--flow)}.staff-card.no-answer{border-top-color:var(--sim)}.staff-card h2{font-size:14px;font-weight:600;color:var(--muted);padding-right:16px;margin-bottom:12px}.report-text{font-size:16px;line-height:1.5}.ts{font-size:14px;color:var(--muted);margin-top:12px;font-variant-numeric:tabular-nums}.status-dot{position:absolute;right:20px;top:24px;width:8px;height:8px;border-radius:50%;background:var(--line)}.reported .status-dot{background:var(--flow)}.no-answer .status-dot{background:var(--sim)}#decision{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:24px;background:white}#decision.decided{border-left-color:var(--flow);background:#EBF3F1}#decision h2{font-size:14px;color:var(--muted);margin-bottom:12px}.decision-text{font-size:24px;font-weight:600;line-height:1.4;color:var(--flow)}.decision-text.empty{color:var(--muted);font-size:18px;font-weight:400}.decision-words{font-size:16px;margin-top:12px}#acks{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.ack-pill{font-size:14px;color:var(--muted);padding:12px 0;border-top:2px solid var(--line)}.ack-pill.acked{color:var(--flow);border-color:var(--flow)}#status-bar{display:flex;justify-content:space-between;gap:16px;padding:24px 0;margin-top:8px;font-size:14px;color:var(--muted);flex-wrap:wrap}#phase{font-weight:600;color:var(--ink)}.footer-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:20px;font-size:14px}.footer-actions a{padding:12px 0;min-height:44px}.footer-actions button{font-size:14px}.count{font-size:14px;color:var(--flow);font-weight:600;float:right}
+@media(max-width:900px){#staff-row{grid-template-columns:repeat(2,1fr)}.fields{grid-template-columns:1fr}.action-panel{grid-template-columns:1fr}.action-panel button{width:100%}header{align-items:start}#acks{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){body{padding:16px}header{margin:24px 0}header h1{font-size:32px}.action-panel{padding:20px}.phases{gap:12px}.phases li{font-size:14px}#staff-row{grid-template-columns:1fr}.staff-card{min-height:130px}.settings-actions button{width:100%}#decision{padding:20px}.decision-text{font-size:24px}#drill-banner{font-size:14px}}
+@media(prefers-reduced-motion:no-preference){.staff-card,#decision{transition:background .25s,border-color .25s}}
 </style>
 </head>
 <body>
 
-<div id="drill-banner">DRILL | RTA FUTURE MOVE HACKATHON | SIMULATED INCIDENT | NOT REAL OPERATIONS</div>
-
-<header><p>Insiyab · Operations rehearsal</p><h1>One incident. One human decision.</h1><p>Collect the facts, brief the duty manager, relay the choice, and check who heard it.</p></header>
-<div class="connection"><label for="relay-url">Rehearsal relay address</label><input id="relay-url" type="url" placeholder="https://your-relay-address" autocomplete="off"><label for="view-key">Viewing key</label><input id="view-key" type="password" autocomplete="off" placeholder="Private viewing key"><button id="connect">Connect to rehearsal</button><button id="sample">Play an illustrated example</button><p id="mode" role="status">Not connected. No calls are placed by this dashboard.</p></div>
-<div class="connection" id="start-box"><label for="call-key">Call key (presenter only)</label><input id="call-key" type="password" autocomplete="off" placeholder="Private call key"><button id="start-call" type="button">Start the drill: call the team</button><span id="call-status" role="status"></span></div>
+<div id="drill-banner">A drill on our own phones, not an RTA system. Simulated incident.</div>
+<header><div><p class="eyebrow brand">Insiyab · Operations</p><h1>The team reports. You decide.</h1><p>Agents collect four reports, call the duty manager with the options, then relay the decision to the team.</p></div></header>
+<section class="action-panel" aria-label="Team call controls"><div><h2 id="readiness">Connect your calling relay</h2><p id="call-explanation">One click starts real calls to the saved team. Four reports → manager briefing → four callbacks.</p></div><button id="start-call" type="button" disabled>Start team calls</button><div id="call-status" role="status">Save your connection below once. Calls never start automatically.</div></section>
+<details class="connection" id="settings" open><summary>Connection settings · saved on this browser</summary><div class="fields"><label for="relay-url">Relay address<input id="relay-url" type="url" placeholder="https://your-relay-address" autocomplete="off"></label><label for="view-key">Viewing key<input id="view-key" type="password" autocomplete="off" placeholder="Private viewing key"></label><label for="call-key">Call key<input id="call-key" type="password" autocomplete="off" placeholder="Private call key"></label><div class="settings-actions"><button id="connect">Save and connect</button><button id="forget">Forget saved settings</button><label><input id="remember" type="checkbox" checked>Remember on this browser</label><p>Use your own device. Saved keys allow calls from this browser; Forget removes them. Keep the relay and its tunnel running.</p></div></div></details>
+<p id="mode" role="status">Not connected. Open connection settings to begin.</p>
 <ol class="phases"><li id="step-check">1. Collect reports</li><li id="step-manager">2. Human decision</li><li id="step-callout">3. Relay and acknowledge</li></ol>
 <div id="main">
   <div id="incident">
@@ -147,6 +34,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
     <div class="source-label" id="inc-source"></div>
   </div>
 
+  <p class="section-label">Reports from the field <span class="count" id="report-count">0 of 4 received</span></p>
   <div id="staff-row">
     <div class="staff-card" id="card-driver">
       <div class="status-dot"></div>
@@ -170,7 +58,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
   </div>
 
   <div id="decision">
-    <h2>Duty manager decision</h2>
+    <h2>The duty manager’s decision</h2>
     <div class="decision-text empty" id="dec-text">Awaiting decision&hellip;</div>
     <div class="decision-words" id="dec-words" style="display:none"></div>
     <div class="ts" id="dec-ts"></div>
@@ -188,6 +76,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
   <span id="last-update">Not connected</span>
 </div>
 
+<div class="footer-actions"><button id="sample">Play an illustrated example</button><a href="../">Back to the pitch</a><span>Only a person chooses an option.</span></div>
 <script>
 (function () {
   'use strict';
@@ -196,6 +85,8 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
   const params = new URLSearchParams(location.search);
   const port = params.get('port') || '7890';
   let STATE_URL = ''; let sampleMode=false; let sampleTimers=[];let viewKey='',connectionVersion=0;
+  let connected=false, latestState=null, sending=false, pendingId='', lastSeen=0;
+  const STORE='insiyab.voice.presenter.v1';
   const localRelay=location.port===port && /\/voice\/?$|^\/$/.test(location.pathname);
   if(localRelay)document.getElementById('relay-url').value=location.origin;
   const POLL_MS = 2500;
@@ -228,22 +119,25 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
   }
 
   function renderState(s) {
+    latestState=s; updateControls();
+    const received=Object.keys(s.reports||{}).length;
+    setText('report-count',received+' of 4 received');
     // Incident
     if (s.incident) {
       const inc = s.incident;
-      setText('inc-title', 'Route ' + inc.route + ', direction ' + inc.direction + ', ' + inc.hour);
+      setText('inc-title', 'Route ' + inc.route + ' · ' + (inc.hour || 'Simulated incident'));
       setText('inc-route', 'Route ' + inc.route);
       setText('inc-time', 'Scheduled ' + inc.hour);
-      setText('inc-late', inc.minutes_late_now + ' min late now');
-      setText('inc-boardings', inc.boardings_this_hour + ' boardings this hour');
-      setText('inc-buses', inc.buses_running + ' buses running (rule: ' + inc.buses_needed_by_rule + ')');
+      setText('inc-late', inc.minutes_late_now == null ? '' : inc.minutes_late_now + ' min late in this scenario');
+      setText('inc-boardings', '');
+      setText('inc-buses', '');
       setText('inc-source', inc.source ? 'Source: ' + inc.source : '');
       setText('options-list','');
       if (inc.options && inc.options.length) {
         const el = document.getElementById('options-list');
         if (el) {
           el.innerHTML = inc.options.map(function (o) {
-            return '<span>' + escHtml(o.key) + ': ' + escHtml(o.say) + '</span>';
+            return '<span>' + escHtml(o.say) + '</span>';
           }).join('');
         }
       }
@@ -258,7 +152,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
     const ph = s.phase || 'idle';
     const phEl = document.getElementById('phase');
     if (phEl) {
-      phEl.textContent = ph === 'done' ? ({complete:'All reports and acknowledgements received',incomplete:'Ended with missing reports or acknowledgements',failed:'Relay failed',no_decision:'Ended without a manager decision',configuration_error:'Configuration needs attention'}[s.outcome] || 'Ended; check the recorded outcome') : ({idle:'Ready for an incident',check:'Collecting staff reports',manager:'Human manager is deciding',callout:'Relaying the manager’s decision'}[ph]||ph);
+      phEl.textContent = ph === 'done' ? ({emergency_reported:'Real emergency reported — routine relay stopped',complete:'All reports and acknowledgements received',incomplete:'Ended with missing reports or acknowledgements',failed:'Relay failed',no_decision:'Ended without a manager decision',configuration_error:'Configuration needs attention'}[s.outcome] || 'Ended; check the recorded outcome') : ({idle:'Ready for an incident',check:'Collecting staff reports',manager:'Human manager is deciding',callout:'Relaying the manager’s decision'}[ph]||ph);
       ['check','manager','callout'].forEach(x=>document.getElementById('step-'+x).classList.toggle('active',ph===x));
       phEl.className = ph;
     }
@@ -291,7 +185,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
         if (tsEl) tsEl.textContent = fmt(noAnswerEv.at);
       } else {
         card.classList.remove('reported', 'no-answer');
-        if (repEl) repEl.textContent = s.mode === 'manager_sample' ? 'Not called in this manager-only sample' : s.phase === 'idle' ? '...' : 'Waiting...';
+        if (repEl) repEl.textContent = s.mode === 'manager_sample' ? 'Not called in this manager-only sample' : s.phase === 'idle' ? 'Report appears here after the call.' : 'Waiting for the report…';
         if (tsEl) tsEl.textContent = '';
       }
     });
@@ -337,42 +231,70 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
     const version=connectionVersion,request=++requestSequence;
     fetch(STATE_URL, { cache: 'no-store',headers:{'x-insiyab-view':viewKey} })
       .then(function (r) { if(!r.ok)throw new Error('HTTP '+r.status);return r.json(); })
-      .then(function(s){if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;document.getElementById('mode').textContent=s.mode==='manager_sample'?'Manager-only phone sample. No staff calls or callbacks.':'Connected to rehearsal relay. Simulated incident; human reports.';renderState(s)})
+      .then(function(s){if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;connected=true;lastSeen=Date.now();if(pendingId && s.controls?.request_id===pendingId){pendingId='';saveSettings();}document.getElementById('mode').textContent=s.mode==='manager_sample'?'Manager-only phone sample. No staff calls or callbacks.':'Connected to rehearsal relay. Simulated incident; human reports.';renderState(s)})
       .catch(function (e) {
-        if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;
+        if(sampleMode||version!==connectionVersion||request<lastAppliedRequest)return;lastAppliedRequest=request;connected=false;updateControls();
         const lu = document.getElementById('last-update');
-        document.getElementById('mode').textContent='Disconnected. Displayed reports may be stale. No calls are placed by this dashboard.';if (lu) lu.textContent = 'Connection error, retrying (' + new Date().toLocaleTimeString() + ')';
+        document.getElementById('mode').textContent='Connection lost. Reports may be stale. Starting calls is paused until the relay reconnects.';if (lu) lu.textContent = 'Connection error, retrying (' + new Date().toLocaleTimeString() + ')';
       });
   }
 
-  // Presenter-only start: rings the consenting team through the relay. The key is typed at the moment of use, sent once, never stored.
-  const DRILL_INCIDENT = {"id": "2025-12-15-310-18", "route": "310", "direction": "1", "hour": "18:00", "planned_minutes": 67, "expected_minutes": 96, "minutes_late_now": 22, "next_bus_in_minutes": 20, "boardings_this_hour": 640, "buses_running": 8, "buses_needed_by_rule": 17, "options": [{"key": "send_spare", "say": "send the standby bus to route 310"}, {"key": "hold", "say": "hold the next departure two minutes to even the gap"}, {"key": "none", "say": "take no action and watch"}], "source": "SIMULATED drill conditions. Rounded route 310 times are based on recorded-day medians, not a live forecast. Availability, current delay and service options are invented for rehearsal.", "drill": true};
-  const rp=params.get('relay');try{if(rp){const u=new URL(rp);if(u.protocol==='https:'&&!u.username&&!u.password)document.getElementById('relay-url').value=u.origin}}catch(e){}
-  // One-link setup for the presenter's own laptop: #relay=...&call=...&view=... in the fragment (never sent to any server), then wiped from the address bar.
-  try{if(location.hash.length>1){const h=new URLSearchParams(location.hash.slice(1));const hr=h.get('relay');if(hr){const u=new URL(hr);if(u.protocol==='https:')document.getElementById('relay-url').value=u.origin}
-    if(h.get('call'))document.getElementById('call-key').value=h.get('call');if(h.get('view'))document.getElementById('view-key').value=h.get('view');
-    history.replaceState(null,'',location.pathname+location.search);if(h.get('view'))setTimeout(()=>document.getElementById('connect').click(),300)}}catch(e){}
-  let armedUntil=0;
+  function baseURL(){
+    const u=new URL(document.getElementById('relay-url').value);
+    if(u.protocol!=='https:' && !(u.protocol==='http:' && ['127.0.0.1','localhost'].includes(u.hostname)))throw Error('Use HTTPS or localhost.');
+    if(u.username||u.password||u.search||u.hash)throw Error('Use only the relay address.');
+    return u.origin;
+  }
+  function saveSettings(){
+    try{if(!document.getElementById('remember').checked){localStorage.removeItem(STORE);return;}
+      localStorage.setItem(STORE,JSON.stringify({relay:document.getElementById('relay-url').value,view:document.getElementById('view-key').value,call:document.getElementById('call-key').value,pendingId}));
+    }catch{setText('call-status','Browser storage is unavailable. Settings will last only while this page stays open.');}
+  }
+  function updateControls(){
+    const controls=latestState?.controls;
+    setText('call-explanation',sampleMode?'Scripted playback of the reports, decision and acknowledgements. No phones are connected.':'One click starts real calls to the saved team. Four reports → manager briefing → four callbacks.');
+    const fresh=connected && Date.now()-lastSeen<10000 && !sampleMode;
+    const available=fresh && controls?.can_start && !sending;
+    const keyReady=document.getElementById('call-key').value.length>=24;
+    const btn=document.getElementById('start-call');
+    btn.disabled=!(available && keyReady);
+    btn.textContent=sending?'Starting calls…':pendingId?'Check / retry this start':controls?.running?'Calls in progress':latestState?.since?'Call the team again':'Start team calls';
+    setText('readiness',sampleMode?'Illustrated example — no calls':!fresh?'Connect your calling relay':controls?.running?'The team is on the call':!controls?.armed?'Relay is not armed':!keyReady?'Add your call key once':controls?.can_start?'Ready when your team is':'Waiting for calls to finish');
+  }
   document.getElementById('start-call').onclick=async()=>{
-    const st=document.getElementById('call-status');const keyEl=document.getElementById('call-key');
-    let base='';try{const u=new URL(document.getElementById('relay-url').value);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost'].includes(u.hostname)))throw new Error();base=u.origin}catch(e){st.textContent='Enter the rehearsal relay address first.';return}
-    if(keyEl.value.length<24){st.textContent='Enter the private call key.';return}
-    if(Date.now()>armedUntil){armedUntil=Date.now()+10000;st.textContent='This rings five phones. Press again within 10 seconds to start.';return}
-    armedUntil=0;st.textContent='Starting the drill...';
-    try{const r=await fetch(base+'/voice/incident',{method:'POST',headers:{'Content-Type':'application/json','x-insiyab-key':keyEl.value},body:JSON.stringify(DRILL_INCIDENT)});
-      keyEl.value='';
-      if(r.status===403){st.textContent='Refused: the call key is wrong.';return}
-      const j=await r.json().catch(()=>({}));
-      if(!r.ok){st.textContent='Not started: '+(j.error||('status '+r.status));return}
-      st.textContent=j.error?('Not started: '+j.error):'Drill started. Calls are going out now. Connect with the viewing key to follow it.';
-    }catch(e){keyEl.value='';st.textContent='Could not reach the relay. Is it running and is the address right?'}
+    if(sending || document.getElementById('start-call').disabled)return;
+    const version=connectionVersion;
+    // Retrying after a lost response uses the same ID, even across a reload.
+    pendingId ||= crypto.randomUUID().replaceAll('-','');
+    saveSettings();sending=true;updateControls();setText('call-status','Starting team calls…');
+    try{
+      const r=await fetch(new URL(STATE_URL).origin+'/voice/incident',{method:'POST',headers:{'Content-Type':'application/json','x-insiyab-key':document.getElementById('call-key').value},body:JSON.stringify({scenario:'default',request_id:pendingId}),signal:AbortSignal.timeout(15000)});
+      const j=await r.json();if(version!==connectionVersion)return;
+      if(!r.ok || j.skipped || j.rehearsal || !j.started){
+        pendingId='';saveSettings();setText('call-status',j.skipped||j.error||(j.rehearsal?'Relay is in rehearsal mode. No real calls placed.':'Calls were not started.'));
+      }else{setText('call-status',j.duplicate?'This start was already received. Following its progress.':'Team calls started. Follow the reports below.');latestState={...latestState,controls:{...latestState.controls,can_start:false,running:true}};}
+    }catch{if(version===connectionVersion)setText('call-status','Start not confirmed. Reconnect, then retry this same start; it will not dial a second team.');}
+    finally{sending=false;updateControls();poll();}
   };
   document.getElementById('connect').onclick=()=>{
-    sampleTimers.forEach(clearTimeout);sampleMode=false;connectionVersion++;renderState({phase:'idle',timeline:[],reports:{},acknowledgements:{}});viewKey=document.getElementById('view-key').value;
-    try{const u=new URL(document.getElementById('relay-url').value);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost'].includes(u.hostname)))throw new Error();if(u.username||u.password||u.search||u.hash)throw new Error();if(viewKey.length<24)throw new Error();STATE_URL=u.origin+'/voice/state/authenticated';poll()}catch{STATE_URL='';document.getElementById('mode').textContent='Enter an HTTPS relay address (or localhost) and the private viewing key.'}
+    sampleTimers.forEach(clearTimeout);sampleMode=false;connected=false;connectionVersion++;renderState({phase:'idle',timeline:[],reports:{},acknowledgements:{}});viewKey=document.getElementById('view-key').value;
+    try{if(viewKey.length<24)throw Error();STATE_URL=baseURL()+'/voice/state/authenticated';saveSettings();poll()}catch{STATE_URL='';setText('mode','Enter an HTTPS relay address (or localhost) and the private viewing key.');}
   };
+  document.getElementById('call-key').oninput=()=>updateControls();
+  document.getElementById('relay-url').oninput=()=>{connected=false;STATE_URL='';connectionVersion++;updateControls();};
+  document.getElementById('remember').onchange=saveSettings;
+  document.getElementById('forget').onclick=()=>{
+    try{localStorage.removeItem(STORE)}catch{}
+    pendingId='';STATE_URL='';viewKey='';connected=false;sampleMode=false;connectionVersion++;sampleTimers.forEach(clearTimeout);
+    ['relay-url','view-key','call-key'].forEach(id=>document.getElementById(id).value='');
+    renderState({phase:'idle',timeline:[],reports:{},acknowledgements:{}});setText('mode','Saved settings removed from this browser.');setText('call-status','Enter your connection settings to use this browser again.');
+  };
+  try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');if(saved){document.getElementById('relay-url').value=saved.relay||'';document.getElementById('view-key').value=saved.view||'';document.getElementById('call-key').value=saved.call||'';pendingId=saved.pendingId||'';document.getElementById('settings').open=false;}}catch{}
+  const rp=params.get('relay');try{if(rp){const u=new URL(rp);if(u.protocol==='https:'&&!u.username&&!u.password)document.getElementById('relay-url').value=u.origin}}catch{}
+  try{if(location.hash.length>1){const h=new URLSearchParams(location.hash.slice(1));if(h.get('relay'))document.getElementById('relay-url').value=h.get('relay');if(h.get('call'))document.getElementById('call-key').value=h.get('call');if(h.get('view'))document.getElementById('view-key').value=h.get('view');history.replaceState(null,'',location.pathname+location.search);}}catch{}
+  if(document.getElementById('view-key').value.length>=24)document.getElementById('connect').click();
   document.getElementById('sample').onclick=()=>{
-    sampleTimers.forEach(clearTimeout);sampleMode=true;connectionVersion++;
+    sampleTimers.forEach(clearTimeout);sampleMode=true;connected=false;connectionVersion++;
     document.getElementById('mode').textContent='ILLUSTRATED EXAMPLE. Scripted reports and decision. No phones connected; no call placed.';
     const s={phase:'check',incident:{route:'310',direction:'1',hour:'18:00',minutes_late_now:22,boardings_this_hour:640,buses_running:8,buses_needed_by_rule:17,source:'Invented operational conditions for this illustrated example.'},reports:{},timeline:[],acknowledgements:{}};
     renderState(s);
@@ -383,7 +305,7 @@ header{margin:8px 0 24px}header h1{font-size:clamp(28px,4vw,44px);line-height:1.
     sampleTimers.push(setTimeout(()=>{for(const r of Object.keys(reports))s.acknowledgements[r]={at:new Date().toISOString()};s.phase='done';s.outcome='complete';renderState(s)},9000));
   };
   poll();
-  setInterval(poll, POLL_MS);
+  setInterval(()=>{updateControls();poll()}, POLL_MS);
 })();
 </script>
 </body>

@@ -136,10 +136,12 @@ function addTimeline(event) {
 
 // Return state stripped of any name or number from the numbers file.
 function privateState() {
+  const controls = {running:relayRunning, can_start:allGuards() && !relayRunning && !process.argv.includes('--sample-manager'), armed:allGuards(), request_id:state.request_id || null};
+  const snapshot = {...state, controls};
   const nums = numbers();
   const toRemove = new Set(nums.flatMap(n => [n.name, n.number]).filter(Boolean));
-  if (!toRemove.size) return JSON.parse(scrub(JSON.stringify(state)));
-  let str = JSON.stringify(state);
+  if (!toRemove.size) return JSON.parse(scrub(JSON.stringify(snapshot)));
+  let str = JSON.stringify(snapshot);
   for (const val of toRemove) str = str.split(val).join('[redacted]');
   return JSON.parse(scrub(str));
 }
@@ -164,6 +166,8 @@ const clean = (s, n) => String(s == null ? '' : s).replace(/[<>{}]/g, '').replac
 
 const callTokens = new Map();
 let callCount = 0;
+let runConversations = [], uncertainCall = false;
+const startedRequests = new Map();
 function handleTool(toolPath, body) {
   const binding = callTokens.get(body.call_token);
   const expectedPhase = {report:'check',decision:'manager',acknowledge:'callout'}[toolPath];
@@ -393,7 +397,7 @@ ${SAFETY_RULES}`,
 /* ---------- calls ---------- */
 
 async function callOne(to, variables, agentId) {
-  if (++callCount > 9) throw new Error('Rehearsal call limit reached; restart only for an approved new run.');
+  if (++callCount > 9) throw new Error('Nine-call limit reached for this run.');
   const r = await EL('/v1/convai/twilio/outbound-call', {
     method: 'POST',
     body: JSON.stringify({
@@ -402,11 +406,14 @@ async function callOne(to, variables, agentId) {
       to_number: to,
       conversation_initiation_client_data: { dynamic_variables: variables },
     }),
-  });
+  }).catch(e => { uncertainCall = true; throw e; });
   const j = await r.json().catch(() => ({}));
   if (!r.ok || j.success === false) {
+    if (r.status >= 500) uncertainCall = true;
     throw new Error('status ' + r.status + ' ' + String(j.message || (j.detail && JSON.stringify(j.detail)) || '').slice(0, 200));
   }
+  if (j.conversation_id) runConversations.push(j.conversation_id);
+  else uncertainCall = true;
   return { conversation: j.conversation_id || null, sid: j.callSid || j.call_sid || null };
 }
 
@@ -493,30 +500,36 @@ async function sampleManager() {
 
 let relayRunning = false;
 
-async function startRelay(incident) {
-  if (relayRunning) return { skipped: 'A relay is already running.' };
+async function startRelay(incident, requestId) {
+  // A lost HTTP response may be retried, but must never dial a second team.
+  if (requestId && startedRequests.has(requestId)) return {...startedRequests.get(requestId), duplicate:true};
+  if (relayRunning) return {skipped:'A relay is already running or its calls are still ending.'};
+  if (process.argv.includes('--sample-manager')) return {skipped:'This process is reserved for the manager-only sample.'};
+  if (callCount && !requestId) return {skipped:'A new run needs a new request ID from the presenter dashboard.'};
+  if (startedRequests.size >= 100) return {skipped:'Session run limit reached. Check the rehearsal budget before restarting.'};
   relayRunning = true;
-  if (allGuards() && callCount) { relayRunning=false; return {skipped:'One live rehearsal per process. Restart only when the team is ready for another.'}; }
   resetState(incident);
+  state.request_id = requestId || null;
+  callCount = 0; runConversations = []; uncertainCall = false;
   callTokens.clear();
   log('relay: incident', incident.id || '', 'route', incident.route, 'at', incident.hour);
-
   if (!allGuards()) {
-    runRehearsal(incident);
-    relayRunning = false;
-    return { rehearsal: true };
+    runRehearsal(incident); relayRunning = false;
+    return {rehearsal:true};
   }
-
-  // Run asynchronously so the HTTP response returns immediately
+  const result = {started:true,request_id:requestId || null};
+  if (requestId) startedRequests.set(requestId,result);
   runLiveRelay(incident).catch(e => {
-    state.outcome='failed'; addTimeline({event:'relay_failed'}); log('relay error:', scrub(e.message));
-  }).finally(() => {
-    relayRunning = false;
+    state.outcome='failed'; addTimeline({event:'relay_failed'}); log('relay error:',scrub(e.message));
+  }).finally(async () => {
     state.phase = 'done';
     state.outcome ||= state.decision ? 'incomplete' : 'no_decision';
+    // Acknowledgement can arrive before hangup. Keep new runs locked until the
+    // provider confirms every call has ended. Unknown outbound results stay locked.
+    while (uncertainCall || !(await allEnded(runConversations))) await sleep(2500);
+    relayRunning = false;
   });
-
-  return { started: true };
+  return result;
 }
 
 async function runLiveRelay(incident) {
@@ -883,8 +896,11 @@ const server = http.createServer(async (req, res) => {
       }
       let body;
       try { body = JSON.parse(await readBody(req, 8000)); } catch (e) { return send(res, 400, 'application/json', '{"error":"bad request"}', cors); }
+      const requestId = body && body.request_id;
+      if (requestId != null && (typeof requestId !== 'string' || !/^[a-zA-Z0-9_-]{16,100}$/.test(requestId))) return send(res,400,'application/json','{"error":"invalid request ID"}',cors);
+      if (body && body.scenario === 'default') body = JSON.parse(fs.readFileSync(path.join(__dirname,'incident-example.json'),'utf8'));
       if (!body || body.drill !== true || !body.route || !Array.isArray(body.options) || body.options.length < 1) return send(res, 400, 'application/json', '{"error":"incident must be a drill with a route and options"}', cors);
-      const result = await startRelay(body);
+      const result = await startRelay(body, requestId);
       return send(res, 200, 'application/json', JSON.stringify(result), cors);
     }
 
