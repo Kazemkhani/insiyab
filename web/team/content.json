@@ -1,0 +1,434 @@
+{
+  "title": "Insiyab. Know your part. Tell one story.",
+  "date": "18 November 2026",
+  "intro": "Dubai's morning and evening peaks had similar boarding totals on the day we studied, but evening departures were much more likely to be late. We examined the time allowed for each trip and found where it fell short of the recorded journey. Insiyab gives a planner a route, an hour and the minutes to review, alongside a separately tested forecast. A person decides what changes.",
+  "status": "Team preparation, based on one service day: 15 December 2025. Main-project pitch results and John-project checks are different runs. The full phone decision-and-callback sequence has not yet completed successfully. Use the labelled illustrated walkthrough until a good rehearsal is recorded.",
+  "people": [
+    {
+      "id": "amir",
+      "name": "Amir",
+      "area": "The decision and the business case",
+      "role": "Team lead and duty manager",
+      "line": "We turn a measured timetable gap into a decision a planner can review.",
+      "learn": [
+        [
+          "What the product is",
+          "The core product is a planner's worklist: route, direction, hour, planned trip time, measured trip time and extra minutes to consider. It helps prioritise a timetable review. It does not dispatch buses or edit an RTA timetable."
+        ],
+        [
+          "Why the number matters",
+          "The 244 bus-hours add up extra running time across many evening-peak trips. They are measured planning demand from 16:00 to 18:59, not hours saved, money saved or a model forecast. Keeping frequency may require more bus time; keeping the fleet may affect frequency. Neither is an approved operating plan."
+        ],
+        [
+          "What comes next",
+          "Propose a limited pilot with RTA: more service days, a later-day test, planner review of selected route-hours, then an operational trial with agreed safeguards. Measure departure reliability and passenger service before and after. No benefit has yet been demonstrated from changing the timetable."
+        ],
+        [
+          "What the agent adds",
+          "It collects four short reports, briefs the duty manager, records the person's choice and relays it back for acknowledgement. It helps close a communication loop. The phone example uses invented operating conditions and does not connect to an RTA dispatch system."
+        ]
+      ],
+      "numbers": [
+        "244 bus-hours: measured evening planning shortfall, not a saving.",
+        "One service day: no proof of next-day reliability.",
+        "Five judging areas, 20 points each: practical use, presentation, innovation, model quality and accuracy."
+      ],
+      "call": "Listen for all four reports and any missing response. Choose an offered option by its exact name or number. If a spare or driver is unconfirmed, choose to monitor or request confirmation. On stage, explain that the human choice is recorded before the callbacks.",
+      "qa": [
+        [
+          "What is new here?",
+          "The contribution is the connection between route-and-hour evidence, an explicit forecast comparison and a reviewable planning decision. We are not claiming that RTA has never used AI or nol data."
+        ],
+        [
+          "How much money will this save?",
+          "We cannot calculate that without RTA's cost model. We report minutes and bus-hours, and would price a planner-approved option in a pilot."
+        ],
+        [
+          "Have you improved service?",
+          "Not yet. We measured the gap and tested a forecast. An improved timetable must still be tested operationally."
+        ],
+        [
+          "Why use an AI phone agent?",
+          "To gather reports and relay a human decision consistently. It must report missing information instead of inventing agreement or taking authority from the manager."
+        ],
+        [
+          "What do you want from RTA?",
+          "Access to more approved service-day aggregates and a planner-led pilot on selected route-hours, with reliability and passenger safeguards agreed in advance."
+        ]
+      ],
+      "avoid": "Do not promise savings, automatic dispatch, government endorsement, or a proven improvement in live service.",
+      "handoff": "Sara, show us what happens to one route in the evening.",
+      "sources": [
+        "facts",
+        "requirements",
+        "chain"
+      ]
+    },
+    {
+      "id": "sara-alrifai",
+      "name": "Sara Alrifai",
+      "area": "The service problem and the evidence",
+      "role": "Service reliability lead; driver in the call",
+      "line": "A trip that overruns can use the break before the next departure and pass its delay on.",
+      "learn": [
+        [
+          "The opening comparison",
+          "At 08:00 the data records 48,724 boardings and about 19% of stop departures at least five minutes late. At 18:00 it records 49,707 boardings and about 45% late. Similar boarding totals prompted the timetable investigation; they do not prove that crowding, traffic or other causes have no effect."
+        ],
+        [
+          "One route makes it concrete",
+          "Route 310, direction 1, at 18:00: the Flow shows 67.3 minutes planned and 96.4 minutes for the middle recorded trip. There are ten trips in this group. The 85th percentile is 104.4 minutes; the proposed addition is 37.2 minutes from source precision."
+        ],
+        [
+          "One late-return definition",
+          "Among 945 late trip starts with a previous trip on the same bus, 589 had the previous arrival after the next scheduled departure. That is 62%. Separately, 696 linked departures had the bus still out when due, and 85% of those started over five minutes late. Different denominators answer different questions."
+        ],
+        [
+          "Read a chart safely",
+          "Read the route, hour, unit and denominator before a percentage. A red route-hour cell is a measured late-departure share, not a count of passengers waiting. The records do not tell us the traffic cause, a breakdown cause or whether a driver was at fault."
+        ]
+      ],
+      "numbers": [
+        "08:00 / 18:00: 48,724 / 49,707 boardings; approximately 19% / 45% late stop departures.",
+        "Route 310 at 18:00: 67.3 planned, 96.4 median actual minutes; ten trips.",
+        "589 of 945 = 62%, using the bus-still-out-at-next-departure definition."
+      ],
+      "call": "Answer as Alrifai, the driver. Invented role card: 'We can continue. Plan for a return about twenty minutes late.' Do not add a mechanical fault or safety claim. On the callback, confirm the manager's message in your own words; say if anything has changed.",
+      "qa": [
+        [
+          "Does similar demand prove the timetable caused the delay?",
+          "No. It is a reason to investigate. The trip-time comparisons and linked previous trips show a scheduling gap on this day, but not every cause of delay."
+        ],
+        [
+          "Why did the figure change from 93% to 62%?",
+          "Those used different definitions and populations. We use one on stage: 589 of 945 late starts where the bus returned after its next departure was due."
+        ],
+        [
+          "Are 696 buses stranded?",
+          "No. It is 696 departures, not unique buses, with a previous trip still unfinished at the scheduled departure time."
+        ],
+        [
+          "Did one bus really leave at 19:36 instead of 19:23?",
+          "That clock example is an illustration made from rounded route-level times. It is not a trace of an individual passenger or a claimed observed trip."
+        ],
+        [
+          "Are you blaming drivers?",
+          "No. We analyse service timing, not individual drivers. We do not display or export driver records."
+        ]
+      ],
+      "avoid": "Do not say all routes have one fixed time, every evening fails, the crowd is ruled out, or drivers caused the delay.",
+      "handoff": "Sarah, show how a planner can use those minutes.",
+      "sources": [
+        "facts",
+        "retest",
+        "chain"
+      ]
+    },
+    {
+      "id": "sarah-maaty",
+      "name": "Sarah Maaty",
+      "area": "The planner's workflow and passenger impact",
+      "role": "Product and passenger lead; station supervisor in the call",
+      "line": "Show one route, one hour, one proposal and who must check it.",
+      "learn": [
+        [
+          "Walk through one worklist row",
+          "On Dataiku tab 2, read Route, Direction, Hour, Planned min, Median actual, 85th pct and Add min. The 85th percentile is the time within which 85 of 100 recorded trips in that group finish. Accept records a proposal for review; it does not change a timetable."
+        ],
+        [
+          "Keep the headline and list distinct",
+          "The 244 bus-hours describe the aggregate evening gap. The visible worklist filters groups with enough trips to inspect, so it may show a smaller subtotal. Do not add a few displayed rows and claim they reproduce the whole headline."
+        ],
+        [
+          "Give the passenger context",
+          "Tab 3 shows boardings by hour, route and stop. A boarding is one occasion when someone gets on a bus; one person can board more than once. Tab 5 compares boardings with seat supply as a planning screen, not an onboard crowd measurement. Use seats; the supplied standing capacity is unverified."
+        ],
+        [
+          "Explain a possible change",
+          "Tab 7 is a simulation. Add a bus, read the changed value, then reset. A real planner still checks the vehicle, driver duties, route access and service on any donor route. Rewards and partner surveys are a later passenger option, presented only after the core solution and build."
+        ]
+      ],
+      "numbers": [
+        "85 in 100 is a trip-time coverage target, not 85% model accuracy.",
+        "244 bus-hours is the evening aggregate; the displayed subset can be smaller.",
+        "No passenger waiting count and no monetary saving is supported."
+      ],
+      "call": "Answer as Sarah, the station supervisor. Invented role card: 'We need an updated departure time for passengers. I can update the display once the manager decides.' On the callback, confirm the message received. Do not claim a real RTA display was changed.",
+      "qa": [
+        [
+          "Does Accept apply a new timetable?",
+          "No. It records a proposal for review in this prototype. RTA's scheduling and operational approval process would still apply."
+        ],
+        [
+          "How many passengers are waiting?",
+          "We do not know. The data contains boardings, not a live queue count."
+        ],
+        [
+          "Why not just move a spare bus?",
+          "Low boardings elsewhere do not prove a bus and driver are available. Duties, location, access and the donor service need checking."
+        ],
+        [
+          "Are passengers asked to wait so a bus can skip a stop?",
+          "No. That is not our proposal. The core is a timetable that better reflects trip times, while protecting access to service."
+        ],
+        [
+          "What do the rewards prove?",
+          "Nothing about uptake yet. Voluntary rewards and partner surveys are a future extension, after service planning and passenger safeguards are validated."
+        ]
+      ],
+      "avoid": "Do not equate boardings with unique passengers, infer a waiting queue, treat simulation as measured improvement, or lead with rewards.",
+      "handoff": "Mustafo, how well can we estimate the trip time before it happens?",
+      "sources": [
+        "facts",
+        "rules",
+        "requirements"
+      ]
+    },
+    {
+      "id": "maruf",
+      "name": "Maruf",
+      "area": "Dataiku, data preparation and reproducibility",
+      "role": "Build and data lead; depot controller in the call",
+      "line": "Follow each claim back to the table and the recipe that produced it.",
+      "learn": [
+        [
+          "The six-step explanation",
+          "RTA's tables provide the planned and actual service. Prepare turns them into usable trip records. Insights compare demand, timing and supply. Forecast estimates trip time and tests the miss. Decisions give a planner evidence to review. Published presents the results. These are explanation steps, not a claim that the Flow has exactly six recipes."
+        ],
+        [
+          "Two projects, clearly named",
+          "The live presenter app is in INSIYAB. Mustafo's independent chain is in John: Trips, Forecast, Planner's list and Control room flag, plus Extra checks. His push does not mean that chain was copied into INSIYAB. Show the actual Flow you have open and read its live recipe counts."
+        ],
+        [
+          "What depends on what",
+          "The planner's list and the control-room flag are measured from the trip table. They do not consume the model's forecast. The forecast is a separately tested estimate of trip duration. A wrong dependency diagram would make the product harder to defend."
+        ],
+        [
+          "Preparation and privacy",
+          "The independent chain keeps 11,136 modelling trips after removing 33 extreme ratios from 11,169. Raw trip, card and driver rows remain in Dataiku; only permitted totals leave. These modelling trips are not the same population as the 11,201 trip records shown in the original overview."
+        ]
+      ],
+      "numbers": [
+        "11,136 cleaned modelling trips in John's chain; 33 extreme ratios removed from 11,169.",
+        "2,043 evening-peak evaluation trips; keep that denominator with the model result.",
+        "Read recipe counts live. Do not memorise a count that can change with the Flow."
+      ],
+      "call": "Answer as Maruf, the depot controller. Invented role card: 'We have one spare. Allow fifteen minutes, and I still need to confirm the driver and vehicle checks.' If asked for a guarantee, say the checks are still needed. A callback acknowledges a message, not an actual dispatch.",
+      "qa": [
+        [
+          "Does the model produce the 244-hour worklist?",
+          "No. That list is measured from recorded trip times. The forecast is tested separately. This distinction is explicit in the new John chain."
+        ],
+        [
+          "Is all of Mustafo's work inside INSIYAB?",
+          "No. His new chain is in John. The repo includes recipes and a how-it-connects note; copying them into INSIYAB is a separate integration step."
+        ],
+        [
+          "Why different trip totals?",
+          "They count different populations: the original overview, the reconstructed trip table and the cleaned modelling sample. State the population instead of forcing the figures to match."
+        ],
+        [
+          "What protects the data?",
+          "We keep raw records in Dataiku and present aggregate results. We do not display card identifiers, devices or individual drivers. A public aggregate page is not an operational data feed."
+        ],
+        [
+          "Can another team reproduce this?",
+          "The repo has preparation and modelling recipes, the test definitions and the source tables named. Reproduction needs authorised access to the original data inside Dataiku."
+        ]
+      ],
+      "avoid": "Do not say all outputs come from the model, John is already merged into INSIYAB, every step is no-code, or raw data is in the public site.",
+      "handoff": "Sarah, show one possible change and what still needs a planner's judgement.",
+      "sources": [
+        "chain",
+        "recipes",
+        "data"
+      ]
+    },
+    {
+      "id": "mustafo",
+      "name": "Mustafo",
+      "area": "Forecast quality, independent checks and limitations",
+      "role": "Model and evaluation lead; planning analyst in the call",
+      "line": "Compare methods on the same trips, and say exactly when the model helps.",
+      "learn": [
+        [
+          "The main pitch result",
+          "The original INSIYAB Flow reports 6.97 minutes average miss against 8.25 for the timetable on 2,043 trips due 16:00 to 18:59. The pitch says about 15% closer. This is a reduction in trip-time forecast error, not a reduction in delay. The split learns from trips due before 16:00; some may still have been running then."
+        ],
+        [
+          "The new John evidence",
+          "The 18 November chain reports 7.15 minutes for built-in LightGBM, about 13% closer, and 6.93 for the tuned script, about 16% closer. Use the current table, not the stale 6.95 in its Q&A prose. These are separate runs, not replacements for the original 6.97 shown in INSIYAB."
+        ],
+        [
+          "The stricter test matters",
+          "For each next hour, train only on trips finished 30 minutes before that hour. The current John table gives 7.76 minutes for trees, 7.48 for the rule and 7.37 for linear regression, against 8.25 for the timetable. Trees improve by about 6%; earlier runs gave 8%. The simpler methods win this test."
+        ],
+        [
+          "Coverage and honest limits",
+          "The timetable covers 29 in 100 evening-peak trips against an 85-in-100 planning target. Trees set to that target cover only 78% to 80%; the simple rule covers 85% to 87%. Keep the worklist measured. In the scheduled-departure pitch test, from 19:00 the timetable is ahead. No test proves performance on a different day."
+        ]
+      ],
+      "numbers": [
+        "INSIYAB pitch run: 6.97 versus 8.25 minutes, about 15% closer, 16:00-18:59 only.",
+        "John current run: built-in 7.15; tuned 6.93; strict next-hour trees 7.76.",
+        "Strict next-hour rule 7.48 and linear 7.37 beat trees; one-day evidence only."
+      ],
+      "call": "Answer as Mustafo, the planning analyst. 'The times come from the recorded day. They are not a live forecast, and they do not prove a spare is available.' Keep the recorded evidence separate from the invented incident conditions. Confirm the manager's message on the callback.",
+      "qa": [
+        [
+          "Why use trees if a simpler method wins?",
+          "Trees help in the evening pitch split. Under the stricter operational test, the rule and linear model are better. A pilot should choose by the intended use and honest test, not by model complexity."
+        ],
+        [
+          "Is there future information in the pitch test?",
+          "The split is by scheduled departure, so some training trips may finish after the cutoff. The strict next-hour test addresses availability by using only finished trips. That is the stronger operational check."
+        ],
+        [
+          "What do MAE, RMSE and MAPE mean?",
+          "MAE is the average miss in minutes. RMSE penalises large misses more. MAPE expresses misses as a share of the actual trip time. Use the same evaluation rows when comparing models."
+        ],
+        [
+          "Why 13%, 15% and 16%?",
+          "They refer to different builds: John's default built-in model, the original INSIYAB pitch run, and John's tuned script. State the project, method, test window and error alongside the percentage."
+        ],
+        [
+          "Does it work tomorrow or on unseen routes?",
+          "Tomorrow is untested. Holding out whole routes on this day gives about 10% over the timetable, but the trees are level with a simple rule. We need later-day tests before an operational claim."
+        ]
+      ],
+      "avoid": "Do not call 15% less delay, mix evaluation windows, claim strict next-hour trees win, or use the missing-hour test as a forecast-ahead result.",
+      "handoff": "Maruf, show where these figures come from in Dataiku.",
+      "sources": [
+        "chain",
+        "retest",
+        "facts"
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "start": 0,
+      "end": 50,
+      "person": "amir",
+      "title": "Open with the service problem",
+      "screen": "Pitch opening, then Dataiku tab 1: The day",
+      "point": "The morning and evening comparison. Keep the old optional film closed.",
+      "say": "Good morning. We are Insiyab. We studied one day of Dubai's bus service and found a problem worth a planner's attention. The morning and evening peaks had similar numbers of boardings, but evening departures were much more likely to be late. We looked at the time the timetable allowed for each trip. Our answer is a list showing which routes and hours need review, alongside a forecast tested against the timetable. Sara will show the evidence through one route.",
+      "action": "Open the first live tab. Leave a short pause for the two peaks to register. If a new film is approved, it must replace this opening within the same 50 seconds; do not add it on top."
+    },
+    {
+      "start": 50,
+      "end": 140,
+      "person": "sara-alrifai",
+      "title": "Show the pattern, then the mechanism",
+      "screen": "Tab 1: The day; tab 4: Service reliability; tab 2: Planner's worklist",
+      "point": "08:00 and 18:00, then one route-hour row for route 310.",
+      "say": "At eight in the morning, the records show about forty-nine thousand boardings. At six in the evening, the total is similar. But the share of stop departures at least five minutes late rises from about nineteen per cent to forty-five per cent. That does not tell us every cause, so we examined the trip times. On route 310 at six in the evening, the timetable allowed about sixty-seven minutes. The middle recorded trip took about ninety-six. When a trip takes longer than planned, it can use the break before the next departure and pass its delay on. We also linked consecutive trips on the same bus. Among nine hundred and forty-five late starts we could link, five hundred and eighty-nine had the bus return after its next departure was already due. That is sixty-two per cent, using one clear definition. Sarah will show what a planner can do with this evidence.",
+      "action": "Point briefly at the evening cells on tab 4. Return to tab 2 and read the selected direction and hour. Do not call the route-level clock illustration an observed individual trip."
+    },
+    {
+      "start": 140,
+      "end": 230,
+      "person": "sarah-maaty",
+      "title": "Make the planner's decision visible",
+      "screen": "Tab 2: Planner's worklist; tab 3: Passenger demand",
+      "point": "Planned min, Median actual, 85th pct, Add min. Then the boarding totals.",
+      "say": "The planner needs a practical answer: which route, at which hour, needs more time? Each row shows the plan beside the recorded trips and the minutes to review. Here, the eighty-fifth percentile is the time enough for eighty-five of every hundred recorded trips in this group. I can accept this row as a proposal or set it aside. That does not change a real timetable. Across the evening peak, the measured gap adds up to two hundred and forty-four bus-hours. That is additional running time across many trips, not time saved by our model. The list on screen is a filtered subset, so its subtotal can be smaller. Passenger demand gives the decision context: where do people board, and when? These are boarding events, not unique people or a count of a queue. Mustafo will now show how well we can estimate the trip time.",
+      "action": "Select Accept once, show its recorded state, then open tab 3. Keep the decision action visible before changing screens."
+    },
+    {
+      "start": 230,
+      "end": 340,
+      "person": "mustafo",
+      "title": "Show the forecast and its hardest test",
+      "screen": "Tab 6: Forecast; updated pitch evidence panel for the independent John run",
+      "point": "The test window, average error, simple rule and linear comparison.",
+      "say": "We ask a separate question: how long will a trip take? On the original INSIYAB evening test, the timetable misses by eight point two five minutes on average. The model misses by six point nine seven. That is about fifteen per cent closer for trips due between four and seven in the evening. It is an improvement in the forecast, not a claim that delays fell by fifteen per cent. I rebuilt the analysis independently in John. We tested a built-in model and a tuned script, and labelled their results separately. We also made the test harder. For each next hour, we used only trips that had already finished. There, the simple rule and linear model do better than the trees. In the original evening test, the timetable becomes closer from seven onwards. This is one day, so tomorrow remains untested. The practical lesson is to choose the method that works for the job. The worklist stays measured, and the forecast is evaluated separately. Maruf will show how those pieces connect.",
+      "action": "Spend the remaining time pointing to the actual comparison rows. Do not quote a live number that differs from the labelled run. Explain that the original scheduled-departure split is weaker than the finished-trip test."
+    },
+    {
+      "start": 340,
+      "end": 410,
+      "person": "maruf",
+      "title": "Trace the build in Dataiku",
+      "screen": "Tab 8: How it is built; the named Flow zones",
+      "point": "RTA's tables, Prepare, Insights, Forecast, Decisions, Published.",
+      "say": "Here is the build in plain words. RTA's tables give us the planned and actual service. We prepare them into trip records. Insights compare the day by route and hour. The forecast estimates trip time and measures its own error. Decisions give the planner evidence to review. Published brings those results onto this screen. The planner's list and the control-room flag come from the recorded trips; they are not outputs of the forecast. The live app is in INSIYAB. Mustafo's independent chain is in John, with the recipes documented in the repository. Raw records stay in Dataiku and only permitted totals are presented. Sarah will show one possible change and the checks it still needs.",
+      "action": "Read live recipe counts only if useful. Do not claim John's chain has been imported into INSIYAB. Keep the six explanation steps distinct from actual recipe counts."
+    },
+    {
+      "start": 410,
+      "end": 455,
+      "person": "sarah-maaty",
+      "title": "Show a change without claiming an outcome",
+      "screen": "Tab 5: Supply and capacity, then tab 7: What if",
+      "point": "Seat assumptions, SIMULATED label, changed value, reset.",
+      "say": "We compare boardings with seat supply as a planning check. It does not measure the crowd on each bus, and standing capacity is unverified. Here we can explore adding a bus. The value changes because this is a simulation, not because a service has changed. A planner still checks the vehicle, driver duties, access and the effect on other routes. I will reset it so the starting point is clear. Amir will show how a human decision can then be communicated.",
+      "action": "Use seated results only. The current Dataiku screen also contains unverified standing assumptions; do not present those as facts. Add one bus, read a changed number, then reset."
+    },
+    {
+      "start": 455,
+      "end": 550,
+      "person": "amir",
+      "title": "Show reports, a decision and acknowledgements",
+      "screen": "Pitch: And on the day itself; then the labelled operations console",
+      "point": "Four roles, missing reports, manager choice, four acknowledgement states.",
+      "say": "There is also an on-the-day communication problem. In the recorded data, six hundred and ninety-six linked departures were due before the bus returned from its previous trip. That flag comes from measured timings, not an AI explanation of the cause. In this example our team represents the driver, depot, station and planning desk. The assistant gathers their reports and briefs the duty manager. I choose from the options after hearing what is known and what is missing. The assistant then relays that choice and records who acknowledged it. Watch the screen move through those three stages. This illustrated walkthrough shows the intended sequence. It is not evidence that today's full phone rehearsal succeeded. The useful part is the complete communication record, with the human decision kept visible.",
+      "action": "Default: press Play an illustrated example and keep its label visible. A verified recording may replace this only after the full loop passes. Do not launch an unrehearsed nine-call sequence inside this 95-second slot. The spoken agent greeting remains natural: Hello [name], this is Insiyab, the AI operations assistant."
+    },
+    {
+      "start": 550,
+      "end": 575,
+      "person": "sarah-maaty",
+      "title": "Passenger reward comes last",
+      "screen": "Stay on the outcome; optional passenger page only if already loaded",
+      "point": "Future extension, voluntary choice, no promised uptake.",
+      "say": "Once the service decision works, there is a passenger extension: voluntary rewards for a useful travel choice, with partner surveys to learn what people value. That is the cherry on the cake. It does not replace a reliable timetable, and we have not measured uptake yet.",
+      "action": "Do not introduce stop skipping or ask passengers to wait longer. This is the last feature mentioned."
+    },
+    {
+      "start": 575,
+      "end": 600,
+      "person": "amir",
+      "title": "Close with the decision and the next test",
+      "screen": "Planner's worklist, one route-hour selected",
+      "point": "One reviewable row and a clear pilot request.",
+      "say": "Insiyab makes the timetable gap visible and gives a planner a decision to review. Our next step is more days of evidence and a planner-led pilot on selected routes and hours. We have shown the measured problem, the forecast and its limits, and the human decision. Thank you.",
+      "action": "Stop at ten minutes. Invite questions. Amir routes each question to its owner; one person answers first."
+    }
+  ],
+  "sources": {
+    "facts": {
+      "title": "Current pitch fact ledger",
+      "path": "web/film/handoff/FACTS.md"
+    },
+    "chain": {
+      "title": "Mustafo's new chain and checks, 18 November",
+      "path": "opendata/onday/HOW-IT-CONNECTS.md"
+    },
+    "retest": {
+      "title": "Independent retest, 17 November",
+      "path": "opendata/onday/FORECAST-RETEST.md"
+    },
+    "recipes": {
+      "title": "John chain recipes",
+      "path": "opendata/onday/dataiku"
+    },
+    "requirements": {
+      "title": "Official scoring sheet transcription",
+      "path": "docs/REQUIREMENTS.md"
+    },
+    "rules": {
+      "title": "Evidence, words and passenger rules",
+      "path": "docs/RULES.md"
+    },
+    "data": {
+      "title": "Dataset definitions and handling",
+      "path": "docs/DATA.md"
+    },
+    "notes": {
+      "title": "Authoritative Dataiku presenter notes",
+      "path": "dataiku/webapp/script.js"
+    }
+  }
+}

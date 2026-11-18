@@ -17,9 +17,13 @@ Use the committed source and exact evaluation definition. All real measurements 
 | 29 in 100; standard 85 | Timetable running time covers 29% of evening-peak trips in independent retest. | Target coverage is not achieved model accuracy. |
 | From 19:00 timetable ahead | Retest reports 4.40 timetable vs 4.94 trees in the later band. | Remove the earlier “after 21:00” line. |
 
-## Differences still requiring a new source
+## New independent build, committed 18 November
 
-The latest user-provided lane-3 summary says 6.95/16% in the pitch split and 7% in the strict next-hour test. The committed retest currently says 6.96 and 8%. The site retains the committed analysis and labels it. Pull the promised reproducible Flow/recipes before replacing those values. Similarly, the 11,201 displayed trip records and 11,136 cleaned modelling trips are different populations; do not present them as contradictory estimates of the same denominator. The retest reports 11,169 before removal of 33 extreme ratios. Keep each population named.
+Commit 7406048 supplies `opendata/onday/HOW-IT-CONNECTS.md` and four recipes. John's current built-in model reports 7.15 minutes average miss (13% closer); its tuned script reports 6.93 (16% closer), against 8.25 on 2,043 trips due 16:00-18:59. The strict next-hour table now reports trees 7.76, rule 7.48 and linear 7.37; trees gain about 6%, with earlier runs at 8%. In scheduled-departure test A, from 19:00 it reports 5.06 for trees against 4.40 for the timetable. These are labelled separate runs, not replacements for INSIYAB's original 6.97. The note's Q&A still says 6.95: use its current table and identify the run.
+
+The scheduled-departure pitch split can include training trips still running at the cutoff. Only the stricter finished-trip test addresses that information-availability issue. The planner's list and OCC flags do not consume forecast output. John's chain is not yet integrated into INSIYAB. Its description of a disclaimer on every phone call is stale: the current agents identify themselves naturally as Insiyab, and the demonstration context remains on the dashboard and in team preparation.
+
+The 11,201 displayed trip records and 11,136 cleaned modelling trips are different populations. The retest reports 11,169 before removal of 33 extreme ratios. Keep each population named. The 244 bus-hours remain the measured evening planning gap; John's whole-day rounding is 629, while the original Flow shows 630. Do not silently combine runs.
 
 ## Government context
 

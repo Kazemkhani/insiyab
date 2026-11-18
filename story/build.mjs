@@ -15,6 +15,7 @@ await mkdir(resolve(out,'voice'),{recursive:true});
 await copyFile(resolve(root,'story/index.html'),resolve(out,'index.html'));
 await copyFile(resolve(root,'opendata/onday/index.html'),resolve(out,'onday/index.html'));
 await copyFile(resolve(root,'opendata/onday/FORECAST-RETEST.md'),resolve(out,'onday/FORECAST-RETEST.md'));
+await copyFile(resolve(root,'opendata/onday/HOW-IT-CONNECTS.md'),resolve(out,'onday/HOW-IT-CONNECTS.md'));
 await copyFile(resolve(root,'live/voice/console.html'),resolve(out,'voice/index.html'));
 await build({stdin:{contents:"import * as THREE from 'three'; window.THREE=THREE;",resolveDir:resolve(root,'web')},bundle:true,minify:true,format:'iife',outfile:resolve(out,'three.js'),logLevel:'silent'});
 await writeFile(resolve(out,'THREE-LICENSE.txt'),await import('node:fs/promises').then(fs=>fs.readFile(resolve(root,'web/node_modules/three/LICENSE'),'utf8')));
