@@ -126,6 +126,33 @@ def make_pdfs(data,notes,out):
         if i==4: items += [PageBreak()]
         items += [KeepTogether([para(f'{i+1}. {key.capitalize()}','heading'),para(n['say']),para('Point at: '+n['point'],'small'),para('Then click: '+n['next'],'small')])]
     save('full-script.pdf',items,'Insiyab - ten-minute script and live presenter notes')
+    items=[para('Before your phone rings','title'),para('Five people. One short report each. One human decision.','sub'),para('Read your named card before the rehearsal. The operational facts on these cards are invented for the demonstration. Only the explicitly identified recorded-day figures are measured. Do not pass these examples off as real RTA operating reports.'),para('The order','heading'),para('Alrifai, Sarah Maaty, Maruf and Mustafo receive the first calls. Amir then hears the reports and chooses an offered option. The four reporting roles receive one callback attempt with his decision. Missing or busy calls stay missing; nine attempts is the maximum.'),para('Your whole job','heading'),para('Answer the one question asked. Use your card only for the agreed scenario. Say unconfirmed if you do not know. On the callback, repeat the decision you actually heard, then say received.'),para('If the call is unclear','heading'),para('Please ask me one clear question. If it is still unclear: I cannot confirm that. Please mark it unconfirmed.'),para('What changed after the rehearsal','heading')]
+    items += [para('• '+x) for x in data['phone_review']]
+    for p in data['people']:
+        c=p['phone'];items += [PageBreak(),para(p['name'],'title'),para(c['job'],'sub'),para('Know these facts before answering','heading')]
+        items += [para('• '+x) for x in c['known']]
+        items += [para('The AI asks','heading'),para(c['question']),para('Your first answer','heading'),para('“'+c['answer']+'”')]
+        for q,a in c['followup']:items += [para(q,'heading'),para('“'+a+'”')]
+        items += [para('If you do not know','heading'),para('“'+c['unknown']+'”'),para('On the callback','heading'),para(c['callback']),para('Keep it clear','heading')]
+        items += [para('• '+x) for x in c['dont']]
+    save('call-cards.pdf',items,'Insiyab - exact phone lines for five teammates')
+
+
+def build_call_cards(data,out):
+    toc=''.join(f'<a href="#call-{p["id"]}"><strong>{E(p["name"])}</strong><span>{E(p["role"])}</span></a>' for p in data['people'])
+    cards=[];md=['# Insiyab: before your phone rings','', 'These are prepared fictional operational roles for the demonstration. Recorded-day times are labelled separately. Use the card for the agreed scenario; otherwise say unconfirmed.','', 'First: Alrifai, Sarah Maaty, Maruf and Mustafo. Next: Amir decides. Last: the four reporting roles receive one callback attempt. Busy calls remain missing.','']
+    for p in data['people']:
+        c=p['phone'];blocks=[('Know before answering','<ul>'+''.join('<li>'+E(x)+'</li>' for x in c['known'])+'</ul>'),('The AI asks',E(c['question'])),('Your first answer','<strong>“'+E(c['answer'])+'”</strong>')]
+        blocks += [(q,'“'+E(a)+'”') for q,a in c['followup']]
+        blocks += [('If you do not know','“'+E(c['unknown'])+'”'),('On the callback',E(c['callback'])),('Keep it clear','<ul>'+''.join('<li>'+E(x)+'</li>' for x in c['dont'])+'</ul>')]
+        cards.append(f'<section id="call-{p["id"]}"><p class="kicker">Your phone card</p><h2>{E(p["name"])}</h2><p class="lead">{E(c["job"])}</p>'+''.join(f'<h3>{E(q)}</h3><div class="call-line">{a}</div>' for q,a in blocks)+'<a class="jump" href="#contents">Back to the five names</a></section>')
+        md += ['## '+p['name'],c['job'],'','### Know before answering']+['- '+x for x in c['known']]+['','### The AI asks',c['question'],'','### Your first answer','> '+c['answer'],'']
+        for q,a in c['followup']:md += ['### '+q,'> '+a,'']
+        md += ['### If you do not know','> '+c['unknown'],'','### On the callback',c['callback'],'','### Keep it clear']+['- '+x for x in c['dont']]+['']
+    style=re.search(r'<style>(.*?)</style>',(out/'index.html').read_text(),re.S).group(1)
+    body='<header class="brand"><b>Insiyab.</b><span>Phone rehearsal cards</span></header><main><section id="contents"><p class="kicker">Read this before answering</p><h1>One clear question.<br>One clear answer.</h1><nav class="toc">'+toc+'</nav><p class="status">Prepared fictional operating conditions for the demonstration. The recorded-day figures are labelled separately. Use the card for the agreed scenario; otherwise say unconfirmed.</p><p>Four reports → Amir’s decision → four callback attempts. Busy or unanswered calls remain missing.</p><p><a class="download" href="call-cards.pdf" download>Download all five call cards</a> <a class="download" href="index.html">Full team briefing and pitch script</a></p><h3>If you are confused</h3><p>“Please ask me one clear question.” If it is still unclear: “I cannot confirm that. Please mark it unconfirmed.”</p></section>'+''.join(cards)+'<section><h2>What we changed after the calls</h2><ul>'+''.join('<li>'+E(x)+'</li>' for x in data['phone_review'])+'</ul></section></main>'
+    (out/'phone-cards.html').write_text('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Insiyab | What to say on your call</title><style>'+style+' .call-line{font-size:var(--s2);line-height:1.6;max-width:70ch} .call-line strong{color:var(--flow)} section{scroll-margin-top:20px}</style>'+body+'</html>')
+    (out/'call-cards.md').write_text('\n'.join(md))
 
 
 def main():
@@ -137,16 +164,17 @@ def main():
     assert data['segments'][0]['start']==0 and data['segments'][-1]['end']==600
     assert all(a['end']==b['start'] for a,b in zip(data['segments'],data['segments'][1:]))
     assert len({p['id'] for p in data['people']})==5
-    build_html(data,notes,out);make_pdfs(data,notes,out)
+    build_html(data,notes,out);make_pdfs(data,notes,out);build_call_cards(data,out)
     readme='OPEN index.html for the interactive guide. Use the clickable names at the top. Each person has a two-page PDF. full-script.pdf contains the ten-minute script and all eight live-app presenter notes. The HTML works offline; source links need internet. No phone numbers, keys or raw records are included.\n\nBuilt from repository commit '+subprocess.check_output(['git','rev-parse','--short','HEAD'],cwd=ROOT,text=True).strip()+'. The published pitch result and John independent checks are labelled separately.\n'
-    (out/'READ-ME.txt').write_text(readme)
+    (out/'READ-ME.txt').write_text('FOR PHONE CALLS: open phone-cards.html first, or send call-cards.pdf. It gives each person the question, exact example answer, uncertainty fallback and callback line.\n\n'+readme)
     from pypdf import PdfReader
     for p in data['people']:
         pdf=out/(p['id']+'-brief.pdf')
         assert len(PdfReader(pdf).pages)==2, f'{pdf.name} is not two pages'
         print('PASS two pages: '+pdf.name)
+    assert len(PdfReader(out/'call-cards.pdf').pages)==6, 'Call cards must be one overview plus one page per person'
     with zipfile.ZipFile(out.parent/'Insiyab-team-briefing.zip','w',zipfile.ZIP_DEFLATED) as z:
-        for p in [out/'index.html',out/'READ-ME.txt',out/'full-script.pdf']+[out/(x['id']+'-brief.pdf') for x in data['people']]:
+        for p in [out/'index.html',out/'READ-ME.txt',out/'full-script.pdf',out/'phone-cards.html',out/'call-cards.pdf',out/'call-cards.md']+[out/(x['id']+'-brief.pdf') for x in data['people']]:
             z.write(p,'Insiyab-team/'+p.name)
     print(f'BUILT {out}/index.html; five two-page briefs; full script; ZIP')
 

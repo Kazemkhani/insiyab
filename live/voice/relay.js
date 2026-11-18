@@ -2,11 +2,11 @@
 /* Insiyab voice relay. Node 22+, no dependencies.
 
    This runs the control-centre drill for one bus incident. The team acts it out on their own phones.
-   Roles: driver, depot, station (staff) and manager (duty manager).
+   Roles: driver, depot, station, planner (staff) and manager (duty manager).
 
    Flow:
      1. Incident posted: POST /voice/incident (shared key) or --incident <file.json>
-     2. Staff check: driver, depot and station called at the same time; each gives a one-sentence update
+     2. Staff check: driver, depot, station and planner called at the same time; each gives a one-sentence update
         through the insiyab_report tool
      3. Manager call: called with the incident, the staff reports, RTA's dispatch test and the options;
         chooses one through the insiyab_decision tool
@@ -178,9 +178,10 @@ function handleTool(toolPath, body) {
     if (!['driver', 'depot', 'station', 'planner'].includes(role)) return { result: 'Unexpected role. Pass driver, depot, station or planner.' };
     if (state.reports[role]) return {result:'This report is already recorded.'};
     state.reports[role] = { report: scrub(report), at: new Date().toISOString() };
+    if (body.real_emergency === true) state.outcome = 'emergency_reported';
     addTimeline({ event: 'report', role, report: scrub(report) });
     log('report from', role + ':', report);
-    return { result: 'Logged. I am briefing the duty manager now. Say goodbye and call end_call.' };
+    return { result: body.real_emergency === true ? 'Emergency report recorded. The normal relay is stopped. Tell the person to contact emergency services and call end_call.' : 'Logged. Say goodbye once and call end_call now.' };
   }
   if (toolPath === 'decision') {
     const option_key = clean(body.option_key, 40);
@@ -199,6 +200,7 @@ function handleTool(toolPath, body) {
   if (toolPath === 'acknowledge') {
     const role = clean(body.role, 20).toLowerCase();
     if (!['driver', 'depot', 'station', 'planner'].includes(role)) return { result: 'Unexpected role.' };
+    if (state.acknowledgements[role]) return {result:'Already acknowledged. Call end_call now.'};
     state.acknowledgements[role] = { at: new Date().toISOString() };
     addTimeline({ event: 'acknowledged', role });
     log('acknowledged:', role);
@@ -241,11 +243,11 @@ async function loadAgents() {
 
 const CALL_INTRO = 'Hello {{person_name}}, this is Insiyab, the AI operations assistant.';
 const DEMO_CONTEXT = 'Internal context: consenting team members are presenting a simulated control-room scenario for the RTA Future Move Hackathon. Keep the conversation natural. Do not announce or repeat a drill disclaimer. If asked, answer honestly that this is a demonstration.';
-const STYLE = 'Use call_token {{call_token}} exactly in every tool call. Address the person as {{person_name}}. Style: calm, one short sentence per reply, under 20 words. Never speak stage directions or emotion tags. Never invent details. Reply in the language the person speaks.';
+const STYLE = 'Use call_token {{call_token}} exactly in every tool call. Use the name only in the opening, never repeatedly; honour a request not to use it. Calm spoken English, short sentences, one question at a time. Never invent details or turn perhaps, I presume, or I do not know into a confirmed fact. If confused, explain your single check once using yes, no, or not confirmed; then log uncertainty instead of asking again. Never speak stage directions. Reply in the language the person speaks. After logging, say goodbye once and use end_call; do not keep chatting or answer off-topic questions.';
 const SAFETY_RULES = `Rules:
 - ${DEMO_CONTEXT}
 - The agent informs and records. It instructs nobody. It never claims to be RTA.
-- If the person reports a real emergency, tell them to call 999 and call end_call.
+- Do not interpret ordinary delay or a road obstruction alone as an emergency. If they explicitly report a real emergency or immediate danger, tell them to call 999. If insiyab_report is available, log real_emergency true with their role, then call end_call. Otherwise end the call without recording a routine decision or acknowledgement. Do not continue ordinary service planning.
 - If the person is silent twice, say goodbye and call end_call.
 - If they decline the drill, say goodbye and call end_call.
 - Keep the conversation concise; the system enforces the call duration limit.`;
@@ -260,7 +262,7 @@ Source: {{source}}.`;
 const AGENT_SPECS = {
   driver: {
     max: 90,
-    first: `${CALL_INTRO} For route {{route}}, can the bus continue, and what return delay should the manager plan for?`,
+    first: `${CALL_INTRO} I need one driver check for route {{route}}. Can your bus continue?`,
     prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the driver of route {{route}}.
@@ -270,17 +272,17 @@ ${INCIDENT_BLOCK}
 ${STYLE}
 
 What to do:
-- Your opening asked what is holding the driver. Listen.
-- Ask at most one follow-up for the most useful detail: where the delay started and whether it is moving.
+- Listen for yes, no, or unconfirmed. If it can continue, ask just: "About how many minutes late will you return?"
+- Do not ask for locations, passenger counts, or a diagnosis. If the return delay is unknown, record it as unknown.
 - Call insiyab_report with a one or two sentence summary in the driver's own words and role "driver".
-- Then say "Logged. I am briefing the duty manager now." Say goodbye and call end_call.
+- Then say "Thank you. Your update is recorded." Say goodbye once and call end_call.
 - If they cannot say yet, report that with the reason.
 
 ${SAFETY_RULES}`,
   },
   depot: {
     max: 90,
-    first: `${CALL_INTRO} is a spare bus available for route {{route}}, and what checks or preparation would it need?`,
+    first: `${CALL_INTRO} I need one depot check. Is a standby bus with a driver confirmed available for route {{route}}?`,
     prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the depot or standby controller.
@@ -290,17 +292,18 @@ ${INCIDENT_BLOCK}
 ${STYLE}
 
 What to do:
-- Your opening asked whether a standby bus and driver are free and how soon. Listen.
-- Ask at most one follow-up for the most useful detail: how many spare buses are ready and the nearest one to route {{route}}.
+- Listen for confirmed availability, unavailable, or unconfirmed. If confirmed, ask only: "How many minutes until it is ready?"
+- A bus currently serving another route is not a confirmed spare. Do not ask how many buses, which one is nearest, or ask them to remove a bus from service.
+- If they say "I presume" or guess a number, record availability as unconfirmed and preserve the estimate as an estimate.
 - Call insiyab_report with a one or two sentence summary in their own words and role "depot".
-- Then say "Logged. I am briefing the duty manager now." Say goodbye and call end_call.
+- Then say "Thank you. Your update is recorded." Say goodbye once and call end_call.
 - If they cannot say yet, report that with the reason.
 
 ${SAFETY_RULES}`,
   },
   station: {
     max: 90,
-    first: `${CALL_INTRO} what departure information should passengers receive while the manager considers route {{route}}?`,
+    first: `Hello, this is Insiyab, the AI operations assistant. I need one station check. Has the departure board for route {{route}} been updated?`,
     prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the station supervisor.
@@ -310,21 +313,23 @@ ${INCIDENT_BLOCK}
 ${STYLE}
 
 What to do:
-- Your opening asked what departure information passengers need. Listen. Do not infer a waiting-person count from boardings.
-- Ask at most one follow-up: whether the departure information needs updating.
+- Ask for one concrete check: whether the departure board shows an updated time, the old time, or cannot be checked.
+- If confused, say: "I mean the time shown at the stop. Is it updated, still the old time, or not confirmed?" Ask no further questions after that.
+- If they do not know, log "Departure board status unconfirmed". Do not ask them to invent a passenger message, an arrival time, or a waiting-person count.
+- Do not speak the person's name on this call.
 - Call insiyab_report with a one or two sentence summary in their own words and role "station".
-- Then say "Logged. I am briefing the duty manager now." Say goodbye and call end_call.
+- Then say "Thank you. Your update is recorded." Say goodbye once and call end_call.
 - If they cannot say yet, report that with the reason.
 
 ${SAFETY_RULES}`,
   },
   planner: {
     max: 90,
-    first: `${CALL_INTRO} What does the route {{route}} evidence support, and what still needs checking?`,
+    first: `${CALL_INTRO} This example uses recorded trip times. Should route {{route}} at {{hour}} go on the timetable-review list?`,
     prompt: `${DEMO_CONTEXT}
 You are speaking to the planning analyst in a simulated control-room exercise.
 ${INCIDENT_BLOCK}
-Ask for the evidence and its limits. The recorded-day running times are not a live forecast. Do not infer an available spare, seat capacity or passenger count from a timetable. Record what the person says using insiyab_report with role planner.
+Ask whether to prioritise a timetable review: yes, no, or uncertain. If they need context, the supplied rounded recorded-day example is {{planned_minutes}} planned minutes versus {{expected_minutes}} measured minutes. It is not a live forecast. Do not ask this analyst to diagnose current traffic or supply driver observations. Record the review recommendation and its limits using insiyab_report with role planner; do not infer spare availability or passenger counts. If they cannot answer, record the recommendation as unconfirmed.
 ${STYLE}
 ${SAFETY_RULES}`,
   },
@@ -352,6 +357,7 @@ ${STYLE}
 
 What to do:
 - Your opening asked permission to brief them. If they agree, summarise the reports in at most 45 words, clearly naming missing reports. Explain the available options in plain words without reading option keys. Ask which option they choose. Do not choose for them.
+- Say "unconfirmed" for guesses or assumptions; do not treat a number of guessed spares as available vehicles. Describe roles, not a repeated roll-call of names.
 - Accept a clear option name, its number, or "the first/second/third option" as a choice. Record it immediately; do not ask a second confirmation of an unambiguous choice. If unclear, ask one short clarification. Do not infer consent from unrelated words or silence.
 - Call insiyab_decision with the option key (send_spare, hold, or none) and any additional words the manager said.
 - Then say "Recorded. I will brief the team." Say goodbye and call end_call.
@@ -362,7 +368,7 @@ ${SAFETY_RULES}`,
   },
   back: {
     max: 90,
-    first: `${CALL_INTRO} The duty manager chose: {{decision_text}}. Can you confirm you received that?`,
+    first: `Hello, this is Insiyab, the AI operations assistant. The duty manager chose: {{decision_text}}. Please say received, or tell me what needs checking.`,
     prompt: `${DEMO_CONTEXT}
 
 You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are calling {{staff_role}} back with the duty manager's decision about route {{route}}.
@@ -546,6 +552,7 @@ async function runLiveRelay(incident) {
   const t0 = Date.now();
   while (Date.now() - t0 < 180000) {
     await sleep(2500);
+    if (state.outcome === 'emergency_reported') return;
     const allReported = staff.every(s => s.role in state.reports);
     if (allReported) { await sleep(1500); break; }
     if (ids1.length && await allEnded(ids1)) break;
@@ -560,6 +567,7 @@ async function runLiveRelay(incident) {
     }
   }
 
+  if (state.outcome === 'emergency_reported') return;
   // Build relay report for the manager
   const reported = staff.filter(s => state.reports[s.role]);
   const silent = staff.filter(s => !state.reports[s.role]);
@@ -598,11 +606,11 @@ async function runLiveRelay(incident) {
 
   if (!state.decision) { state.phase = 'done'; log('relay: done, no decision logged'); return; }
 
-  // Step 3: call back staff who reported
+  // Every reporting role receives one callback attempt, including a missed first call.
   state.phase = 'callout';
   const decisionText = state.decision.say + (state.decision.words ? '. ' + state.decision.words : '');
 
-  const toCallBack = reported.length ? reported : staff;
+  const toCallBack = staff;
   const step3 = await placeAll(
     toCallBack,
     p => ({
@@ -732,6 +740,7 @@ async function setupAgents() {
         prompt: {
           prompt: spec.prompt,
           tool_ids: toolNames.map(n => toolIds[n]).filter(Boolean),
+          built_in_tools: {end_call: {type:'system',name:'end_call',description:'',params:{system_tool_type:'end_call'}}},
         },
         dynamic_variables: { dynamic_variable_placeholders: placeholders },
       },
@@ -759,7 +768,7 @@ async function ensureTools() {
   const toolDefs = [
     { name: 'insiyab_report', path: 'report',
       description: 'Log a one or two sentence update from a staff member (driver, depot, station or planner). Call this once you have their answer. Pass a summary in their own words and their role.',
-      props: { report: { type: 'string', description: 'One or two sentences: what they see or confirm, in their words' }, role: { type: 'string', description: 'Their role: driver, depot, station or planner' } },
+      props: { report: { type: 'string', description: 'One or two sentences: what they see or confirm, in their words. Preserve uncertainty.' }, role: { type: 'string', description: 'Their role: driver, depot, station or planner' }, real_emergency: {type:'boolean',description:'True only if the person explicitly reports a real emergency or immediate danger. Stops the normal relay.'} },
       required: ['report', 'role'] },
     { name: 'insiyab_decision', path: 'decision',
       description: 'Log the duty manager\'s choice. Pass the option key (send_spare, hold, or none) and any additional words they said.',

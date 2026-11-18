@@ -194,3 +194,9 @@ The default roster is five people, with four reports and acknowledgements. `VOIC
 `GET /voice/state` exposes event status by role only. It never exposes free-text reports or incident details. The dashboard uses `GET /voice/state/authenticated` with the private `x-insiyab-view` header. Callback tools additionally require a per-call token bound to the current run, role and phase.
 
 Completion requires all four reports, the manager’s valid choice, and all four acknowledgements. Busy, unanswered or missing callbacks remain incomplete. The illustrated dashboard playback is scripted and never initiates a call.
+
+## Preparing the people and the agents
+
+Build `web/team/` and share `phone-cards.html` or `call-cards.pdf` before ringing the team. Each reporting role answers one concrete check; unconfirmed facts remain unconfirmed. All four reporting roles receive one callback attempt after a valid manager decision, even if a first call was missed. Completion still requires every report and acknowledgement. A duplicate acknowledgement changes nothing. An explicitly flagged real emergency stops the normal report-to-manager sequence.
+
+`AGENT_SPECS` in `relay.js` is the authoritative prompt source. `--setup-agents --live` updates all six agents and explicitly enables their `end_call` system tool; it does not dial. Restart the local relay to use changed orchestration code. The prepared phone cards describe fictional operating conditions, while any recorded-day statistics are separately identified.

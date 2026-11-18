@@ -16,7 +16,7 @@ These are student role-play assignments, not claims that team members hold RTA o
 
 Four concurrent report calls, then one manager call, then four acknowledgements. At most nine call attempts in one process; at most 90 seconds per staff call and 150 seconds for the manager. No auto-redial loop. A second live rehearsal requires an intentional restart. The default roster is five; the original four-person configuration is supported only when explicitly set with VOICE_ROSTER_SIZE=4. Do not drop a required role and declare success.
 
-Each call starts by saying it is a student drill and nothing said changes real operations. The manager owns the decision. The tool validates the offered option, the call token, role, active run and current phase. Missing answers remain missing. A call accepted by the provider is not an answered call; an answered call is not a recorded report; a report is not an acknowledgement.
+Each call naturally identifies Insiyab as the AI operations assistant. It does not repeat a drill disclaimer; if asked, it truthfully explains the demonstration context. The manager owns the decision. The tool validates the offered option, the call token, role, active run and current phase. Missing answers remain missing. A call accepted by the provider is not an answered call; an answered call is not a recorded report; a report is not an acknowledgement.
 
 The dashboard can either connect to the real rehearsal relay using a private viewing key, or play a clearly labelled illustrated example. Its mode label must never claim the scripted example is a live report. Public state contains only progress status. Free-text reports require authentication. The viewing key does not start calls.
 

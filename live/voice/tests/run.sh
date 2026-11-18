@@ -27,6 +27,8 @@ run_test "No-answer handling"                  "tests/voice-noanswer.test.js"
 run_test "State sanitisation and folder scan"  "tests/voice-state.test.js"
 
 run_test "Five-person relay and call ceiling" "tests/voice-five.test.js"
+run_test "Emergency stops routine relay" "tests/voice-five.test.js" --emergency
+run_test "Agent end-call configuration" "tests/voice-setup.test.js"
 run_test "Manager-only sample" "tests/voice-sample.test.js"
 run_test "Unavailable sample callback" "tests/voice-sample.test.js" --unreachable
 

@@ -1,9 +1,9 @@
 /* voice-noanswer.test.js: relay when only one of three staff answers.
    No network, no calls, no credits. Node 22+, no dependencies.
    Run: node live/voice/tests/voice-noanswer.test.js
-   Four staff on the list: only the depot reports. The other two are marked no-answer.
+   Four people on the list: only the depot reports. The other two are marked no-answer.
    The manager hears only the depot report and is told who did not answer.
-   Only the depot is called back. */
+   All three staff receive a callback attempt; missing reports stay missing. */
 'use strict';
 const path = require('path');
 const fs = require('fs');
@@ -127,9 +127,13 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await tool('decision', { option_key: 'send_spare', words: '' });
   convStatus[calls[3].id] = 'done';
 
-  for (let i = 0; i < 40 && calls.length < 5; i++) await sleep(250);
-  ok('only depot is called back (only one who reported)', calls.length === 5 && calls[4].to_number === '+10000000013', calls.length + ' calls, last to ' + (calls[4] && calls[4].to_number));
-  ok('driver and station are not called back', !calls.slice(4).some(c => c.to_number === '+10000000012' || c.to_number === '+10000000014'), calls.slice(4).map(c => c.to_number).join());
+  for (let i = 0; i < 40 && calls.length < 7; i++) await sleep(250);
+  ok('all staff receive the manager decision, including missed first calls', calls.length === 7 && calls.slice(4).map(c=>c.to_number).sort().join() === '+10000000012,+10000000013,+10000000014');
+  await tool('acknowledge', {role:'depot'});
+  for (const c of calls.slice(4)) convStatus[c.id] = 'done';
+  for (let i=0;i<80 && (await state()).phase!=='done';i++) await sleep(250);
+  const final=await state();
+  ok('missing reports and acknowledgements remain incomplete', final.outcome==='incomplete' && Object.keys(final.acknowledgements).length===1);
 
   // State check: no names or numbers
   const s = await state();

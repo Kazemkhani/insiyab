@@ -33,7 +33,7 @@
         "One service day: no proof of next-day reliability.",
         "Five judging areas, 20 points each: practical use, presentation, innovation, model quality and accuracy."
       ],
-      "call": "Listen for all four reports and any missing response. Choose an offered option by its exact name or number. If a spare or driver is unconfirmed, choose to monitor or request confirmation. On stage, explain that the human choice is recorded before the callbacks.",
+      "call": "First answer: “Yes. Give me the confirmed reports and tell me what is missing.” If uncertain: “Which option can we support with the reports we actually have?” Callback: You do not receive a second call in this flow. Watch the four acknowledgement indicators.",
       "qa": [
         [
           "What is new here?",
@@ -62,7 +62,37 @@
         "facts",
         "requirements",
         "chain"
-      ]
+      ],
+      "phone": {
+        "job": "Duty manager. Hear the reports, choose one offered option, and let the AI relay it.",
+        "known": [
+          "In the prepared scenario, the driver can continue but expects a late return.",
+          "The depot card confirms one standby bus and driver, ready in ten minutes. This is an invented rehearsal fact.",
+          "If a real call does not confirm those facts, use what was actually reported instead."
+        ],
+        "question": "Route 310 needs a decision. May I brief you on the staff reports and options?",
+        "answer": "Yes. Give me the confirmed reports and tell me what is missing.",
+        "followup": [
+          [
+            "If the bus and driver are confirmed available",
+            "Send the standby bus to route 310."
+          ],
+          [
+            "If availability or the driver report is missing",
+            "Take no action and watch. Spare availability is not confirmed."
+          ],
+          [
+            "If you choose the second offered option",
+            "Hold the next departure two minutes to even the gap."
+          ]
+        ],
+        "unknown": "Which option can we support with the reports we actually have?",
+        "callback": "You do not receive a second call in this flow. Watch the four acknowledgement indicators.",
+        "dont": [
+          "Do not read a preferred answer regardless of the reports.",
+          "A choice is recorded in the demonstration; it is not an actual RTA dispatch."
+        ]
+      }
     },
     {
       "id": "sara-alrifai",
@@ -93,7 +123,7 @@
         "Route 310 at 18:00: 67.3 planned, 96.4 median actual minutes; ten trips.",
         "589 of 945 = 62%, using the bus-still-out-at-next-departure definition."
       ],
-      "call": "Answer as Alrifai, the driver. Invented role card: 'We can continue. Plan for a return about twenty minutes late.' Do not add a mechanical fault or safety claim. On the callback, confirm the manager's message in your own words; say if anything has changed.",
+      "call": "First answer: “Yes, the bus can continue.” If uncertain: “I cannot confirm the return time yet. Please mark it unconfirmed.” Callback: Received: [repeat the decision the AI actually says].",
       "qa": [
         [
           "Does similar demand prove the timetable caused the delay?",
@@ -122,7 +152,29 @@
         "facts",
         "retest",
         "chain"
-      ]
+      ],
+      "phone": {
+        "job": "Driver. Report whether the bus can continue and the expected return delay.",
+        "known": [
+          "Prepared fictional role: the bus can continue.",
+          "Prepared fictional role: return is expected about twenty minutes late.",
+          "You are reporting the driver role, not diagnosing the whole network."
+        ],
+        "question": "I need one driver check for route 310. Can your bus continue?",
+        "answer": "Yes, the bus can continue.",
+        "followup": [
+          [
+            "When asked how late you expect to return",
+            "About twenty minutes late."
+          ]
+        ],
+        "unknown": "I cannot confirm the return time yet. Please mark it unconfirmed.",
+        "callback": "Received: [repeat the decision the AI actually says].",
+        "dont": [
+          "Do not invent a breakdown, injury, or passenger count.",
+          "If the phone is busy or you miss the first call, that report remains missing."
+        ]
+      }
     },
     {
       "id": "sarah-maaty",
@@ -153,7 +205,7 @@
         "244 bus-hours is the evening aggregate; the displayed subset can be smaller.",
         "No passenger waiting count and no monetary saving is supported."
       ],
-      "call": "Answer as Sarah, the station supervisor. Invented role card: 'We need an updated departure time for passengers. I can update the display once the manager decides.' On the callback, confirm the message received. Do not claim a real RTA display was changed.",
+      "call": "First answer: “No. The board still shows the old time.” If uncertain: “I cannot check the board right now. Please mark its status unconfirmed.” Callback: Received: [repeat the decision]. I will update the board when the new departure time is confirmed.",
       "qa": [
         [
           "Does Accept apply a new timetable?",
@@ -182,7 +234,29 @@
         "facts",
         "rules",
         "requirements"
-      ]
+      ],
+      "phone": {
+        "job": "Station supervisor. Check the departure information shown to passengers.",
+        "known": [
+          "Prepared fictional role: the departure board still shows the old time.",
+          "You need a confirmed updated departure time before changing the message.",
+          "You do not need to estimate a crowd, diagnose traffic, or invent an arrival time."
+        ],
+        "question": "I need one station check. Has the departure board for route 310 been updated?",
+        "answer": "No. The board still shows the old time.",
+        "followup": [
+          [
+            "If asked what is needed next",
+            "I need the confirmed updated departure time before changing the board."
+          ]
+        ],
+        "unknown": "I cannot check the board right now. Please mark its status unconfirmed.",
+        "callback": "Received: [repeat the decision]. I will update the board when the new departure time is confirmed.",
+        "dont": [
+          "You can say: Please ask me one clear question.",
+          "The agent should not repeat your name. You do not have to supply numbers you were not given."
+        ]
+      }
     },
     {
       "id": "maruf",
@@ -213,7 +287,7 @@
         "2,043 evening-peak evaluation trips; keep that denominator with the model result.",
         "Read recipe counts live. Do not memorise a count that can change with the Flow."
       ],
-      "call": "Answer as Maruf, the depot controller. Invented role card: 'We have one spare. Allow fifteen minutes, and I still need to confirm the driver and vehicle checks.' If asked for a guarantee, say the checks are still needed. A callback acknowledges a message, not an actual dispatch.",
+      "call": "First answer: “Yes. One standby bus and its driver are confirmed available.” If uncertain: “I have not confirmed a bus and driver. Please record availability as unconfirmed.” Callback: Received: [repeat the decision the AI actually says].",
       "qa": [
         [
           "Does the model produce the 244-hour worklist?",
@@ -242,7 +316,29 @@
         "chain",
         "recipes",
         "data"
-      ]
+      ],
+      "phone": {
+        "job": "Depot controller. Confirm a standby bus AND a driver, then the preparation time.",
+        "known": [
+          "Prepared fictional role: one standby bus and its driver are confirmed available.",
+          "Prepared fictional role: they can be ready in ten minutes.",
+          "This is a standby vehicle, not a bus removed from another running route."
+        ],
+        "question": "Is a standby bus with a driver confirmed available for route 310?",
+        "answer": "Yes. One standby bus and its driver are confirmed available.",
+        "followup": [
+          [
+            "When asked how soon it will be ready",
+            "Ten minutes."
+          ]
+        ],
+        "unknown": "I have not confirmed a bus and driver. Please record availability as unconfirmed.",
+        "callback": "Received: [repeat the decision the AI actually says].",
+        "dont": [
+          "Avoid I presume or maybe two or three if you mean confirmed availability.",
+          "If you are unsure, say unconfirmed. Do not guess a vehicle, route change, or capacity."
+        ]
+      }
     },
     {
       "id": "mustafo",
@@ -273,7 +369,7 @@
         "John current run: built-in 7.15; tuned 6.93; strict next-hour trees 7.76.",
         "Strict next-hour rule 7.48 and linear 7.37 beat trees; one-day evidence only."
       ],
-      "call": "Answer as Mustafo, the planning analyst. 'The times come from the recorded day. They are not a live forecast, and they do not prove a spare is available.' Keep the recorded evidence separate from the invented incident conditions. Confirm the manager's message on the callback.",
+      "call": "First answer: “Yes. The recorded journey took longer than planned, so that hour needs a timetable review.” If uncertain: “I cannot verify that figure now. Please mark the recommendation as unconfirmed.” Callback: Received: [repeat the decision the AI actually says].",
       "qa": [
         [
           "Why use trees if a simpler method wins?",
@@ -302,7 +398,29 @@
         "chain",
         "retest",
         "facts"
-      ]
+      ],
+      "phone": {
+        "job": "Planning analyst. Say whether the recorded evidence justifies a timetable review.",
+        "known": [
+          "Recorded-day illustration for route 310: about 67 minutes planned, 96 measured.",
+          "Those rounded figures describe the studied day, not current traffic.",
+          "The first-call role is planning. You are not being asked to act as the driver."
+        ],
+        "question": "This example uses recorded trip times. Should route 310 at 18:00 go on the timetable-review list?",
+        "answer": "Yes. The recorded journey took longer than planned, so that hour needs a timetable review.",
+        "followup": [
+          [
+            "If asked whether this predicts the situation now",
+            "No. It is a recorded-day example. We need more days and current reports."
+          ]
+        ],
+        "unknown": "I cannot verify that figure now. Please mark the recommendation as unconfirmed.",
+        "callback": "Received: [repeat the decision the AI actually says].",
+        "dont": [
+          "Do not introduce an obstruction or emergency as extra story detail.",
+          "If there is an actual emergency, say so; the normal rehearsal must stop."
+        ]
+      }
     }
   ],
   "segments": [
@@ -430,5 +548,12 @@
       "title": "Authoritative Dataiku presenter notes",
       "path": "dataiku/webapp/script.js"
     }
-  }
+  },
+  "phone_review": [
+    "The station question was too abstract and repeated after confusion. The new question checks the departure board: updated, old time, or unconfirmed.",
+    "The depot call asked for extra vehicle details, encouraging guesses. The new call asks only confirmed bus-and-driver availability, then readiness time.",
+    "The analyst role was unclear and drifted into a road incident. The new question asks for a timetable-review recommendation based on the recorded day.",
+    "The end-call system tool was disabled in the provider configuration. Enabling it allows agents to finish after logging instead of repeatedly saying goodbye.",
+    "Busy phones are missing evidence. A report, decision, or acknowledgement is counted only when its tool event is actually recorded."
+  ]
 }

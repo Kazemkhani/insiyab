@@ -8,6 +8,11 @@ from playwright.sync_api import sync_playwright
 out=Path(sys.argv[1]).resolve()
 shots=Path(sys.argv[2]);shots.mkdir(parents=True,exist_ok=True)
 data=json.loads(Path(__file__).with_name('content.json').read_text())
+cards=PdfReader(out/'call-cards.pdf')
+assert len(cards.pages)==6
+for i,person in enumerate(data['people'],1):
+    assert person['name'] in cards.pages[i].extract_text()
+print('PASS six-page call guide: overview and one named card per person')
 for p in data['people']:
     doc=PdfReader(out/(p['id']+'-brief.pdf'))
     assert len(doc.pages)==2
@@ -52,6 +57,19 @@ with sync_playwright() as pw:
             page.evaluate('scrollTo(0,0)');page.wait_for_timeout(600);page.screenshot(path=str(shots/f'contents-{w}.png'))
             page.locator('#sara-alrifai').scroll_into_view_if_needed();page.wait_for_timeout(600);page.screenshot(path=str(shots/f'brief-{w}.png'))
         assert not errors,errors
+        page.goto((out/'phone-cards.html').as_uri())
+        assert page.locator('.toc a').count()==5
+        for person in data['people']:
+            page.locator(f'a[href="#call-{person["id"]}"]').first.click()
+            card=page.locator('#call-'+person['id'])
+            assert person['phone']['answer'] in card.inner_text()
+            assert person['phone']['unknown'] in card.inner_text()
+        assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+        assert not errors,errors
+        if w in (1280,390) and not reduced:
+            page.evaluate('scrollTo(0,0)');page.screenshot(path=str(shots/f'calls-{w}.png'))
+            page.locator('#call-sarah-maaty').scroll_into_view_if_needed();page.screenshot(path=str(shots/f'sarah-call-{w}.png'))
+        print(f'PASS offline phone cards {w}x{h}: five names, exact answers and uncertainty fallbacks')
         print(f'PASS offline {w}x{h}, reduced={reduced}: named links, Q&A, animation state, timer, eight notes, no overflow/errors')
         c.close()
     b.close()

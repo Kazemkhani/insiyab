@@ -145,7 +145,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok('no decision can be recorded during staff calls',!(await state()).decision,earlyDecision.result);
   // Reports come in via tool calls
   const rep1 = await tool('report', { report: 'Traffic blocked at the main junction, barely moving.', role: 'driver' });
-  ok('driver report logged, agent told to hand over', /briefing the duty manager/.test(rep1.result), rep1.result);
+  ok('driver report logged, agent told to end call', /end_call/.test(rep1.result), rep1.result);
 
   const rep2 = await tool('report', { report: 'One standby bus free at depot, can be ready in 15 minutes.', role: 'depot' });
   ok('depot report logged', rep2.result.includes('Logged'), rep2.result);
