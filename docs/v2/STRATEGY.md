@@ -12,6 +12,23 @@ Version 1 sold a faster reaction: a bus is late, Insiyab makes the phone calls. 
 
 This is not a new product. The engine already exists and is measured. It was never put at the front of the story.
 
+## 1b. The bigger vision: from smart city to cognitive city
+
+> **Dubai built the smart city. Insiyab is a first piece of the cognitive city: a city that perceives, predicts, learns, and lets people decide.**
+
+A smart city senses and reports; a cognitive city keeps learning from what happens and from its citizens, so it adapts before the next disruption (Finger and Portmann, *Towards Cognitive Cities*, Springer 2016). Dubai already uses the term: Dubai RDI funds "cognitive cities" research and MBRSG with Stanford runs *AI-Atlas UAE: Real-Time Observatory for Cognitive City Innovation*. Insiyab is that idea in a bus control room:
+
+| Cognitive step | Insiyab today | Status |
+|---|---|---|
+| Perceive | six watchers: running late, overflow, heat, lanes, events, connections | running late measured; others rule or proposal |
+| Predict | trip-time forecast, 15% closer than the timetable on 2,043 held-out trips | measured (RTA records) |
+| Coordinate | parallel calls, one briefing, the call theatre on the map | drill ran end to end |
+| Decide | a person, every time | by design |
+| Learn | every incident becomes a labelled example; the forecast retrains on outcomes (pilot) | proposal |
+| Citizens as senses | opt-in reports from riders at stops (shade, crowding, heat) for nol points; the Pokemon Go principle: Niantic's geospatial model was trained on player scans across over a million locations | proposal |
+
+Bus lanes are the live example: RTA expects 24 to 59% shorter journeys on lane streets, and the literature shows lanes mainly cut **variability**; a forecast trained before a lane opens is wrong after it. A cognitive control room notices and relearns.
+
 ## 2. Why this wins the scoring sheet
 
 Sixty of the hundred points are about the forecasting model (criteria 3, 4, 5). "Sees it coming" makes the model the hero instead of a footnote.

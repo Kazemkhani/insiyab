@@ -39,6 +39,14 @@
 | RTA last-mile plan (Jul 2026): 34 residential areas linked, 63 Metro and bus stations upgraded by 2030 | Reported | The National, 19 Jul 2026 |
 | 57.3 million bike rides and 39.6 million e-scooter trips in 2025 | Reported | Gulf News, Jul 2026 |
 
+| "Cognitive cities" is a Dubai RDI research priority; AI-Atlas UAE (MBRSG with Stanford) is a "Real-Time Observatory for Cognitive City Innovation" | Verified | https://dubairdi.ae/ai-atlas-uae-real-time-observatory-for-cognitive-city-innovation/ |
+| Cognitive city: a city that keeps learning from interaction with its citizens to become more efficient, sustainable and resilient | Verified (book) | Finger and Portmann (eds.), Towards Cognitive Cities, Springer 2016, ISBN 978-3-319-33798-2 |
+| Niantic Large Geospatial Model (Nov 2024): 50+ million neural networks, 150+ trillion parameters, over a million locations, trained on scans from Pokemon Go and Scaniverse players (opt-in) | Verified | singularityhub.com, 27 Nov 2024, quoting Niantic's blog |
+| RTA AI Strategy (1 Nov 2026): 41 areas, AED 300m+ a year, 50% of operations and services to an agentic AI ecosystem in 2.5 years; Agentic AI Bus Network Planner (~20 agents) up to 10% better on-time performance (that planner only) | Reported (agent saw the RTA page) | rta.ae, 1 Nov 2026 |
+| RTA Strategic Plan 2024-2030: 80% of daily services within a 20-minute walk or cycle; 42.5% of transport on sustainable means by 2030; public transport and shared mobility 25% of journeys by 2030 | Reported | mediaoffice.ae, 10 Dec 2023; RTA releases |
+| Dedicated lanes mainly cut variability: 5 to 20 s less standard deviation of delay per km; Madison Ave NYC standard deviation down over 50%; Seoul buses +-2.7 min vs +-15.3 min for cars on the same corridor | Reported | ScienceDirect 2025; TCRP Report 90; seoulsolution.kr |
+| NYC MTA automated bus lane cameras: about 5% average speed gain on ACE routes | Reported | mta.info ACE page |
+
 ## Elsewhere (comparators)
 
 | Fact | Status | Source |
