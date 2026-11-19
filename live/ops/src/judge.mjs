@@ -9,7 +9,10 @@ export function normaliseJudge(data) {
     unit: 'min', target: data.target || 'lateness',
     source: data.label || 'Model output',
     tested_on: [data.part, data.naive_label && `Simple rule: ${data.naive_label}`].filter(Boolean).join('. ') || 'Held-out part of the service day',
-    rows: data.picks.map(p => ({route: String(p.route), hour: p.hour, forecast: minutes(p.forecast_s), baseline: minutes(p.naive_s), actual: minutes(p.actual_s), n: p.n})),
+    // Each cell averages forecasts made in that hour over horizons of 1 to 20 stops. Signed means cancel, so the
+    // miss must come from the producer's mean absolute errors, never from |mean forecast - mean actual|.
+    horizons_note: 'Each cell averages forecasts made in that hour, 1 to 20 stops ahead; a miss is the mean absolute error',
+    rows: data.picks.map(p => ({route: String(p.route), hour: p.hour, forecast: minutes(p.forecast_s), baseline: minutes(p.naive_s), actual: minutes(p.actual_s), n: p.n, forecast_mae: minutes(p.forecast_mae_s), baseline_mae: minutes(p.naive_mae_s)})),
   };
 }
 export function validateJudge(input) {
@@ -18,7 +21,7 @@ export function validateJudge(input) {
   const seen=new Set();
   for(const row of data.rows) {
     const key=`${row.route}/${row.hour}`;
-    if(typeof row.route!=='string' || !/^(16|17|18|19|20):00$/.test(row.hour) || !Number.isInteger(row.n) || row.n<0 || !['forecast','baseline','actual'].every(k=>row[k]===null||Number.isFinite(row[k])) || seen.has(key)) throw Error('Invalid or duplicate judge-pick row');
+    if(typeof row.route!=='string' || !/^(16|17|18|19|20):00$/.test(row.hour) || !Number.isInteger(row.n) || row.n<0 || !['forecast','baseline','actual'].every(k=>row[k]===null||Number.isFinite(row[k])) || !['forecast_mae','baseline_mae'].every(k=>row[k]===undefined||row[k]===null||(Number.isFinite(row[k])&&row[k]>=0)) || seen.has(key)) throw Error('Invalid or duplicate judge-pick row');
     seen.add(key);
   }
   return data;
@@ -38,7 +41,7 @@ export function mountJudge(input) {
   const head=element('thead');head.append(headings);table.append(head);
   const body=element('tbody'), values=element('tr');body.append(values);table.append(body);host.append(table);
   const result=element('p',undefined,'judge-result');result.setAttribute('aria-live','polite');host.append(result);
-  host.append(element('p',`${data.rows.length} available route-hours · ${data.service_day} · ${data.source}. ${data.tested_on}`,'source-note'));
+  host.append(element('p',`${data.rows.length} available route-hours · ${data.service_day} · ${data.source}. ${data.tested_on}${data.horizons_note?`. ${data.horizons_note}.`:''}`,'source-note'));
   function render() {
     const row=data.rows.find(r=>r.route===route.value && r.hour===hour.value);
     values.replaceChildren();
@@ -46,7 +49,8 @@ export function mountJudge(input) {
     if(!row) result.textContent='No held-out row for this route and hour. No value is inferred.';
     else if(row.n===0 || [row.forecast,row.baseline,row.actual].some(v=>v===null)) result.textContent='Comparison unavailable. The missing result stays visible.';
     else {
-      const error=Math.abs(row.forecast-row.actual), baseline=Math.abs(row.baseline-row.actual);
+      const hasMae=Number.isFinite(row.forecast_mae)&&Number.isFinite(row.baseline_mae);
+      const error=hasMae?row.forecast_mae:Math.abs(row.forecast-row.actual), baseline=hasMae?row.baseline_mae:Math.abs(row.baseline-row.actual);
       const verdict=error>baseline?'The simple rule was closer.':error<baseline?'The forecast was closer.':'Both were equally close.';
       result.textContent=`Forecast miss: ${Number(error.toFixed(2))} ${data.unit}. Simple-rule miss: ${Number(baseline.toFixed(2))} ${data.unit}. ${verdict}`;
     }
