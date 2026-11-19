@@ -413,6 +413,110 @@ with sync_playwright() as p:
     assert not th_requests, th_requests
     print('PASS theatre: 4 reported pre-decided; briefing rows visible with role names before screenshot; no marker label overlap; 4 briefing rows at calling_duty start; red calling rings; teal received rings; incident report 3-col grid with staff rows before decision; learn card; PDF; reset; zero voice requests')
     page.close()
+
+    # --- Stalled bus: ring and label appear after clicking Start incident ---
+    page=browser.new_page(viewport={'width':1440,'height':900})
+    drill_calls=[]
+    page.route('**/*',lambda route:(drill_calls.append(route.request.url),route.abort()) if '/api/drill/' in route.request.url else route.continue_())
+    page.clock.install()
+    page.goto(url)
+    page.wait_for_selector('#map[data-ready=true]')
+    page.clock.pause_at('2027-01-01T00:00:00Z')
+    assert not page.locator('.stall-ring').is_visible()
+    assert not page.locator('.stall-label').is_visible()
+    page.locator('#incident').click()
+    page.wait_for_timeout(200)
+    assert page.locator('.stall-ring').is_visible(),'stall ring should appear after Start incident'
+    assert page.locator('.stall-label').is_visible(),'stall label should appear after Start incident'
+    assert 'Not moving' in page.locator('.stall-label').inner_text()
+    assert '13 min' in page.locator('.stall-label').inner_text()
+    page.screenshot(path=str(shots/'stall-ring.png'),full_page=False)
+    print('PASS stalled bus: ring and label appear after Start incident')
+    page.close()
+
+    # --- Demo mode: no-ack → drill auto-starts after ack window, zero /api/drill calls ---
+    page=browser.new_page(viewport={'width':1440,'height':900})
+    drill_calls=[]
+    page.route('**/*',lambda route:(drill_calls.append(route.request.url),route.abort()) if '/api/drill/' in route.request.url else route.continue_())
+    page.clock.install()
+    page.goto(url+'?ack=5')  # 5-second ack window
+    page.wait_for_selector('#map[data-ready=true]')
+    page.clock.pause_at('2027-01-01T00:00:00Z')
+    page.locator('#incident').click()
+    page.wait_for_timeout(100)
+    page.clock.fast_forward(1100)  # → suggested
+    page.clock.fast_forward(1100)  # → unacknowledged
+    page.clock.fast_forward(5100)  # → calling_duty (ack window expired)
+    page.wait_for_timeout(200)
+    assert page.locator('#calls').get_attribute('data-phase')=='calling_duty',\
+        f'expected calling_duty after no-ack, got: {page.locator("#calls").get_attribute("data-phase")}'
+    assert not drill_calls,f'demo mode made drill API calls: {drill_calls}'
+    page.screenshot(path=str(shots/'no-ack-calling-duty.png'),full_page=False)
+    print('PASS demo mode no-ack: auto-starts calling_duty after 5s ack window, zero /api/drill requests')
+    page.close()
+
+    # --- Ack in time: confirms decision before ack window → phase decided, zero /api/drill calls ---
+    page=browser.new_page(viewport={'width':1440,'height':900})
+    drill_calls=[]
+    page.route('**/*',lambda route:(drill_calls.append(route.request.url),route.abort()) if '/api/drill/' in route.request.url else route.continue_())
+    page.clock.install()
+    page.goto(url+'?ack=30')  # large ack window to have time to confirm
+    page.wait_for_selector('#map[data-ready=true]')
+    page.clock.pause_at('2027-01-01T00:00:00Z')
+    page.locator('#incident').click()
+    page.clock.fast_forward(1100)  # → suggested
+    page.clock.fast_forward(1100)  # → unacknowledged
+    page.wait_for_timeout(100)
+    # Controller acknowledges: select option and confirm
+    page.locator('[data-option]').first.click()
+    page.wait_for_selector('#confirm')
+    page.locator('#confirm').click()
+    page.wait_for_timeout(100)
+    assert page.locator('#calls').get_attribute('data-phase')=='decided',\
+        f'expected decided after ack, got: {page.locator("#calls").get_attribute("data-phase")}'
+    # Advance past what would have been the ack window
+    page.clock.fast_forward(31000)
+    page.wait_for_timeout(200)
+    assert page.locator('#calls').get_attribute('data-phase')!='calling_duty','should not have escalated after ack'
+    assert not drill_calls,f'ack should prevent drill API calls: {drill_calls}'
+    page.screenshot(path=str(shots/'ack-decided.png'),full_page=False)
+    print('PASS ack in time: phase decided, no drill API calls placed')
+    page.close()
+
+    # --- PDF button glows after demo drill completes ---
+    page=browser.new_page(viewport={'width':1440,'height':900})
+    page.clock.install()
+    page.goto(url)
+    page.wait_for_selector('#map[data-ready=true]')
+    page.clock.pause_at('2027-01-01T00:00:00Z')
+    page.locator('#incident').click()
+    page.clock.fast_forward(1100)  # → suggested
+    page.clock.fast_forward(1100)  # → unacknowledged
+    # Confirm quickly
+    page.locator('[data-option]').first.click()
+    page.wait_for_selector('#confirm')
+    page.locator('#confirm').click()
+    # Advance through relaying and all received (~15s)
+    page.clock.fast_forward(1000)   # → relaying
+    page.clock.fast_forward(15000)  # → received
+    page.wait_for_timeout(300)
+    assert page.locator('#report').is_visible(),'#report section should be visible after completion'
+    has_glow=page.locator('#save-pdf').evaluate("(e)=>e.classList.contains('pdf-glow')")
+    assert has_glow,'#save-pdf should have pdf-glow class after drill completes'
+    page.screenshot(path=str(shots/'pdf-glow.png'),full_page=False)
+    print('PASS PDF button glows and report panel reveals after drill completes')
+    page.close()
+
+    # --- Reduced motion: stall ring has no animation ---
+    page=browser.new_page(reduced_motion='reduce')
+    page.goto(url)
+    page.wait_for_selector('#map[data-ready=true]')
+    page.locator('#incident').click()
+    page.wait_for_timeout(200)
+    anim=page.locator('.stall-ring').evaluate("(e)=>getComputedStyle(e).animationName")
+    assert anim=='none' or anim=='',f'stall ring should have no animation under reduced motion, got: {anim}'
+    print('PASS reduced motion: stall ring has no animation')
+    page.close()
     # Rehearse the actual 90-second stage sequence, without an accelerated clock.
     if os.environ.get('OPS_REALTIME')=='1':
         page=browser.new_page(viewport={'width':1440,'height':900})

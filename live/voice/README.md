@@ -222,3 +222,27 @@ The dashboard posts `scenario: "default"` and a fresh `request_id`; the relay
 reads `incident-example.json` as the single source of that scenario. Direct
 incident clients can still post a complete incident; repeated live runs need
 a unique request ID. An unresolved provider call keeps the relay locked.
+
+## (e) Pointing tool webhooks at the Vercel drill endpoint
+
+After deploying to Vercel, re-run `--setup-agents` with `VOICE_TOOL_BASE` pointing at the
+Vercel function instead of the laptop tunnel. This tells ElevenLabs to call
+`/api/drill/tool/<name>` on the production site rather than a local relay:
+
+```
+VOICE_PUBLIC_URL=https://your-tunnel.ngrok.io \
+  VOICE_TOOL_BASE=https://insiyab.vercel.app/api/drill/tool \
+  INSIYAB_CALLS=armed \
+  node live/voice/relay.js --setup-agents --live
+```
+
+To switch back to the laptop tunnel (tunnel URL only, no Vercel):
+
+```
+VOICE_PUBLIC_URL=https://your-tunnel.ngrok.io \
+  INSIYAB_CALLS=armed \
+  node live/voice/relay.js --setup-agents --live
+```
+
+Omitting `VOICE_TOOL_BASE` causes the tool URLs to default to
+`VOICE_PUBLIC_URL + '/voice/tool'`, which is the original behaviour.

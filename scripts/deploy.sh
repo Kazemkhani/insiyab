@@ -189,6 +189,10 @@ if [ "$RELAY" = "1" ]; then
   echo "PASS the room relay answers ($(cat "$LOCK/room.txt")), and refuses a visitor all three presenter calls"
 fi
 
+# 13b. Drill endpoint requires auth: a request with no key must answer 401 and place zero ElevenLabs calls.
+code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -X POST -H 'content-type: application/json' "$CHECK/api/drill/start")"; [ "$code" = "401" ] || stop "/api/drill/start with no key answered $code, not 401"
+echo "PASS /api/drill/start with no key answers 401"
+
 # 14. A real browser on the served address, at laptop and phone size.
 BROWSER_ARGS=(); [ "$FIXTURE" = "true" ] && BROWSER_ARGS+=(--fixture); [ "$KHUTWA" = "1" ] && BROWSER_ARGS+=(--khutwa); [ -n "$SHOTS" ] && BROWSER_ARGS+=(--shots "$SHOTS/served")
 python3 tests/browser_check.py "$CHECK/index.html" ${BROWSER_ARGS[@]+"${BROWSER_ARGS[@]}"} > "$LOCK/smoke.txt" 2>&1; tail -1 "$LOCK/smoke.txt" | grep -q "^ERRORS: 0$" || { grep -E "^FAIL|Error" "$LOCK/smoke.txt" | head; stop "the browser check failed on $CHECK"; }

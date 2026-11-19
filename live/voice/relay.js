@@ -821,7 +821,7 @@ async function ensureTools() {
       response_timeout_secs: 10,
       pre_tool_speech: 'force',
       api_schema: {
-        url: PUBLIC_URL + '/voice/tool/' + t.path,
+        url: (process.env.VOICE_TOOL_BASE ? process.env.VOICE_TOOL_BASE.replace(/\/+$/, '') : (PUBLIC_URL + '/voice/tool')) + '/' + t.path,
         method: 'POST',
         request_headers: { 'x-insiyab-tool': TOOL_SECRET },
         request_body_schema: { type: 'object', description: t.description, properties: {...t.props, call_token:{type:'string',description:'Use the exact call_token provided for this conversation.'}}, required: [...t.required,'call_token'] },

@@ -46,6 +46,7 @@ SUITES=(
   tests/test_season.py
   tests/test_congestion.py
   tests/test_events.py
+  live/api/drill/tests/run.sh
   live/tests/run.sh
   live/ops/tests/run.sh
   web/tests/run.sh
