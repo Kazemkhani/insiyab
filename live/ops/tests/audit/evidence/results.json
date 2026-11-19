@@ -1,0 +1,260 @@
+{
+  "time": "2026-11-19T02:18:57.065213+00:00",
+  "base": "https://insiyab.amirkazemkhani.com",
+  "deployment": {
+    "commit": "c258552",
+    "bundle": "fixtures",
+    "fixture": true
+  },
+  "results": [
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "home loads at 1920",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "home no horizontal overflow at 1920",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "pitch loads at 1920",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "pitch no horizontal overflow at 1920",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "1920: reduced motion uses static chapters",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "planner",
+      "check": "1920: planner worklist exists",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "deck loads at 1920",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "deck no horizontal overflow at 1920",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "ops loads at 1920",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "ops no horizontal overflow at 1920",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "1920: stand-in alerts labelled",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "home loads at 390",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "home no horizontal overflow at 390",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "pitch loads at 390",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "pitch no horizontal overflow at 390",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "390: reduced motion uses static chapters",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "planner",
+      "check": "390: planner worklist exists",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "deck loads at 390",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "deck no horizontal overflow at 390",
+      "detail": ""
+    },
+    {
+      "pass_": false,
+      "persona": "accessibility",
+      "check": "phone deck body text stays readable",
+      "detail": "9.8 effective pixels; stage is uniformly scaled"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "ops loads at 390",
+      "detail": "200"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "ops no horizontal overflow at 390",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "390: stand-in alerts labelled",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "pitch navigation opens operations console",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "timeout never makes the human decision",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "supervisor waits the full escalation period",
+      "detail": "72.1s"
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "one click alone cannot decide",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "role receipts arrive separately",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "real-time demo completes with four receipts",
+      "detail": "90.2s"
+    },
+    {
+      "pass_": true,
+      "persona": "data-scientist",
+      "check": "judge picker keeps model loss visible",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "data-scientist",
+      "check": "missing route-hour is not invented",
+      "detail": ""
+    },
+    {
+      "pass_": false,
+      "persona": "data-scientist",
+      "check": "judge challenge has measured held-out predictions",
+      "detail": "Currently three invented route-hour rows, explicitly labelled"
+    },
+    {
+      "pass_": true,
+      "persona": "planner",
+      "check": "heat remains a labelled July scenario",
+      "detail": ""
+    },
+    {
+      "pass_": false,
+      "persona": "data-scientist",
+      "check": "forecast headline preserves source provenance",
+      "detail": "Model card labels the 43\u201346% figures as invented-data results; deck calls them RTA records"
+    },
+    {
+      "pass_": false,
+      "persona": "executive",
+      "check": "planned stage sequence fits eight minutes",
+      "detail": "650s including 40s film; planned timing, not measured delivery"
+    },
+    {
+      "pass_": false,
+      "persona": "executive",
+      "check": "shelter claim respects incomplete coverage",
+      "detail": "993 poles among 1600 known kinds; 4526 total stops; majority of all stops not established"
+    },
+    {
+      "pass_": false,
+      "persona": "executive",
+      "check": "connection dispatch has its proposal label beside the claim",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "executive",
+      "check": "closing ask specifies bounded pilot",
+      "detail": ""
+    },
+    {
+      "pass_": true,
+      "persona": "controller",
+      "check": "zero attempted voice or write requests",
+      "detail": "0"
+    },
+    {
+      "pass_": true,
+      "persona": "accessibility",
+      "check": "no JavaScript exceptions",
+      "detail": "[]"
+    },
+    {
+      "pass_": true,
+      "persona": "release",
+      "check": "deployment identity stayed stable during audit",
+      "detail": "{\"commit\": \"c258552\", \"bundle\": \"fixtures\", \"fixture\": true}"
+    }
+  ],
+  "passed": 35,
+  "failed": 6,
+  "blocked_requests": []
+}
