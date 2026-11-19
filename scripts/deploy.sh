@@ -55,7 +55,8 @@ else echo "NOTE this deploy has no Khutwa page"; fi
 RELAY=0
 if [ -d "$WORK/src/live/api" ]; then
   [ -e "$UP/api" ] && stop "a build wrote something under api/: that address belongs to the room relay"
-  cp -R "$WORK/src/live/api" "$UP/api"; RELAY=1
+  # The functions only: their tests stay out (every .js under api/ becomes a public endpoint, and *.sh may not ship).
+  rsync -a --exclude tests/ "$WORK/src/live/api/" "$UP/api/"; RELAY=1
 fi
 # The pitch page (story/): the film, then the real day in figures, then the link into Dataiku. Its figures are totals worked out
 # from RTA's data, so it goes up only on the same recorded yes as the real bundle. The film is kept outside git and is copied in if it is there.
@@ -86,7 +87,7 @@ if [ -f "$WORK/src/live/ops/build.mjs" ]; then
 else echo "NOTE this deploy has no operations console yet (live/ops/build.mjs does not exist)"; fi
 # The deployer's own files: the page asks not to be indexed whatever the builds contain, and says which commit it is.
 [ -f "$UP/vercel.json" ] || cat > "$UP/vercel.json" <<'JSON'
-{"redirects": [{"source": "/", "destination": "/pitch/", "permanent": false}], "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"}, {"key": "X-Content-Type-Options", "value": "nosniff"}]}]}
+{"functions": {"api/drill/start.js": {"maxDuration": 300}}, "redirects": [{"source": "/", "destination": "/pitch/", "permanent": false}], "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"}, {"key": "X-Content-Type-Options", "value": "nosniff"}]}]}
 JSON
 [ -f "$UP/robots.txt" ] || printf 'User-agent: *\nDisallow: /\n' > "$UP/robots.txt"
 printf '{"commit": "%s", "bundle": "%s", "fixture": %s}\n' "$SHORT" "$BUNDLE" "$FIXTURE" > "$UP/deploy.json"
@@ -120,7 +121,7 @@ PY
 # Nothing but static files, and one bundle only: stand-in and real are never mixed.
 [ -z "$(find "$UP" \( -name '.env*' -o -name '*.db' -o -name '*.py' -o -name '*.sh' -o -name '.git*' -o -name 'node_modules' \) -print -quit)" ] || stop "the upload holds a file that must not be public"
 [ -z "$(find "$UP" -path '*/api/*' ! -path "$UP/api/*" -print -quit)" ] || stop "the upload holds an api folder that is not the room relay's"
-if [ "$RELAY" = "1" ]; then diff -rq "$WORK/src/live/api" "$UP/api" >/dev/null || stop "the relay in the upload is not the relay in the commit"; fi
+if [ "$RELAY" = "1" ]; then diff -rq -x tests "$WORK/src/live/api" "$UP/api" >/dev/null || stop "the relay in the upload is not the relay in the commit"; [ -z "$(find "$UP/api" -name tests -print -quit)" ] || stop "a tests folder is in the upload's api/"; fi
 python3 - "$UP" "$FIXTURE" > "$LOCK/mix.txt" 2>&1 <<'PY' || { cat "$LOCK/mix.txt"; stop "the upload mixes stand-in and real data, or a data file does not say which it is"; }
 import json, os, sys
 up, want = sys.argv[1], sys.argv[2] == "true"; n = 0; bad = 0

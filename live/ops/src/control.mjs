@@ -139,6 +139,10 @@ export function mountControl(alert, replay, theatre, briefing) {
     if (keyClear) keyClear.addEventListener('click',()=>{keyInput.value='';setPresenterKey('');keyClear.hidden=true;});
   }
 
+  // --- Stage: /ops/?stage=1 opens in live mode with the presenter-key box showing. Nothing is called until
+  // the key is entered and Start incident is pressed; without the parameter the console opens as before.
+  if (new URLSearchParams(location.search).get('stage') === '1') controller.setMode('live');
+
   // --- Start Incident button ---
   const incidentBtn=document.querySelector('#incident');
   if (incidentBtn) {

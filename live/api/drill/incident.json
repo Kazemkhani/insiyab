@@ -1,0 +1,29 @@
+{
+  "id": "2025-12-15-310-18",
+  "route": "310",
+  "direction": "1",
+  "hour": "18:00",
+  "planned_minutes": 67,
+  "expected_minutes": 96,
+  "minutes_late_now": 22,
+  "next_bus_in_minutes": 20,
+  "boardings_this_hour": 640,
+  "buses_running": 8,
+  "buses_needed_by_rule": 17,
+  "options": [
+    {
+      "key": "send_spare",
+      "say": "send the standby bus to route 310"
+    },
+    {
+      "key": "hold",
+      "say": "hold the next departure two minutes to even the gap"
+    },
+    {
+      "key": "none",
+      "say": "take no action and watch"
+    }
+  ],
+  "source": "SIMULATED drill conditions. Rounded route 310 times are based on recorded-day medians, not a live forecast. Availability, current delay and service options are invented for rehearsal.",
+  "drill": true
+}

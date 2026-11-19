@@ -295,14 +295,14 @@ const handler = async (req, res) => {
 
   // 6. Load incident from sibling file (falls back to built-in defaults).
   let incident;
-  try { incident = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'voice', 'incident-example.json'), 'utf8')); }
+  // The scenario ships beside this function (a copy of live/voice/incident-example.json; a test keeps them equal).
+  try { incident = JSON.parse(fs.readFileSync(path.join(__dirname, 'incident.json'), 'utf8')); }
   catch {
     incident = { drill: true, id: 'drill-001', route: '310', direction: '1', hour: '18:00', planned_minutes: 67, expected_minutes: 96, minutes_late_now: 22, next_bus_in_minutes: 20, boardings_this_hour: 640, buses_running: 8, buses_needed_by_rule: 17, source: 'Stand-in drill scenario.', options: [{ key: 'send_spare', say: 'send the standby bus to route 310' }, { key: 'hold', say: 'hold the next departure' }, { key: 'none', say: 'take no action' }] };
   }
 
   // 7. Stream NDJSON.
   res.setHeader('Content-Type', 'application/x-ndjson');
-  res.setHeader('Access-Control-Allow-Origin', '*');
 
   const names = new Set(roster.map(p => p.name).filter(Boolean));
   const scrub = s => {

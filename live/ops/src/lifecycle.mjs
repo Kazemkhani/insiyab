@@ -2,9 +2,10 @@
 export const ROLES = ['driver','depot','station','planning'];
 const OPEN = new Set(['suggested','unacknowledged','calling_duty','calling_supervisor']);
 export function ackSeconds(search) {
-  const raw = new URLSearchParams(search).get('ack');
-  const value = raw === null ? 10 : Number(raw);
-  return Number.isFinite(value) && value >= 1 && value <= 300 ? value : 10;
+  const params = new URLSearchParams(search), raw = params.get('ack');
+  const fallback = params.get('stage') === '1' ? 5 : 10;   // the stage flow: 5 seconds with no acknowledgement, then Insiyab calls
+  const value = raw === null ? fallback : Number(raw);
+  return Number.isFinite(value) && value >= 1 && value <= 300 ? value : fallback;
 }
 // Drill API role name → lifecycle ROLES name.
 const DRILL_ROLE = { driver:'driver', depot:'depot', station:'station', planner:'planning' };
