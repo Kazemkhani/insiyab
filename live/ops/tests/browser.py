@@ -216,9 +216,7 @@ with sync_playwright() as p:
     page.goto(url)
     page.wait_for_selector('#map[data-ready=true]')
     page.clock.pause_at('2027-01-01T00:00:00Z')
-    # Set up the same alert the main loop uses so option ids match.
-    page.locator('#judge-route').select_option('310')
-    page.locator('#judge-hour').select_option('19:00')
+    # The NOW card comes from the alerts file, not the judge picker; the picker's rows are the model's output.
     assert page.locator('#now h3').inner_text() == 'Route 310 · 19:23'
     # Before demo: no theatre markers in the DOM (not added yet).
     assert page.locator('[data-person]').count() == 0
