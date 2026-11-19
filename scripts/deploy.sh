@@ -86,7 +86,7 @@ if [ -f "$WORK/src/live/ops/build.mjs" ]; then
 else echo "NOTE this deploy has no operations console yet (live/ops/build.mjs does not exist)"; fi
 # The deployer's own files: the page asks not to be indexed whatever the builds contain, and says which commit it is.
 [ -f "$UP/vercel.json" ] || cat > "$UP/vercel.json" <<'JSON'
-{"headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"}, {"key": "X-Content-Type-Options", "value": "nosniff"}]}]}
+{"redirects": [{"source": "/", "destination": "/pitch/", "permanent": false}], "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive"}, {"key": "X-Content-Type-Options", "value": "nosniff"}]}]}
 JSON
 [ -f "$UP/robots.txt" ] || printf 'User-agent: *\nDisallow: /\n' > "$UP/robots.txt"
 printf '{"commit": "%s", "bundle": "%s", "fixture": %s}\n' "$SHORT" "$BUNDLE" "$FIXTURE" > "$UP/deploy.json"
@@ -172,6 +172,9 @@ echo "PASS served equals built: every one of $(find "$UP" -type f ! -path '*/.ve
 for f in .env .git/config .vercel/project.json scripts/deploy.sh tools/guard.py model/run.py docs/STRATEGY.md fixtures/raw/nol_transactions.csv data/CENSUS-LOCAL.md; do
   code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$CHECK/$f")"; [ "$code" = "404" ] || [ "$code" = "403" ] || stop "$f answers $code on $CHECK"; done
 curl -sI --max-time 20 "$CHECK/index.html" | grep -qi '^x-robots-tag:.*noindex' || stop "$CHECK does not send noindex"
+# The front door is the v2 pitch page; the v1 page stays in the build, unlinked, at /index.html.
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 20 "$CHECK/" | grep -Eq '^30[1278] .*/pitch/$' || stop "$CHECK/ does not send visitors to /pitch/"
+echo "PASS the front door opens the pitch page"
 echo "PASS closed paths answer 404 and the site asks not to be indexed"
 
 # The room relay answers, says which store holds the room, and refuses a visitor the presenter's calls.
@@ -188,7 +191,7 @@ fi
 
 # 14. A real browser on the served address, at laptop and phone size.
 BROWSER_ARGS=(); [ "$FIXTURE" = "true" ] && BROWSER_ARGS+=(--fixture); [ "$KHUTWA" = "1" ] && BROWSER_ARGS+=(--khutwa); [ -n "$SHOTS" ] && BROWSER_ARGS+=(--shots "$SHOTS/served")
-python3 tests/browser_check.py "$CHECK/" ${BROWSER_ARGS[@]+"${BROWSER_ARGS[@]}"} > "$LOCK/smoke.txt" 2>&1; tail -1 "$LOCK/smoke.txt" | grep -q "^ERRORS: 0$" || { grep -E "^FAIL|Error" "$LOCK/smoke.txt" | head; stop "the browser check failed on $CHECK"; }
+python3 tests/browser_check.py "$CHECK/index.html" ${BROWSER_ARGS[@]+"${BROWSER_ARGS[@]}"} > "$LOCK/smoke.txt" 2>&1; tail -1 "$LOCK/smoke.txt" | grep -q "^ERRORS: 0$" || { grep -E "^FAIL|Error" "$LOCK/smoke.txt" | head; stop "the browser check failed on $CHECK"; }
 echo "PASS browser on $CHECK ($(grep -c '^PASS ' "$LOCK/smoke.txt") checks)"
 
 rm -rf "$WORK" "$LOCK"

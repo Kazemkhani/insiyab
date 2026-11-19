@@ -94,14 +94,17 @@ def main():
     target = args[0]; fixture = "--fixture" in args; khutwa = "--khutwa" in args
     shots = args[args.index("--shots") + 1] if "--shots" in args else None
     srv = None
-    if target.startswith("http"):
+    first = ""
+    if target.startswith("http") and target.endswith(".html"):   # a page inside its folder, e.g. .../index.html
+        base, first = target.rsplit("/", 1)[0] + "/", target.rsplit("/", 1)[1]
+    elif target.startswith("http"):
         base = target.rstrip("/") + "/"
     else:
         srv = serve(target); base = f"http://127.0.0.1:{srv.server_address[1]}/"
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for size in SIZES:
-            look(browser, base, "", "first screen", size, fixture, shots)
+            look(browser, base, first, "first screen", size, fixture, shots)
             if khutwa:
                 look(browser, base, "khutwa/", "khutwa", size, fixture, shots)
         browser.close()
