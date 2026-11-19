@@ -11,7 +11,7 @@ export function normaliseJudge(data) {
     tested_on: [data.part, data.naive_label && `Simple rule: ${data.naive_label}`].filter(Boolean).join('. ') || 'Held-out part of the service day',
     // Each cell averages forecasts made in that hour over horizons of 1 to 20 stops. Signed means cancel, so the
     // miss must come from the producer's mean absolute errors, never from |mean forecast - mean actual|.
-    horizons_note: 'Each cell averages forecasts made in that hour, 1 to 20 stops ahead; a miss is the mean absolute error',
+    horizons_note: 'Each cell averages the forecasts made in that hour; a miss is the mean absolute error',
     rows: data.picks.map(p => ({route: String(p.route), hour: p.hour, forecast: minutes(p.forecast_s), baseline: minutes(p.naive_s), actual: minutes(p.actual_s), n: p.n, forecast_mae: minutes(p.forecast_mae_s), baseline_mae: minutes(p.naive_mae_s)})),
   };
 }
@@ -28,6 +28,14 @@ export function validateJudge(input) {
 }
 export function mountJudge(input) {
   const data=validateJudge(input), host=document.querySelector('#judge-pick');
+  // Stand-in cells are never shown as proof (FACTS: stand-in tables never on screen). Until a real held-out file
+  // arrives (fixture false), the section shows the one verified result and where it comes from.
+  if(data.fixture){
+    host.append(element('h2','Tested on trips it never saw'));
+    host.append(element('p','On RTA\'s records in Dataiku, across 2,043 held-out evening trips, the forecast missed by 6.97 minutes on average against the timetable\'s 8.25: 15% closer.'));
+    host.append(element('p','Source: RTA records, 15 Dec 2025 (opendata/onday/FORECAST-RETEST.md). The route-by-route cells in this build come from stand-in practice data, so they are not shown.','source-note'));
+    return;
+  }
   host.append(element('h2','Pick any route and hour'));
   const note=element('p',data.fixture?'Stand-in forecasts · STAND-IN DATA, NOT A RESULT':'Held-out forecasts','source-note');host.append(note);
   const controls=element('div',undefined,'judge-controls');

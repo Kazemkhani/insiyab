@@ -337,10 +337,10 @@ slides.append("""<!-- 9 THE DRILL PROOF -->
 
 # 10 DUBAI HEAT (stop map)
 slides.append("""<!-- 10 DUBAI HEAT -->
-<section class="slide light" data-notes="Sara · 30 s. Dubai is not Singapore. Singapore built 200 km of covered walkways. Here, most stops are poles in the sun. Insiyab ranks the same delay higher at a bare pole at 15:00 in July. Each dot is a stop. Ink: air-conditioned shelter. Red: bare pole in the July scenario. Say: 553 air-conditioned shelters, 993 poles, among the stops whose kind RTA published.">
+<section class="slide light" data-notes="Sara · 30 s. Dubai is not Singapore. Singapore built 200 km of covered walkways. Here, of the 1,600 stops whose kind RTA published, 993 are bare poles and 553 are air-conditioned shelters. Insiyab ranks the same delay higher at a bare pole at 15:00 in July. Each dot is a stop. Ink: air-conditioned shelter. Red: bare pole in the July scenario. Say: 553 air-conditioned shelters, 993 poles, among the stops whose kind RTA published.">
   <div class="pad" style="top:80px">
     <h2 style="font-size:80px;color:var(--ink)">Dubai is not Singapore.</h2>
-    <p style="font-size:28px;line-height:1.4;color:var(--mute);margin-top:16px;max-width:1200px">Singapore built 200 km of covered walkways. Here, most stops are poles in the sun. The same delay matters more at a bare pole at 15:00 in July.</p>
+    <p style="font-size:28px;line-height:1.4;color:var(--mute);margin-top:16px;max-width:1200px">Singapore built 200 km of covered walkways. Here, of the 1,600 stops whose kind RTA published, 993 are bare poles and 553 are air-conditioned shelters. The same delay matters more at a bare pole at 15:00 in July.</p>
   </div>
   <div style="position:absolute;left:140px;top:290px;right:140px;bottom:72px;display:flex;flex-direction:column;gap:0">
     <div style="position:relative;flex:1;min-height:0;overflow:hidden">

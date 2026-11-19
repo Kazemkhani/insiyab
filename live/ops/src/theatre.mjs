@@ -109,7 +109,7 @@ export function mountTheatre(map, alert, onRoleTalked) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const markers = {};
   const legend = document.getElementById('theatre-legend');
-  let lastPhase = null, lastRoles = {}, theatreTimers = [], panDone = false;
+  let lastPhase = null, lastRoles = {}, theatreTimers = [], panDone = false, followMap = null;
 
   for (const role of Object.keys(LOCS)) {
     const el = makeMarkerEl(role);
@@ -153,19 +153,27 @@ export function mountTheatre(map, alert, onRoleTalked) {
     const overlap = (l, t) => others.reduce((sum, o) =>
       sum + Math.max(0, Math.min(l + W, o.right) - Math.max(l, o.left)) * Math.max(0, Math.min(t + H, o.bottom) - Math.max(t, o.top)), 0);
     const inside = (l, t) => l >= frame.left + 4 && l + W <= frame.right - 4 && t >= frame.top + 4 && t + H <= frame.bottom - 4;
+    // Candidates, nearest first: each side of the controller at growing distances, then the map's corners and edges.
+    const cand = [];
+    for (const gap of [8, 56, 112, 168, 240]) {
+      cand.push([c.left + c.width/2 - W/2, c.top - gap - H], [c.right + gap, c.top + c.height/2 - H/2],
+                [c.left + c.width/2 - W/2, c.bottom + gap], [c.left - gap - W, c.top + c.height/2 - H/2]);
+    }
+    const fx = [frame.left + 12, frame.left + frame.width/2 - W/2, frame.right - 12 - W];
+    const fy = [frame.top + 12, frame.top + frame.height/2 - H/2, frame.bottom - 12 - H];
+    for (const y of fy) for (const x of fx) cand.push([x, y]);
     let best = null;
-    for (const gap of [8, 56, 112]) for (const side of ['above', 'right', 'below', 'left']) {
-      const l = side === 'right' ? c.right + gap : side === 'left' ? c.left - gap - W : c.left + c.width/2 - W/2;
-      const t = side === 'above' ? c.top - gap - H : side === 'below' ? c.bottom + gap : c.top + c.height/2 - H/2;
+    for (const [l, t] of cand) {
       if (!inside(l, t)) continue;
       const cost = overlap(l, t);
-      if (!best || cost < best.cost) best = {side, gap, cost};
+      if (!best || cost < best.cost) best = {l, t, cost};
       if (cost === 0) break;
     }
-    const pick = best || {side: 'above', gap: 8};
-    host.dataset.bubbleSide = pick.side;
-    host.style.setProperty('--bubble-gap', pick.gap + 'px');
+    if (!best) return;
+    host.dataset.bubbleSide = 'free';
+    Object.assign(b.style, {left: (best.l - c.left) + 'px', top: (best.t - c.top) + 'px', right: 'auto', bottom: 'auto', transform: 'none'});
   }
+
 
   function clearTimers() { theatreTimers.forEach(clearTimeout); theatreTimers = []; panDone = false; }
   function later(fn, ms) { theatreTimers.push(setTimeout(fn, ms)); }
@@ -230,6 +238,8 @@ export function mountTheatre(map, alert, onRoleTalked) {
       clearControllerSpot();
       streamWords(bubble('controller'), DRILL_WORDS.controller, reduced);
       placeControllerBubble();
+      // Marker screen positions change whenever the map moves (the fly-to may still be running), so re-place each time.
+      if (!followMap) { followMap = () => { clearControllerSpot(); placeControllerBubble(); }; map.on('move', followMap); }
     }
 
     // Relay sweep: lifecycle role statuses drive reported/calling → sent → received.
@@ -252,6 +262,7 @@ export function mountTheatre(map, alert, onRoleTalked) {
 
   function reset() {
     clearTimers();
+    if (followMap) { map.off('move', followMap); followMap = null; }
     for (const role of Object.keys(markers)) {
       const m = markers[role];
       if (m.added) { m.mk.remove(); m.added = false; }

@@ -355,17 +355,12 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   <div class="wrap">
     <p class="ey reveal">Our answer</p>
     <h2 class="big reveal">Insiyab sees it coming.<br><span>The controller decides.</span></h2>
-    <p class="lede reveal">Insiyab watches the evening before it happens. It predicts which buses will run late, which will overflow, which stops are in the heat, and suggests a fix early. When a critical alert is not acknowledged, it makes the calls and gives the controller one short briefing. A person always decides.</p>
-    <div class="wlist reveal" id="six-watchers" aria-label="The six things Insiyab watches">
+    <p class="lede reveal">Insiyab watches the evening before it happens. It predicts which buses will run late and which stops are in the heat, and suggests a fix early. When a critical alert is not acknowledged, it makes the calls and gives the controller one short briefing. A person always decides.</p>
+    <div class="wlist reveal" id="six-watchers" aria-label="What Insiyab watches">
       <div class="wrow">
         <div class="wrow-head"><span class="wrow-name">Running late</span><span class="wlabel">measured model</span></div>
         <p class="wrow-say">Insiyab watches every departure. When the bus is still out on its previous trip, the next departure starts <span class="r">late 85 in 100 times</span> (696 such departures, measured). Its trip-time forecast is 15% closer than the timetable on 2,043 evening trips it never saw.</p>
-        <p class="wrow-src">Source: MODEL-CARD.md, lines 216 to 219</p>
-      </div>
-      <div class="wrow">
-        <div class="wrow-head"><span class="wrow-name">Overflow</span><span class="wlabel">estimate, range shown</span></div>
-        <p class="wrow-say">When a bus is predicted to arrive at a stop with more riders than seats, Insiyab flags the route and hour early. The boarding estimate is close to the best simple rule; the range includes zero.</p>
-        <p class="wrow-src">Source: MODEL-CARD.md, lines 49 to 51</p>
+        <p class="wrow-src">Source: RTA records, 15 Dec 2025, analysed in Dataiku (opendata/onday/HOW-IT-CONNECTS.md)</p>
       </div>
       <div class="wrow">
         <div class="wrow-head"><span class="wrow-name">Heat</span><span class="wlabel">priority rule</span></div>
@@ -440,7 +435,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
     <p class="ey reveal">The forecast</p>
     <h2 class="big reveal">Tested on trips it never saw:<br><span>15% closer than the timetable.</span></h2>
     <p class="lede reveal">Four methods on the same 2,043 held-out evening trips: RTA's timetable misses by <b>8.25</b> minutes on average, the best simple rule by 7.42, a linear model by 7.31, and Insiyab's boosted trees by <b>6.97</b>, lowest on MAE, RMSE and MAPE. Where it loses, we show it below.</p>
-    <p class="src reveal">Source: MODEL-CARD.md, lines 216 to 219</p>
+    <p class="src reveal">Source: RTA records, 15 Dec 2025, 2,043 held-out evening trips in Dataiku (opendata/onday/FORECAST-RETEST.md)</p>
     <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:72px">Trip-time forecast against the timetable.</h3>
     <p class="lede reveal">The pitch test learns from trips before 16:00 and scores 2,043 trips from 16:00 to 19:00 on the same day. Average miss in minutes; lower is better. This is not a test on another day.</p>
     <div class="bars reveal">
