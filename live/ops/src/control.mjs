@@ -125,6 +125,19 @@ export function mountControl(alert, replay, theatre, briefing) {
     replay.stop();replay.setTime(67980);controller.startDemo();
   });
 
+  // --- Presenter key from a setup link: /ops/?stage=1#key=... The fragment never reaches the server; it is read once,
+  // kept for this tab only, and removed from the address bar at once so it never shows on the projector.
+  {
+    const m=location.hash.match(/(?:^#|&)key=([^&]+)/);
+    if (m) { setPresenterKey(decodeURIComponent(m[1]).trim()); history.replaceState(null,'',location.pathname+location.search); }
+  }
+  // --- A live run that cannot start says so on screen (never a silent fallback to the script) ---
+  function liveProblem(text) {
+    let p=document.querySelector('#live-problem');
+    if (!p) { p=document.createElement('p'); p.id='live-problem'; p.setAttribute('role','alert'); document.querySelector('#calls')?.append(p); }
+    p.textContent=text; p.hidden=!text;
+  }
+
   // --- Presenter key (sessionStorage only) ---
   const keyInput=document.querySelector('#drill-key-input');
   const keyClear=document.querySelector('#drill-key-clear');
@@ -174,13 +187,14 @@ export function mountControl(alert, replay, theatre, briefing) {
 
   async function startLiveDrill() {
     const key=getPresenterKey();
-    if (!key || key.length<24) return; // no key: silently skip (button handles mode guard)
+    if (!key || key.length<24) { liveProblem('Live run could not start: no presenter key. Paste it, or press Demo mode.'); return; }
+    liveProblem('');
     let reader, decoder;
     try {
       const r=await fetch('/api/drill/start',{method:'POST',headers:{'Content-Type':'application/json','x-insiyab-key':key},signal:AbortSignal.timeout(300000)});
-      if (!r.ok) { console.warn('Drill API refused:', r.status); return; }
+      if (!r.ok) { liveProblem(r.status===401?'Live run refused: the presenter key is wrong. Check it, or press Demo mode.':`Live run could not start (server answered ${r.status}). Press Demo mode.`); return; }
       reader=r.body.getReader(); decoder=new TextDecoder();
-    } catch(e) { console.warn('Drill API unavailable:', e.message); return; }
+    } catch(e) { liveProblem('Live run could not reach the server. Check the internet, or press Demo mode.'); return; }
     let buf='';
     try {
       while (true) {

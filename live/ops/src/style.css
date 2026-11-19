@@ -69,7 +69,7 @@ footer{border-top:1px solid var(--insiyab-ink-25);padding:14px 28px}.timeline{di
 /* Speech bubble: absolute-positioned to the side of the marker for collision avoidance.
  * Default: to the right; depot goes left (NE area, map edge avoidance).
  * Controller goes ABOVE the ring so it never covers any marker below. */
-.speech-bubble{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);width:320px;max-width:320px;font-size:20px;line-height:1.3;background:var(--insiyab-ivory);border:1.5px solid var(--insiyab-ink-25);padding:5px 7px;border-radius:3px;text-align:left;word-break:break-word;z-index:10}
+.speech-bubble{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);width:260px;max-width:260px;font-size:16px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;background:var(--insiyab-ivory);border:1.5px solid var(--insiyab-ink-25);padding:5px 7px;border-radius:3px;text-align:left;word-break:break-word;z-index:10}
 .theatre-marker[data-person=depot] .speech-bubble{left:auto;right:calc(100% + 10px)}
 .theatre-marker[data-person=controller] .speech-bubble{left:50%;right:auto;top:auto;bottom:calc(100% + var(--bubble-gap,8px));transform:translateX(-50%);width:260px;max-width:260px}
 .theatre-marker[data-person=controller][data-bubble-side=right] .speech-bubble{left:calc(100% + var(--bubble-gap,8px));right:auto;bottom:auto;top:50%;transform:translateY(-50%)}
@@ -109,7 +109,7 @@ footer{border-top:1px solid var(--insiyab-ink-25);padding:14px 28px}.timeline{di
 #learn p{font-size:13px;line-height:1.5;margin-top:4px}
 
 /* Responsive: smaller markers at 1440 wide */
-@media(max-width:1500px){.marker-name{font-size:16px}.speech-bubble{font-size:18px}}
+@media(max-width:1500px){.marker-name{font-size:16px}.speech-bubble{font-size:15px}}
 /* Mobile: hide theatre markers — the right panel shows calling/talking/received states */
 @media(max-width:760px){.theatre-marker{display:none!important}}
 
@@ -138,3 +138,8 @@ footer{border-top:1px solid var(--insiyab-ink-25);padding:14px 28px}.timeline{di
 
 /* Stage link only: the closing slides below the console, one screen each */
 #stage-close{display:block}#stage-close .stage-slide{display:block;width:100vw;height:100vh;border:0;margin:0;background:var(--insiyab-ink)}
+
+#live-problem{color:var(--insiyab-red);font-weight:600;margin-top:8px}
+
+/* One bubble at a time: only the person speaking now */
+.theatre-marker:not([data-speaking]) .speech-bubble{display:none!important}

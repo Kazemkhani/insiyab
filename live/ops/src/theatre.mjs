@@ -60,10 +60,10 @@ function streamWords(bubble, text, reduced) {
   // driven by a separate later() call in startStaffCalls at the same scheduler
   // depth as the talking timer; this lets them fire within one Playwright
   // fake-clock fast_forward regardless of how many word timeouts are queued.
-  if (reduced.matches) { bubble.textContent = text; return; }
+  if (reduced.matches) { const w = text.split(' '); bubble.textContent = (w.length > 10 ? '… ' : '') + w.slice(-10).join(' '); return; }
   const words = text.split(' ');
   for (let i = 0; i < words.length; i++) {
-    setTimeout(() => { bubble.textContent = words.slice(0, i + 1).join(' '); }, (i + 1) * 180);
+    setTimeout(() => { const shown = words.slice(Math.max(0, i - 9), i + 1).join(' '); bubble.textContent = (i > 9 ? '… ' : '') + shown; }, (i + 1) * 180);
   }
 }
 
@@ -128,7 +128,16 @@ export function mountTheatre(map, alert, onRoleTalked) {
     // 'decided' (controller) must not regress when relaying starts.
     if (m.el.dataset.state === 'hidden') m.el.dataset.state = 'calling';
   }
-  function setState(role, state) { markers[role].el.dataset.state = state; }
+  // Only the person speaking right now shows a bubble; their full words are in the briefing panel.
+  let speaking = null;
+  function setState(role, state) {
+    markers[role].el.dataset.state = state;
+    if (state === 'talking' || state === 'decided') {
+      if (speaking && speaking !== role && markers[speaking]) delete markers[speaking].el.dataset.speaking;
+      speaking = role; markers[role].el.dataset.speaking = '1';
+      setTimeout(() => placeBubble(role), 1);
+    } else if (speaking === role) { delete markers[role].el.dataset.speaking; speaking = null; }
+  }
   function bubble(role) { return markers[role].el.querySelector('.speech-bubble'); }
   // The bubble's final box (260 x 64 px) is tried above, right, below and left of the controller;
   // the first side that touches no other marker wins. Marker positions depend on the map, so no fixed side is safe.
@@ -143,13 +152,16 @@ export function mountTheatre(map, alert, onRoleTalked) {
     for (const d of [70, 110, 150]) for (const [dx, dy] of [[d,0],[0,-d],[-d,0],[0,d],[d,-d],[-d,-d],[d,d],[-d,d]])
       if (clear(dx, dy)) { m.mk.setOffset([dx, dy]); return; }
   }
-  function placeControllerBubble() {
-    const host = markers.controller.el, b = bubble('controller');
+  function placeControllerBubble() { placeBubble('controller'); }
+  function placeBubble(role) {
+    if (!markers[role]) return;
+    const host = markers[role].el, b = bubble(role);
     if (!host || !b) return;
     const c = host.getBoundingClientRect(), W = 260, H = 64;
     const frame = (host.closest('.map-stage') || document.body).getBoundingClientRect();
-    const others = Object.entries(markers).filter(([r, m]) => r !== 'controller' && m.added && m.el.isConnected)
+    const others = Object.entries(markers).filter(([r, m]) => r !== role && m.added && m.el.isConnected)
       .map(([, m]) => m.el.getBoundingClientRect());
+    const stall = document.querySelector('.stall-label'); if (stall && !stall.hidden) others.push(stall.getBoundingClientRect());
     const overlap = (l, t) => others.reduce((sum, o) =>
       sum + Math.max(0, Math.min(l + W, o.right) - Math.max(l, o.left)) * Math.max(0, Math.min(t + H, o.bottom) - Math.max(t, o.top)), 0);
     const inside = (l, t) => l >= frame.left + 4 && l + W <= frame.right - 4 && t >= frame.top + 4 && t + H <= frame.bottom - 4;
@@ -239,7 +251,7 @@ export function mountTheatre(map, alert, onRoleTalked) {
       streamWords(bubble('controller'), DRILL_WORDS.controller, reduced);
       placeControllerBubble();
       // Marker screen positions change whenever the map moves (the fly-to may still be running), so re-place each time.
-      if (!followMap) { followMap = () => { clearControllerSpot(); placeControllerBubble(); }; map.on('move', followMap); }
+      if (!followMap) { followMap = () => { clearControllerSpot(); if (speaking) placeBubble(speaking); }; map.on('move', followMap); }
     }
 
     // Relay sweep: lifecycle role statuses drive reported/calling → sent → received.
