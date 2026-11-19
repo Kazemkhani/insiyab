@@ -63,7 +63,7 @@ const PHONE_ID = cfg('ELEVENLABS_PHONE_NUMBER_ID');
 const VOICE_ID = cfg('ELEVENLABS_VOICE_ID');
 const VOICE_MODEL = cfg('ELEVENLABS_VOICE_MODEL') || 'eleven_v4_turbo';
 // The conversation model is set explicitly: left unset, ElevenLabs used its account default (deepseek-v41-flash on 18 Nov).
-const AGENT_LLM = cfg('ELEVENLABS_AGENT_LLM') || 'gpt-4o-mini';
+const AGENT_LLM = cfg('ELEVENLABS_AGENT_LLM') || 'claude-sonnet-5-5';
 const SHARED_KEY = cfg('VOICE_SHARED_KEY');
 const VIEW_KEY = cfg('VOICE_VIEW_KEY');
 let PUBLIC_URL = cfg('VOICE_PUBLIC_URL').replace(/\/+$/, '');
@@ -252,7 +252,7 @@ const CALL_INTRO = 'Hello {{person_name}}, this is Insiyab, the AI operations as
 // Identity, stated once. No scenario framing and no permission to step out of the role: on 18 Nov a weak model
 // treated "answer honestly that this is a demonstration" as a cue to talk about itself instead of the call.
 const DEMO_CONTEXT = 'If asked who or what you are, say exactly: "This is Insiyab, the control room\'s automated assistant." Then return to your check.';
-const STYLE = 'Use call_token {{call_token}} exactly in every tool call. Use the name only in the opening, never repeatedly; honour a request not to use it. Calm spoken English. One short sentence per reply, under 20 words. One question at a time. Never describe what you can or cannot do, and never mention tools, logging, recording limits, models or exercises. For anything off-topic, say "Let me finish this one check first," then repeat your question. Never invent details or turn perhaps, I presume, or I do not know into a confirmed fact. If confused, explain your single check once using yes, no, or not confirmed; then log uncertainty instead of asking again. Never speak stage directions. Reply in the language the person speaks. After logging, say goodbye once and use end_call; do not keep chatting or answer off-topic questions.';
+const STYLE = 'Use call_token {{call_token}} exactly in every tool call. Use the name only in the opening, never repeatedly; honour a request not to use it. Calm spoken English. One short sentence per reply, under 20 words. One question at a time. Never describe what you can or cannot do, and never mention tools, logging, recording limits, models or exercises. For anything off-topic, say "Let me finish this one check first," then repeat your question. Never invent details or turn perhaps, I presume, or I do not know into a confirmed fact. If confused, explain your single check once using yes, no, or not confirmed; then log uncertainty instead of asking again. Never speak stage directions. You may say briefly what you are doing. Just before a tool call say exactly one short phrase to the person, such as "Noting that down now.", and nothing before it. Every word you produce is heard by the person, so speak only to them, never about them, and never think aloud: no comments on what they already said, on your instructions, or on tool fields. If a tool call fails, call it once more saying only "One moment."; if it fails again say only "Thank you. Goodbye." and use end_call. Never mention an error, a retry, trying again, or that something did not go through, and never say something was recorded or logged when the tool call failed. Reply in the language the person speaks. After logging, say goodbye once and use end_call; do not keep chatting or answer off-topic questions.';
 const SAFETY_RULES = `Rules:
 - The agent informs and records. It instructs nobody. It never claims to be RTA.
 - An emergency means only: fire, a crash, an injury, a medical problem, or a person in immediate danger. Traffic, a road obstruction, a breakdown, lateness or crowding is never an emergency; treat it as a normal update. If they report an emergency, tell them to call 999. If insiyab_report is available, log real_emergency true with their role, then call end_call. Otherwise end the call without recording a routine decision or acknowledgement. Do not continue ordinary service planning.
@@ -280,7 +280,7 @@ ${INCIDENT_BLOCK}
 ${STYLE}
 
 What to do:
-- Listen for yes, no, or unconfirmed. If it can continue, ask just: "About how many minutes late will you return?"
+- Listen for yes, no, or unconfirmed. If it can continue, ask just: "About how many minutes late will you return?" If they already gave the delay, skip that question without remarking on it.
 - Do not ask for locations, passenger counts, or a diagnosis. If the return delay is unknown, record it as unknown.
 - Call insiyab_report with a one or two sentence summary in the driver's own words and role "driver".
 - Then say "Thank you. Your update is recorded." Say goodbye once and call end_call.

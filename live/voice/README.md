@@ -30,7 +30,7 @@ Copy `live/voice/voice.env.example` to `~/.config/insiyab/voice.env` and fill in
 | `ELEVENLABS_PHONE_NUMBER_ID` | The Twilio number as imported into ElevenLabs (run `--import-number`) |
 | `ELEVENLABS_VOICE_ID` | Voice ID for the agents (a calm British voice is recommended) |
 | `ELEVENLABS_VOICE_MODEL` | TTS model (default: `eleven_v4_turbo`) |
-| `ELEVENLABS_AGENT_LLM` | Conversation model for every agent (default: `gpt-4o-mini`; never leave it to the account default) |
+| `ELEVENLABS_AGENT_LLM` | Conversation model for every agent (default: `claude-sonnet-5-5`; never leave it to the account default) |
 | `VOICE_SHARED_KEY` | 24+ character key; protects `POST /voice/incident` |
 | `VOICE_VIEW_KEY` | Separate 24+ character key for detailed dashboard reports |
 | `VOICE_PUBLIC_URL` | Public HTTPS address of this process (needed for tool webhooks when running `--setup-agents`) |
