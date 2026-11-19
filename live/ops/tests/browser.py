@@ -237,9 +237,11 @@ with sync_playwright() as p:
     assert page.locator('#briefing').is_hidden()
     assert page.locator('#incident-report').is_hidden()
     page.screenshot(path=str(shots/'theatre-02-calling.png'), full_page=True)
-    # Advance enough for all 4 staff to finish talking; longest is depot (~8.4 s from demo start).
-    # At demo+12000 ms the lifecycle escalates to calling_duty — still pre-decision.
-    page.clock.fast_forward(10000)
+    # Advance enough for all 4 staff to finish talking; longest is depot (~9.4 s from demo start).
+    # Advance to 11500ms total (2000+9500) — all staff reported, lifecycle still unacknowledged
+    # (calling_duty fires at 12000ms). The briefing screenshot must show 4 rows and 'reported'
+    # markers BEFORE the CALLS header says 'Calling the duty controller'.
+    page.clock.fast_forward(9500)
     # KEY ASSERTION: all four 'talking' states occurred BEFORE 'decided'.
     # Proof: each marker is now in 'reported' (calling → talking → reported). They talked
     # before the user has clicked confirm, so the decision has not been made yet.
@@ -255,7 +257,57 @@ with sync_playwright() as p:
     assert page.locator('#briefing').is_visible()
     pre_rows = page.locator('.briefing-row').count()
     assert pre_rows == 4, f'Expected 4 briefing rows pre-decision, got {pre_rows}'
+    # Fire level-2 timers: briefing.mjs uses setTimeout(fn,1) to add briefing-row--in
+    # and theatre.mjs uses setTimeout(fn,1) for collision resolution. These are level-2
+    # timers (created during level-1 reported callbacks), so they need a subsequent
+    # fast_forward call. 50ms is well over the 1ms delay they were scheduled with.
+    page.clock.fast_forward(50)
+    # Wait for CSS transitions to complete (opacity .35s = 350ms real time).
+    page.wait_for_timeout(400)
+    # DOM assertion: each briefing row's role name appears in its text content
+    for role_label in ['Driver', 'Depot', 'Station', 'Planning desk']:
+        matches = page.evaluate(
+            f'''() => [...document.querySelectorAll('.briefing-row')]
+               .some(r => r.textContent.includes({repr(role_label)}))''')
+        assert matches, f'Briefing row for "{role_label}" not found in DOM text at pre-decision'
+    # Briefing-row--in class applied (opacity visible) — rAF fired during wait_for_timeout
+    invisible = page.evaluate(
+        '''() => [...document.querySelectorAll('.briefing-row')]
+           .filter(r => !r.classList.contains('briefing-row--in')).length''')
+    assert invisible == 0, f'{invisible} briefing row(s) still invisible (briefing-row--in not applied)'
+    # Marker label no-overlap: no two visible label bounding boxes should intersect
+    overlap_ok = page.evaluate('''() => {
+      const labels = [...document.querySelectorAll('.theatre-marker .marker-label')].filter(l => {
+        const st = l.closest('[data-person]')?.dataset?.state;
+        return st && !['hidden','calling','decided','sent','received'].includes(st);
+      });
+      for (let i = 0; i < labels.length; i++) {
+        const a = labels[i].getBoundingClientRect();
+        for (let j = i+1; j < labels.length; j++) {
+          const b = labels[j].getBoundingClientRect();
+          const ox = Math.min(a.right,b.right) - Math.max(a.left,b.left);
+          const oy = Math.min(a.bottom,b.bottom) - Math.max(a.top,b.top);
+          if (ox > 1 && oy > 1) return "overlap:" + labels[i].textContent.trim() + " vs " + labels[j].textContent.trim();
+        }
+      }
+      return "ok";
+    }''')
+    assert overlap_ok == 'ok', f'Marker label collision detected: {overlap_ok}'
     page.screenshot(path=str(shots/'theatre-03-briefing.png'), full_page=True)
+    # DOM assertion at calling_duty start: briefing must still have 4 rows with role names.
+    # This checks state at the MOMENT the duty-controller call starts (not on internal state).
+    page.clock.fast_forward(500)   # 11550 + 500 = 12050ms → calling_duty phase (fires at 12000ms)
+    page.wait_for_timeout(50)
+    assert page.locator('#calls').get_attribute('data-phase') == 'calling_duty', (
+        'Expected calling_duty phase at 12000ms demo time')
+    calling_duty_rows = page.locator('.briefing-row').count()
+    assert calling_duty_rows == 4, (
+        f'Briefing must have 4 rows when duty-controller call starts; got {calling_duty_rows}')
+    for role_label in ['Driver', 'Depot', 'Station', 'Planning desk']:
+        present = page.evaluate(
+            f'''() => [...document.querySelectorAll('.briefing-row')]
+               .some(r => r.textContent.includes({repr(role_label)}))''')
+        assert present, f'"{role_label}" must appear in briefing at calling_duty start'
     # User decides via the two-click on-screen path (available throughout all pre-decided phases).
     page.locator('[data-option=send_spare]').click()
     page.get_by_role('button', name='Confirm decision:', exact=False).click()
@@ -293,6 +345,22 @@ with sync_playwright() as p:
     assert briefing_rows == 4, f'Expected 4 briefing rows, got {briefing_rows}'
     assert page.locator('#incident-report').is_visible()
     assert page.locator('.print-btn').count() == 1
+    # Assert incident report row structure: 3-column grid, each row starts with a time element
+    rows_ok = page.evaluate('''() => {
+      const rows = [...document.querySelectorAll('.report-row')];
+      if (!rows.length) return 'no rows';
+      for (const row of rows) {
+        const kids = [...row.children];
+        if (kids.length < 2) return 'row has ' + kids.length + ' child(ren), need >= 2';
+        if (!kids[0].matches('time.report-time')) return 'first child not time.report-time: ' + kids[0].tagName;
+      }
+      return 'ok';
+    }''')
+    assert rows_ok == 'ok', f'Incident report row structure: {rows_ok}'
+    # Assert staff report rows appear before "Decision made"
+    incident_text = page.locator('#incident-report').inner_text()
+    for staff_label in ['Driver reported', 'Depot reported', 'Station reported', 'Planning desk reported']:
+        assert staff_label in incident_text, f'Missing "{staff_label}" in incident report'
     page.screenshot(path=str(shots/'theatre-07-all-received.png'), full_page=True)
     # Learn card appears after 1200ms timeout in briefing.mjs.
     page.clock.fast_forward(1500)
@@ -309,7 +377,7 @@ with sync_playwright() as p:
     assert visible_after_reset == 0, f'{visible_after_reset} marker(s) still visible after demo reset'
     assert page.locator('#briefing').is_hidden()
     assert not th_requests, th_requests
-    print('PASS theatre: staff call before decision (4 reported pre-decided), red calling rings at unacknowledged, teal received rings, 4 pre-decision briefing rows, incident report, learn card, PDF, reset, zero voice requests')
+    print('PASS theatre: 4 reported pre-decided; briefing rows visible with role names before screenshot; no marker label overlap; 4 briefing rows at calling_duty start; red calling rings; teal received rings; incident report 3-col grid with staff rows before decision; learn card; PDF; reset; zero voice requests')
     page.close()
     # Rehearse the actual 90-second stage sequence, without an accelerated clock.
     if os.environ.get('OPS_REALTIME')=='1':

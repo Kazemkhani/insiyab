@@ -25,6 +25,7 @@ export function mountBriefing(alert) {
   if (!briefingEl || !reportEl || !learnEl) return {onState(){}, reset(){}};
 
   const arrivedRoles = new Set();
+  const roleAt = {};   // role -> absolute ms timestamp when addRoleReport was called
   let decisionRecord = null, startedAt = null, phaseAt = {};
 
   function resetPanels() {
@@ -32,7 +33,8 @@ export function mountBriefing(alert) {
     briefingEl.replaceChildren(element('h2','ONE BRIEFING'));
     reportEl.replaceChildren(element('h2','Incident report'));
     learnEl.replaceChildren(element('h2','What Insiyab learned'));
-    arrivedRoles.clear(); decisionRecord = null; startedAt = null; phaseAt = {};
+    arrivedRoles.clear(); Object.keys(roleAt).forEach(k => delete roleAt[k]);
+    decisionRecord = null; startedAt = null; phaseAt = {};
   }
   resetPanels();
 
@@ -40,16 +42,19 @@ export function mountBriefing(alert) {
   function addReport(role) {
     if (arrivedRoles.has(role)) return;
     arrivedRoles.add(role);
+    roleAt[role] = Date.now();  // record when this role reported, for incident timeline
     briefingEl.hidden = false;
     const row = element('div', undefined, 'briefing-row');
     row.dataset.briefingRole = role;
     const lbl = element('strong', ROLE_LABEL[role] + ': ');
     const txt = element('span', DRILL_WORDS[role]);
-    const src = element('span', ' (Simulated · drill words, 18 Nov 2026)', 'source-note');
+    const src = element('span', ' (Simulated, drill words, 18 Nov 2026)', 'source-note');
     row.append(lbl, txt, src);
-    // Trigger fly-in animation by adding class after append
+    // Trigger fly-in animation: setTimeout(fn,1) defers one tick after the DOM
+    // is committed, so the CSS transition fires. Use setTimeout not requestAnimationFrame
+    // so Playwright's fake clock can advance it in tests (rAF is not clock-controlled).
     briefingEl.append(row);
-    requestAnimationFrame(() => row.classList.add('briefing-row--in'));
+    setTimeout(() => row.classList.add('briefing-row--in'), 1);
   }
 
   function addBriefingOptions(state) {
@@ -58,7 +63,7 @@ export function mountBriefing(alert) {
     const opts = element('div', undefined, 'briefing-options');
     opts.append(element('p','Options considered:','source-note'));
     for (const opt of alert.suggestion.options) {
-      const p = element('p', `${opt.label}: likely effect (estimate) — ${opt.likely_effect}`);
+      const p = element('p', `${opt.label}: likely effect (estimate): ${opt.likely_effect}`);
       if (opt.id === alert.suggestion.dss_pick) {
         p.append(element('span',' · Simulated RTA system pick','source-note'));
       }
@@ -78,12 +83,18 @@ export function mountBriefing(alert) {
     // Timeline
     const tl = element('div',undefined,'report-timeline');
     const rows = [
-      ['Alert raised', phaseAt.predicted || startedAt, 'Route 310, 19:23 — likely 13 min late'],
+      ['Alert raised', phaseAt.predicted || startedAt, 'Route 310, 19:23: likely 13 min late'],
       ['Options shown', phaseAt.suggested, ''],
       ['Controller called', phaseAt.calling_duty || phaseAt.unacknowledged, 'Simulated call'],
+    ];
+    // Insert staff reports in the order they arrived, before Decision made
+    for (const role of ['driver','depot','station','planning']) {
+      if (roleAt[role]) rows.push([`${ROLE_LABEL[role]} reported`, roleAt[role], '']);
+    }
+    rows.push(
       ['Decision made', state.decision_at, `${OPTION_LABEL[state.decision] || state.decision}`],
       ['Decision relayed', phaseAt.relaying, 'Four roles called'],
-    ];
+    );
     for (const [role, roleRec] of Object.entries(state.roles)) {
       if (roleRec.at) rows.push([`${ROLE_LABEL[role] || role} received`, roleRec.at, '']);
     }
@@ -91,7 +102,7 @@ export function mountBriefing(alert) {
       if (!at) continue;
       const row = element('div',undefined,'report-row');
       row.append(element('time', stamp(at, startedAt), 'report-time'), element('span', label),
-        detail ? element('span',' — ' + detail,'report-detail') : '');
+        detail ? element('span',': ' + detail,'report-detail') : '');
       tl.append(row);
     }
     reportEl.append(tl);

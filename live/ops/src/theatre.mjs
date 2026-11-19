@@ -1,7 +1,7 @@
 /** Call theatre: five people on the map with calling, talking, reported, sent and received states.
  *  Staff call BEFORE the decision (unacknowledged phase); controller speaks at decided;
- *  relay sweep drives sent→received. Demo mode only. Zero network calls.
- *  onRoleTalked(role) is called after each staff member finishes talking — used by
+ *  relay sweep drives sent-received. Demo mode only. Zero network calls.
+ *  onRoleTalked(role) is called after each staff member finishes talking; used by
  *  briefing.mjs to add their report row to ONE BRIEFING before the decision. */
 import maplibregl from 'maplibre-gl';
 
@@ -42,24 +42,23 @@ function makeMarkerEl(role) {
   const img = document.createElement('img');
   img.src = `icons/${ICON[role]}.svg`; img.alt = ''; img.width = 44; img.height = 44;
   ring.append(img);
-  // Label: flex column so name and note are separate flex children (no text overlap)
+  // Label: only the role name. Illustrative note moved to the shared map legend.
   const lbl = makeEl('div','marker-label');
   const name = makeEl('span','marker-name', LABEL[role]);
-  const note = makeEl('span','marker-note', ILLUSTRATIVE[role]);
-  lbl.append(name, note);
+  lbl.append(name);
   const wave = makeEl('div','voice-wave'); wave.setAttribute('aria-hidden','true');
   for (let i=0;i<5;i++) wave.append(document.createElement('span'));
   const bubble = makeEl('div','speech-bubble');
   bubble.setAttribute('role','log'); bubble.setAttribute('aria-live','polite');
-  const src = makeEl('p','source-note','Simulated · drill words, 18 Nov 2026');
-  wrap.append(ring, lbl, wave, bubble, src);
+  // No per-marker source-note; shared legend (#theatre-legend) carries the label.
+  wrap.append(ring, lbl, wave, bubble);
   return wrap;
 }
 
 function streamWords(bubble, text, reduced) {
   // Visual word-by-word stream. State transitions (reported, onRoleTalked) are
   // driven by a separate later() call in startStaffCalls at the same scheduler
-  // depth as the talking timer — this lets them fire within one Playwright
+  // depth as the talking timer; this lets them fire within one Playwright
   // fake-clock fast_forward regardless of how many word timeouts are queued.
   if (reduced.matches) { bubble.textContent = text; return; }
   const words = text.split(' ');
@@ -68,9 +67,48 @@ function streamWords(bubble, text, reduced) {
   }
 }
 
+/** Collision avoidance for marker labels (deferred one tick after state changes).
+ *  Runs 3 iterative repulsion passes so overlapping labels spread apart horizontally.
+ *  Uses getBoundingClientRect() which forces a synchronous layout on each call.
+ *  Uses setTimeout(fn,1) rather than requestAnimationFrame so Playwright's fake clock
+ *  can fire it in tests with a small fast_forward (rAF is not clock-controlled). */
+function resolveMarkerLabelCollisions(markers) {
+  setTimeout(() => {
+    const items = [];
+    for (const m of Object.values(markers)) {
+      if (!m.added) continue;
+      const st = m.el.dataset.state;
+      if (['hidden','calling','decided','sent','received'].includes(st)) continue;
+      const lbl = m.el.querySelector('.marker-label');
+      if (lbl) items.push({ lbl, dx: 0 });
+    }
+    if (items.length < 2) return;
+    for (const it of items) { it.lbl.style.transform = ''; it.dx = 0; }
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+          const a = items[i].lbl.getBoundingClientRect();
+          const b = items[j].lbl.getBoundingClientRect();
+          const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+          const oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+          if (ox > 1 && oy > 1) {
+            const push = ox / 2 + 5;
+            const aCX = (a.left + a.right) / 2, bCX = (b.left + b.right) / 2;
+            if (aCX <= bCX) { items[i].dx -= push; items[j].dx += push; }
+            else            { items[i].dx += push; items[j].dx -= push; }
+            items[i].lbl.style.transform = `translateX(${items[i].dx}px)`;
+            items[j].lbl.style.transform = `translateX(${items[j].dx}px)`;
+          }
+        }
+      }
+    }
+  });
+}
+
 export function mountTheatre(map, alert, onRoleTalked) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const markers = {};
+  const legend = document.getElementById('theatre-legend');
   let lastPhase = null, lastRoles = {}, theatreTimers = [], panDone = false;
 
   for (const role of Object.keys(LOCS)) {
@@ -82,7 +120,10 @@ export function mountTheatre(map, alert, onRoleTalked) {
 
   function show(role) {
     const m = markers[role];
-    if (!m.added) { m.mk.addTo(map); m.added = true; }
+    if (!m.added) {
+      m.mk.addTo(map); m.added = true;
+      if (legend) legend.hidden = false; // reveal shared legend on first marker
+    }
     // Only set to 'calling' if the marker is still hidden; a marker that reached
     // 'decided' (controller) must not regress when relaying starts.
     if (m.el.dataset.state === 'hidden') m.el.dataset.state = 'calling';
@@ -127,6 +168,7 @@ export function mountTheatre(map, alert, onRoleTalked) {
         if (markers[role].el.dataset.state === 'talking') {
           setState(role, 'reported');
           if (onRoleTalked) onRoleTalked(role);
+          resolveMarkerLabelCollisions(markers);
         }
       }, delay + 200 + wordMs + 50);
     }
