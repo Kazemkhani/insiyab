@@ -426,14 +426,13 @@ slides.append("""<!-- 14 THE ARC -->
 
 # 15 ASK AND CLOSE
 slides.append("""<!-- 15 ASK AND CLOSE -->
-<section class="slide" data-notes="Amir · 40 s. Silence first. Then: Dubai does not wait for the impossible. It schedules it. Insiyab sees it coming. The controller decides. Hold the QR. Do not explain it.">
+<section class="slide" data-notes="Amir · 10 s. Our ask: one control-room shift, for eight weeks. Let Insiyab make the calls, so your controllers can make the decisions. Two seconds of silence. Thank you.">
   <div class="photo" style="background-image:url(photos/close-1.jpg);left:760px;background-position:30% center"></div>
   <div style="position:absolute;left:0;top:0;bottom:0;width:760px;background:var(--ink)"></div>
   <div style="position:absolute;left:120px;top:110px;width:580px">
     <h2 style="font-size:80px">One shift.<br>Selected routes.<br>Eight weeks.</h2>
     <p style="font-size:24px;line-height:1.5;color:var(--mute-on-ink);margin-top:28px">Measure controller minutes on calls, departures leaving late, incidents caught before they happened.</p>
-    <p style="font-family:var(--head);font-weight:800;font-size:38px;line-height:1.15;margin-top:36px">Dubai does not wait for the impossible.<br><span style="color:var(--gold)">It schedules it.</span></p>
-    <p style="font-family:var(--head);font-weight:800;font-size:32px;line-height:1.2;margin-top:24px;color:var(--mute-on-ink)">Insiyab sees it coming.<br>The controller decides.</p>
+    <p style="font-family:var(--head);font-weight:800;font-size:38px;line-height:1.2;margin-top:40px">Let Insiyab make the calls,<br><span style="color:var(--gold)">so your controllers can make the decisions.</span></p>
   </div>
   <div style="position:absolute;left:120px;bottom:80px;display:flex;align-items:center;gap:24px">
     <div class="qr" style="width:132px;height:132px;padding:10px"><img src="qr-pitch.svg" alt="QR code to the live site"></div>
@@ -454,20 +453,22 @@ slides.append("""<!-- BACKUP 1: WHY NOW -->
   <div class="credit">Dubai Media Office, 23 April 2026 (UAE Cabinet meeting chaired by His Highness Sheikh Mohammed bin Rashid Al Maktoum). Strategies: u.ae and Government of Dubai portals.</div>
 </section>""")
 
-# BACKUP 2: REWARDS
-slides.append("""<!-- BACKUP 2: REWARDS -->
-<section class="slide light" data-notes="Backup, for Q&amp;A. A proposal only. Always opt-in, nobody asked to wait longer, aggregates only. No partnership with Google or any brand exists.">
-  <div class="pad" style="top:120px">
-    <p style="font-size:22px;color:var(--mute)">Backup</p>
-    <h2 style="font-size:76px;color:var(--ink);margin-top:12px">Next: points for helping others</h2>
-    <p style="font-size:36px;line-height:1.4;margin-top:48px;max-width:1450px">Riders could earn nol Plus points for a short, opt-in survey. RTA already runs the points.</p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);column-gap:80px;margin-top:72px">
-      <div><div class="num" style="font-size:96px">100M+</div><p style="font-size:24px;line-height:1.45;margin-top:14px;color:var(--mute)">Play Store downloads of Google Opinion Rewards (Sept 2024). In the UAE since April 2020.</p></div>
-      <div><div class="num" style="font-size:96px">$153bn</div><p style="font-size:24px;line-height:1.45;margin-top:14px;color:var(--mute)">the global insights industry in 2024. Brands pay to learn what customers think.</p></div>
-      <div><div class="num" style="font-size:96px">nol Plus</div><p style="font-size:24px;line-height:1.45;margin-top:14px;color:var(--mute)">points on metro, bus, taxi and parking, redeemable as nol credit or partner discounts.</p></div>
+# PASSENGERS: INSIYAB CALLS PASSENGERS TOO (spoken by Sarah after the live calls)
+slides.append("""<!-- PASSENGERS -->
+<section class="slide light" data-notes="Sarah · 25 s. Insiyab can call passengers too. Picture a bus about to stop for just one person. If that person has signed up, Insiyab calls and offers them nol Plus points to get off at the next stop instead. One person walks a short way. Everyone else gets home sooner. And people love small rewards: Google Opinion Rewards has over 100 million downloads. Our next step, not built. Never say partner with Google.">
+  <div class="pad" style="top:110px">
+    <h2 style="font-size:76px;color:var(--ink)">Insiyab calls passengers too</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);column-gap:64px;margin-top:64px">
+      <div><div class="num" style="font-size:64px">1</div><p style="font-size:30px;line-height:1.4;margin-top:10px">A bus is about to stop for just one person.</p></div>
+      <div><div class="num" style="font-size:64px">2</div><p style="font-size:30px;line-height:1.4;margin-top:10px">If they signed up, Insiyab calls: nol Plus points to use the next stop.</p></div>
+      <div><div class="num" style="font-size:64px">3</div><p style="font-size:30px;line-height:1.4;margin-top:10px">One person walks a short way. Everyone else gets home sooner.</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);column-gap:80px;margin-top:80px;max-width:1300px">
+      <div><div class="num" style="font-size:88px">100M+</div><p style="font-size:24px;line-height:1.45;margin-top:12px;color:var(--mute)">downloads of Google Opinion Rewards: people trade a minute for a small reward (Sept 2024).</p></div>
+      <div><div class="num" style="font-size:88px">nol Plus</div><p style="font-size:24px;line-height:1.45;margin-top:12px;color:var(--mute)">RTA's own points, on metro, bus, taxi and parking.</p></div>
     </div>
   </div>
-  <div class="credit">9to5Google, 2 Sep 2024; Android Police, 14 Apr 2020; ESOMAR Global Market Research 2025; RTA, 26 Feb 2019. A proposal only: no partnership exists.</div>
+  <div class="credit">Our next step, not built. Opt-in only; never a walk from a bare pole in the heat. No partnership exists. 9to5Google, 2 Sep 2024; RTA, 26 Feb 2019.</div>
 </section>""")
 
 # BACKUP 3: SOURCES (updated with new sources)
