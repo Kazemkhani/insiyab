@@ -12,6 +12,8 @@
 | Trip time 6.97 vs 8.25 min, 15% closer, 2,043 held-out evening trips | Verified | deck, model card |
 | 85 in 100 late when the bus is still out; 696 cases | Verified | Insiyab analysis, deck |
 | 45% vs 19% late; 49,707 vs 48,724 boardings; route 310 19:23 left 19:36; 67 vs 96 min | Verified | RTA records 15 Dec 2025 (aggregates) |
+| Six controllers per shift, about 1,400 buses | Verified (team notes, stated by RTA staff) | RTA control-centre and planning staff, in conversation with the team, 18 November 2026. RTA's DSS release says it monitors 1,100+ buses: say both and where each comes from |
+| 1,071 buses, 166 routes, 11,201 trips, 1,056,343 card taps, 544,583 check-ins on Monday 15 Dec 2025 | Verified | RTA hackathon records in Dataiku (aggregates computed by the census program, `model/census.py`); rows stay on RTA's platform |
 | 553 `ac_shelter`, 993 `pole` among 1,600 stops of known kind (of 4,526); kinds from 2020 to 2022 reports | Verified | `opendata/public/bus-stops.csv`, `opendata/public/bus-network.source.md` |
 | Drill: 4 reports, 1 human decision, 4 confirmations, 18 Nov 2026 | Verified | relay record |
 
