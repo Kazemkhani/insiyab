@@ -57,14 +57,30 @@ with sync_playwright() as p:
         page.locator('#heat').click()
         assert page.locator('#map').get_attribute('data-heat') == '0'
         assert page.get_by_text('Stand-in forecasts · STAND-IN DATA, NOT A RESULT').is_visible()
-        page.locator('#judge-route').select_option('8')
-        page.locator('#judge-hour').select_option('18:00')
-        assert 'simple rule was closer' in page.locator('.judge-result').inner_text()
-        assert page.locator('tbody td').all_text_contents() == ['9 min','5 min','4 min','18']
-        page.locator('#judge-hour').select_option('20:00')
-        assert 'No held-out row' in page.locator('.judge-result').inner_text()
-        page.locator('#judge-route').select_option('310')
-        page.locator('#judge-hour').select_option('19:00')
+        # Data-driven: use whatever judge-pick rows this build loaded (stand-in demo or stream C's output).
+        rows = page.evaluate('window.INSIYAB_OPS_DATA.judge.rows')
+        def miss(r):
+            if r.get('forecast_mae') is not None and r.get('baseline_mae') is not None: return r['forecast_mae'], r['baseline_mae']
+            return abs(r['forecast']-r['actual']), abs(r['baseline']-r['actual'])
+        def closer(r): f, b = miss(r); return f < b
+        valid = [r for r in rows if None not in (r['forecast'], r['baseline'], r['actual'])]
+        for want, phrase in ((False, 'simple rule was closer'), (True, 'forecast was closer')):
+            pick = next((r for r in valid if closer(r) == want and miss(r)[0] != miss(r)[1]), None)
+            if pick is None: continue
+            page.locator('#judge-route').select_option(pick['route'])
+            page.locator('#judge-hour').select_option(pick['hour'])
+            assert phrase in page.locator('.judge-result').inner_text(), (phrase, pick)
+            cells = page.locator('tbody td').all_text_contents()
+            assert cells[-1] == str(pick['n']), (cells, pick)
+            if pick.get('forecast_mae') is not None:
+                text = page.locator('.judge-result').inner_text()
+                assert f"Forecast miss: {round(pick['forecast_mae'], 2):g}" in text, (text, pick)  # the miss is the MAE, not |mean - mean|
+        present = {(r['route'], r['hour']) for r in rows}
+        missing = next(((rt, h) for rt in sorted({r['route'] for r in rows}) for h in ('16:00','17:00','18:00','19:00','20:00') if (rt, h) not in present), None)
+        if missing:
+            page.locator('#judge-route').select_option(missing[0])
+            page.locator('#judge-hour').select_option(missing[1])
+            assert 'No held-out row' in page.locator('.judge-result').inner_text()
         assert page.locator('#now h3').inner_text() == 'Route 310 · 19:23'
         assert page.locator('[data-option]').count() == 3
         assert page.get_by_text("Simulated pick: RTA's system is not connected").is_visible()
