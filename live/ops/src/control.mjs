@@ -37,7 +37,7 @@ export function mountControl(alert, replay, theatre, briefing) {
     document.documentElement.dataset.mode=state.mode;
     calls.dataset.phase=state.phase;calls.dataset.run=state.run_id;
     const demo=state.mode==='demo';
-    document.querySelector('.mode-label').replaceChildren(element('div',demo?'Demo mode':'Live — drill running'),element('span',demo?'Simulated calls. Nobody is connected.':'Calls are real. Incident is simulated.'));
+    document.querySelector('.mode-label').replaceChildren(element('div',demo?'Demo mode':'Live run'),element('span',demo?'Simulated calls. Nobody is connected.':'Real calls to the team\'s phones. The incident is simulated.'));
     sourceNote.hidden=demo;
     const kr=document.querySelector('#drill-key-row');if(kr)kr.hidden=demo; // key row only needed in live mode
     status.textContent=(demo?'Simulated · ':'')+( names[state.phase]||state.phase)+(state.complete?' · Complete':state.unanswered?' · No answer. Controller action required.':'');
@@ -102,7 +102,7 @@ export function mountControl(alert, replay, theatre, briefing) {
             const rpt=liveReports[role]||r.report||'';
             rows.push(`<div class="report-row"><strong>${roleNames[role]||role}</strong>: ${rpt?String(rpt).slice(0,200):'No report received.'}</div>`);
           }
-          if (liveDecision) rows.push(`<div class="report-decision"><strong>Decision:</strong> ${liveDecision.say||''}${liveDecision.words?' — '+liveDecision.words:''}</div>`);
+          if (liveDecision) rows.push(`<div class="report-decision"><strong>Decision:</strong> ${liveDecision.say||''}${liveDecision.words?'. In their words: '+liveDecision.words:''}</div>`);
           else if (state.decision) rows.push(`<div class="report-decision"><strong>Decision:</strong> ${state.decision}</div>`);
           body.innerHTML=rows.join('\n');
         }
@@ -141,7 +141,16 @@ export function mountControl(alert, replay, theatre, briefing) {
 
   // --- Stage: /ops/?stage=1 opens in live mode with the presenter-key box showing. Nothing is called until
   // the key is entered and Start incident is pressed; without the parameter the console opens as before.
-  if (new URLSearchParams(location.search).get('stage') === '1') controller.setMode('live');
+  if (new URLSearchParams(location.search).get('stage') === '1') {
+    controller.setMode('live');
+    // After the run, the presenter scrolls straight on to the two closing slides, taken from the deck itself.
+    const close=document.createElement('section'); close.id='stage-close'; close.setAttribute('aria-label','Closing slides');
+    for (const n of [17, 15]) {
+      const f=document.createElement('iframe'); f.src='../pitch/deck/?s='+n+'&all=1'; f.title='Slide '+n; f.loading='lazy';
+      f.className='stage-slide'; close.append(f);
+    }
+    document.body.append(close);
+  }
 
   // --- Start Incident button ---
   const incidentBtn=document.querySelector('#incident');
