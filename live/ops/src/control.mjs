@@ -1,6 +1,8 @@
 import {element} from './alerts.mjs';
 import {createLifecycle, ackSeconds, ROLES} from './lifecycle.mjs';
-export function mountControl(alert, replay) {
+export function mountControl(alert, replay, theatre, briefing) {
+  const _theatre = theatre || {onState(){}, reset(){}};
+  const _briefing = briefing || {onState(){}, reset(){}};
   const calls=document.querySelector('#calls'), escalation=document.querySelector('#escalation');
   calls.replaceChildren(element('h2','CALLS'));
   const status=element('p',undefined,'lifecycle-status');status.id='lifecycle-status';status.setAttribute('aria-live','polite');calls.append(status);
@@ -57,12 +59,14 @@ export function mountControl(alert, replay) {
     }
     if (!demo || state.decision) {ring.pause();ring.currentTime=0;}
     lastPhase=state.phase;
+    if (demo) { _theatre.onState(state); _briefing.onState(state); }
   }});
   document.querySelectorAll('[data-option]').forEach(button=>button.addEventListener('click',e=>{if(e.isTrusted)controller.select(button.dataset.option);}));
   const demo=document.querySelector('#demo');demo.disabled=false;
   demo.addEventListener('click',()=>{
     // Unlock audio inside a human gesture; the later ring is timer-driven.
     ring.muted=true;ring.play().then(()=>{ring.pause();ring.currentTime=0;ring.muted=false;}).catch(()=>{ring.muted=false;});
+    _theatre.reset(); _briefing.reset();
     replay.stop();replay.setTime(67980);controller.startDemo();
   });
   setInterval(()=>controller.tick(),100);

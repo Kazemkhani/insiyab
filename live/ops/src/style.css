@@ -18,3 +18,100 @@ footer{border-top:1px solid var(--insiyab-ink-25);padding:14px 28px}.timeline{di
 @media(max-width:760px){.heat-info{padding:0 18px 14px}.heat-info summary{min-height:44px}.map-heading{gap:8px}.map-heading h2{flex-basis:100%}#replay-clock{margin-left:auto}}
 .options button[aria-pressed=true]:disabled{opacity:1}
 @media(min-width:1700px){.decision-panel section{padding:16px 0}.decision-panel section h2{font-size:14px}.source-note{font-size:12px}#now h3{font-size:30px}.risk-headline{font-size:26px}.why{font-size:15px}.range-note{font-size:14px}.suggestion-title{font-size:18px}.options button{padding:8px 12px}.options button[aria-pressed=true]{padding:7px 11px}.option-label{font-size:16px}.option-effect{font-size:12px}.role-row{font-size:15px;padding:7px 0}.role-row [data-role]{font-size:12px}.lifecycle-status,.decision-stamp{font-size:13px}.pick-label{font-size:12px}}
+
+/* ── Call Theatre ───────────────────────────────────────────────────────── */
+
+/* Marker wrapper: a card pinned to the map by MapLibre HTML marker anchor */
+.theatre-marker{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;width:140px;pointer-events:none;transform:translateX(-50%)}
+.theatre-marker[data-state=hidden]{display:none}
+
+/* Ring: a circle that changes appearance per state */
+.marker-ring{width:40px;height:40px;border-radius:50%;border:2.5px solid var(--insiyab-ink-25);transition:border-color .25s var(--insiyab-ease),box-shadow .25s var(--insiyab-ease);position:relative;display:flex;align-items:center;justify-content:center}
+.theatre-marker[data-state=calling] .marker-ring{border-color:var(--insiyab-red);animation:theatre-call-pulse 1.1s ease-in-out infinite}
+.theatre-marker[data-state=talking] .marker-ring{border-color:var(--insiyab-ink);border-width:2.5px}
+.theatre-marker[data-state=decided] .marker-ring{border-color:var(--insiyab-ink);animation:theatre-call-pulse 1.1s ease-in-out 2}
+.theatre-marker[data-state=sent] .marker-ring{border-color:var(--insiyab-ink-50)}
+.theatre-marker[data-state=received] .marker-ring{border-color:var(--insiyab-teal)}
+@keyframes theatre-call-pulse{0%,100%{box-shadow:0 0 0 0 rgba(196,43,43,.5)}50%{box-shadow:0 0 0 7px rgba(196,43,43,0)}}
+
+/* Ring contains the icon (flex-centered; no position:absolute) */
+.marker-ring img{width:22px;height:22px;display:block}
+
+/* Label: flex column so name and note are separate rows — prevents text overlap */
+.marker-label{display:flex;flex-direction:column;align-items:center;background:var(--insiyab-ivory);padding:2px 5px;border-radius:2px;gap:1px}
+.marker-name{font-size:18px;font-family:Overpass,sans-serif;font-weight:600;white-space:nowrap;line-height:1.15}
+.marker-note{font-family:Plex,sans-serif;font-size:11px;font-weight:400;color:var(--insiyab-ink-50);white-space:nowrap;line-height:1.2}
+.theatre-marker.received .marker-name{color:var(--insiyab-teal)}
+
+/* Voice-wave: 5 animated bars, ink colour; shown only while talking */
+.voice-wave{display:none;align-items:flex-end;gap:2px;height:18px;overflow:hidden}
+.theatre-marker[data-state=talking] .voice-wave,.theatre-marker[data-state=decided] .voice-wave{display:flex}
+.voice-wave span{width:3px;background:var(--insiyab-ink);border-radius:1.5px;height:6px;animation:wave-bar .65s ease-in-out infinite alternate}
+.voice-wave span:nth-child(1){animation-delay:.00s;height:8px}
+.voice-wave span:nth-child(2){animation-delay:.10s;height:14px}
+.voice-wave span:nth-child(3){animation-delay:.05s;height:18px}
+.voice-wave span:nth-child(4){animation-delay:.15s;height:12px}
+.voice-wave span:nth-child(5){animation-delay:.08s;height:7px}
+@keyframes wave-bar{from{height:3px}to{height:100%}}
+
+/* Speech bubble: shown while talking; min-font 20px per spec */
+.speech-bubble{font-size:20px;line-height:1.3;background:var(--insiyab-ivory);border:1.5px solid var(--insiyab-ink-25);padding:5px 7px;border-radius:3px;max-width:220px;text-align:left;word-break:break-word}
+.theatre-marker[data-state=hidden] .speech-bubble,.theatre-marker[data-state=calling] .speech-bubble,.theatre-marker[data-state=sent] .speech-bubble,.theatre-marker[data-state=received] .speech-bubble{display:none}
+/* Source note only visible alongside speech bubble */
+.theatre-marker .source-note{display:none}
+.theatre-marker[data-state=talking] .source-note,.theatre-marker[data-state=decided] .source-note{display:block}
+/* After talking: hide label text to avoid map text overlap in sent/received states */
+.theatre-marker[data-state=decided] .marker-label,.theatre-marker[data-state=sent] .marker-label,.theatre-marker[data-state=received] .marker-label{display:none}
+
+/* Briefing panel */
+#briefing h2{color:var(--insiyab-ink);letter-spacing:.12em;font-size:14px;margin-bottom:8px}
+.briefing-row{opacity:0;transform:translateY(6px);transition:opacity .35s var(--insiyab-ease),transform .35s var(--insiyab-ease);font-size:13px;padding:5px 0;border-top:1px solid var(--insiyab-ink-10)}
+.briefing-row--in{opacity:1;transform:translateY(0)}
+.briefing-options{font-size:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--insiyab-ink-10)}
+.briefing-options p{line-height:1.4;margin-top:4px}
+
+/* Incident report panel */
+#incident-report{scroll-margin-top:12px}
+#incident-report h2{letter-spacing:.12em;margin-bottom:6px}
+.report-header .source-note{margin-bottom:8px}
+.report-timeline{display:grid;grid-template-columns:max-content 1fr;gap:3px 10px;font-size:12px;margin-bottom:10px}
+.report-row{display:contents}
+.report-time{font-family:Mono,monospace;white-space:nowrap;color:var(--insiyab-ink-50)}
+.report-detail{color:var(--insiyab-ink-50)}
+.report-rpts{font-size:12px;line-height:1.5;margin-bottom:10px}
+.report-rpts p{margin-top:4px}
+.print-btn{background:var(--insiyab-ink);color:var(--insiyab-ivory);border-color:var(--insiyab-ink);font-size:13px;width:100%}
+.print-btn:hover{background:var(--insiyab-ink-50)}
+
+/* Learning card */
+#learn{background:var(--insiyab-gold-10);border-left:3px solid var(--insiyab-gold)}
+#learn h2{letter-spacing:.12em;margin-bottom:6px}
+#learn p{font-size:13px;line-height:1.5;margin-top:4px}
+
+/* Responsive: smaller markers at 1440 wide */
+@media(max-width:1500px){.marker-name{font-size:16px}.speech-bubble{font-size:18px}}
+/* Mobile: hide theatre markers — the right panel shows calling/talking/received states */
+@media(max-width:760px){.theatre-marker{display:none!important}}
+
+/* Reduced motion: static wave, text instant, no pulse, no fly-in */
+@media(prefers-reduced-motion:reduce){
+  .theatre-marker[data-state=calling] .marker-ring{animation:none}
+  .theatre-marker[data-state=decided] .marker-ring{animation:none}
+  .briefing-row{opacity:1;transform:none;transition:none}
+}
+
+/* ── Print stylesheet (Incident report) ───────────────────────────────── */
+@media print{
+  *{background:transparent!important;color:#000!important;border-color:#ccc!important;box-shadow:none!important;animation:none!important}
+  body{font-family:Plex,sans-serif;font-size:12pt}
+  header,.timeline,footer,.map-column,#calls,#now,#suggested,#next,#briefing,#learn,#escalation,.map-stage,#judge-pick,.heat-info,.data-banner,.mode-label{display:none!important}
+  .workspace{display:block}
+  .decision-panel{padding:0;border:0;width:100%}
+  #incident-report{display:block!important;border:none}
+  #incident-report h2{font-size:18pt;margin-bottom:8pt}
+  .report-timeline{font-size:11pt}
+  .print-btn{display:none!important}
+  @page{size:A4;margin:20mm}
+  .print-title::before{content:'Insiyab · Incident report';display:block;font-size:9pt;color:#666;margin-bottom:4pt}
+  .print-footer-note{content:'Simulated drill · 18 Nov 2026 · NOT a real incident';font-size:8pt;color:#666}
+}
