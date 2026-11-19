@@ -217,7 +217,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   <p style="position:absolute;right:16px;bottom:10px;font-size:11px;color:rgba(247,245,240,.55);z-index:1;text-align:right" aria-label="Photo credit">Sheikh Zayed Road at night. Photo: Irshad Ahmad, Pexels</p>
   <p class="ey2">Student prototype · RTA Future Move Hackathon · One service day</p>
   <h1>Six controllers.<br>1,400 buses.</h1>
-  <p class="opening"><b>Insiyab sees it coming. The controller decides.</b> The signal is in the data before 19:23: the bus on route 310 is still out on its previous trip, which took 96 minutes when the timetable gave it 67. When this happens, the next departure leaves late 85 times in 100. Insiyab reads that signal up to 20 stops ahead, predicts which routes will overflow, which stops are in the heat, and suggests a fix early. When a critical alert is not acknowledged, it calls driver, depot, station and planning at once and gives the controller one briefing with three options. <b>A person always decides.</b></p>
+  <p class="opening"><b>Insiyab sees it coming. The controller decides.</b> The signal is in the data before 19:23: the bus on route 310 is still out on its previous trip, which took 96 minutes when the timetable gave it 67. When this happens, the next departure leaves late 85 times in 100. Insiyab reads that signal, forecasts how long each evening trip will really take, flags which buses may overflow, which stops are in the heat, and suggests a fix early. When a critical alert is not acknowledged, it calls driver, depot, station and planning at once and gives the controller one briefing with three options. <b>A person always decides.</b></p>
   <div class="row"><a class="btn" href="#film-player">Watch the film</a><a class="btn" href="#descent">Explore the animated bus journey</a></div>
   <section class="film-player" id="film-player" aria-label="The film"><p><strong>The film · two and a half minutes</strong><br>The evening problem on RTA's recorded day, the planner's tool in Dataiku, and how Insiyab supports the control centre when a bus runs late. Figures from 15 December 2025; the 19:23 departure and the control-centre incident are labelled illustrations.</p><video id="fv" src="film.mp4" controls playsinline preload="metadata" aria-label="Insiyab film: the evening problem, the planner tool and the control-centre co-pilot"></video><p id="fgone" hidden>The film could not load. You can still explore the bus journey below.</p><a class="btn" href="#descent">Continue into the bus journey</a></section>
 </header>
@@ -348,7 +348,7 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
     <div class="wlist reveal" id="six-watchers" aria-label="The six things Insiyab watches">
       <div class="wrow">
         <div class="wrow-head"><span class="wrow-name">Running late</span><span class="wlabel">measured model</span></div>
-        <p class="wrow-say">Insiyab forecasts how late a bus will be, up to 20 stops ahead. When the bus is still out on its previous trip, the next departure starts <span class="r">late 85 in 100 times</span>. At 5 stops ahead the lateness forecast is 46 in 100 closer than the best simple rule; at 10 and 20 stops, 43 in 100 closer.</p>
+        <p class="wrow-say">Insiyab watches every departure. When the bus is still out on its previous trip, the next departure starts <span class="r">late 85 in 100 times</span> (696 such departures, measured). Its trip-time forecast is 15% closer than the timetable on 2,043 evening trips it never saw.</p>
         <p class="wrow-src">Source: MODEL-CARD.md, lines 216 to 219</p>
       </div>
       <div class="wrow">
@@ -413,8 +413,8 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 <section id="forecast" class="alt">
   <div class="wrap">
     <p class="ey reveal">The forecast</p>
-    <h2 class="big reveal">Up to 20 stops ahead,<br><span>43 to 46 in 100 closer than the best simple rule.</span></h2>
-    <p class="lede reveal">The lateness forecast predicts how late a bus will be at each stop it has not yet reached, using the bus's current delay and the route's history. At 5 stops ahead it is <b>46 in 100 closer</b> than "the bus stays as late as it is now"; at 10 and 20 stops ahead, <b>43 in 100 closer</b>. At 1 stop ahead there is no real gain. These numbers feed the Running late watcher.</p>
+    <h2 class="big reveal">Tested on trips it never saw:<br><span>15% closer than the timetable.</span></h2>
+    <p class="lede reveal">Four methods on the same 2,043 held-out evening trips: RTA's timetable misses by <b>8.25</b> minutes on average, the best simple rule by 7.42, a linear model by 7.31, and Insiyab's boosted trees by <b>6.97</b>, lowest on MAE, RMSE and MAPE. Where it loses, we show it below.</p>
     <p class="src reveal">Source: MODEL-CARD.md, lines 216 to 219</p>
     <h3 class="big reveal" style="font-size:clamp(28px,3.4vw,44px);margin-top:72px">Trip-time forecast against the timetable.</h3>
     <p class="lede reveal">The pitch test learns from trips before 16:00 and scores 2,043 trips from 16:00 to 19:00 on the same day. Average miss in minutes; lower is better. This is not a test on another day.</p>

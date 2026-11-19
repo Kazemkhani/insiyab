@@ -6,9 +6,9 @@
 
 | Fact | Status | Source |
 |---|---|---|
-| Lateness forecast +46 in 100 at 5 stops, +43 at 10 and 20, +2 at 1 stop, vs "the bus stays as late as it is now" | Verified | `docs/MODEL-CARD.md:216-219` |
-| Ranges promised 90 in 100, held 91 to 98 | Verified | `docs/MODEL-CARD.md:81,144` |
-| Boarding forecast gain range includes zero; at 120 min it loses | Verified | `docs/MODEL-CARD.md:49-53,103-107` |
+| Trip-time forecast, 2,043 held-out evening trips: MAE timetable 8.25, simple rule 7.42, linear 7.31, boosted trees 6.97 min; RMSE 12.57/11.62/11.47/10.76; MAPE 10.5/9.3/9.3/9.0% | Verified | RTA records in Dataiku; `story/index.html` accuracy table |
+| Model card lateness tables (+42/+43/+46 in 100) and conformal ranges | **STAND-IN, never on screen** | `docs/MODEL-CARD.md` first paragraph: invented raw tables |
+| Boarding forecast tables in the model card | STAND-IN, never on screen | `docs/MODEL-CARD.md` |
 | Trip time 6.97 vs 8.25 min, 15% closer, 2,043 held-out evening trips | Verified | deck, model card |
 | 85 in 100 late when the bus is still out; 696 cases | Verified | Insiyab analysis, deck |
 | 45% vs 19% late; 49,707 vs 48,724 boardings; route 310 19:23 left 19:36; 67 vs 96 min | Verified | RTA records 15 Dec 2025 (aggregates) |

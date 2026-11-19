@@ -291,21 +291,26 @@ slides.append("""<!-- 6 THE SIX WATCHERS -->
   </div>
 </section>""")
 
-# 7 THE MODEL: inline SVG chart
+# 7 THE MODEL: the real evaluation (Dataiku, RTA records), four methods compared
 slides.append("""<!-- 7 THE MODEL -->
-<section class="slide light" data-notes="Mustafo · 60 s. The heart of Insiyab: a lateness forecast. Here is what it shows by horizon: how far ahead we look. At 1 stop there is no real gain; we show it. At 5 stops we are 46 in 100 closer than the best simple rule. At 10 and 20 stops, 43 in 100. The dashed line is the best naive rule: the bus stays as late as it is now. The solid line is Insiyab. The range promised to hold 90 in 100 times; it held 91 to 98. Cross-validated by route and by community. Where we lose, we show it.">
+<section class="slide light" data-notes="Mustafo · 60 s. The heart of Insiyab is a forecast of how long each evening trip will really take, made before it leaves. We tested it on 2,043 evening trips it had never seen, on RTA's own records in Dataiku. Four methods: RTA's timetable, the best simple rule, a linear model, and boosted trees, which we chose. Average miss: 8.25 minutes for the timetable, 6.97 for ours: 15 per cent closer, and lowest on all three error measures. Where it loses, we say so: forecasting only the next hour, the simple rule wins; after 19:00 the timetable is as close. One day of data; the pilot adds weeks. If asked: the early-warning signal is separate and also measured: 85 in 100.">
   <div class="pad" style="top:80px">
-    <h2 style="font-size:72px;color:var(--ink)">The forecast by horizon</h2>
-    <p style="font-size:28px;line-height:1.4;color:var(--mute);margin-top:16px;max-width:1200px">Seconds of error at a stop ahead. Lower is better. Tested on 35,003 rows the model never saw.</p>
+    <h2 style="font-size:72px;color:var(--ink)">Tested on trips it never saw.</h2>
+    <p style="font-size:28px;line-height:1.4;color:#4A5059;margin-top:16px;max-width:1450px">Trip-time forecast for the evening peak, 16:00 to 18:59: 2,043 trips on 162 routes held out. Average miss in minutes; lower is better.</p>
   </div>
-  <div style="position:absolute;left:140px;top:290px">""" + MODEL_CHART + """</div>
-  <div style="position:absolute;right:140px;top:310px;width:580px">
-    <div class="num" style="font-size:160px;color:var(--ink)">+46<span style="font-size:72px"> in 100</span></div>
-    <p style="font-size:28px;line-height:1.4;margin-top:16px;color:var(--mute)">at 5 stops ahead against the best naive rule<br>(MAE 29.6 s vs 54.3 s, n 10,202)</p>
-    <p style="font-size:24px;line-height:1.4;margin-top:28px;color:var(--mute)">Ranges promised 90 in 100; they held 91 to 98.</p>
-    <p style="font-size:24px;line-height:1.4;margin-top:16px;color:var(--red)">One stop ahead there is no real gain; we show it.</p>
+  <div style="position:absolute;left:140px;top:310px;width:1160px">
+    <div style="display:grid;grid-template-columns:300px 440px 110px 270px;column-gap:20px;font-size:20px;color:#4A5059;margin-bottom:6px"><span></span><span>Average miss (MAE)</span><span></span><span>RMSE · MAPE</span></div>
+    <div style="display:grid;grid-template-columns:300px 440px 110px 270px;column-gap:20px;align-items:center;margin-top:24px"><p style="font-size:28px;font-weight:600;color:var(--ink)">RTA's timetable</p><div style="height:44px;width:440px;background:rgba(21,24,29,.28)"></div><p style="font-family:var(--head);font-weight:800;font-size:34px;color:var(--ink)">8.25</p><p style="font-size:24px;color:#4A5059;white-space:nowrap">12.57 · 10.5%</p></div>
+    <div style="display:grid;grid-template-columns:300px 440px 110px 270px;column-gap:20px;align-items:center;margin-top:24px"><p style="font-size:28px;font-weight:600;color:var(--ink)">Best simple rule</p><div style="height:44px;width:396px;background:rgba(21,24,29,.28)"></div><p style="font-family:var(--head);font-weight:800;font-size:34px;color:var(--ink)">7.42</p><p style="font-size:24px;color:#4A5059;white-space:nowrap">11.62 · 9.3%</p></div>
+    <div style="display:grid;grid-template-columns:300px 440px 110px 270px;column-gap:20px;align-items:center;margin-top:24px"><p style="font-size:28px;font-weight:600;color:var(--ink)">Linear model</p><div style="height:44px;width:390px;background:rgba(21,24,29,.28)"></div><p style="font-family:var(--head);font-weight:800;font-size:34px;color:var(--ink)">7.31</p><p style="font-size:24px;color:#4A5059;white-space:nowrap">11.47 · 9.3%</p></div>
+    <div style="display:grid;grid-template-columns:300px 440px 110px 270px;column-gap:20px;align-items:center;margin-top:24px"><p style="font-size:28px;font-weight:800;color:var(--ink)">Boosted trees: Insiyab</p><div style="height:44px;width:372px;background:var(--ink)"></div><p style="font-family:var(--head);font-weight:800;font-size:34px;color:var(--ink)">6.97</p><p style="font-size:24px;color:#4A5059;white-space:nowrap">10.76 · 9.0%</p></div>
   </div>
-  <div class="credit">Insiyab analysis on RTA records, 15 December 2025. Cross-validated by route and community. docs/MODEL-CARD.md</div>
+  <div style="position:absolute;left:1380px;top:320px;width:400px">
+    <div class="num" style="font-size:170px;color:var(--ink)">15%</div>
+    <p style="font-size:30px;line-height:1.35;margin-top:10px;font-weight:600;color:var(--ink)">closer than the timetable, and lowest on all three measures</p>
+    <p style="font-size:24px;line-height:1.45;margin-top:26px;color:#4A5059">Where it loses, we show it: for the next hour only, the simple rule wins; after 19:00 the timetable is as close.</p>
+  </div>
+  <div class="credit">Insiyab analysis in Dataiku on RTA records, 15 December 2025. One day of data; re-runs differ by hundredths of a minute.</div>
 </section>""")
 
 # 8 INSIYAB LIVE (console)
@@ -369,7 +374,7 @@ slides.append("""<!-- 12 WITH RTA'S DSS -->
     <p style="font-size:30px;line-height:1.45;margin-top:28px;color:var(--mute);max-width:1400px">Live since 6 July 2026: more than 1,100 buses, 26 scenarios, on RTA's Dataiku platform. It used to take 30 to 60 minutes. The calls to staff are still made by hand.</p>
   </div>
   <div class="pad step" data-step="1" style="top:520px;display:grid;grid-template-columns:repeat(6,1fr);column-gap:36px;border-top:2px solid rgba(21,24,29,.14);padding-top:30px">
-    <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">Predicts early</p><p class="nt">lateness forecast 20 stops ahead</p></div>
+    <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">Predicts early</p><p class="nt">trip-time forecast and the bus-still-out signal</p></div>
     <div><p class="own">RTA DSS</p><p class="st">Picks the bus</p><p class="nt">in under a minute</p></div>
     <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">Contacts staff</p><p class="nt">driver, depot, station, planning, at once</p></div>
     <div><p class="own" style="color:#7A5F28">Insiyab</p><p class="st">One briefing</p><p class="nt">the DSS pick and every answer</p></div>
@@ -474,7 +479,7 @@ slides.append("""<!-- BACKUP 3: SOURCES -->
       <p><b>RTA records in Dataiku.</b> Running times, fleet list and nol card taps for Monday 15 December 2025: 1,056,343 taps, 544,583 check-ins, 11,201 trips. Not public; rows stay on RTA's platform.</p>
       <p><b>RTA control-centre and planning staff,</b> in conversation with the team, 18 November 2026: six controllers per shift, about 1,400 buses, manual coordination.</p>
       <p><b>RTA, bus passengers by route, monthly.</b> Dubai open data (dataset 459793): 15.28 million bus journeys in December 2025.</p>
-      <p><b>Insiyab analysis.</b> Forecast tested on 2,043 evening trips and 35,003 lateness rows not used in training; 244 bus hours 16:00 to 18:59; calling drill 18 November 2026. Code and method in the shared source package.</p>
+      <p><b>Insiyab analysis.</b> Forecast tested on 2,043 evening trips not used in training; 244 bus hours 16:00 to 18:59; calling drill 18 November 2026. Code and method in the shared source package.</p>
       <p><b>RTA press release, 6 July 2026:</b> Decision Support System (1,100+ buses, 26 scenarios, under one minute). rta.ae/wps/portal/rta/ae/home/news-and-media/all-news/NewsDetails/enhancing-the-operational-efficiency-of-1100-buses-through-an-ai-powered-system</p>
       <p><b>Bus lanes:</b> Khaleej Times, 21 June 2026. khaleejtimes.com/uae/dubai-new-taxi-bus-lanes. 24% to 59% shorter on routes using dedicated lanes.</p>
       <p><b>Bus On Demand:</b> Dubai Media Office, 11 May 2026. 984,929 riders in 2025, up 136%, 17 areas, 49 buses. mediaoffice.ae/en/news/2026/may/11-05/rta-adds-four-new-areas...</p>

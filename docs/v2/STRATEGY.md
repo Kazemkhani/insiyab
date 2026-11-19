@@ -22,18 +22,16 @@ Sixty of the hundred points are about the forecasting model (criteria 3, 4, 5). 
 | 2 Documentation and presentation | 20 | One story, one console, honest model card, every number with its source on screen |
 | 3 Innovation | 20 | Heat-aware priority (nobody does it), conformal ranges, voice agents in parallel with a human gate, Marsad-style escalation |
 | 4 AI model | 20 | Boosted trees with a count loss, justified against a Poisson model and naive rules; cross-validation by route and by community; ranges that held |
-| 5 Forecast accuracy | 20 | Lateness 5 to 20 stops ahead: **43 to 46 in 100 better than the best naive rule**; trip time 15% closer than the timetable; by horizon, by peak, losses shown |
+| 5 Forecast accuracy | 20 | Trip time on 2,043 held-out evening trips (RTA records, Dataiku): **6.97 vs 8.25 minutes, 15% closer than the timetable**, best of four methods on MAE, RMSE and MAPE; losses shown (next hour only, after 19:00) |
 
 ## 3. What is real today (measured, say it plainly)
 
 | Claim | Number | Where it is |
 |---|---|---|
-| Lateness forecast, 5 stops ahead | +46 in 100 vs "the bus stays as late as it is now" (MAE 29.6 s vs 54.3 s, n 10,202) | `docs/MODEL-CARD.md:217` |
-| Lateness forecast, 10 and 20 stops ahead | +43 in 100 each (n 8,326 and 4,734) | `docs/MODEL-CARD.md:218-219` |
-| Lateness forecast, 1 stop ahead | +2 in 100: no real gain that close, say so | `docs/MODEL-CARD.md:216` |
+| Trip-time forecast vs three alternatives | timetable 8.25, simple rule 7.42, linear 7.31, boosted trees 6.97 minutes (MAE); RMSE 12.57 / 11.62 / 11.47 / 10.76; MAPE 10.5 / 9.3 / 9.3 / 9.0% | Dataiku flow on RTA records; `story/index.html` accuracy table; `opendata/onday/HOW-IT-CONNECTS.md` |
+| **Warning: the model card's lateness tables (+42, +43, +46 in 100) and its ranges come from STAND-IN data** | never on screen or stage | `docs/MODEL-CARD.md` first paragraph |
 | Trip-time forecast vs the timetable | 6.97 vs 8.25 minutes off, 15% closer, 2,043 held-out evening trips | deck, `docs/MODEL-CARD.md` |
 | Early-warning signal | 85 in 100 departures leave 5+ min late when their bus is still out on its last trip (696 cases) | deck |
-| Confidence ranges | promised 90 in 100, held 91 to 98 in 100 (conformal, rolling) | `docs/MODEL-CARD.md:81,144` |
 | Boarding forecast | +4 to +8 in 100, **range includes zero: never claim it beats naive** | `docs/MODEL-CARD.md:49,51,103-105` |
 | Stop shelters | 553 air-conditioned shelters and 993 bare poles among the 1,600 stops whose kind is published (2020 to 2022 reports) | `opendata/public/bus-stops.csv`, `bus-network.source.md` |
 | Calling drill | 4 reports, 1 human decision, 4 confirmations, on real phones, 18 Nov 2026 | relay record |
@@ -66,7 +64,7 @@ Then the loop, as the brand's motion spec draws it: **suggest a fix with its lik
 
 | | What Insiyab is |
 |---|---|
-| **Now, 2026** | Measured: a lateness forecast that sees 20 stops ahead, an early-warning signal, a calling agent that ran end to end. The ask: one control-centre shift, selected evening routes, eight weeks. |
+| **Now, 2026** | Measured on RTA's records: a trip-time forecast 15% closer than the timetable, an early-warning signal (85 in 100), a calling agent that ran end to end. The ask: one control-centre shift, selected evening routes, eight weeks. |
 | **2030** | The forecast learns seasons, events, heat and new lanes from months of data. Its early warning feeds RTA's Decision Support System as a trigger. Riders get heat-aware arrival times and shaded walking routes. When a bus is late, Insiyab protects the connection and sends an on-demand or autonomous shuttle for the last mile (Dubai's target: 25% of journeys autonomous by 2030). Bus, metro, marine and on-demand share one anticipatory layer. |
 | **2040** | The Dubai 2040 Urban Master Plan puts people and public transport at the centre. Insiyab is the city's foresight for movement: the control room sees tomorrow's problems today and arranges the fix before anyone waits. |
 
@@ -79,7 +77,8 @@ Line for the close: **"Dubai does not wait for the impossible. It schedules it. 
 | "RTA's AI cut delays by 68%" | "RTA's AI dashboards cut **early** departures by more than 68%" (RTA, 8 Jun 2026) |
 | "RTA improved punctuality by 50%" | nothing; one newspaper headline, no RTA source |
 | "Our boarding model beats the naive forecast" | "Our boarding forecast is close to the best simple rule; we show its range" |
-| "The warning comes 30 minutes / an hour ahead" | "The lateness forecast looks up to 20 stops ahead; the trip-time forecast is made 30 minutes before departure" |
+| "The warning comes 30 minutes / an hour ahead" | "The trip-time forecast is made before departure; the bus-still-out signal is read when the departure is due" |
+| "+46 / +43 in 100", "20 stops ahead", "ranges held 91 to 98" | these come from the stand-in engine run; use the real trip-time result (15%, 6.97 vs 8.25) |
 | "Robots cut last-mile delivery cost by X" | no published figure; say "RTA already approves delivery robots and robotaxi trials" |
 | "Every late bus was late an hour ago" | "Most late evening departures were visible before they left: 85 in 100 when the bus was still out" |
 | Any count of unshaded stops we did not compute | "553 air-conditioned shelters and 993 poles among the stops whose kind RTA published" |
