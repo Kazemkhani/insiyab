@@ -61,6 +61,8 @@ const EL_KEY = cfg('ELEVENLABS_API_KEY');
 const PHONE_ID = cfg('ELEVENLABS_PHONE_NUMBER_ID');
 const VOICE_ID = cfg('ELEVENLABS_VOICE_ID');
 const VOICE_MODEL = cfg('ELEVENLABS_VOICE_MODEL') || 'eleven_v4_turbo';
+// The conversation model is set explicitly: left unset, ElevenLabs used its account default (deepseek-v41-flash on 18 Nov).
+const AGENT_LLM = cfg('ELEVENLABS_AGENT_LLM') || 'gpt-4o-mini';
 const SHARED_KEY = cfg('VOICE_SHARED_KEY');
 const VIEW_KEY = cfg('VOICE_VIEW_KEY');
 let PUBLIC_URL = cfg('VOICE_PUBLIC_URL').replace(/\/+$/, '');
@@ -246,12 +248,13 @@ async function loadAgents() {
 /* ---------- tool definitions (for --setup-agents) ---------- */
 
 const CALL_INTRO = 'Hello {{person_name}}, this is Insiyab, the AI operations assistant.';
-const DEMO_CONTEXT = 'Internal context: consenting team members are presenting a simulated control-room scenario for the RTA Future Move Hackathon. Keep the conversation natural. Do not announce or repeat a drill disclaimer. If asked, answer honestly that this is a demonstration.';
-const STYLE = 'Use call_token {{call_token}} exactly in every tool call. Use the name only in the opening, never repeatedly; honour a request not to use it. Calm spoken English, short sentences, one question at a time. Never invent details or turn perhaps, I presume, or I do not know into a confirmed fact. If confused, explain your single check once using yes, no, or not confirmed; then log uncertainty instead of asking again. Never speak stage directions. Reply in the language the person speaks. After logging, say goodbye once and use end_call; do not keep chatting or answer off-topic questions.';
+// Identity, stated once. No scenario framing and no permission to step out of the role: on 18 Nov a weak model
+// treated "answer honestly that this is a demonstration" as a cue to talk about itself instead of the call.
+const DEMO_CONTEXT = 'If asked who or what you are, say exactly: "This is Insiyab, the control room\'s automated assistant." Then return to your check.';
+const STYLE = 'Use call_token {{call_token}} exactly in every tool call. Use the name only in the opening, never repeatedly; honour a request not to use it. Calm spoken English. One short sentence per reply, under 20 words. One question at a time. Never describe what you can or cannot do, and never mention tools, logging, recording limits, models or exercises. For anything off-topic, say "Let me finish this one check first," then repeat your question. Never invent details or turn perhaps, I presume, or I do not know into a confirmed fact. If confused, explain your single check once using yes, no, or not confirmed; then log uncertainty instead of asking again. Never speak stage directions. Reply in the language the person speaks. After logging, say goodbye once and use end_call; do not keep chatting or answer off-topic questions.';
 const SAFETY_RULES = `Rules:
-- ${DEMO_CONTEXT}
 - The agent informs and records. It instructs nobody. It never claims to be RTA.
-- Do not interpret ordinary delay or a road obstruction alone as an emergency. If they explicitly report a real emergency or immediate danger, tell them to call 999. If insiyab_report is available, log real_emergency true with their role, then call end_call. Otherwise end the call without recording a routine decision or acknowledgement. Do not continue ordinary service planning.
+- An emergency means only: fire, a crash, an injury, a medical problem, or a person in immediate danger. Traffic, a road obstruction, a breakdown, lateness or crowding is never an emergency; treat it as a normal update. If they report an emergency, tell them to call 999. If insiyab_report is available, log real_emergency true with their role, then call end_call. Otherwise end the call without recording a routine decision or acknowledgement. Do not continue ordinary service planning.
 - If the person is silent twice, say goodbye and call end_call.
 - If they decline the drill, say goodbye and call end_call.
 - Keep the conversation concise; the system enforces the call duration limit.`;
@@ -269,7 +272,7 @@ const AGENT_SPECS = {
     first: `${CALL_INTRO} I need one driver check for route {{route}}. Can your bus continue?`,
     prompt: `${DEMO_CONTEXT}
 
-You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the driver of route {{route}}.
+You are Insiyab, the control room's automated voice assistant. You are on a call with the driver of route {{route}}.
 
 ${INCIDENT_BLOCK}
 
@@ -289,7 +292,7 @@ ${SAFETY_RULES}`,
     first: `${CALL_INTRO} I need one depot check. Is a standby bus with a driver confirmed available for route {{route}}?`,
     prompt: `${DEMO_CONTEXT}
 
-You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the depot or standby controller.
+You are Insiyab, the control room's automated voice assistant. You are on a call with the depot or standby controller.
 
 ${INCIDENT_BLOCK}
 
@@ -310,7 +313,7 @@ ${SAFETY_RULES}`,
     first: `Hello, this is Insiyab, the AI operations assistant. I need one station check. Has the departure board for route {{route}} been updated?`,
     prompt: `${DEMO_CONTEXT}
 
-You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the station supervisor.
+You are Insiyab, the control room's automated voice assistant. You are on a call with the station supervisor.
 
 ${INCIDENT_BLOCK}
 
@@ -331,7 +334,7 @@ ${SAFETY_RULES}`,
     max: 90,
     first: `${CALL_INTRO} This example uses recorded trip times. Should route {{route}} at {{hour}} go on the timetable-review list?`,
     prompt: `${DEMO_CONTEXT}
-You are speaking to the planning analyst in a simulated control-room exercise.
+You are Insiyab, the control room's automated voice assistant. You are on a call with the planning analyst.
 ${INCIDENT_BLOCK}
 Ask whether to prioritise a timetable review: yes, no, or uncertain. If they need context, the supplied rounded recorded-day example is {{planned_minutes}} planned minutes versus {{expected_minutes}} measured minutes. It is not a live forecast. Do not ask this analyst to diagnose current traffic or supply driver observations. Record the review recommendation and its limits using insiyab_report with role planner; do not infer spare availability or passenger counts. If they cannot answer, record the recommendation as unconfirmed.
 ${STYLE}
@@ -342,7 +345,7 @@ ${SAFETY_RULES}`,
     first: `${CALL_INTRO} Route {{route}} needs a decision. May I brief you on the staff reports and options?`,
     prompt: `${DEMO_CONTEXT}
 
-You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are on a call with the duty manager.
+You are Insiyab, the control room's automated voice assistant. You are on a call with the duty manager.
 
 ${INCIDENT_BLOCK}
 
@@ -375,7 +378,7 @@ ${SAFETY_RULES}`,
     first: `Hello, this is Insiyab, the AI operations assistant. The duty manager chose: {{decision_text}}. Please say received, or tell me what needs checking.`,
     prompt: `${DEMO_CONTEXT}
 
-You are Insiyab, an automated voice for a student team's control-centre drill for the RTA Future Move Hackathon. You are calling {{staff_role}} back with the duty manager's decision about route {{route}}.
+You are Insiyab, the control room's automated voice assistant. You are calling {{staff_role}} back with the duty manager's decision about route {{route}}.
 
 Their earlier report: {{their_report}}
 
@@ -752,12 +755,15 @@ async function setupAgents() {
         first_message: spec.first,
         prompt: {
           prompt: spec.prompt,
+          llm: AGENT_LLM,
+          temperature: 0,
           tool_ids: toolNames.map(n => toolIds[n]).filter(Boolean),
           built_in_tools: {end_call: {type:'system',name:'end_call',description:'',params:{system_tool_type:'end_call'}}},
         },
         dynamic_variables: { dynamic_variable_placeholders: placeholders },
       },
       conversation: { max_duration_seconds: spec.max },
+      turn: { turn_timeout: 7 },
     };
     if (VOICE_ID) {
       cc.tts = { voice_id: VOICE_ID, model_id: VOICE_MODEL };
