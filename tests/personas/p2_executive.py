@@ -5,7 +5,7 @@ Fails them: jargon; numbers without sources; a claim from the banned list (docs/
 """
 import re
 
-from common import BASE, EM_DASH, OWNER, banned_hits, deck_slides, main
+from common import BASE, EM_DASH, OWNER, banned_hits, deck_slides, main, redirected_pages
 
 JARGON = r"\b(MAE|RMSE|MAPE|conformal|Poisson|LightGBM|XGBoost|quantile|regressor|hyperparameter|cross-validation|feature importance|SHAP|R²|R2)\b"
 SOURCE = (r"RTA|records|Dataiku|source|Khaleej|WAM|Media Office|press release|reports?\b|drill|published|told us|staff|"
@@ -18,7 +18,10 @@ MAIN_SLIDES = 15  # 16 to 18 are backups for questions
 def walk(run):
     run.new(1920, 1080)
     texts = {}
-    for name in ("home", "pitch", "ops"):
+    gone = redirected_pages(run)
+    for name, loc in gone.items():
+        print(f"NOTE {name} redirects to {loc}: not walked separately", flush=True)
+    for name in [n for n in ("home", "pitch", "ops") if n not in gone]:
         run.goto(name)
         texts[name] = run.text()
     slides = deck_slides(run)
@@ -87,14 +90,15 @@ def walk(run):
 
     # ---- eight minutes ---------------------------------------------------------------------
     secs = sum(int(m.group(1)) for _, _, n in slides[:MAIN_SLIDES] if (m := re.search(r"(\d+) s\b", n)))
-    run.check(secs + 40 <= 480, "deck", "planned timing (speaker notes + 40 s film) fits eight minutes", "blocker", "B and E",
-              f"{secs} s of slides + 40 s film = {secs + 40} s", shot=False)
+    # 19 Nov 17:30: lane 1 moved the final to a 5-minute plan; stream E writes the new script.
+    run.check(secs + 40 <= 300, "deck", "planned timing (speaker notes + 40 s film) fits the 5-minute plan", "fix", "B and E",
+              f"{secs} s of slides + 40 s film = {secs + 40} s against 300 s", shot=False)
 
     # ---- the prototype says what it is, on every page -------------------------------------
     for name, txt in texts.items():
         ok = re.search(r"student prototype|RTA Future Move Hackathon", txt, re.I) is not None
         run.check(ok, name, "the page says it is a student prototype for the RTA Future Move Hackathon (docs/RULES.md 4.2)", "fix", OWNER[name], shot=False)
-    for name in ("home", "ops"):  # the two pages that load the engine bundle deploy.json describes
+    for name in [n for n in ("home", "ops") if n not in gone]:  # the pages that load the engine bundle deploy.json describes
         run.goto(name)
         if run.deploy.get("fixture"):
             run.check("STAND-IN DATA" in run.text(), name, "the deploy runs on stand-in data and the page says STAND-IN DATA",

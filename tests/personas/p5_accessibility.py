@@ -4,12 +4,17 @@ Goal: read the site on a phone.
 Fails them: overflow at 390 px; contrast under 4.5:1; motion that ignores reduced motion; images without alt text.
 Also checks overflow at 1920x1080, 44 px touch targets (docs/RULES.md 5.5) and the page language.
 """
-from common import ALT_JS, CONTRAST_JS, MOTION_JS, OVERFLOW_JS, OWNER, TARGETS_JS, main
+from common import ALT_JS, CONTRAST_JS, MOTION_JS, OVERFLOW_JS, OWNER, TARGETS_JS, main, redirected_pages
 
 ORDER = ("pitch", "home", "deck", "ops")  # the QR on the closing slide opens /pitch/
 
 
 def walk(run):
+    global ORDER
+    gone = redirected_pages(run)
+    for name, loc in gone.items():
+        print(f"NOTE {name} redirects to {loc}: not walked separately", flush=True)
+    ORDER = tuple(n for n in ORDER if n not in gone)
     # ---- overflow at the two sizes the brief names -----------------------------------------
     for w, h, mobile in ((390, 844, True), (1920, 1080, False)):
         run.new(w, h, reduced=True, mobile=mobile)

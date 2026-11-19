@@ -140,6 +140,23 @@ class Run:
         return 1 if failed else 0
 
 
+def redirected_pages(run):
+    """Pages whose address now redirects to another page in PAGES (on 19 Nov / began redirecting to /pitch/).
+    Walking them again would only repeat the other page's findings, so the walks skip them and say so."""
+    out = {}
+    req = run.pw.request.new_context()
+    for name, path in PAGES.items():
+        try:
+            r = req.get(BASE + path, max_redirects=0)
+            loc = r.headers.get("location", "")
+            if 300 <= r.status < 400:
+                out[name] = loc
+        except Exception:
+            pass
+    req.dispose()
+    return out
+
+
 # ---- shared checks, each returns data; the persona decides severity and owner ---------
 def banned_hits(text):
     hits = []

@@ -1,5 +1,7 @@
 # Persona report (stream G)
 
+**Final state (run 3, Thu 17:36, deploy 9703223): 0 blockers open, 16 fixes and 1 polish open.** Details under Runs.
+
 Five people meet Insiyab on Friday. This report walks the public address as each of them, lists what fails them, and hands each finding to the stream that owns the file. Stream G fixes nothing outside `tests/personas/`.
 
 **How it was run.** `bash tests/personas/run.sh` against `https://insiyab.amirkazemkhani.com`, headless Chromium, read-only: every request to `/voice/` and every non-GET request is aborted and counted, so no walk can place a call. Each failure saves a screenshot; `python3 tests/personas/publish_shots.py` copies them to `tests/personas/shots/<run>/`. The manual checklist is `tests/personas/MANUAL-CHECKLIST.md`.
@@ -16,6 +18,24 @@ Owners: **A** console (`live/ops/`), **B** story (`story/`: pitch page, deck, fi
 | 2, **the 12:00 run, after the freeze** | Thu 19 Nov 12:01 | 91dcd2e (equals main) | `PERSONAS: 127 PASS, 24 FAIL (5 blocker, 18 fix, 1 polish); deploy 91dcd2e; 0 voice requests attempted, all aborted` |
 
 Per persona in run 2: controller 28 pass, 5 fail; executive 19 pass, 6 fail (4 blockers); data scientist 14 pass, 7 fail (1 blocker); planner 18 pass, 1 fail; accessibility 48 pass, 5 fail.
+
+| 3, **after the afternoon deploy (final)** | Thu 19 Nov 17:36 | 9703223 (equals main) | `PERSONAS: 119 PASS, 17 FAIL (0 blocker, 16 fix, 1 polish); deploy 9703223; 0 voice requests attempted, all aborted` |
+
+Per persona in run 3: controller 28 pass, 5 fail; executive 18 pass, 3 fail; data scientist 18 pass, 3 fail; planner 19 pass, 1 fail; accessibility 36 pass, 5 fail. Fewer checks than run 2 because `/` now redirects (307) to `/pitch/`: the walks skip a page that redirects to another page they already walk, instead of counting its findings twice.
+
+**Run 3: no blocker remains open.**
+
+| Blocker | Status after run 3 | Evidence |
+|---|---|---|
+| G1 pitch cited the stand-in model card | **closed** (lane 1, e7c3523): the pitch cites RTA records in Dataiku and `opendata/onday/` | check "the headline trip-time result cites a source that contains it" PASS |
+| G2 "most stops are poles" on slide 10 | **closed** (e7c3523) | banned-claim check on every slide PASS |
+| G3 the same line in the notes and PITCH.md | **closed** (e7c3523) | banned-claim check on speaker notes PASS |
+| G4 notes timings 650 s against 8:00 | **superseded**: lane 1 moved the final to a 5-minute plan and stream E is writing the script. Kept as a fix: the deck notes now total 580 s + 40 s film = 620 s against 300 s | timing check, now against 300 s, FAIL (fix, B and E) |
+| G19 judge picker with stand-in "20 stops ahead" cells that never lose | **closed** (e7c3523): while `judge_pick.json` is stand-in the console shows no picker, only the verified 6.97 vs 8.25 with "Source: RTA records, 15 Dec 2025 (opendata/onday/FORECAST-RETEST.md)" | checks "the console shows the verified result with its source" and "no stand-in cells" PASS |
+
+Also new in run 3 and passing: the stage entry `/ops/?stage=1` (live mode with a 5-second acknowledgement window) makes no request to `/voice/` and no write for a visitor without the presenter key. The Overflow watcher row was removed from the pitch page (its claim came from the stand-in card); the planner walk no longer expects it, but checks its label if it returns.
+
+Still open as fixes (owners unchanged, screenshots in `tests/personas/shots/20261119T133606Z/`): G5 (pitch says driver, depot, station and planning are called before a decision; the demo keeps them Waiting), G6 to G9 and G18 (console: disabled options under "Choose an option", small honesty labels, two contrast failures, the 14 px map credit link), G10 (deck cut off on a phone), G11 (pitch contrast), G12 (15% and 16% on one screen), G13 (two still-out figures), G15 (244 bus hours and 162 routes not in FACTS), G16 (no "eight weeks" on the pitch page), G17 (no link to the planner's worklist). G14 is resolved with G19.
 
 **Run 2 against run 1:** none of the 21 run-1 findings is fixed in deploy 91dcd2e (that deploy carried the call theatre, voice-agent settings, film sources and model modules). It adds one blocker (G19: the console's judge picker now shows the stand-in engine's "1 to 20 stops ahead" cells, in which the forecast never loses) and two fixes folded into G14. Screenshots below are from run 2 unless marked.
 

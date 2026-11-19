@@ -153,7 +153,7 @@ def walk(run):
     run.check("simulated" in duty_text, P, "the escalation call is labelled simulated in demo mode", "blocker", "A")
 
     # ---- Must never happen 3: no call from demo mode or from a visitor without the key --------
-    for q in ("?live=1", "#live", "?mode=live", "#key=wrong"):
+    for q in ("?stage=1", "?live=1", "#live", "?mode=live", "#key=wrong"):
         page = run.new(1920, 1080)
         ready(run, q)
         for b in ("#demo", "#replay"):

@@ -13,8 +13,9 @@ WATCHERS = {
     "Lanes": (r"rule|roadmap|list|proposal", r"measured"),
     "Events": (r"rule|list|simulated|proposal", r"measured"),
     "Connections": (r"rule|proposal", r"measured"),
-    "Overflow": (r"estimate|range", r"measured model"),
 }
+# The Overflow row was removed from the pitch page on 19 Nov (lane 1): its claim came from the stand-in card.
+OPTIONAL = {"Overflow": (r"estimate|range", r"measured model")}
 
 
 def walk(run):
@@ -59,6 +60,10 @@ def walk(run):
                 wrong.append(f"{key}: block not found")
             elif re.search(bad_rx, head, re.I) or not re.search(ok_rx, head, re.I):
                 wrong.append(f"{key}: '{head.strip()[:90]}'")
+        for key, (ok_rx, bad_rx) in OPTIONAL.items():  # if it comes back, it must carry its estimate label
+            blk = next((b for b in blocks if b.strip().lower().startswith(key.lower())), "")
+            if blk and (re.search(bad_rx, blk[:120], re.I) or not re.search(ok_rx, blk[:120], re.I)):
+                wrong.append(f"{key}: '{blk.strip()[:90]}'")
         sw.scroll_into_view_if_needed()
         run.check(not wrong, "pitch", "each watcher shows its honest status (heat is a rule, lanes a rule and roadmap, connections a proposal)", "blocker", "B", wrong)
     else:

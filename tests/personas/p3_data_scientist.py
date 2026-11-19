@@ -113,20 +113,27 @@ def walk(run):
     run.goto("ops", settle=300)
     page.wait_for_selector("#map[data-ready=true]", timeout=30000)
     jp = page.locator("#judge-pick")
-    routes = page.locator("#judge-route option").all_inner_texts()
-    hours = page.locator("#judge-hour option").all_inner_texts()
-    seen_loss = False
-    for r in routes:
-        for h in hours:
-            page.locator("#judge-route").select_option(label=r)
-            page.locator("#judge-hour").select_option(label=h)
-            page.wait_for_timeout(80)
-            t = jp.inner_text()
-            if re.search(r"simple rule was closer|rule was closer", t, re.I):
-                seen_loss = True
-    run.check(seen_loss, "ops", "the judge picker shows a route-hour where the simple rule wins (losses not hidden)", "fix", "A", shot=False)
-    jtxt = jp.inner_text()
-    run.check("STAND-IN" not in jtxt.upper(), "ops", "the judge picker shows real held-out forecasts, not stand-in rows", "fix", "C and A", jtxt[-260:])
+    if page.locator("#judge-route").count() == 0:
+        # 19 Nov: while judge_pick.json is stand-in, the console shows the verified result instead of a picker.
+        t = jp.inner_text() if jp.count() else ""
+        ok = "6.97" in t and "8.25" in t and re.search(r"RTA records|Dataiku|FORECAST-RETEST|HOW-IT-CONNECTS", t) is not None
+        run.check(ok, "ops", "without real route cells, the console shows the verified trip-time result with its source, not invented cells", "fix", "A", t[-300:])
+        run.check("stops ahead" not in t.lower() and "forecast miss:" not in t.lower(), "ops",
+                  "the console's forecast panel shows no stand-in cells", "blocker", "A and C", t[-300:])
+    else:
+        routes = page.locator("#judge-route option").all_inner_texts()
+        hours = page.locator("#judge-hour option").all_inner_texts()
+        seen_loss = False
+        for r in routes:
+            for h in hours:
+                page.locator("#judge-route").select_option(label=r)
+                page.locator("#judge-hour").select_option(label=h)
+                page.wait_for_timeout(80)
+                if re.search(r"simple rule was closer|rule was closer", jp.inner_text(), re.I):
+                    seen_loss = True
+        run.check(seen_loss, "ops", "the judge picker shows a route-hour where the simple rule wins (losses not hidden)", "fix", "A", shot=False)
+        jtxt = jp.inner_text()
+        run.check("STAND-IN" not in jtxt.upper(), "ops", "the judge picker shows real held-out forecasts, not stand-in rows", "fix", "C and A", jtxt[-260:])
 
     # ---- traceability: every number on the console and the deck --------------------------------------
     known = known_numbers()
