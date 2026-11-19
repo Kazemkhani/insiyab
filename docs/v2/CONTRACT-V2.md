@@ -65,6 +65,8 @@ Stop kind comes only from `opendata/public/bus-stops.csv` (`pole`, `ac_shelter`,
 
 For the live "pick any route and hour" moment: for every route and every hour 16:00 to 20:00 on the held-out part, the forecast lateness, the naive forecast and what happened, with `n`. The console shows all three and never hides a miss.
 
+**Exact format (agreed 19 Nov 2026).** Stream C writes `picks[]` with `route` (string), `hour` ("16:00" to "20:00"), `n`, `forecast_s`, `naive_s`, `actual_s` (seconds), plus top-level `fixture`, `service_day`, `unit`, `target`, `label`, `part`, `naive_label`. The console converts it in `live/ops/src/judge.mjs` (`normaliseJudge`) to its `rows[]` in minutes and shows `label` as the source line, so a stand-in label always reaches the screen. A producer that changes these keys must update `normaliseJudge` and its test in the same commit.
+
 ## `artifacts/forecast/scatter.json` (stream C)
 
 The held-out evening trips: forecast error and timetable error per trip, plus the share where the forecast was closer, computed, never typed.

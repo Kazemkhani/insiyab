@@ -1,5 +1,19 @@
 import {element} from './alerts.mjs';
-export function validateJudge(data) {
+// Stream C (model/) writes judge_pick.json as picks[] in seconds; the console reads rows[] in minutes.
+// Convert here so both formats work and the producer's own label stays the source line.
+const minutes = s => (s === null || s === undefined) ? null : Math.round(s / 6) / 10;
+export function normaliseJudge(data) {
+  if (!data || !Array.isArray(data.picks)) return data;
+  return {
+    version: data.version, fixture: data.fixture, service_day: data.service_day,
+    unit: 'min', target: data.target || 'lateness',
+    source: data.label || 'Model output',
+    tested_on: [data.part, data.naive_label && `Simple rule: ${data.naive_label}`].filter(Boolean).join('. ') || 'Held-out part of the service day',
+    rows: data.picks.map(p => ({route: String(p.route), hour: p.hour, forecast: minutes(p.forecast_s), baseline: minutes(p.naive_s), actual: minutes(p.actual_s), n: p.n})),
+  };
+}
+export function validateJudge(input) {
+  const data = normaliseJudge(input);
   if (typeof data.fixture!=='boolean' || !Array.isArray(data.rows) || !data.unit || !data.source || !data.tested_on || !data.service_day) throw Error('Judge-pick metadata is incomplete');
   const seen=new Set();
   for(const row of data.rows) {
