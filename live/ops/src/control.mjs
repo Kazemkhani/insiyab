@@ -39,6 +39,7 @@ export function mountControl(alert, replay, theatre, briefing) {
     const demo=state.mode==='demo';
     document.querySelector('.mode-label').replaceChildren(element('div',demo?'Demo mode':'Live — drill running'),element('span',demo?'Simulated calls. Nobody is connected.':'Calls are real. Incident is simulated.'));
     sourceNote.hidden=demo;
+    const kr=document.querySelector('#drill-key-row');if(kr)kr.hidden=demo; // key row only needed in live mode
     status.textContent=(demo?'Simulated · ':'')+( names[state.phase]||state.phase)+(state.complete?' · Complete':state.unanswered?' · No answer. Controller action required.':'');
     const band=state.phase==='unacknowledged'||state.unanswered;
     escalation.hidden=!band;

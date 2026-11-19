@@ -147,7 +147,7 @@ with sync_playwright() as p:
         backgrounds=page.evaluate('''()=>[...document.querySelectorAll('body *')].filter(e=>{
           const s=getComputedStyle(e);
           if(s.fontFamily.includes('Instrument Serif'))return true;
-          if(s.backgroundColor==='rgb(196, 43, 43)')return e.id!=='escalation';
+          if(s.backgroundColor==='rgb(196, 43, 43)')return e.id!=='escalation'&&!e.classList.contains('stall-label');
           if(s.backgroundColor==='rgb(46, 125, 107)')return !e.closest('.received');
           if(s.borderTopColor==='rgb(156, 123, 62)'&&s.borderTopWidth!=='0px')return e.id!=='suggested';
           return false;
@@ -496,9 +496,11 @@ with sync_playwright() as p:
     page.locator('[data-option]').first.click()
     page.wait_for_selector('#confirm')
     page.locator('#confirm').click()
-    # Advance through relaying and all received (~15s)
+    # Advance through relaying and all received (~15s), then past the 90s elapsed threshold
+    # that lifecycle.mjs requires before setting state.complete in demo mode.
     page.clock.fast_forward(1000)   # → relaying
-    page.clock.fast_forward(15000)  # → received
+    page.clock.fast_forward(15000)  # → received (all 4 roles)
+    page.clock.fast_forward(75000)  # → elapsed > 90s → state.complete → PDF glow
     page.wait_for_timeout(300)
     assert page.locator('#report').is_visible(),'#report section should be visible after completion'
     has_glow=page.locator('#save-pdf').evaluate("(e)=>e.classList.contains('pdf-glow')")
