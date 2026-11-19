@@ -293,6 +293,9 @@ with sync_playwright() as p:
       return "ok";
     }''')
     assert overlap_ok == 'ok', f'Marker label collision detected: {overlap_ok}'
+    # The CALLS rows must agree with the briefing on screen: every role whose report is shown reads "Reported".
+    call_rows = page.locator('#calls span[data-role]').all_text_contents()
+    assert call_rows == ['Reported'] * 4, f'Call rows disagree with the briefing: {call_rows}'
     page.screenshot(path=str(shots/'theatre-03-briefing.png'), full_page=True)
     # DOM assertion at calling_duty start: briefing must still have 4 rows with role names.
     # This checks state at the MOMENT the duty-controller call starts (not on internal state).
@@ -323,6 +326,24 @@ with sync_playwright() as p:
     present = page.evaluate('''() => [...document.querySelectorAll('[data-person]')]
         .filter(e => e.dataset.state !== 'hidden').length''')
     assert present > 0, f'Expected markers visible during relay, got {present}'
+    # The controller's speech bubble must not cover any other person's marker.
+    bubble_hit = page.evaluate('''() => {
+      const b = document.querySelector('[data-person=controller] .speech-bubble');
+      if (!b || getComputedStyle(b).display === 'none') return 'no visible controller bubble';
+      const r = b.getBoundingClientRect();
+      for (const m of document.querySelectorAll('[data-person]:not([data-person=controller])')) {
+        if (m.dataset.state === 'hidden') continue;
+        const o = m.getBoundingClientRect();
+        if (r.left < o.right && r.right > o.left && r.top < o.bottom && r.bottom > o.top) return 'covers ' + m.dataset.person;
+      }
+      const c = document.querySelector('[data-person=controller] .marker-ring').getBoundingClientRect();
+      for (const m of document.querySelectorAll('[data-person]:not([data-person=controller]) .marker-ring')) {
+        const o = m.getBoundingClientRect();
+        if (o.width && c.left < o.right && c.right > o.left && c.top < o.bottom && c.bottom > o.top) return 'controller icon covers ' + m.closest('[data-person]').dataset.person;
+      }
+      return 'ok';
+    }''')
+    assert bubble_hit == 'ok', f'Controller bubble: {bubble_hit}'
     page.screenshot(path=str(shots/'theatre-05-relaying.png'), full_page=True)
     page.clock.fast_forward(2400)
     assert page.locator('[data-role=driver]').get_attribute('data-status') == 'received'
@@ -349,18 +370,23 @@ with sync_playwright() as p:
     rows_ok = page.evaluate('''() => {
       const rows = [...document.querySelectorAll('.report-row')];
       if (!rows.length) return 'no rows';
+      const lefts = new Set(), times = [], events = [];
       for (const row of rows) {
         const kids = [...row.children];
-        if (kids.length < 2) return 'row has ' + kids.length + ' child(ren), need >= 2';
-        if (!kids[0].matches('time.report-time')) return 'first child not time.report-time: ' + kids[0].tagName;
+        if (kids.length !== 3) return 'row has ' + kids.length + ' cells, need exactly 3: ' + row.textContent;
+        if (!kids[0].matches('time.report-time')) return 'first cell not time.report-time: ' + kids[0].tagName;
+        lefts.add(Math.round(kids[0].getBoundingClientRect().left));
+        lefts.add('e' + Math.round(kids[1].getBoundingClientRect().left));
+        times.push(kids[0].textContent); events.push(kids[1].textContent);
       }
+      if (lefts.size !== 2) return 'columns do not line up: ' + [...lefts].join(',');
+      for (let i = 1; i < times.length; i++) if (times[i] < times[i-1]) return 'times out of order at ' + events[i];
+      const decided = events.indexOf('Decision made');
+      for (const s of ['Driver reported','Depot reported','Station reported','Planning desk reported'])
+        if (!(events.indexOf(s) >= 0 && events.indexOf(s) < decided)) return s + ' missing or after the decision';
       return 'ok';
     }''')
     assert rows_ok == 'ok', f'Incident report row structure: {rows_ok}'
-    # Assert staff report rows appear before "Decision made"
-    incident_text = page.locator('#incident-report').inner_text()
-    for staff_label in ['Driver reported', 'Depot reported', 'Station reported', 'Planning desk reported']:
-        assert staff_label in incident_text, f'Missing "{staff_label}" in incident report'
     page.screenshot(path=str(shots/'theatre-07-all-received.png'), full_page=True)
     # Learn card appears after 1200ms timeout in briefing.mjs.
     page.clock.fast_forward(1500)

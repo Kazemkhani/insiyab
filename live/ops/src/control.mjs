@@ -29,7 +29,10 @@ export function mountControl(alert, replay, theatre, briefing) {
     escalation.textContent=state.unanswered?'Not acknowledged. Neither decision-maker answered. No decision was made.':`Not acknowledged. Insiyab will phone the duty controller in ${state.remaining} s${demo?' (simulated).':'.'}`;
     for (const [role,value] of rows) {
       const record=state.roles[role];
-      value.textContent=(record.status==='waiting'?'Waiting':record.status[0].toUpperCase()+record.status.slice(1))+(record.at===null?'':` · ${stamp(record.at,state)}`);
+      if(['predicted','suggested'].includes(state.phase)) delete value.dataset.reported; // a new run starts clean
+      // Before the decision is relayed, a role that has already reported to the briefing says so (set by theatre.mjs).
+      const waiting=record.status==='waiting'?(value.dataset.reported?'Reported':'Waiting'):null;
+      value.textContent=(waiting??record.status[0].toUpperCase()+record.status.slice(1))+(record.at===null?'':` · ${stamp(record.at,state)}`);
       value.className=record.status==='received'?'received':'';
       value.dataset.status=record.status;
     }

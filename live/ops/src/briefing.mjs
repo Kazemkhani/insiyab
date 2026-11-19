@@ -98,11 +98,12 @@ export function mountBriefing(alert) {
     for (const [role, roleRec] of Object.entries(state.roles)) {
       if (roleRec.at) rows.push([`${ROLE_LABEL[role] || role} received`, roleRec.at, '']);
     }
-    for (const [label, at, detail] of rows) {
-      if (!at) continue;
+    // One row per event, in the order things happened; every row has exactly three cells so columns never shift.
+    const timed = rows.filter(([, at]) => at).map((r, i) => [...r, i]).sort((a, b) => (a[1] - b[1]) || (a[3] - b[3]));
+    for (const [label, at, detail] of timed) {
       const row = element('div',undefined,'report-row');
-      row.append(element('time', stamp(at, startedAt), 'report-time'), element('span', label),
-        detail ? element('span',': ' + detail,'report-detail') : '');
+      row.append(element('time', stamp(at, startedAt), 'report-time'), element('span', label, 'report-event'),
+        element('span', detail || '', 'report-detail'));
       tl.append(row);
     }
     reportEl.append(tl);

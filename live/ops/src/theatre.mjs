@@ -130,6 +130,42 @@ export function mountTheatre(map, alert, onRoleTalked) {
   }
   function setState(role, state) { markers[role].el.dataset.state = state; }
   function bubble(role) { return markers[role].el.querySelector('.speech-bubble'); }
+  // The bubble's final box (260 x 64 px) is tried above, right, below and left of the controller;
+  // the first side that touches no other marker wins. Marker positions depend on the map, so no fixed side is safe.
+  // The control centre's position is illustrative, so if its icon lands on another person's marker
+  // it is nudged (screen offset only) to the nearest clear spot.
+  function clearControllerSpot() {
+    const m = markers.controller; m.mk.setOffset([0, 0]);
+    const others = Object.entries(markers).filter(([r, o]) => r !== 'controller' && o.added && o.el.isConnected)
+      .map(([, o]) => o.el.getBoundingClientRect());
+    const c = m.el.getBoundingClientRect();
+    const clear = (dx, dy) => !others.some(o => c.left + dx < o.right && c.right + dx > o.left && c.top + dy < o.bottom && c.bottom + dy > o.top);
+    for (const d of [70, 110, 150]) for (const [dx, dy] of [[d,0],[0,-d],[-d,0],[0,d],[d,-d],[-d,-d],[d,d],[-d,d]])
+      if (clear(dx, dy)) { m.mk.setOffset([dx, dy]); return; }
+  }
+  function placeControllerBubble() {
+    const host = markers.controller.el, b = bubble('controller');
+    if (!host || !b) return;
+    const c = host.getBoundingClientRect(), W = 260, H = 64;
+    const frame = (host.closest('.map-stage') || document.body).getBoundingClientRect();
+    const others = Object.entries(markers).filter(([r, m]) => r !== 'controller' && m.added && m.el.isConnected)
+      .map(([, m]) => m.el.getBoundingClientRect());
+    const overlap = (l, t) => others.reduce((sum, o) =>
+      sum + Math.max(0, Math.min(l + W, o.right) - Math.max(l, o.left)) * Math.max(0, Math.min(t + H, o.bottom) - Math.max(t, o.top)), 0);
+    const inside = (l, t) => l >= frame.left + 4 && l + W <= frame.right - 4 && t >= frame.top + 4 && t + H <= frame.bottom - 4;
+    let best = null;
+    for (const gap of [8, 56, 112]) for (const side of ['above', 'right', 'below', 'left']) {
+      const l = side === 'right' ? c.right + gap : side === 'left' ? c.left - gap - W : c.left + c.width/2 - W/2;
+      const t = side === 'above' ? c.top - gap - H : side === 'below' ? c.bottom + gap : c.top + c.height/2 - H/2;
+      if (!inside(l, t)) continue;
+      const cost = overlap(l, t);
+      if (!best || cost < best.cost) best = {side, gap, cost};
+      if (cost === 0) break;
+    }
+    const pick = best || {side: 'above', gap: 8};
+    host.dataset.bubbleSide = pick.side;
+    host.style.setProperty('--bubble-gap', pick.gap + 'px');
+  }
 
   function clearTimers() { theatreTimers.forEach(clearTimeout); theatreTimers = []; panDone = false; }
   function later(fn, ms) { theatreTimers.push(setTimeout(fn, ms)); }
@@ -167,6 +203,8 @@ export function mountTheatre(map, alert, onRoleTalked) {
       later(() => {
         if (markers[role].el.dataset.state === 'talking') {
           setState(role, 'reported');
+          const row = document.querySelector(`#calls span[data-role="${role}"][data-status="waiting"]`);
+          if (row) { row.dataset.reported = '1'; row.textContent = 'Reported'; }
           if (onRoleTalked) onRoleTalked(role);
           resolveMarkerLabelCollisions(markers);
         }
@@ -189,7 +227,9 @@ export function mountTheatre(map, alert, onRoleTalked) {
       clearTimers();
       if (!markers.controller.added) { markers.controller.mk.addTo(map); markers.controller.added = true; }
       setState('controller', 'decided');
+      clearControllerSpot();
       streamWords(bubble('controller'), DRILL_WORDS.controller, reduced);
+      placeControllerBubble();
     }
 
     // Relay sweep: lifecycle role statuses drive reported/calling → sent → received.
