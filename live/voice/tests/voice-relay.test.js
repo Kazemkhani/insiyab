@@ -191,6 +191,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok('call back carries the decision word for word', backVars && /send the standby bus to route 310/.test(backVars.decision_text), backVars && backVars.decision_text);
   ok('call back carries the manager\'s extra words', backVars && /Get the bus to route 310 junction stop/.test(backVars.decision_text), backVars && backVars.decision_text);
 
+  const dv = c => c.conversation_initiation_client_data.dynamic_variables.decision_text;
+  const byTo = n => backCalls.find(c => c.to_number === n);
+  ok('only the depot controller is told the chosen standby bus needs their approval', /needs your approval as Depot controller/.test(dv(byTo('+10000000003'))) && !/needs your approval/.test(dv(byTo('+10000000002'))) && !/needs your approval/.test(dv(byTo('+10000000004'))), dv(byTo('+10000000003')));
+
   // Acknowledge
   await tool('acknowledge', { role: 'driver' });
   await tool('acknowledge', { role: 'depot' });

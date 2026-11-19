@@ -43,6 +43,9 @@ SUITES=(
   tests/test_notebook.py
   tests/test_real_formats.py
   tests/test_forecast_v2.py
+  tests/test_season.py
+  tests/test_congestion.py
+  tests/test_events.py
   live/tests/run.sh
   live/ops/tests/run.sh
   web/tests/run.sh

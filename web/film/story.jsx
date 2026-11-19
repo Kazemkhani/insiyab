@@ -149,8 +149,7 @@ function Scene1() {
   const redBarW = lerp(f, 20, 130, 0, 340);
   const redBarAlpha = easeOut(f, 20, 35);
 
-  // Counter: 0 to 13 min
-  const counterMin = Math.round(lerp(f, 20, 130, 0, 13));
+  // 13 MIN label: static, shown only after bar animation finishes
 
   return (
     <AbsoluteFill style={{ background: C.paper }}>
@@ -176,13 +175,10 @@ function Scene1() {
           </div>
           <div style={{ fontFamily: 'Plex', fontSize: 40, color: C.g4 }}>Scheduled</div>
         </div>
-        <div style={{ marginTop: 12, fontFamily: 'Plex', fontSize: 36, color: C.over, letterSpacing: 2 }}>
-          ILLUSTRATION
-        </div>
       </div>
 
-      {/* Time axis */}
-      <div style={{ position: 'absolute', top: 480, left: 96, width: 1200, opacity: boardAlpha }}>
+      {/* Time axis — lowered to clear the board */}
+      <div style={{ position: 'absolute', top: 560, left: 96, width: 1200, opacity: boardAlpha }}>
         {/* Base axis line */}
         <div style={{ width: '100%', height: 3, background: C.ink, position: 'relative' }}>
           {/* 19:23 marker */}
@@ -199,13 +195,13 @@ function Scene1() {
         }} />
 
         {/* Counter */}
-        {counterMin > 0 && (
+        {f >= 130 && (
           <div style={{
-            position: 'absolute', top: 10, left: redBarW + 16,
+            position: 'absolute', top: 10, left: 420,
             fontFamily: 'PlexMono', fontSize: 56, color: C.over,
             fontWeight: 400,
           }}>
-            {counterMin} MIN
+            13 MIN LATE
           </div>
         )}
       </div>
@@ -259,14 +255,12 @@ function Scene2() {
             width: greyW, height: barH,
             border: `3px solid ${C.g3}`, background: C.g1,
           }} />
-          {greyW > 20 && (
+          {f >= 80 && (
             <div style={{
-              position: 'absolute', right: -100, top: 8,
-              fontFamily: 'PlexMono', fontSize: 48, color: C.g4,
-              transform: `translateX(${Math.min(greyW + 16, 800)}px)`,
-              left: 'auto',
+              position: 'absolute', top: 8, left: 67 * scale + 24,
+              fontFamily: 'PlexMono', fontSize: 48, color: C.g4, whiteSpace: 'nowrap',
             }}>
-              <span style={{ marginLeft: 16 }}>{Math.round(lerp(f, 10, 80, 0, 67))} min</span>
+              67 min
             </div>
           )}
         </div>
@@ -293,7 +287,7 @@ function Scene2() {
             <div style={{ width: 67 * scale, textAlign: 'center', fontFamily: 'PlexMono', fontSize: 36, color: C.ink }}>
               67 min
             </div>
-            <div style={{ width: redExtW, textAlign: 'center', fontFamily: 'PlexMono', fontSize: 36, color: C.over, fontWeight: 600 }}>
+            <div style={{ width: redExtW, textAlign: 'left', fontFamily: 'PlexMono', fontSize: 36, color: C.over, fontWeight: 600, whiteSpace: 'nowrap' }}>
               {f > 160 ? '+29 min' : ''}
             </div>
           </div>
@@ -392,7 +386,7 @@ function Scene3() {
         {/* Label: break label */}
         {f > 25 && (
           <div style={{
-            position: 'absolute', top: barH + 24, left: (67 + 29) * scale,
+            position: 'absolute', top: barH + 100, left: (67 + 29) * scale,
             fontFamily: 'PlexMono', fontSize: 40, color: C.g4,
           }}>
             Break: 16 min
@@ -465,7 +459,7 @@ function Scene4() {
           position: 'absolute', top: 560, left: 96,
           fontFamily: 'PlexMono', fontSize: 56, color: C.over,
         }}>
-          +{Math.round(lerp(f, 60, 110, 0, 29 * 5))} min of delay across 5 trips
+          +{Math.round(lerp(f, 60, 78, 0, 29 * 5))} min of delay across 5 trips
         </div>
       )}
 
@@ -512,7 +506,7 @@ function Scene5() {
           <div style={{ fontFamily: 'PlexMono', fontSize: 52, color: C.ink, marginTop: 12 }}>{F.board0800}</div>
           <div style={{ fontFamily: 'Plex', fontSize: 36, color: C.g4 }}>boardings</div>
           <div style={{ fontFamily: 'Overpass', fontWeight: 600, fontSize: 72, color: C.over, marginTop: 20 }}>
-            {Math.round(lerp(f, 70, 110, 0, 19))}%
+            {Math.round(lerp(f, 70, 88, 0, 19))}%
           </div>
           <div style={{ fontFamily: 'Plex', fontSize: 36, color: C.over }}>departures late</div>
           <div style={{ fontFamily: 'Overpass', fontWeight: 600, fontSize: 56, color: C.g4, marginTop: 16 }}>08:00</div>
@@ -530,7 +524,7 @@ function Scene5() {
           <div style={{ fontFamily: 'PlexMono', fontSize: 52, color: C.ink, marginTop: 12 }}>{F.board1800}</div>
           <div style={{ fontFamily: 'Plex', fontSize: 36, color: C.g4 }}>boardings</div>
           <div style={{ fontFamily: 'Overpass', fontWeight: 600, fontSize: 72, color: C.over, marginTop: 20 }}>
-            {Math.round(lerp(f, 80, 120, 0, 45))}%
+            {Math.round(lerp(f, 80, 98, 0, 45))}%
           </div>
           <div style={{ fontFamily: 'Plex', fontSize: 36, color: C.over }}>departures late</div>
           <div style={{ fontFamily: 'Overpass', fontWeight: 600, fontSize: 56, color: C.g4, marginTop: 16 }}>18:00</div>
@@ -689,10 +683,8 @@ function Scene8() {
   const caption = "It turns that into a list for the timetable planner: each route, each hour, and the minutes to add.";
 
   const rows = [
-    { route: '310', hour: '18:00', planned: 67, needed: 96, add: '+29' },
-    { route: '310', hour: '17:00', planned: 65, needed: 86, add: '+21' },
-    { route: 'C01', hour: '18:00', planned: 72, needed: 94, add: '+22' },
-    { route: '28',  hour: '18:00', planned: 58, needed: 76, add: '+18' },
+    // The one real row, exactly as the Dataiku worklist shows it (needed = 85th percentile).
+    { route: '310', hour: '18:00', planned: 67.3, needed: 104.4, add: '+37.2' },
   ];
 
   const headerAlpha = easeOut(f, 5, 20);
@@ -749,7 +741,7 @@ function Scene8() {
       {/* Footer: 244 bus hours */}
       {f > 120 && (
         <div style={{
-          position: 'absolute', bottom: 160, left: 96,
+          position: 'absolute', top: 700, left: 96,
           fontFamily: 'PlexMono', fontSize: 56, color: C.over,
         }}>
           {F.busHoursEve} bus hours, 16:00 to 18:59
@@ -793,7 +785,7 @@ function Scene9() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <div style={{ width: tmBarW, height: 56, background: C.g3 }} />
           <div style={{ fontFamily: 'PlexMono', fontSize: 56, color: C.g4 }}>
-            {(8.25 * lerp(f, 15, 70, 0, 1)).toFixed(2)} min
+            {f >= 70 ? '8.25 min' : ''}
           </div>
         </div>
       </div>
@@ -804,7 +796,7 @@ function Scene9() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <div style={{ width: modBarW, height: 56, background: C.flow }} />
           <div style={{ fontFamily: 'PlexMono', fontSize: 56, color: C.flow }}>
-            {(6.97 * lerp(f, 40, 100, 0, 1)).toFixed(2)} min
+            {f >= 100 ? '6.97 min' : ''}
           </div>
         </div>
       </div>
@@ -944,10 +936,10 @@ function Scene11() {
         </div>
       </div>
 
-      {/* Closing delay bar */}
-      <div style={{ position: 'absolute', top: 480, left: 96, width: 1200, opacity: boardAlpha }}>
+      {/* Closing delay bar — lowered to clear ILLUSTRATION label */}
+      <div style={{ position: 'absolute', top: 560, left: 96, width: 1200, opacity: boardAlpha }}>
         <div style={{ width: '100%', height: 3, background: C.ink, position: 'relative', marginTop: 40 }}>
-          <div style={{ position: 'absolute', left: 0, top: -40, fontFamily: 'PlexMono', fontSize: 36, color: C.flow }}>19:36</div>
+          <div style={{ position: 'absolute', left: 0, top: 10, fontFamily: 'PlexMono', fontSize: 36, color: C.flow }}>19:36</div>
         </div>
         <div style={{
           position: 'absolute', top: 10, left: 0,
@@ -1010,8 +1002,8 @@ const SCENES = [
   [Scene7, 930, 180],   // 31.0 s — forecast bar
   [Scene8, 1110, 180],  // 37.0 s — worklist
   [Scene9, 1290, 150],  // 43.0 s — error bars
-  [Scene10, 1440, 150], // 48.0 s — accept control
-  [Scene11, 1590, 150], // 53.0 s — updated board
+  [Scene10, 1440, 220], // 48.0 s — accept control, held to 55.33 s so it covers the cut at 55.25 s
+  [Scene11, 1660, 80],  // 55.33 s — updated board
   [Scene12, 1740, 60],  // 58.0 s — end card
 ];
 

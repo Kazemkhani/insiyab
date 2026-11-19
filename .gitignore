@@ -37,3 +37,7 @@ out/
 # a browser tool some reviewers use leaves this behind
 .playwright-mcp/
 .venv-dss/
+
+# Remotion build caches (hundreds of MB, regenerated on render)
+.cache/
+.remotion/

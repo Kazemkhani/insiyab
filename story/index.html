@@ -192,6 +192,17 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
 @media(max-width:760px){.cap{bottom:110px;max-height:calc(100svh - 210px)}.cap .num{font-size:clamp(36px,17cqi,64px)}.cap [data-fit-number]{font-size:13.6cqi}.cap .so{font-size:13px;line-height:1.4}.cap.hero{top:17%;bottom:auto}.cap.hero h1{font-size:64px}.cap.hero p{font-size:20px}.chapter-controls{left:12px;right:12px;bottom:24px;padding:6px;gap:6px}.chapter-controls button{padding:8px;font-size:13px}#chapter-current{font-size:12px;max-width:130px}.hint{display:none}.bars{height:auto;grid-template-columns:1fr 1fr}.bar{height:290px}.bar span{min-height:64px}.note{font-size:10px;left:12px;right:auto}#film .opening{font-size:18px}}
 .static-story#descent{height:auto}.static-story .sticky{position:static;height:auto;overflow:visible;padding:64px 16px}.static-story .cap{position:static;opacity:1!important;transform:none!important;margin:28px auto;max-height:none;width:min(650px,100%)}.static-story .cap.hero{background:var(--card);text-align:left}.static-story #cv,.static-story #lbls,.static-story .hint,.static-story .chapter-controls,.static-story .progress,.static-story .note{display:none}
 
+
+#options .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:48px}
+#options .card{background:var(--card);border:1px solid var(--line);padding:28px 24px;display:flex;flex-direction:column;gap:12px}
+#options .card .k{font-size:15px;font-weight:700;letter-spacing:.08em;color:var(--goldtext)}
+#options .card h3{font-size:22px;line-height:1.25;font-weight:700}
+#options .card .n{font-size:clamp(30px,3.4vw,44px);font-weight:700;letter-spacing:-.03em;line-height:1.05}
+#options .card .n.less{color:var(--sea)}#options .card .n.more{color:var(--red)}
+#options .card dl{display:grid;gap:10px;margin-top:8px;font-size:15px}
+#options .card dt{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#options .card dd{margin:0}
+#options .flow{margin-top:40px;font-size:18px;max-width:780px;font-weight:500}
 </style>
 </head>
 <body>
@@ -408,6 +419,20 @@ nav a{min-height:44px;display:inline-flex;align-items:center}.btn{min-height:44p
   <div class="actions"><a class="btn" href="onday/index.html">Explore the recorded-day drill</a><a class="btn" href="voice/index.html">Open the rehearsal dashboard</a></div>
   <p class="src">SIMULATED INCIDENT. These links place no call. Calls reach consenting team members only; no real bus operation changes.</p>
   <details><summary>Why this use of AI agents is relevant</summary><p>The UAE announced a framework in April 2026 to deploy agentic AI across 50% of government sectors and operations within two years. Our prototype explores one bounded workflow: collecting reports, preparing a briefing and tracking a human decision. It is not an RTA deployment or a claim to fulfil that government target.</p><a href="https://www.mediaoffice.ae/en/news/2026/april/23-04/mohammed-bin-rashid-chairs-uae-cabinet-meeting" target="_blank" rel="noopener">Dubai Media Office, 23 April 2026</a></details>
+</div></section>
+<section id="options"><div class="wrap">
+  <p class="ey">The decision, with its price</p><h2 class="big reveal">Three options.<br><span>Each one priced, each with a name on it.</span></h2>
+  <p class="lede reveal">Route 310 is 22 minutes late and the next bus is 20 minutes away. The call gives the duty manager three options. Each says what it does to passenger waiting, what it costs, and who must approve it.</p>
+  <div class="cards reveal">
+    <article class="card"><span class="k">OPTION A</span><h3>Send the standby bus</h3><div class="n less">63.6% less waiting</div>
+      <dl><div><dt>Who it helps</dt><dd>About 213 passengers wait 8 minutes instead of 22.</dd></div><div><dt>What it costs</dt><dd>One standby bus and driver, for one trip.</dd></div><div><dt>Who decides</dt><dd>Depot controller</dd></div></dl></article>
+    <article class="card"><span class="k">OPTION B</span><h3>Hold the next departure two minutes</h3><div class="n more">9.1% more waiting</div>
+      <dl><div><dt>Who it helps</dt><dd>Passengers further along, if two buses would have bunched. Not priced: the data holds no stop-by-stop gaps.</dd></div><div><dt>What it costs</dt><dd>The 213 passengers on the next bus wait 2 minutes longer.</dd></div><div><dt>Who decides</dt><dd>Station supervisor</dd></div></dl></article>
+    <article class="card"><span class="k">OPTION C</span><h3>Take no action</h3><div class="n">The baseline</div>
+      <dl><div><dt>Who it helps</dt><dd>Nobody now. 4,686 passenger-minutes of waiting.</dd></div><div><dt>What it costs</dt><dd>No waiting is added or removed.</dd></div><div><dt>Who decides</dt><dd>Duty manager</dd></div></dl></article>
+  </div>
+  <p class="flow reveal"><b>How it speeds the decision.</b> One call gives the manager all three options with their figures. The person who must approve the chosen option is called next, told it is theirs to carry out, and confirms. Every step is logged.</p>
+  <p class="src">SIMULATED DRILL. Passengers affected = 640 boardings this hour x 20 / 60 = 213. Waiting = passengers x extra minutes each, compared with doing nothing. Assumes every affected passenger arrived for the planned time, and that a standby bus is 8 minutes away: invented for the drill, not confirmed by any staff report. We have not measured how many minutes this saves a real control centre. The tool advises; a named person decides. Nothing is sent to RTA.</p>
 </div></section>
 
 <section id="forecast" class="alt">

@@ -26,6 +26,7 @@ run_test "Full relay end to end"               "tests/voice-relay.test.js"
 run_test "No-answer handling"                  "tests/voice-noanswer.test.js"
 run_test "State sanitisation and folder scan"  "tests/voice-state.test.js"
 
+run_test "Options priced, approver named" "tests/voice-options.test.js"
 run_test "Five-person relay and call ceiling" "tests/voice-five.test.js"
 run_test "Emergency stops routine relay" "tests/voice-five.test.js" --emergency
 run_test "Agent end-call configuration" "tests/voice-setup.test.js"

@@ -35,6 +35,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const os = require('os');
+const { priceOptions, optionsText } = require('./options');
 
 /* ---------- configuration ---------- */
 
@@ -363,7 +364,7 @@ Options available:
 ${STYLE}
 
 What to do:
-- Your opening asked permission to brief them. If they agree, summarise the reports in at most 45 words, clearly naming missing reports. Explain the available options in plain words without reading option keys. Ask which option they choose. Do not choose for them.
+- Your opening asked permission to brief them. If they agree, summarise the reports in at most 45 words, clearly naming missing reports. Explain each option in plain words without reading option keys: what it does, how its waiting figure compares with doing nothing, and who must approve it. Say once that the figures are a simulation. Ask which option they choose. Do not choose for them.
 - Say "unconfirmed" for guesses or assumptions; do not treat a number of guessed spares as available vehicles. Describe roles, not a repeated roll-call of names.
 - Accept a clear option name, its number, or "the first/second/third option" as a choice. Record it immediately; do not ask a second confirmation of an unambiguous choice. If unclear, ask one short clarification. Do not infer consent from unrelated words or silence.
 - Call insiyab_decision with the option key (send_spare, hold, or none) and any additional words the manager said.
@@ -476,7 +477,7 @@ async function sampleManager() {
     throw new Error('The public callback address does not match this relay. No call placed.');
   await loadAgents();
   if (!AGENTS.manager) throw new Error('Manager agent is not configured.');
-  const incident = JSON.parse(fs.readFileSync(path.join(__dirname, 'incident-example.json'), 'utf8'));
+  const incident = priceOptions(JSON.parse(fs.readFileSync(path.join(__dirname, 'incident-example.json'), 'utf8')));
   resetState(incident);
   state.mode = 'manager_sample';
   state.phase = 'manager';
@@ -485,7 +486,7 @@ async function sampleManager() {
     const calls = await placeAll(manager, () => ({...incidentVars(incident),
       staff_reports: 'No staff reports have been collected for this single-person sample. Spare availability is unconfirmed.',
       team_roster: numbers().map(p => p.role + ': ' + p.name).join('; '),
-      options_text: incident.options.map((o,i) => `${i+1}. ${o.say} (key: ${o.key})`).join('; ')
+      options_text: optionsText(incident.options)
     }), AGENTS.manager, 'manager sample');
     const call = calls[0];
     addTimeline({event: call.ok ? 'call_placed' : 'call_failed', role:'manager'});
@@ -504,6 +505,7 @@ async function sampleManager() {
 let relayRunning = false;
 
 async function startRelay(incident, requestId) {
+  incident = priceOptions(incident);   // prices each option against doing nothing; names its approver (simulated)
   // A lost HTTP response may be retried, but must never dial a second team.
   if (requestId && startedRequests.has(requestId)) return {...startedRequests.get(requestId), duplicate:true};
   if (relayRunning) return {skipped:'A relay is already running or its calls are still ending.'};
@@ -533,6 +535,13 @@ async function startRelay(incident, requestId) {
     relayRunning = false;
   });
   return result;
+}
+
+// The person who must approve the chosen option is told it is theirs to carry out; the others are only informed.
+function approverNote(incident, key, role) {
+  const o = (incident.options || []).find(x => x.key === key);
+  if (!o || !o.approver_role || o.approver_role !== role || key === 'none') return '';
+  return `. This one needs your approval as ${o.approver}: ${o.what_it_costs.replace(/\.$/, '')}. Please confirm you will carry it out`;
 }
 
 async function runLiveRelay(incident) {
@@ -595,7 +604,7 @@ async function runLiveRelay(incident) {
   }
   if (!staff_reports) staff_reports = 'No staff reports received.';
 
-  const options_text = (incident.options || []).map((o, i) => (i + 1) + '. ' + o.say + ' (key: ' + o.key + ')').join('; ');
+  const options_text = optionsText(incident.options);
 
   // Step 2: call the manager
   state.phase = 'manager';
@@ -632,7 +641,7 @@ async function runLiveRelay(incident) {
     p => ({
       ...incVars,
       staff_role: p.role,
-      decision_text: decisionText,
+      decision_text: decisionText.replace(/\.+$/, '') + approverNote(incident, state.decision.option_key, p.role),
       their_report: (state.reports[p.role] && state.reports[p.role].report) ? state.reports[p.role].report : 'no update from you yet',
     }),
     p => AGENTS.back,
@@ -677,6 +686,7 @@ function incidentVars(incident) {
 /* ---------- rehearsal mode ---------- */
 
 function runRehearsal(incident) {
+  incident = priceOptions(incident);
   console.log('\nREHEARSAL - RTA Future Move Hackathon. Guards not all met. No calls will be made.');
   const reasons = [
     !guardLive()    && 'process not started with --live',

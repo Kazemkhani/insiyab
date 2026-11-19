@@ -10,6 +10,16 @@
 @media(max-width:900px){#staff-row{grid-template-columns:repeat(2,1fr)}.fields{grid-template-columns:1fr}.action-panel{grid-template-columns:1fr}.action-panel button{width:100%}header{align-items:start}#acks{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){body{padding:16px}header{margin:24px 0}header h1{font-size:32px}.action-panel{padding:20px}.phases{gap:12px}.phases li{font-size:14px}#staff-row{grid-template-columns:1fr}.staff-card{min-height:130px}.settings-actions button{width:100%}#decision{padding:20px}.decision-text{font-size:24px}#drill-banner{font-size:14px}}
 @media(prefers-reduced-motion:no-preference){.staff-card,#decision{transition:background .25s,border-color .25s}}
+/* priced options (each option against doing nothing) */
+#options-list .opt { display: grid; grid-template-columns: 2.5rem 1fr auto; gap: 0.25rem 1rem; padding: 1rem 0; border-top: 2px solid var(--ink); }
+#options-list .opt .k { font-size: 1.6rem; font-weight: 800; grid-row: 1 / span 2; }
+#options-list .opt .nm { font-size: 1.05rem; font-weight: 700; }
+#options-list .opt .fig { font-size: 1.5rem; font-weight: 800; text-align: right; }
+#options-list .opt .fig.less { color: var(--flow); } #options-list .opt .fig.more { color: var(--over); }
+#options-list .opt dl { grid-column: 2 / span 2; display: grid; grid-template-columns: 9rem 1fr; gap: 0.2rem 1rem; margin: 0.4rem 0 0; font-size: 0.9rem; }
+#options-list .opt dt { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; padding-top: 0.15rem; }
+#options-list .opt dd { margin: 0; }
+#options-list .sim { color: var(--sim); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 0.5rem; }
 </style>
 </head>
 <body>
@@ -136,9 +146,16 @@
       if (inc.options && inc.options.length) {
         const el = document.getElementById('options-list');
         if (el) {
-          el.innerHTML = inc.options.map(function (o) {
-            return '<span>' + escHtml(o.say) + '</span>';
-          }).join('');
+          el.innerHTML = inc.options.map(function (o, i) {
+            if (!o.impact) return '<span>' + escHtml(o.key) + ': ' + escHtml(o.say) + '</span>';
+            var cls = o.impact.change_pct < 0 ? 'less' : (o.impact.change_pct > 0 ? 'more' : '');
+            return '<div class="opt"><div class="k">' + 'ABC'.charAt(i) + '</div><div class="nm">' + escHtml(o.say) + '</div>' +
+              '<div class="fig ' + cls + '">' + escHtml(o.impact.headline) + '</div><dl>' +
+              '<dt>Who it helps</dt><dd>' + escHtml(o.who_it_helps) + '</dd>' +
+              '<dt>What it costs</dt><dd>' + escHtml(o.what_it_costs) + '</dd>' +
+              '<dt>Who decides</dt><dd>' + escHtml(o.approver) + '. Insiyab advises; it does not instruct anyone.</dd>' +
+              '<dt>How worked out</dt><dd>' + escHtml(o.how_worked_out) + '</dd></dl></div>';
+          }).join('') + '<div class="sim">Simulated drill. Nothing is sent to RTA.</div>';
         }
       }
     }

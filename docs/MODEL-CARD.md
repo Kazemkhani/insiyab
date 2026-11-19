@@ -419,6 +419,22 @@ On the strict split the boosted trees were closer than the timetable on 87 in 10
 
 `forecast/judge_pick.json` holds, for every route and every hour from 16:00 to 20:00 of the untouched part, the average lateness forecast, the naive forecast (the bus stays as late as it is now) and what happened, with the count. Of 36 route-hours the model's average miss was lower in 35 and not lower in 1; 0 with fewer than 5 forecasts are left out. The misses stay in the file.
 
+## Seasonal normalisation and standby placement
+
+Demand on Dubai's bus network varies by month. The seasonal index for a route and month is its passenger total for that month divided by its mean across valid months, averaged over 2024 and 2025. A year-month is excluded when the network total is below 60 per cent of that year's median: this removes partial months (February, March and August of 2023 each cover about 40 per cent of a normal month; March and November are absent from 2024; September is absent from 2025). A route needs at least 8 valid months to have its own index; otherwise the network index is used and the result says so.
+
+|  | December index (2024-2025) |
+|---|---|
+| Network | 1.054 |
+| Route 310 | 1.066 |
+| Route C01 | 1.056 |
+
+The normalised load factor for a route-hour group is its peak load divided by seats offered (seats only; standing capacity is not verified), then divided by the route's December index. Both values are kept side by side: `load_factor_raw` is the measured ratio, `load_factor_normalised` is after removing the seasonal effect.
+
+Standby placement ranks route-hour groups by normalised load factor (at least 5 trips) and returns a proposed list for the planner, made days ahead from historic data. It changes nothing by itself; a planner decides.
+
+What this does not claim: there is no split between tourist and commuter demand; the index is monthly, not hourly; seat counts only.
+
 ## Why these models
 
 One day of data, a table of mixed features, and a planner who must be able to trust the answer. Boosted trees with a loss made for counts took the M5 forecasting competition and lead published work on bus boardings; a plain model is kept beside them for each target to show how much of the answer is simple; a deep network would have nothing to learn its extra freedom from. The comparison and its sources are in `docs/research/research-methods.md`. What the comparison came to on this day:
