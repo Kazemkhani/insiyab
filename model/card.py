@@ -1,5 +1,4 @@
-"""Writes docs/MODEL-CARD.md from a bundle. Most numbers are read from metrics.json and meta.json. The seasonal
-normalisation section is computed from the opendata monthly passengers CSV via model.season.
+"""Writes docs/MODEL-CARD.md from a bundle. Every number in the card is read from metrics.json and meta.json: none is typed.
 
   python3 -m model.card --bundle fixtures --out docs/MODEL-CARD.md
   python3 -m model.card --bundle fixtures --check docs/MODEL-CARD.md      say whether the card on disk equals a fresh one"""
@@ -185,35 +184,6 @@ def card(bundle):
     if pick:
         w("## Pick any route and hour\n")
         w(f"`forecast/judge_pick.json` holds, for every route and every hour from 16:00 to 20:00 of the untouched part, the average lateness forecast, the naive forecast ({pick['naive_label'].lower()}) and what happened, with the count. Of {_n(pick['route_hours'])} route-hours the model's average miss was lower in {_n(pick['route_hours_where_the_forecast_was_closer'])} and not lower in {_n(pick['route_hours_where_the_naive_was_closer_or_equal'])}; {_n(pick['route_hours_left_out_as_too_few'])} with fewer than {pick['least_forecasts']} forecasts are left out. The misses stay in the file.\n")
-    w("## Seasonal normalisation and standby placement\n")
-    from .season import seasonal_index, network_index
-    SEASON_ROUTES = [("310", "Route 310"), ("C01", "Route C01")]
-    SEASON_YEARS = (2024, 2025)
-    SEASON_MONTH = 12
-    ni = network_index(SEASON_MONTH, years=SEASON_YEARS)
-    route_rows = []
-    for route_id, label in SEASON_ROUTES:
-        si = seasonal_index(route_id, SEASON_MONTH, years=SEASON_YEARS)
-        fallback = " (network index used)" if si["fallback"] else ""
-        route_rows.append([label, f"{si['index']:.3f}{fallback}"])
-    w("Demand on Dubai's bus network varies by month. The seasonal index for a route and month is its "
-      "passenger total for that month divided by its mean across valid months, averaged over "
-      + " and ".join(str(y) for y in SEASON_YEARS) + ". "
-      "A year-month is excluded when the network total is below 60 per cent of that year's median: "
-      "this removes partial months (February, March and August of 2023 each cover about 40 per cent "
-      "of a normal month; March and November are absent from 2024; September is absent from 2025). "
-      f"A route needs at least 8 valid months to have its own index; otherwise the network index "
-      "is used and the result says so.\n")
-    w(_table(["", "December index (2024-2025)"], [["Network", f"{ni['index']:.3f}"]] + route_rows) + "\n")
-    w("The normalised load factor for a route-hour group is its peak load divided by seats offered "
-      "(seats only; standing capacity is not verified), then divided by the route's December index. "
-      "Both values are kept side by side: `load_factor_raw` is the measured ratio, "
-      "`load_factor_normalised` is after removing the seasonal effect.\n")
-    w("Standby placement ranks route-hour groups by normalised load factor (at least 5 trips) and "
-      "returns a proposed list for the planner, made days ahead from historic data. It changes nothing "
-      "by itself; a planner decides.\n")
-    w("What this does not claim: there is no split between tourist and commuter demand; the index is "
-      "monthly, not hourly; seat counts only.\n")
     w("## Why these models\n")
     w("One day of data, a table of mixed features, and a planner who must be able to trust the answer. Boosted trees with a loss made for counts took the M5 forecasting competition and lead published work on bus boardings; a plain model is kept beside them for each target to show how much of the answer is simple; a deep network would have nothing to learn its extra freedom from. The comparison and its sources are in `docs/research/research-methods.md`. What the comparison came to on this day:\n")
     for line in _why(targets, trip):
