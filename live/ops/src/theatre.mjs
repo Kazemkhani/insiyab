@@ -1,6 +1,8 @@
-/** Call theatre: five people on the map with calling, talking and relay states.
- *  Demo mode only. Zero network calls. Labelled "Simulated · drill words, 18 Nov 2026".
- *  Returns onState(lifecycleState) for control.mjs to call on every lifecycle change. */
+/** Call theatre: five people on the map with calling, talking, reported, sent and received states.
+ *  Staff call BEFORE the decision (unacknowledged phase); controller speaks at decided;
+ *  relay sweep drives sent→received. Demo mode only. Zero network calls.
+ *  onRoleTalked(role) is called after each staff member finishes talking — used by
+ *  briefing.mjs to add their report row to ONE BRIEFING before the decision. */
 import maplibregl from 'maplibre-gl';
 
 export const DRILL_WORDS = {
@@ -38,7 +40,7 @@ function makeMarkerEl(role) {
   // Ring contains the icon (flex-centered; no position:absolute needed)
   const ring = makeEl('div','marker-ring'); ring.setAttribute('aria-hidden','true');
   const img = document.createElement('img');
-  img.src = `icons/${ICON[role]}.svg`; img.alt = ''; img.width = 22; img.height = 22;
+  img.src = `icons/${ICON[role]}.svg`; img.alt = ''; img.width = 44; img.height = 44;
   ring.append(img);
   // Label: flex column so name and note are separate flex children (no text overlap)
   const lbl = makeEl('div','marker-label');
@@ -55,17 +57,18 @@ function makeMarkerEl(role) {
 }
 
 function streamWords(bubble, text, reduced) {
-  if (reduced.matches) { bubble.textContent = text; return Promise.resolve(); }
-  return new Promise(resolve => {
-    const words = text.split(' '); let i = 0;
-    const id = setInterval(() => {
-      bubble.textContent = words.slice(0, ++i).join(' ');
-      if (i >= words.length) { clearInterval(id); resolve(); }
-    }, 180);
-  });
+  // Visual word-by-word stream. State transitions (reported, onRoleTalked) are
+  // driven by a separate later() call in startStaffCalls at the same scheduler
+  // depth as the talking timer — this lets them fire within one Playwright
+  // fake-clock fast_forward regardless of how many word timeouts are queued.
+  if (reduced.matches) { bubble.textContent = text; return; }
+  const words = text.split(' ');
+  for (let i = 0; i < words.length; i++) {
+    setTimeout(() => { bubble.textContent = words.slice(0, i + 1).join(' '); }, (i + 1) * 180);
+  }
 }
 
-export function mountTheatre(map, alert) {
+export function mountTheatre(map, alert, onRoleTalked) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const markers = {};
   let lastPhase = null, lastRoles = {}, theatreTimers = [], panDone = false;
@@ -97,46 +100,61 @@ export function mountTheatre(map, alert) {
       easing: t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t});
   }
 
-  function startCallingSequence(roles) {
+  // Show four staff in calling state, then stagger their talking.
+  // Called at 'unacknowledged' so reports fly into ONE BRIEFING BEFORE the decision.
+  //
+  // Two later() calls per role, both scheduled here (same depth as the lifecycle tick
+  // that calls us). This means both fire within a single Playwright fake-clock
+  // fast_forward — word timeouts inside streamWords can't cascade through the fake
+  // clock, so the state transition must NOT live inside the streamWords callback.
+  function startStaffCalls() {
     panToIncident();
-    for (const role of ['driver','depot','station','planning','controller']) show(role);
-    // Controller shows decided state if already decided (will be set by onState)
-    // The four calling roles animate talking in a staggered sequence; guard against lifecycle
-    // advancing the role to 'sent' before the timer fires.
+    for (const role of ['driver','depot','station','planning']) show(role);
     for (const role of ['driver','depot','station','planning']) {
       const delay = TALK_DELAY_MS[role];
+      // Talking: show voice-wave and start visual word stream.
       later(() => {
-        const cur = markers[role].el.dataset.state;
-        if (cur === 'calling') {
+        if (markers[role].el.dataset.state === 'calling') {
           setState(role, 'talking');
           streamWords(bubble(role), DRILL_WORDS[role], reduced);
         }
       }, delay + 200);
+      // Reported: fires after the last word would have finished streaming.
+      // Scheduled at the same depth as the talking timer so it fires within
+      // one fast_forward call in tests (depth-1 within-range timer).
+      const wordMs = DRILL_WORDS[role].split(' ').length * 180;
+      later(() => {
+        if (markers[role].el.dataset.state === 'talking') {
+          setState(role, 'reported');
+          if (onRoleTalked) onRoleTalked(role);
+        }
+      }, delay + 200 + wordMs + 50);
     }
   }
 
   function onState(state) {
     const phase = state.phase;
 
-    // Controller decision: show their speech bubble
+    // unacknowledged: staff appear in calling state; staggered talking starts.
+    // All reports land in ONE BRIEFING BEFORE the duty controller is called.
+    if (phase === 'unacknowledged' && lastPhase !== 'unacknowledged') {
+      clearTimers();
+      startStaffCalls();
+    }
+
+    // decided: cancel any pending talking timers (quick-decide path), then show controller.
     if (phase === 'decided' && lastPhase !== 'decided') {
+      clearTimers();
       if (!markers.controller.added) { markers.controller.mk.addTo(map); markers.controller.added = true; }
-      setState('controller','decided');
+      setState('controller', 'decided');
       streamWords(bubble('controller'), DRILL_WORDS.controller, reduced);
     }
 
-    // Start calling all four roles
-    if (phase === 'relaying' && lastPhase !== 'relaying') {
-      clearTimers();
-      startCallingSequence(['driver','depot','station','planning']);
-    }
-
-    // Role transitions from calling → sent / received
+    // Relay sweep: lifecycle role statuses drive reported/calling → sent → received.
     for (const role of ['driver','depot','station','planning']) {
       const rec = state.roles[role];
       const prev = lastRoles[role]?.status;
       if (rec.status === 'sent' && prev !== 'sent' && prev !== 'received') {
-        // Delay sent state so it doesn't interrupt the talk animation
         later(() => {
           if (markers[role].el.dataset.state !== 'received') setState(role, 'sent');
         }, 200);
@@ -148,18 +166,6 @@ export function mountTheatre(map, alert) {
 
     lastPhase = phase;
     lastRoles = structuredClone(state.roles);
-
-    // Reset on new run
-    if (state.phase === 'predicted' && lastPhase === null) {
-      clearTimers();
-      for (const role of Object.keys(markers)) {
-        const m = markers[role];
-        if (m.added) { m.mk.remove(); m.added = false; }
-        m.el.dataset.state = 'hidden';
-        bubble(role).textContent = '';
-      }
-      lastPhase = null; lastRoles = {};
-    }
   }
 
   function reset() {

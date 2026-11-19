@@ -10,10 +10,12 @@ const OPTION_LABEL = {send_spare:'Send the standby bus', hold:'Hold the next dep
   monitor:'Monitor and request an update'};
 let LABELLED_COUNT = 128; // simulated running counter
 
-function stamp(at) {
-  // Map demo relative time to 18:xx
-  if (!at) return '--:--';
-  return new Date(at).toLocaleTimeString('en-GB',{timeZone:'UTC',hour:'2-digit',minute:'2-digit'});
+// stamp converts a fake-clock absolute timestamp to the demo's simulated 18:xx:ss display.
+// The formula mirrors control.mjs: 67980 seconds since midnight = 18:53:00 at demo start.
+function stamp(at, startedAt) {
+  if (!at || !startedAt) return '--:--';
+  const demoSec = 67980 + (at - startedAt) / 1000;
+  return new Date(demoSec * 1000).toISOString().slice(11, 19);
 }
 
 export function mountBriefing(alert) {
@@ -88,7 +90,7 @@ export function mountBriefing(alert) {
     for (const [label, at, detail] of rows) {
       if (!at) continue;
       const row = element('div',undefined,'report-row');
-      row.append(element('time', stamp(at), 'report-time'), element('span', label),
+      row.append(element('time', stamp(at, startedAt), 'report-time'), element('span', label),
         detail ? element('span',' — ' + detail,'report-detail') : '');
       tl.append(row);
     }
@@ -124,18 +126,23 @@ export function mountBriefing(alert) {
 
   let lastPhase = null;
 
+  // addRoleReport is called by theatre.mjs when a staff member finishes talking
+  // (pre-decision, during 'unacknowledged' phase). Reports fly into ONE BRIEFING.
+  function addRoleReport(role) { addReport(role); }
+
   function onState(state) {
     const p = state.phase;
     if (!startedAt) startedAt = state.started_at;
     if (p !== lastPhase) phaseAt[p] = state.phase_at;
 
-    // Add reports as roles become 'sent' (they've reported back in the theatre narrative)
+    // Fallback: add reports via lifecycle status for the quick-decide path where
+    // staff did not get time to talk (e.g. user clicked immediately).
     for (const role of ROLES) {
       if (state.roles[role].status === 'sent' || state.roles[role].status === 'received') {
         addReport(role);
       }
     }
-    // Once all reports in and decision made, add options
+    // Once all reports in and decision made, add the options summary.
     if (arrivedRoles.size === ROLES.length && state.decision) addBriefingOptions(state);
 
     // Build incident report and learn card when demo completes
@@ -148,5 +155,5 @@ export function mountBriefing(alert) {
     lastPhase = p;
   }
 
-  return {onState, reset: resetPanels};
+  return {onState, reset: resetPanels, addRoleReport};
 }

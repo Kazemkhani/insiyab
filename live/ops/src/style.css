@@ -25,17 +25,18 @@ footer{border-top:1px solid var(--insiyab-ink-25);padding:14px 28px}.timeline{di
 .theatre-marker{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;width:140px;pointer-events:none;transform:translateX(-50%)}
 .theatre-marker[data-state=hidden]{display:none}
 
-/* Ring: a circle that changes appearance per state */
-.marker-ring{width:40px;height:40px;border-radius:50%;border:2.5px solid var(--insiyab-ink-25);transition:border-color .25s var(--insiyab-ease),box-shadow .25s var(--insiyab-ease);position:relative;display:flex;align-items:center;justify-content:center}
+/* Ring: a circle that changes appearance per state; 56px to hold the 44px stage icon */
+.marker-ring{width:56px;height:56px;border-radius:50%;border:2.5px solid var(--insiyab-ink-25);transition:border-color .25s var(--insiyab-ease),box-shadow .25s var(--insiyab-ease);position:relative;display:flex;align-items:center;justify-content:center}
 .theatre-marker[data-state=calling] .marker-ring{border-color:var(--insiyab-red);animation:theatre-call-pulse 1.1s ease-in-out infinite}
 .theatre-marker[data-state=talking] .marker-ring{border-color:var(--insiyab-ink);border-width:2.5px}
+.theatre-marker[data-state=reported] .marker-ring{border-color:var(--insiyab-ink-25)}
 .theatre-marker[data-state=decided] .marker-ring{border-color:var(--insiyab-ink);animation:theatre-call-pulse 1.1s ease-in-out 2}
 .theatre-marker[data-state=sent] .marker-ring{border-color:var(--insiyab-ink-50)}
 .theatre-marker[data-state=received] .marker-ring{border-color:var(--insiyab-teal)}
 @keyframes theatre-call-pulse{0%,100%{box-shadow:0 0 0 0 rgba(196,43,43,.5)}50%{box-shadow:0 0 0 7px rgba(196,43,43,0)}}
 
-/* Ring contains the icon (flex-centered; no position:absolute) */
-.marker-ring img{width:22px;height:22px;display:block}
+/* Icon is 44px for stage visibility */
+.marker-ring img{width:44px;height:44px;display:block}
 
 /* Label: flex column so name and note are separate rows — prevents text overlap */
 .marker-label{display:flex;flex-direction:column;align-items:center;background:var(--insiyab-ivory);padding:2px 5px;border-radius:2px;gap:1px}
@@ -54,14 +55,17 @@ footer{border-top:1px solid var(--insiyab-ink-25);padding:14px 28px}.timeline{di
 .voice-wave span:nth-child(5){animation-delay:.08s;height:7px}
 @keyframes wave-bar{from{height:3px}to{height:100%}}
 
-/* Speech bubble: shown while talking; min-font 20px per spec */
-.speech-bubble{font-size:20px;line-height:1.3;background:var(--insiyab-ivory);border:1.5px solid var(--insiyab-ink-25);padding:5px 7px;border-radius:3px;max-width:220px;text-align:left;word-break:break-word}
-.theatre-marker[data-state=hidden] .speech-bubble,.theatre-marker[data-state=calling] .speech-bubble,.theatre-marker[data-state=sent] .speech-bubble,.theatre-marker[data-state=received] .speech-bubble{display:none}
+/* Speech bubble: absolute-positioned to the side of the marker for collision avoidance.
+ * Default: to the right; depot and controller (NE area) go left to avoid map edge. */
+.speech-bubble{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);width:320px;max-width:320px;font-size:20px;line-height:1.3;background:var(--insiyab-ivory);border:1.5px solid var(--insiyab-ink-25);padding:5px 7px;border-radius:3px;text-align:left;word-break:break-word;z-index:10}
+.theatre-marker[data-person=controller] .speech-bubble,.theatre-marker[data-person=depot] .speech-bubble{left:auto;right:calc(100% + 10px)}
+.theatre-marker[data-state=hidden] .speech-bubble,.theatre-marker[data-state=calling] .speech-bubble,.theatre-marker[data-state=reported] .speech-bubble,.theatre-marker[data-state=sent] .speech-bubble,.theatre-marker[data-state=received] .speech-bubble{display:none}
 /* Source note only visible alongside speech bubble */
 .theatre-marker .source-note{display:none}
 .theatre-marker[data-state=talking] .source-note,.theatre-marker[data-state=decided] .source-note{display:block}
-/* After talking: hide label text to avoid map text overlap in sent/received states */
-.theatre-marker[data-state=decided] .marker-label,.theatre-marker[data-state=sent] .marker-label,.theatre-marker[data-state=received] .marker-label{display:none}
+/* Hide labels in calling state (ring-only during attention phase) and after the decision,
+ * preventing text overlap when two markers are geographically close on the map. */
+.theatre-marker[data-state=calling] .marker-label,.theatre-marker[data-state=decided] .marker-label,.theatre-marker[data-state=sent] .marker-label,.theatre-marker[data-state=received] .marker-label{display:none}
 
 /* Briefing panel */
 #briefing h2{color:var(--insiyab-ink);letter-spacing:.12em;font-size:14px;margin-bottom:8px}

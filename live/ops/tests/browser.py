@@ -189,7 +189,10 @@ with sync_playwright() as p:
     assert not page.locator('#fixture-banner').is_visible()
     print('PASS fixture=false removes the alerts banner; reduced-motion pulse is disabled')
     page.close()
-    # Theatre: marker states, briefing panels, PDF export, zero voice requests.
+    # Theatre: new sequence — staff call BEFORE the decision.
+    # predicted → suggested → unacknowledged → calling staff (red rings) →
+    # talking + reports into ONE BRIEFING → decided → relaying → Sent → Received →
+    # incident report → learn card.
     page = browser.new_page(viewport={'width':1440,'height':900})
     th_requests = []
     page.route('**/*', lambda route: (th_requests.append(route.request.url), route.abort()) if '/voice/' in route.request.url else route.continue_())
@@ -207,32 +210,54 @@ with sync_playwright() as p:
     page.locator('#demo').click()
     page.clock.fast_forward(2000)
     assert page.locator('#calls').get_attribute('data-phase') == 'unacknowledged'
-    # Briefing hidden; no markers visible (relaying not started).
+    # Staff should already be in calling state (red rings) at unacknowledged, not at relaying.
+    calling_count = page.evaluate('''() => [...document.querySelectorAll('[data-person]')]
+        .filter(e => e.dataset.state === 'calling').length''')
+    assert calling_count == 4, f'Expected 4 calling markers at unacknowledged, got {calling_count}'
+    # Red border on calling rings — borderTopColor (shorthand is empty in Chromium).
+    red_ok = page.evaluate('''() => {
+      const els = [...document.querySelectorAll('.theatre-marker[data-state=calling] .marker-ring')];
+      return els.length === 4 && els.every(e => getComputedStyle(e).borderTopColor.includes('196, 43, 43'));
+    }''')
+    assert red_ok, 'Four calling markers with red ring border expected at unacknowledged'
     assert page.locator('#briefing').is_hidden()
     assert page.locator('#incident-report').is_hidden()
-    page.screenshot(path=str(shots/'theatre-02-unacknowledged.png'), full_page=True)
+    page.screenshot(path=str(shots/'theatre-02-calling.png'), full_page=True)
+    # Advance enough for all 4 staff to finish talking; longest is depot (~8.4 s from demo start).
+    # At demo+12000 ms the lifecycle escalates to calling_duty — still pre-decision.
+    page.clock.fast_forward(10000)
+    # KEY ASSERTION: all four 'talking' states occurred BEFORE 'decided'.
+    # Proof: each marker is now in 'reported' (calling → talking → reported). They talked
+    # before the user has clicked confirm, so the decision has not been made yet.
+    # theatre.mjs schedules 'reported' via a separate later() at the same depth as the
+    # 'talking' later() — both are depth-1 within-range timers that fire within one
+    # fast_forward, without relying on streamWords word-timeout cascading.
+    reported_count = page.evaluate('''() => [...document.querySelectorAll('[data-person]')]
+        .filter(e => e.dataset.state === 'reported').length''')
+    assert reported_count == 4, (
+        f'All four staff must reach "reported" state (talking complete) before the decision; '
+        f'got {reported_count}')
+    # Briefing must have all 4 rows — reports flew in pre-decision.
+    assert page.locator('#briefing').is_visible()
+    pre_rows = page.locator('.briefing-row').count()
+    assert pre_rows == 4, f'Expected 4 briefing rows pre-decision, got {pre_rows}'
+    page.screenshot(path=str(shots/'theatre-03-briefing.png'), full_page=True)
+    # User decides via the two-click on-screen path (available throughout all pre-decided phases).
     page.locator('[data-option=send_spare]').click()
     page.get_by_role('button', name='Confirm decision:', exact=False).click()
     assert page.locator('#calls').get_attribute('data-phase') == 'decided'
-    # Controller marker appears in 'decided' state immediately.
+    # Controller marker appears in 'decided' state.
     page.clock.fast_forward(100)
     assert page.locator('[data-person=controller]').get_attribute('data-state') == 'decided'
-    page.screenshot(path=str(shots/'theatre-03-decided.png'), full_page=True)
-    # Advance through relaying → role-sent window.
+    page.screenshot(path=str(shots/'theatre-04-decided.png'), full_page=True)
+    # Advance through relaying → driver sent.
     page.clock.fast_forward(1600)
     assert page.locator('[data-role=driver]').get_attribute('data-status') == 'sent'
-    # At least calling/talking markers appeared (markers are non-hidden).
+    # Non-hidden markers still present (staff transitioning from reported → sent/received).
     present = page.evaluate('''() => [...document.querySelectorAll('[data-person]')]
         .filter(e => e.dataset.state !== 'hidden').length''')
-    assert present > 0, f'Expected at least one theatre marker visible after relaying, got {present}'
-    # Red border check: any marker currently in calling state must have red ring border.
-    # Use borderTopColor — borderColor shorthand returns empty string in Chromium.
-    red_ok = page.evaluate('''() => {
-      const els = [...document.querySelectorAll('.theatre-marker[data-state=calling] .marker-ring')];
-      return els.every(e => getComputedStyle(e).borderTopColor.includes('196, 43, 43'));
-    }''')
-    assert red_ok, 'calling marker ring border should be red'
-    page.screenshot(path=str(shots/'theatre-04-relaying.png'), full_page=True)
+    assert present > 0, f'Expected markers visible during relay, got {present}'
+    page.screenshot(path=str(shots/'theatre-05-relaying.png'), full_page=True)
     page.clock.fast_forward(2400)
     assert page.locator('[data-role=driver]').get_attribute('data-status') == 'received'
     # Teal border on received markers (borderTopColor — shorthand is empty in Chromium).
@@ -241,12 +266,12 @@ with sync_playwright() as p:
       return els.length === 0 || els.every(e => getComputedStyle(e).borderTopColor.includes('46, 125, 107'));
     }''')
     assert teal_ok, 'received marker ring border should be teal'
-    page.screenshot(path=str(shots/'theatre-05-driver-received.png'), full_page=True)
+    page.screenshot(path=str(shots/'theatre-06-driver-received.png'), full_page=True)
     page.clock.fast_forward(7800)
     assert page.locator('#calls').get_attribute('data-phase') == 'received'
-    # Flush the 150ms theatre timers that fire near the end of the window.
+    # Flush the 150ms theatre timers that fire near the end of the relay window.
     page.clock.fast_forward(300)
-    # All four markers in received state; briefing rows present.
+    # All four markers in received state; briefing rows still 4 (pre-decision reports).
     received_markers = page.evaluate('''() => [...document.querySelectorAll('.theatre-marker[data-state=received]')].length''')
     assert received_markers == 4, f'Expected 4 received markers, got {received_markers}'
     assert page.locator('#briefing').is_visible()
@@ -254,11 +279,11 @@ with sync_playwright() as p:
     assert briefing_rows == 4, f'Expected 4 briefing rows, got {briefing_rows}'
     assert page.locator('#incident-report').is_visible()
     assert page.locator('.print-btn').count() == 1
-    page.screenshot(path=str(shots/'theatre-06-all-received.png'), full_page=True)
+    page.screenshot(path=str(shots/'theatre-07-all-received.png'), full_page=True)
     # Learn card appears after 1200ms timeout in briefing.mjs.
     page.clock.fast_forward(1500)
     assert page.locator('#learn').is_visible()
-    page.screenshot(path=str(shots/'theatre-07-learn-card.png'), full_page=True)
+    page.screenshot(path=str(shots/'theatre-08-learn-card.png'), full_page=True)
     # PDF export: page.pdf() should produce a non-trivial PDF.
     pdf_bytes = page.pdf(format='A4', print_background=False)
     assert len(pdf_bytes) > 2000, f'PDF unexpectedly small: {len(pdf_bytes)} bytes'
@@ -269,9 +294,8 @@ with sync_playwright() as p:
         .filter(e => e.dataset.state !== 'hidden').length''')
     assert visible_after_reset == 0, f'{visible_after_reset} marker(s) still visible after demo reset'
     assert page.locator('#briefing').is_hidden()
-    page.screenshot(path=str(shots/'theatre-08-reset.png'), full_page=True)
     assert not th_requests, th_requests
-    print('PASS theatre markers, calling/received ring colours, briefing panels, learn card, PDF export, reset, zero voice requests')
+    print('PASS theatre: staff call before decision (4 reported pre-decided), red calling rings at unacknowledged, teal received rings, 4 pre-decision briefing rows, incident report, learn card, PDF, reset, zero voice requests')
     page.close()
     # Rehearse the actual 90-second stage sequence, without an accelerated clock.
     if os.environ.get('OPS_REALTIME')=='1':

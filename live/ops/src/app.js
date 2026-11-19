@@ -13,8 +13,8 @@ async function start() {
   const alert = renderAlerts(window.INSIYAB_OPS_DATA.alerts, window.INSIYAB_OPS_DATA.bundle);
   replay.setAlerts(window.INSIYAB_OPS_DATA.alerts.alerts);
   if (alert) {
-    const theatre = mountTheatre(replay.map, alert);
     const briefing = mountBriefing(alert);
+    const theatre = mountTheatre(replay.map, alert, (role) => briefing.addRoleReport(role));
     mountControl(alert, replay, theatre, briefing);
   }
   mountJudge(window.INSIYAB_OPS_DATA.judge);
